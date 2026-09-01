@@ -1,0 +1,35 @@
+{
+  "deploy": {
+    "include": [
+      "server.ts",
+      "index.html",
+      "manifest.json",
+      "sw.js",
+      "icon-192x192.png",
+      "icon-512x512.png",
+      "logo.png"
+    ],
+    "org": "bishoymamdouh",
+    "entrypoint": "server.ts",
+    "project": "a4b5ac79-ac53-4b88-8ef1-c4a2acae9fa9",
+    "exclude": [
+      ".env",
+      "database.sqlite"
+    ],
+    "app": "labor-system-live"
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

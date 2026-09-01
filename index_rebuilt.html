@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>نظام إدارة العمالة</title>
+    
+    <!-- PWA Settings -->
+    <link rel="manifest" href="/manifest.json?v=2">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="apple-touch-icon" href="/logo.png?v=2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Labor Sys">
+
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+:root {
+    --primary-color: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary-color: #334155;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --bg-main: #0f172a;
+    --bg-card: #1e293b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --border-color: #334155;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Tajawal', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+/* Typography */
+h1, h2, h3, h4 {
+    color: var(--text-main);
+    margin-bottom: 10px;
+}
+
+/* Utilities */
+.hidden { display: none !important; }
+.mt-20 { margin-top: 20px; }
+.mb-10 { margin-bottom: 10px; }
+.text-center { text-align: center; }
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: var(--text-main);
+}
+
+.btn-secondary:hover {
+    background-color: #dfe1e6;
+}
+
+.btn-success {
+    background-color: var(--success);
+    color: white;
+}
+
+.btn-danger {
+    background-color: var(--danger);
+    color: white;
+}
+
+.btn-block {
+    width: 100%;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+.btn-icon:hover {
+    color: var(--danger);
+}
+
+/* Layout */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: var(--bg-card);
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-sm);
+    z-index: 10;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.sidebar-header h2 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 20px 0;
+}
+
+.nav-links li {
+    padding: 0 15px;
+    margin-bottom: 5px;
+}
+
+.nav-links a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.nav-links a:hover, .nav-links a.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.user-info i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.user-info small {
+    color: var(--text-muted);
+    background: var(--secondary-color);
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-top: 5px;
+}
+
+.btn-logout {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 700;
+    transition: var(--transition);
+}
+
+.btn-logout:hover {
+    background: var(--danger);
+    color: white;
+}
+
+.main-content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    background-color: var(--bg-main);
+}
+
+/* Views */
+.view {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+/* Cards */
+.card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 25px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+/* Login View */
+#view-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-card {
+    background: var(--bg-card);
+    padding: 40px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.login-header p {
+    color: var(--text-muted);
+    margin-bottom: 30px;
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: var(--transition);
+    background-color: #fafbfc;
+}
+
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1);
+    background-color: white;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-row .half {
+    flex: 1;
+}
+
+.inline-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.inline-form .form-group {
+    margin-bottom: 0;
+    flex: 1;
+    min-width: 200px;
+}
+
+.btn-group-align {
+    display: flex;
+    gap: 10px;
+}
+
+/* Tables */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+    padding: 15px;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.data-table th {
+    background-color: var(--secondary-color);
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Status Badges */
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.badge-pending {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    border: 1px solid rgba(245, 158, 11, 0.7);
+}
+
+.badge-approved {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    border: 1px solid rgba(16, 185, 129, 0.7);
+}
+
+.badge-rejected {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: white;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+    border: 1px solid rgba(239, 68, 68, 0.7);
+}
+
+.badge-glow {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    letter-spacing: 0.5px;
+    font-size: 0.95rem;
+}
+
+.badge-glow-supervisor {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+    border: 1px solid rgba(59, 130, 246, 0.7);
+}
+
+.badge-glow-engineer {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+    border: 1px solid rgba(16, 185, 129, 0.7);
+}
+
+/* Record Summary */
+.record-summary {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--secondary-color);
+    border-radius: var(--radius-md);
+}
+
+.summary-item strong {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+}
+
+/* Reports Summary Cards */
+.reports-summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.summary-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+.summary-card i {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    opacity: 0.8;
+}
+
+.summary-card .info {
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-card .label {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.summary-card .value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.summary-card.highlight {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border: none;
+}
+
+.summary-card.highlight i, .summary-card.highlight .label, .summary-card.highlight .value {
+    color: white;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(9, 30, 66, 0.54);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    animation: fadeIn 0.3s;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Print / Screen Utilities */
+@media screen {
+    .print-only-text { display: none !important; }
+}
+
+/* Print Styles */
+@media print {
+    @page {
+        size: landscape;
+        margin: 1cm;
+    }
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff;
+    }
+    tfoot {
+        display: table-row-group;
+    }
+    
+    /* Hide everything except the print-area path */
+    .sidebar, 
+    .main-content > header, 
+    .view:not(#view-reports), 
+    #view-reports > .view-header, 
+    #view-reports > .filter-card {
+        display: none !important;
+    }
+
+    #print-area {
+        position: static !important;
+        width: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+    }
+    
+    .table-responsive {
+        overflow: visible !important;
+    }
+    
+    .data-table {
+        display: table !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        page-break-inside: auto;
+        border-collapse: collapse !important;
+        table-layout: auto !important;
+    }
+    
+    .data-table th, .data-table td {
+        font-size: 11px !important;
+        padding: 4px !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        border: 1px solid #ddd !important;
+    }
+    
+    .data-table tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+    
+    .data-table thead {
+        display: table-header-group !important;
+    }
+    
+    .data-table tfoot {
+        display: table-footer-group !important;
+    }
+    
+    .column-filter, .report-col-filter, .screen-only {
+        display: none !important;
+    }
+    
+    .print-only-text {
+        display: inline !important;
+    }
+    
+    .filter-icon {
+        display: none !important;
+    }
+}
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+    }
+    .sidebar-header {
+        padding: 10px;
+    }
+    .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 10px 0;
+    }
+    .nav-links li {
+        margin: 5px;
+        padding: 0;
+    }
+    .nav-links a {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+    .sidebar-footer {
+        padding: 10px;
+    }
+    .main-content {
+        padding: 15px;
+    }
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .form-row .half, .form-row .third {
+        width: 100%;
+    }
+    .table-container, .table-responsive, [style*="overflow-x:auto"], [style*="overflow-x: auto"] {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 15px;
+    }
+    table {
+        min-width: 600px;
+    }
+    .card {
+        padding: 15px;
+    }
+    .view-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .view-header .btn {
+        width: 100%;
+    }
+    .login-card {
+        padding: 20px;
+    }
+}
+</style>
+    <script>
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            const errStr = `Error: ${msg}\nURL: ${url}\nLine: ${lineNo}:${columnNo}\nStack: ${error ? error.stack : ''}`;
+            alert(errStr);
+            fetch('/api/logs', { method: 'POST', body: JSON.stringify({ error: errStr }) });
+            return false;
+        };
+        
+        function customSort(a, b, isUser = false) {
+            let nameA = (isUser ? a.username : a.name) || "";
+            let nameB = (isUser ? b.username : b.name) || "";
+
+            if (isUser && nameA === 'admin') return -1;
+            if (isUser && nameB === 'admin') return 1;
+
+            const isArabicA = /[\u0600-\u06FF]/.test(nameA);
+            const isArabicB = /[\u0600-\u06FF]/.test(nameB);
+
+            if (isArabicA && !isArabicB) return 1;
+            if (!isArabicA && isArabicB) return -1;
+
+            return nameA.localeCompare(nameB, 'ar');
+        }
+
+        window.onunhandledrejection = function(event) {
+            const errStr = `Unhandled Promise: ${event.reason}`;
+            console.error(errStr);
+            fetch('/api/logs', { method: 'POST', body: JSON.stringify({ error: errStr }) }).catch(() => {});
+        };
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation (Hidden on Login) -->
+        <nav id="sidebar" class="sidebar hidden">
+            <div class="sidebar-header" style="text-align: center; padding: 20px 0;">
+                <img src="/logo.png?v=2" alt="Company Logo" style="max-width: 80%; height: auto; margin-bottom: 10px;">
+                <h2 style="font-size: 1.2rem; margin:0;"><i class="fas fa-hard-hat"></i> نظام السراكي</h2>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <!-- Dynamically populated based on role -->
+            </ul>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div id="profile-pic-container" style="position: relative; cursor: pointer; display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; margin-bottom: 5px;" title="تغيير الصورة الشخصية">
+                        <img id="current-profile-pic" src="" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: none; background: var(--secondary-color);">
+                        <i id="default-profile-icon" class="fas fa-user-circle" style="font-size: 60px; color: var(--primary-color); margin-bottom: 0;"></i>
+                        <input type="file" id="profile-pic-input" accept="image/*" style="display: none;">
+                    </div>
+                    <span id="current-username">اسم المستخدم</span>
+                    <small id="current-role">الدور</small>
+                </div>
+                <button id="logout-btn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Login View -->
+            <section id="view-login" class="view active">
+                <div class="login-card">
+                    <div class="login-header">
+                        <img src="/logo.png?v=2" alt="Company Logo" style="max-width: 180px; margin-bottom: 15px;">
+                        <h1>تسجيل الدخول</h1>
+                        <p>نظام إدارة العمالة اليومية</p>
+                    </div>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="username">اسم المستخدم</label>
+                            <input type="text" id="username" required placeholder="أدخل اسم المستخدم">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">كلمة المرور</label>
+                            <input type="password" id="password" required placeholder="أدخل كلمة المرور">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block mb-10"><i class="fas fa-sign-in-alt"></i> دخول</button>
+                    </form>
+                    <form id="invite-form" class="hidden">
+                        <div class="form-group text-center">
+                            <h3 style="color: var(--primary-color); margin-bottom: 10px;">أهلاً بك!</h3>
+                            <p id="invite-username-display" style="font-weight: bold; margin-bottom: 20px; font-size: 1.2rem;"></p>
+                            <p style="margin-bottom: 15px; color: var(--text-muted);">يرجى إنشاء كلمة مرور جديدة وخاصة بك لحماية حسابك.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="invite-password">كلمة المرور الجديدة</label>
+                            <input type="text" id="invite-password" required placeholder="اكتب كلمة مرور قوية">
+                        </div>
+                        <input type="hidden" id="invite-user-id">
+                        <button type="submit" class="btn btn-success btn-block mb-10"><i class="fas fa-save"></i> حفظ ودخول</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Admin View: Manage Users -->
+            <section id="view-admin" class="view hidden">
+                <header class="view-header">
+                    <h2><i class="fas fa-users-cog"></i> لوحة الإدارة</h2>
+                </header>
+                
+                <h3 class="mb-10"><i class="fas fa-user-shield"></i> إدارة المستخدمين</h3>
+                <div class="card">
+                    <form id="add-user-form" class="inline-form">
+                        <div class="form-group">
+                            <input type="text" id="new-username" required placeholder="اسم المستخدم">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" id="new-password" required placeholder="كلمة المرور">
+                        </div>
+                        <div class="form-group">
+                            <select id="new-role" required>
+                                <option value="" disabled selected>اختر الصلاحية</option>
+                                <option value="supervisor">مشرف</option>
+                                <option value="surveyor">مساح</option>
+                                <option value="warehouse_manager">مدير مخزن</option>
+                                <option value="operator_supervisor">مشرف مشغل</option>
+                                <option value="engineer">مهندس</option>
+                                <option value="admin">مدير</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> إضافة مستخدم</button>
+                    </form>
+                </div>
+
+                <details class="card mt-20" style="padding: 10px; cursor: pointer;">
+                    <summary style="font-weight: bold; margin-bottom: 10px;"><i class="fas fa-chevron-down"></i> عرض جدول المستخدمين</summary>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>اسم المستخدم</th>
+                                    <th>الباسورد</th>
+                                    <th>الصلاحية</th>
+                                    <th>إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                <!-- Users list populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </details>
+
+                <h3 class="mt-20 mb-10"><i class="fas fa-address-book"></i> إدارة قاعدة العمال</h3>
+                <div class="card">
+                    <form id="add-dir-worker-form" class="inline-form">
+                        <div class="form-group">
+                            <input type="text" id="dir-worker-name" required placeholder="اسم العامل">
+                        </div>
+                        <div class="form-group">
+                            <select id="dir-worker-type" required>
+                                <option value="عامل">عامل</option>
+                                <option value="نحات">نحات</option>
+                                <option value="صنايعى">صنايعى</option>
+                                <option value="مشرف عمال">مشرف عمال</option>
+                                <option value="بوفيه">بوفيه</option>
+                                <option value="اخرى">اخرى</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="number" id="dir-worker-amount" required min="0" placeholder="اليومية الافتراضية">
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> إضافة لقاعدة العمال</button>
+                    </form>
+                </div>
+                
+                <details class="card mt-20" style="padding: 10px; cursor: pointer;">
+                    <summary style="font-weight: bold; margin-bottom: 10px;"><i class="fas fa-chevron-down"></i> عرض جدول العمالة</summary>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>اسم العامل</th>
+                                    <th>النوع</th>
+                                    <th>اليومية</th>
+                                    <th>إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dir-workers-table-body">
+                                <!-- Directory workers list populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </details>
+
+                <h3 class="mt-20 mb-10"><i class="fas fa-bell"></i> إرسال إشعار للمستخدمين</h3>
+                <div class="card">
+                    <form id="broadcast-form" class="inline-form" style="align-items: flex-start;">
+                        <div class="form-group" style="flex: 1;">
+                            <input type="text" id="broadcast-title" placeholder="عنوان الإشعار (اختياري)">
+                        </div>
+                        <div class="form-group" style="flex: 2;">
+                            <input type="text" id="broadcast-message" required placeholder="نص الإشعار...">
+                        </div>
+                        <div class="form-group" style="flex: 1; min-width: 250px;">
+                            <div class="custom-multiselect" id="broadcast-multiselect" style="position: relative; width: 100%;">
+                                <div class="multiselect-header" style="border: 1px solid var(--border-color); padding: 10px 15px; border-radius: 5px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center; min-height: 44px; transition: border-color 0.2s;">
+                                    <span id="multiselect-title" style="color: #333; font-weight: bold; font-size: 14px;">جميع المستخدمين</span>
+                                    <i class="fas fa-chevron-down" style="color: #666; transition: transform 0.3s;" id="multiselect-icon"></i>
+                                </div>
+                                <div class="multiselect-dropdown" style="display: none; position: absolute; top: calc(100% + 5px); left: 0; right: 0; background: white; border: 1px solid var(--border-color); border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000;">
+                                    <label style="display: flex; align-items: center; padding: 12px 15px; border-bottom: 2px solid #eee; cursor: pointer; margin: 0; background: #f8f9fa; position: sticky; top: 0; z-index: 2;">
+                                        <input type="checkbox" id="broadcast-target-all" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color);"> 
+                                        <strong style="color: var(--primary-color); margin-right: 10px; font-size: 15px;">جميع المستخدمين</strong>
+                                    </label>
+                                    <div id="broadcast-user-list" style="padding: 0;">
+                                        <!-- Users populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="broadcast-submit-btn"><i class="fas fa-paper-plane"></i> إرسال</button>
+                    </form>
+                </div>
+
+                <details class="card mt-20" style="padding: 10px; cursor: pointer;">
+                    <summary style="font-weight: bold; margin-bottom: 10px;"><i class="fas fa-database"></i> استعادة بيانات النظام</summary>
+                    <div style="padding: 10px;">
+                        <p style="margin-bottom: 15px; color: #555;">يتم أخذ نسخة احتياطية من النظام تلقائياً عند تصدير تقرير الإكسيل. يمكنك استعادة النظام بالكامل من هنا عن طريق اختيار ملف النسخة الاحتياطية (.json).</p>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="file" id="import-file-input" accept=".json" style="display: none;">
+                            <button type="button" class="btn btn-secondary" onclick="document.getElementById('import-file-input').click()"><i class="fas fa-file-import"></i> استعادة النظام (.json)</button>
+                        </div>
+                    </div>
+                </details>
+
+            </section>
+
+            <!-- Supervisor View: Create Daily Record -->
+            <section id="view-supervisor" class="view hidden">
+                <header class="view-header">
+                    <h2><i class="fas fa-file-signature"></i> تسجيل سركي يومية</h2>
+                    <div class="header-actions">
+                        <span class="date-badge" id="current-date-badge"></span>
+                    </div>
+                </header>
+                <div class="card">
+                    <form id="record-form">
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label for="record-date">التاريخ</label>
+                                <input type="date" id="record-date" required readonly style="pointer-events: none; background-color: var(--bg-card); color: var(--text-main); font-weight: bold;">
+                            </div>
+                            <div class="form-group half">
+                                <label for="record-engineer">المهندس المسؤول (للاعتماد)</label>
+                                <select id="record-engineer" required>
+                                    <option value="" disabled selected>اختر المهندس</option>
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="workers-section">
+                            <h3><i class="fas fa-users"></i> العمالة</h3>
+                            
+                            <div class="table-responsive">
+                                <table class="data-table" id="workers-table">
+                                    <thead>
+                                        <tr>
+                                            <th>اسم العامل</th>
+                                            <th>النوع</th>
+                                            <th>اليومية (جنيه)</th>
+                                            <th>مكان العمل</th>
+                                            <th>ملاحظات</th>
+                                            <th>إجراء</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="workers-list">
+                                        <!-- Worker rows added dynamically -->
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="6">
+                                                <button type="button" id="add-worker-btn" class="btn btn-secondary btn-small"><i class="fas fa-plus"></i> إضافة عامل</button>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        

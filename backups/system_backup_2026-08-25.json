@@ -1,0 +1,4458 @@
+{
+  "users": [
+    {
+      "key": [
+        "users",
+        "038bb081-d96d-4671-849f-8272a9c6f2d9"
+      ],
+      "value": {
+        "username": "Michael",
+        "password": "123456123456",
+        "role": "warehouse_manager",
+        "id": "038bb081-d96d-4671-849f-8272a9c6f2d9",
+        "profilePic": "data:image/jpeg;base64,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"
+      }
+    },
+    {
+      "key": [
+        "users",
+        "1e740ec4-b91e-41e6-a4f2-93fbf49992a3"
+      ],
+      "value": {
+        "username": "Ayman",
+        "password": "2611",
+        "role": "supervisor",
+        "id": "1e740ec4-b91e-41e6-a4f2-93fbf49992a3"
+      }
+    },
+    {
+      "key": [
+        "users",
+        "1ff9986e-c31f-4cf2-8a4f-a4ed27039fc1"
+      ],
+      "value": {
+        "username": "Yassa Eshak",
+        "password": "onayfam611",
+        "role": "supervisor",
+        "id": "1ff9986e-c31f-4cf2-8a4f-a4ed27039fc1"
+      }
+    },
+    {
+      "key": [
+        "users",
+        "3151e59a-63b1-4c25-a61c-142da4ffc0c1"
+      ],
+      "value": {
+        "username": "Mina Girgis",
+        "password": "01145700316jesus",
+        "role": "engineer",
+        "id": "3151e59a-63b1-4c25-a61c-142da4ffc0c1"
+      }
+    },
+    {
+      "key": [
+        "users",
+        "43d20da3-4ccf-4d5c-9339-1e5d59b9e65c"
+      ],
+      "value": {
+        "username": "Fady Nashat",
+        "password": "01286045132",
+        "role": "engineer",
+        "id": "43d20da3-4ccf-4d5c-9339-1e5d59b9e65c",
+        "profilePic": "data:image/jpeg;base64,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"
+      }
+    },
+    {
+      "key": [
+        "users",
+        "59bc5c93-a278-4365-b0ee-bd4888d6f1e9"
+      ],
+      "value": {
+        "username": "Yasser",
+        "password": "2050",
+        "role": "supervisor",
+        "id": "59bc5c93-a278-4365-b0ee-bd4888d6f1e9"
+      }
+    },
+    {
+      "key": [
+        "users",
+        "5f48a88b-9459-44bf-8785-1c6af7a068bd"
+      ],
+      "value": {
+        "username": "Girgis",
+        "password": "Girgs 8670",
+        "role": "supervisor",
+        "id": "5f48a88b-9459-44bf-8785-1c6af7a068bd"
+      }
+    },
+    {
+      "key": [
+        "users",
+        "5fdce1cf-7ff0-4c28-80d0-1c6060f5b7df"
+      ],
+      "value": {
+        "username": "Youssef",
+        "password": "Youssef3126",
+        "role": "supervisor",
+        "id": "5fdce1cf-7ff0-4c28-80d0-1c6060f5b7df",
+        "profilePic": "data:image/jpeg;base64,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"
+      }
+    },
+    {
+      "key": [
+        "users",
+        "6657107d-9c9e-4a9b-a163-909470d7ddb4"
+      ],
+      "value": {
+        "username": "Samuel",
+        "password": "612612",
+        "role": "supervisor",
+        "id": "6657107d-9c9e-4a9b-a163-909470d7ddb4"
+      }
+    },
+    {
+      "key": [
+        "users",
+        "7248bcc9-bb53-4bab-a604-dd049d6e7486"
+      ],
+      "value": {
+        "username": "Andrew",
+        "password": "192.168.1.1",
+        "role": "surveyor",
+        "id": "7248bcc9-bb53-4bab-a604-dd049d6e7486"
+      }
+    },
+    {
+      "key": [
+        "users",
+        "8e983243-0ea0-4675-b697-5d0c70049561"
+      ],
+      "value": {
+        "username": "Anees",
+        "password": "aniscsd26",
+        "role": "engineer",
+        "id": "8e983243-0ea0-4675-b697-5d0c70049561"
+      }
+    },
+    {
+      "key": [
+        "users",
+        "admin_default_id"
+      ],
+      "value": {
+        "username": "Bishoy Mamdouh",
+        "password": "420911",
+        "role": "admin",
+        "id": "admin_default_id",
+        "profilePic": "data:image/jpeg;base64,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"
+      }
+    },
+    {
+      "key": [
+        "users",
+        "d5a95fda-518e-4fa7-8d79-04040f4eab7c"
+      ],
+      "value": {
+        "username": "Ramadan",
+        "password": "1981",
+        "role": "supervisor",
+        "id": "d5a95fda-518e-4fa7-8d79-04040f4eab7c"
+      }
+    },
+    {
+      "key": [
+        "users",
+        "dc1565bc-1454-4c7f-8308-e99892be7e6b"
+      ],
+      "value": {
+        "username": "Fady Sherif",
+        "password": "FadyRaafat14",
+        "role": "engineer",
+        "id": "dc1565bc-1454-4c7f-8308-e99892be7e6b"
+      }
+    },
+    {
+      "key": [
+        "users",
+        "e476e6b6-3e38-4e29-8152-720a64593daf"
+      ],
+      "value": {
+        "username": "ابو العلى",
+        "password": "123456",
+        "role": "operator_supervisor",
+        "id": "e476e6b6-3e38-4e29-8152-720a64593daf"
+      }
+    }
+  ],
+  "records": [
+    {
+      "key": [
+        "records",
+        "01122ded-9e88-4abf-9038-d7598a74ba0c"
+      ],
+      "value": {
+        "date": "2026-08-13",
+        "supervisorId": "admin_default_id",
+        "engineerId": "dc1565bc-1454-4c7f-8308-e99892be7e6b",
+        "status": "approved",
+        "totalWorkers": 7,
+        "totalAmount": 2800,
+        "createdAt": "2026-08-19T08:05:35.147Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "046f587c-34a0-416d-b28f-81b387a4720c"
+      ],
+      "value": {
+        "date": "2026-08-17",
+        "supervisorId": "59bc5c93-a278-4365-b0ee-bd4888d6f1e9",
+        "engineerId": "43d20da3-4ccf-4d5c-9339-1e5d59b9e65c",
+        "status": "approved",
+        "totalWorkers": 2,
+        "totalAmount": 800,
+        "createdAt": "2026-08-17T06:33:38.255Z",
+        "id": "046f587c-34a0-416d-b28f-81b387a4720c"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "0bb4f15f-fa01-40b4-8da6-9def279a83e3"
+      ],
+      "value": {
+        "date": "2026-08-13",
+        "supervisorId": "admin_default_id",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 3,
+        "totalAmount": 1500,
+        "createdAt": "2026-08-19T08:00:46.770Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "13d19558-e4ef-4cdf-a551-19479e94bc7c"
+      ],
+      "value": {
+        "date": "2026-08-19",
+        "supervisorId": "5fdce1cf-7ff0-4c28-80d0-1c6060f5b7df",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 2,
+        "totalAmount": 800,
+        "createdAt": "2026-08-19T06:32:24.371Z",
+        "id": "13d19558-e4ef-4cdf-a551-19479e94bc7c"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "14d00ead-cb45-460b-a2bb-8700f0f6cf5a"
+      ],
+      "value": {
+        "date": "2026-08-17",
+        "supervisorId": "6657107d-9c9e-4a9b-a163-909470d7ddb4",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 3,
+        "totalAmount": 1500,
+        "createdAt": "2026-08-17T07:29:35.975Z",
+        "id": "14d00ead-cb45-460b-a2bb-8700f0f6cf5a"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "16d959e2-c447-468e-954a-f81f7ce77612"
+      ],
+      "value": {
+        "date": "2026-08-17",
+        "supervisorId": "d5a95fda-518e-4fa7-8d79-04040f4eab7c",
+        "engineerId": "3151e59a-63b1-4c25-a61c-142da4ffc0c1",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 350,
+        "createdAt": "2026-08-17T06:53:24.584Z",
+        "id": "16d959e2-c447-468e-954a-f81f7ce77612"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "189992be-280e-4150-a46f-427fa436300b"
+      ],
+      "value": {
+        "date": "2026-08-18",
+        "supervisorId": "5fdce1cf-7ff0-4c28-80d0-1c6060f5b7df",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 2,
+        "totalAmount": 800,
+        "createdAt": "2026-08-18T06:29:33.388Z",
+        "id": "189992be-280e-4150-a46f-427fa436300b"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "2779ccd6-6cf2-4cef-8e05-04a79d4e8f97"
+      ],
+      "value": {
+        "date": "2026-08-20",
+        "supervisorId": "7248bcc9-bb53-4bab-a604-dd049d6e7486",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 2,
+        "totalAmount": 700,
+        "createdAt": "2026-08-20T06:49:15.610Z",
+        "id": "2779ccd6-6cf2-4cef-8e05-04a79d4e8f97"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "2a1a75cf-30e9-4f56-a02d-2c701ec5cf69"
+      ],
+      "value": {
+        "date": "2026-08-16",
+        "supervisorId": "1e740ec4-b91e-41e6-a4f2-93fbf49992a3",
+        "engineerId": "dc1565bc-1454-4c7f-8308-e99892be7e6b",
+        "status": "approved",
+        "totalWorkers": 7,
+        "totalAmount": 2800,
+        "createdAt": "2026-08-16T07:52:13.067Z",
+        "id": "2a1a75cf-30e9-4f56-a02d-2c701ec5cf69"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "2a49969e-2525-4d27-8b6d-713eec24e1cd"
+      ],
+      "value": {
+        "date": "2026-08-13",
+        "supervisorId": "admin_default_id",
+        "engineerId": "3151e59a-63b1-4c25-a61c-142da4ffc0c1",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 350,
+        "createdAt": "2026-08-19T08:03:23.796Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "2ab75945-75b4-4966-b548-fb7891a3f2d4"
+      ],
+      "value": {
+        "date": "2026-08-24",
+        "supervisorId": "d5a95fda-518e-4fa7-8d79-04040f4eab7c",
+        "engineerId": "3151e59a-63b1-4c25-a61c-142da4ffc0c1",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 400,
+        "createdAt": "2026-08-24T06:27:30.178Z",
+        "id": "2ab75945-75b4-4966-b548-fb7891a3f2d4"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "2b0183e4-8f14-4e48-9e04-0bb15f1e6670"
+      ],
+      "value": {
+        "date": "2026-08-25",
+        "supervisorId": "7248bcc9-bb53-4bab-a604-dd049d6e7486",
+        "engineerId": "8e983243-0ea0-4675-b697-5d0c70049561",
+        "status": "pending",
+        "totalWorkers": 2,
+        "totalAmount": 700,
+        "createdAt": "2026-08-25T07:12:27.269Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "2b818ae3-24c1-4159-afa5-da3328f4d0d5"
+      ],
+      "value": {
+        "date": "2026-08-13",
+        "supervisorId": "admin_default_id",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 2,
+        "totalAmount": 700,
+        "createdAt": "2026-08-19T08:06:32.020Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "2e236db0-ed64-4323-967a-19d7a3b97b07"
+      ],
+      "value": {
+        "date": "2026-08-24",
+        "supervisorId": "038bb081-d96d-4671-849f-8272a9c6f2d9",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 350,
+        "createdAt": "2026-08-24T07:59:42.525Z",
+        "id": "2e236db0-ed64-4323-967a-19d7a3b97b07"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "35640488-5acd-4a9f-82b8-7b2ecab629b7"
+      ],
+      "value": {
+        "date": "2026-08-17",
+        "supervisorId": "038bb081-d96d-4671-849f-8272a9c6f2d9",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 2,
+        "totalAmount": 700,
+        "createdAt": "2026-08-17T08:02:51.531Z",
+        "id": "35640488-5acd-4a9f-82b8-7b2ecab629b7"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "36b8636d-2402-4f85-9111-b8776840a0f7"
+      ],
+      "value": {
+        "date": "2026-08-15",
+        "supervisorId": "admin_default_id",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 17,
+        "totalAmount": 6900,
+        "createdAt": "2026-08-19T08:34:05.536Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "3a733f49-c9b1-4887-a4b9-24b211b0fda2"
+      ],
+      "value": {
+        "date": "2026-08-13",
+        "supervisorId": "admin_default_id",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 400,
+        "createdAt": "2026-08-19T08:53:57.205Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "3ab1e622-f4ae-4ada-b197-94587fb3b298"
+      ],
+      "value": {
+        "date": "2026-08-19",
+        "supervisorId": "6657107d-9c9e-4a9b-a163-909470d7ddb4",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 3,
+        "totalAmount": 1500,
+        "createdAt": "2026-08-19T07:34:50.783Z",
+        "id": "3ab1e622-f4ae-4ada-b197-94587fb3b298"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "3c94c316-1e1b-47bd-9beb-276db46cf9e0"
+      ],
+      "value": {
+        "date": "2026-08-23",
+        "supervisorId": "7248bcc9-bb53-4bab-a604-dd049d6e7486",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 350,
+        "createdAt": "2026-08-23T08:33:57.144Z",
+        "id": "3c94c316-1e1b-47bd-9beb-276db46cf9e0"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "3dee57f8-b6df-4a12-b604-d5a1711ce1f9"
+      ],
+      "value": {
+        "date": "2026-08-16",
+        "supervisorId": "d5a95fda-518e-4fa7-8d79-04040f4eab7c",
+        "engineerId": "3151e59a-63b1-4c25-a61c-142da4ffc0c1",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 350,
+        "createdAt": "2026-08-16T08:01:01.441Z",
+        "id": "3dee57f8-b6df-4a12-b604-d5a1711ce1f9"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "42a6513e-4910-4649-a01f-74b48e92d24b"
+      ],
+      "value": {
+        "date": "2026-08-22",
+        "supervisorId": "038bb081-d96d-4671-849f-8272a9c6f2d9",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 350,
+        "createdAt": "2026-08-22T08:53:02.879Z",
+        "id": "42a6513e-4910-4649-a01f-74b48e92d24b"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "45e2bb2f-164d-4f42-b48e-420f9c6162b5"
+      ],
+      "value": {
+        "date": "2026-08-20",
+        "supervisorId": "1ff9986e-c31f-4cf2-8a4f-a4ed27039fc1",
+        "engineerId": "dc1565bc-1454-4c7f-8308-e99892be7e6b",
+        "status": "approved",
+        "totalWorkers": 5,
+        "totalAmount": 2000,
+        "createdAt": "2026-08-20T06:48:24.608Z",
+        "id": "45e2bb2f-164d-4f42-b48e-420f9c6162b5"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "51344424-c2b7-4560-ab39-1f787b923c1d"
+      ],
+      "value": {
+        "date": "2026-08-16",
+        "supervisorId": "5fdce1cf-7ff0-4c28-80d0-1c6060f5b7df",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 400,
+        "createdAt": "2026-08-16T07:06:57.985Z",
+        "id": "51344424-c2b7-4560-ab39-1f787b923c1d"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "5439c088-d2aa-4046-8607-f8404a544d47"
+      ],
+      "value": {
+        "date": "2026-08-16",
+        "supervisorId": "admin_default_id",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 350,
+        "createdAt": "2026-08-16T09:33:19.685Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "5fb6d598-33be-40f6-b6d4-c7d7af0d1fd5"
+      ],
+      "value": {
+        "date": "2026-08-19",
+        "supervisorId": "43d20da3-4ccf-4d5c-9339-1e5d59b9e65c",
+        "engineerId": "43d20da3-4ccf-4d5c-9339-1e5d59b9e65c",
+        "status": "approved",
+        "totalWorkers": 3,
+        "totalAmount": 1200,
+        "createdAt": "2026-08-19T08:50:46.661Z",
+        "id": "5fb6d598-33be-40f6-b6d4-c7d7af0d1fd5"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "613e6479-c130-47cc-b94f-cbe28513d569"
+      ],
+      "value": {
+        "date": "2026-08-25",
+        "supervisorId": "1ff9986e-c31f-4cf2-8a4f-a4ed27039fc1",
+        "engineerId": "dc1565bc-1454-4c7f-8308-e99892be7e6b",
+        "status": "approved",
+        "totalWorkers": 5,
+        "totalAmount": 2000,
+        "createdAt": "2026-08-25T07:39:09.993Z",
+        "id": "613e6479-c130-47cc-b94f-cbe28513d569"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "666fc6bd-5d7b-44fb-9f22-1c017822471c"
+      ],
+      "value": {
+        "date": "2026-08-17",
+        "supervisorId": "admin_default_id",
+        "engineerId": "43d20da3-4ccf-4d5c-9339-1e5d59b9e65c",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 400,
+        "createdAt": "2026-08-19T09:06:11.615Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "6d8beeb5-b7f1-4dae-9742-5b74c2f53835"
+      ],
+      "value": {
+        "date": "2026-08-17",
+        "supervisorId": "7248bcc9-bb53-4bab-a604-dd049d6e7486",
+        "engineerId": "8e983243-0ea0-4675-b697-5d0c70049561",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 350,
+        "createdAt": "2026-08-17T06:49:20.331Z",
+        "id": "6d8beeb5-b7f1-4dae-9742-5b74c2f53835"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "71635f7f-c8d4-4f49-9d86-438131300d79"
+      ],
+      "value": {
+        "date": "2026-08-17",
+        "supervisorId": "1e740ec4-b91e-41e6-a4f2-93fbf49992a3",
+        "engineerId": "dc1565bc-1454-4c7f-8308-e99892be7e6b",
+        "status": "approved",
+        "totalWorkers": 6,
+        "totalAmount": 2400,
+        "createdAt": "2026-08-17T07:14:33.438Z",
+        "id": "71635f7f-c8d4-4f49-9d86-438131300d79"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "716a3598-f447-4e5d-8d2c-8039a16030a3"
+      ],
+      "value": {
+        "date": "2026-08-13",
+        "supervisorId": "admin_default_id",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 350,
+        "createdAt": "2026-08-19T08:08:03.804Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "7949bd7d-aa45-4949-98bb-9b124f2517ad"
+      ],
+      "value": {
+        "date": "2026-08-16",
+        "supervisorId": "6657107d-9c9e-4a9b-a163-909470d7ddb4",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 3,
+        "totalAmount": 1500,
+        "createdAt": "2026-08-16T08:33:26.420Z",
+        "id": "7949bd7d-aa45-4949-98bb-9b124f2517ad"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "7ae6bb1f-daeb-4e2a-8fc3-b6d5eb68c1d9"
+      ],
+      "value": {
+        "date": "2026-08-23",
+        "supervisorId": "59bc5c93-a278-4365-b0ee-bd4888d6f1e9",
+        "engineerId": "43d20da3-4ccf-4d5c-9339-1e5d59b9e65c",
+        "status": "approved",
+        "totalWorkers": 4,
+        "totalAmount": 1550,
+        "createdAt": "2026-08-23T09:42:44.504Z",
+        "id": "7ae6bb1f-daeb-4e2a-8fc3-b6d5eb68c1d9"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "7cdb5622-dd4a-4358-aa02-a910727d5928"
+      ],
+      "value": {
+        "date": "2026-08-13",
+        "supervisorId": "admin_default_id",
+        "engineerId": "43d20da3-4ccf-4d5c-9339-1e5d59b9e65c",
+        "status": "approved",
+        "totalWorkers": 2,
+        "totalAmount": 800,
+        "createdAt": "2026-08-19T08:04:11.864Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "7febf65c-e46e-4914-bac6-c5f204c47ab1"
+      ],
+      "value": {
+        "date": "2026-08-18",
+        "supervisorId": "038bb081-d96d-4671-849f-8272a9c6f2d9",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 2,
+        "totalAmount": 700,
+        "createdAt": "2026-08-18T07:02:36.344Z",
+        "id": "7febf65c-e46e-4914-bac6-c5f204c47ab1"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "8b0f28b0-7a5e-4f56-8036-90fc6798883a"
+      ],
+      "value": {
+        "date": "2026-08-25",
+        "supervisorId": "1ff9986e-c31f-4cf2-8a4f-a4ed27039fc1",
+        "engineerId": "43d20da3-4ccf-4d5c-9339-1e5d59b9e65c",
+        "status": "pending",
+        "totalWorkers": 5,
+        "totalAmount": 1950,
+        "createdAt": "2026-08-25T08:36:22.181Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "8be0edaf-6d0b-4068-b715-81892d514cd4"
+      ],
+      "value": {
+        "date": "2026-08-17",
+        "supervisorId": "5fdce1cf-7ff0-4c28-80d0-1c6060f5b7df",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 400,
+        "createdAt": "2026-08-17T06:28:18.263Z",
+        "id": "8be0edaf-6d0b-4068-b715-81892d514cd4"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "8bec467b-3845-4e11-baca-49024cecee3f"
+      ],
+      "value": {
+        "date": "2026-08-16",
+        "supervisorId": "5fdce1cf-7ff0-4c28-80d0-1c6060f5b7df",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 400,
+        "createdAt": "2026-08-16T07:09:42.856Z",
+        "id": "8bec467b-3845-4e11-baca-49024cecee3f"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "94889fd6-54bb-40fc-a2a8-c2162779020c"
+      ],
+      "value": {
+        "date": "2026-08-20",
+        "supervisorId": "6657107d-9c9e-4a9b-a163-909470d7ddb4",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 2,
+        "totalAmount": 1150,
+        "createdAt": "2026-08-20T08:10:49.700Z",
+        "id": "94889fd6-54bb-40fc-a2a8-c2162779020c"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "94bae72c-dda3-44ba-afee-bd436887db75"
+      ],
+      "value": {
+        "date": "2026-08-18",
+        "supervisorId": "6657107d-9c9e-4a9b-a163-909470d7ddb4",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 3,
+        "totalAmount": 1500,
+        "createdAt": "2026-08-18T09:01:22.203Z",
+        "id": "94bae72c-dda3-44ba-afee-bd436887db75"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "950fd821-967d-4a6f-a0f7-538a9a2942f3"
+      ],
+      "value": {
+        "date": "2026-08-22",
+        "supervisorId": "6657107d-9c9e-4a9b-a163-909470d7ddb4",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 600,
+        "createdAt": "2026-08-22T07:36:27.932Z",
+        "id": "950fd821-967d-4a6f-a0f7-538a9a2942f3"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "9d405e74-01c8-4cb2-a417-e3f12b0ad5f8"
+      ],
+      "value": {
+        "date": "2026-08-22",
+        "supervisorId": "1ff9986e-c31f-4cf2-8a4f-a4ed27039fc1",
+        "engineerId": "dc1565bc-1454-4c7f-8308-e99892be7e6b",
+        "status": "approved",
+        "totalWorkers": 6,
+        "totalAmount": 2400,
+        "createdAt": "2026-08-22T06:27:45.250Z",
+        "id": "9d405e74-01c8-4cb2-a417-e3f12b0ad5f8"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "9dbc62d6-6ffd-47fb-9c28-a977d7d904b7"
+      ],
+      "value": {
+        "date": "2026-08-24",
+        "supervisorId": "43d20da3-4ccf-4d5c-9339-1e5d59b9e65c",
+        "engineerId": "43d20da3-4ccf-4d5c-9339-1e5d59b9e65c",
+        "status": "approved",
+        "totalWorkers": 3,
+        "totalAmount": 1200,
+        "createdAt": "2026-08-24T09:41:56.678Z",
+        "id": "9dbc62d6-6ffd-47fb-9c28-a977d7d904b7"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "abf48364-3c1c-439d-a164-0427f23e7075"
+      ],
+      "value": {
+        "date": "2026-08-19",
+        "supervisorId": "d5a95fda-518e-4fa7-8d79-04040f4eab7c",
+        "engineerId": "3151e59a-63b1-4c25-a61c-142da4ffc0c1",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 350,
+        "createdAt": "2026-08-19T08:04:38.822Z",
+        "id": "abf48364-3c1c-439d-a164-0427f23e7075"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "aeebb643-7b0b-4bbc-8d54-752fd92b6712"
+      ],
+      "value": {
+        "date": "2026-08-13",
+        "supervisorId": "admin_default_id",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 400,
+        "createdAt": "2026-08-19T08:07:38.035Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "b0519900-ace2-4463-90c2-7a7e8a07bd49"
+      ],
+      "value": {
+        "date": "2026-08-24",
+        "supervisorId": "1ff9986e-c31f-4cf2-8a4f-a4ed27039fc1",
+        "engineerId": "dc1565bc-1454-4c7f-8308-e99892be7e6b",
+        "status": "approved",
+        "totalWorkers": 4,
+        "totalAmount": 1600,
+        "createdAt": "2026-08-24T06:27:40.055Z",
+        "lastReminderSentAt": "2026-08-25T06:59:18.583Z",
+        "id": "b0519900-ace2-4463-90c2-7a7e8a07bd49"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "b3acb765-5391-46d5-b78d-ac9393b4abd5"
+      ],
+      "value": {
+        "date": "2026-08-13",
+        "supervisorId": "admin_default_id",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 350,
+        "createdAt": "2026-08-19T08:07:17.800Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "b87dd6df-1b3d-4b44-8eef-02ace5f55d7e"
+      ],
+      "value": {
+        "date": "2026-08-23",
+        "supervisorId": "6657107d-9c9e-4a9b-a163-909470d7ddb4",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 2,
+        "totalAmount": 1150,
+        "createdAt": "2026-08-23T09:39:51.541Z",
+        "id": "b87dd6df-1b3d-4b44-8eef-02ace5f55d7e"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "b8a70982-1ceb-4a6a-9758-ce52bb8b45fd"
+      ],
+      "value": {
+        "date": "2026-08-18",
+        "supervisorId": "7248bcc9-bb53-4bab-a604-dd049d6e7486",
+        "engineerId": "8e983243-0ea0-4675-b697-5d0c70049561",
+        "status": "approved",
+        "totalWorkers": 2,
+        "totalAmount": 700,
+        "createdAt": "2026-08-18T07:00:56.594Z",
+        "id": "b8a70982-1ceb-4a6a-9758-ce52bb8b45fd"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "ba1bd140-53f8-4839-b947-360a92734751"
+      ],
+      "value": {
+        "date": "2026-08-16",
+        "supervisorId": "038bb081-d96d-4671-849f-8272a9c6f2d9",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 2,
+        "totalAmount": 700,
+        "createdAt": "2026-08-16T06:14:10.825Z",
+        "id": "ba1bd140-53f8-4839-b947-360a92734751"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "bae054a1-af4a-420c-8f12-ad6ac9a3c3b2"
+      ],
+      "value": {
+        "date": "2026-08-19",
+        "supervisorId": "038bb081-d96d-4671-849f-8272a9c6f2d9",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 2,
+        "totalAmount": 700,
+        "createdAt": "2026-08-19T08:42:05.998Z",
+        "id": "bae054a1-af4a-420c-8f12-ad6ac9a3c3b2"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "bb4fc18a-322e-4237-a46d-cc076f9d4bde"
+      ],
+      "value": {
+        "date": "2026-08-18",
+        "supervisorId": "1ff9986e-c31f-4cf2-8a4f-a4ed27039fc1",
+        "engineerId": "dc1565bc-1454-4c7f-8308-e99892be7e6b",
+        "status": "approved",
+        "totalWorkers": 6,
+        "totalAmount": 2400,
+        "createdAt": "2026-08-18T07:13:44.044Z",
+        "id": "bb4fc18a-322e-4237-a46d-cc076f9d4bde"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "be9a46c4-2045-4d87-a4b8-5525f4d08951"
+      ],
+      "value": {
+        "date": "2026-08-23",
+        "supervisorId": "5fdce1cf-7ff0-4c28-80d0-1c6060f5b7df",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 500,
+        "createdAt": "2026-08-23T09:44:20.780Z",
+        "id": "be9a46c4-2045-4d87-a4b8-5525f4d08951"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "c70fe611-e689-4835-9f53-51aa840e28dc"
+      ],
+      "value": {
+        "date": "2026-08-20",
+        "supervisorId": "038bb081-d96d-4671-849f-8272a9c6f2d9",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 350,
+        "createdAt": "2026-08-20T07:28:05.475Z",
+        "id": "c70fe611-e689-4835-9f53-51aa840e28dc"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "c928d771-d5c7-4dab-82a3-276063ab43e2"
+      ],
+      "value": {
+        "date": "2026-08-14",
+        "supervisorId": "admin_default_id",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 400,
+        "createdAt": "2026-08-19T08:30:38.770Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "cc97bf81-7ae3-4400-84fc-04c80b1ae863"
+      ],
+      "value": {
+        "date": "2026-08-24",
+        "supervisorId": "7248bcc9-bb53-4bab-a604-dd049d6e7486",
+        "engineerId": "3151e59a-63b1-4c25-a61c-142da4ffc0c1",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 350,
+        "createdAt": "2026-08-24T06:27:59.661Z",
+        "id": "cc97bf81-7ae3-4400-84fc-04c80b1ae863"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "d33773e0-f54b-47ac-8056-32d4dfceb3bb"
+      ],
+      "value": {
+        "date": "2026-08-16",
+        "supervisorId": "59bc5c93-a278-4365-b0ee-bd4888d6f1e9",
+        "engineerId": "43d20da3-4ccf-4d5c-9339-1e5d59b9e65c",
+        "status": "approved",
+        "totalWorkers": 2,
+        "totalAmount": 800,
+        "createdAt": "2026-08-16T07:34:36.133Z",
+        "id": "d33773e0-f54b-47ac-8056-32d4dfceb3bb"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "d6f7cc1a-a368-4ac0-ae1e-66fa4863c5e1"
+      ],
+      "value": {
+        "date": "2026-08-18",
+        "supervisorId": "59bc5c93-a278-4365-b0ee-bd4888d6f1e9",
+        "engineerId": "43d20da3-4ccf-4d5c-9339-1e5d59b9e65c",
+        "status": "approved",
+        "totalWorkers": 3,
+        "totalAmount": 1200,
+        "createdAt": "2026-08-18T07:43:59.819Z",
+        "id": "d6f7cc1a-a368-4ac0-ae1e-66fa4863c5e1"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "dc90f526-c0b2-4006-b3ef-75ccef107c31"
+      ],
+      "value": {
+        "date": "2026-08-19",
+        "supervisorId": "7248bcc9-bb53-4bab-a604-dd049d6e7486",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 2,
+        "totalAmount": 700,
+        "createdAt": "2026-08-19T06:53:02.887Z",
+        "id": "dc90f526-c0b2-4006-b3ef-75ccef107c31"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "ddd63b70-0be3-4a25-be06-163e61e0526e"
+      ],
+      "value": {
+        "date": "2026-08-17",
+        "supervisorId": "5fdce1cf-7ff0-4c28-80d0-1c6060f5b7df",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 400,
+        "createdAt": "2026-08-17T08:28:10.918Z",
+        "id": "ddd63b70-0be3-4a25-be06-163e61e0526e"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "df7d92c9-9e70-4eaf-8c8d-943b344b2966"
+      ],
+      "value": {
+        "date": "2026-08-18",
+        "supervisorId": "d5a95fda-518e-4fa7-8d79-04040f4eab7c",
+        "engineerId": "3151e59a-63b1-4c25-a61c-142da4ffc0c1",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 400,
+        "createdAt": "2026-08-18T06:32:52.330Z",
+        "id": "df7d92c9-9e70-4eaf-8c8d-943b344b2966"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "e23eaa15-40a8-41ad-8f9c-1b23531d3d8d"
+      ],
+      "value": {
+        "date": "2026-08-15",
+        "supervisorId": "admin_default_id",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 400,
+        "createdAt": "2026-08-19T08:31:04.006Z"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "e31d7d6d-20d8-4aec-87cc-99db1daf7415"
+      ],
+      "value": {
+        "date": "2026-08-23",
+        "supervisorId": "1ff9986e-c31f-4cf2-8a4f-a4ed27039fc1",
+        "engineerId": "dc1565bc-1454-4c7f-8308-e99892be7e6b",
+        "status": "approved",
+        "totalWorkers": 6,
+        "totalAmount": 2400,
+        "createdAt": "2026-08-23T08:36:27.278Z",
+        "id": "e31d7d6d-20d8-4aec-87cc-99db1daf7415"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "e544a3b4-ee9b-4e16-9cae-894080ca9b6b"
+      ],
+      "value": {
+        "date": "2026-08-25",
+        "supervisorId": "6657107d-9c9e-4a9b-a163-909470d7ddb4",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 3,
+        "totalAmount": 1550,
+        "createdAt": "2026-08-25T08:45:54.351Z",
+        "id": "e544a3b4-ee9b-4e16-9cae-894080ca9b6b"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "f03ab49c-b2e4-4a5e-8abd-dfd1466483d9"
+      ],
+      "value": {
+        "date": "2026-08-19",
+        "supervisorId": "1ff9986e-c31f-4cf2-8a4f-a4ed27039fc1",
+        "engineerId": "dc1565bc-1454-4c7f-8308-e99892be7e6b",
+        "status": "approved",
+        "totalWorkers": 6,
+        "totalAmount": 2400,
+        "createdAt": "2026-08-19T06:21:33.363Z",
+        "id": "f03ab49c-b2e4-4a5e-8abd-dfd1466483d9"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "f34f8986-94f6-4810-b426-7a46d6bb0854"
+      ],
+      "value": {
+        "date": "2026-08-22",
+        "supervisorId": "7248bcc9-bb53-4bab-a604-dd049d6e7486",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 1,
+        "totalAmount": 350,
+        "createdAt": "2026-08-22T06:17:19.548Z",
+        "id": "f34f8986-94f6-4810-b426-7a46d6bb0854"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "f5cf78ce-ceae-4cea-94ef-0f151378e175"
+      ],
+      "value": {
+        "date": "2026-08-20",
+        "supervisorId": "59bc5c93-a278-4365-b0ee-bd4888d6f1e9",
+        "engineerId": "43d20da3-4ccf-4d5c-9339-1e5d59b9e65c",
+        "status": "approved",
+        "totalWorkers": 3,
+        "totalAmount": 1200,
+        "createdAt": "2026-08-20T10:30:31.180Z",
+        "id": "f5cf78ce-ceae-4cea-94ef-0f151378e175"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "f7dc0fbc-ea00-49a0-8a6f-006bccb43066"
+      ],
+      "value": {
+        "date": "2026-08-22",
+        "supervisorId": "1ff9986e-c31f-4cf2-8a4f-a4ed27039fc1",
+        "engineerId": "43d20da3-4ccf-4d5c-9339-1e5d59b9e65c",
+        "status": "approved",
+        "totalWorkers": 4,
+        "totalAmount": 1550,
+        "createdAt": "2026-08-22T11:28:38.631Z",
+        "id": "f7dc0fbc-ea00-49a0-8a6f-006bccb43066"
+      }
+    },
+    {
+      "key": [
+        "records",
+        "fbfd5534-f836-41df-962f-461fc583f737"
+      ],
+      "value": {
+        "date": "2026-08-24",
+        "supervisorId": "6657107d-9c9e-4a9b-a163-909470d7ddb4",
+        "engineerId": "admin_default_id",
+        "status": "approved",
+        "totalWorkers": 3,
+        "totalAmount": 1550,
+        "createdAt": "2026-08-24T08:18:47.322Z",
+        "id": "fbfd5534-f836-41df-962f-461fc583f737"
+      }
+    }
+  ],
+  "workers": [
+    {
+      "key": [
+        "workers",
+        "051ec7e6-359c-4327-9316-31edceb38b1a"
+      ],
+      "value": {
+        "recordId": "613e6479-c130-47cc-b94f-cbe28513d569",
+        "name": "طه محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "نظافه شقق للتسليم في Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "051ec7e6-359c-4327-9316-31edceb38b1a"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "06b9f711-39d3-4d5b-8736-12bb93967feb"
+      ],
+      "value": {
+        "recordId": "9d405e74-01c8-4cb2-a417-e3f12b0ad5f8",
+        "name": "محمد سالم",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D ",
+        "deduction": 0,
+        "notes": "",
+        "id": "06b9f711-39d3-4d5b-8736-12bb93967feb"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "06e95fec-3240-4f88-91e0-b6fa594b7cd5"
+      ],
+      "value": {
+        "recordId": "14d00ead-cb45-460b-a2bb-8700f0f6cf5a",
+        "name": "فادى سلامه",
+        "type": "عامل",
+        "amount": 350,
+        "location": "مع الكهربائية ",
+        "deduction": 0,
+        "notes": "",
+        "id": "06e95fec-3240-4f88-91e0-b6fa594b7cd5"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "087aa246-7452-489c-b4ea-2f6d56e1ce06"
+      ],
+      "value": {
+        "recordId": "7cdb5622-dd4a-4358-aa02-a910727d5928",
+        "name": "مصطفى على",
+        "type": "نحات",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "09d976f8-2715-42ff-955f-023452f76c5b"
+      ],
+      "value": {
+        "recordId": "0bb4f15f-fa01-40b4-8da6-9def279a83e3",
+        "name": "عماد معوض",
+        "type": "صنايعى",
+        "amount": 550,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "0bed4cbe-377e-42c4-b4b7-aeee1efd7176"
+      ],
+      "value": {
+        "recordId": "35640488-5acd-4a9f-82b8-7b2ecab629b7",
+        "name": "فادى مكرم",
+        "type": "عامل",
+        "amount": 350,
+        "location": "المخزن",
+        "deduction": 0,
+        "notes": "",
+        "id": "0bed4cbe-377e-42c4-b4b7-aeee1efd7176"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "0cbb6054-2078-40cf-93d3-a8ce5b57319b"
+      ],
+      "value": {
+        "recordId": "3ab1e622-f4ae-4ada-b197-94587fb3b298",
+        "name": "فادى سلامه",
+        "type": "عامل",
+        "amount": 350,
+        "location": "مع الكهربائية ",
+        "deduction": 0,
+        "notes": "",
+        "id": "0cbb6054-2078-40cf-93d3-a8ce5b57319b"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "0cdc97c1-da99-45c3-b4e6-77c369383416"
+      ],
+      "value": {
+        "recordId": "f7dc0fbc-ea00-49a0-8a6f-006bccb43066",
+        "name": "حسين خلاوى",
+        "type": "صنايعى",
+        "amount": 400,
+        "location": "كاكتس A",
+        "deduction": 0,
+        "notes": "عمال تبع استاذ ياسر",
+        "id": "0cdc97c1-da99-45c3-b4e6-77c369383416"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "0f02ee32-7af4-491d-83ac-717e260f8ae8"
+      ],
+      "value": {
+        "recordId": "189992be-280e-4150-a46f-427fa436300b",
+        "name": "ابو العلى",
+        "type": "مشرف عمال",
+        "amount": 400,
+        "location": "خدمه موقع",
+        "deduction": 0,
+        "notes": "",
+        "id": "0f02ee32-7af4-491d-83ac-717e260f8ae8"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "1206fb47-e069-4434-bf2c-a3f4e71ac529"
+      ],
+      "value": {
+        "recordId": "c70fe611-e689-4835-9f53-51aa840e28dc",
+        "name": "نشأت عيسى",
+        "type": "عامل",
+        "amount": 350,
+        "location": "warwehouse",
+        "deduction": 0,
+        "notes": "",
+        "id": "1206fb47-e069-4434-bf2c-a3f4e71ac529"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "12160f5a-84eb-49f8-8351-c510cb3dd16c"
+      ],
+      "value": {
+        "recordId": "2a1a75cf-30e9-4f56-a02d-2c701ec5cf69",
+        "name": "مصطفي عبد الوكيل",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "12160f5a-84eb-49f8-8351-c510cb3dd16c"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "12acb53f-b0d2-4392-a39c-2ef0783439d3"
+      ],
+      "value": {
+        "recordId": "01122ded-9e88-4abf-9038-d7598a74ba0c",
+        "name": "محمد محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "14a309f8-3378-4161-877e-d2eedd8dd0d0"
+      ],
+      "value": {
+        "recordId": "2a1a75cf-30e9-4f56-a02d-2c701ec5cf69",
+        "name": "عبد الرحمن",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "14a309f8-3378-4161-877e-d2eedd8dd0d0"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "14ba9f19-2792-42d7-abd2-bb5741eaa8c3"
+      ],
+      "value": {
+        "recordId": "7ae6bb1f-daeb-4e2a-8fc3-b6d5eb68c1d9",
+        "name": "مصطفى على",
+        "type": "نحات",
+        "amount": 400,
+        "location": "لانتاناA",
+        "deduction": 0,
+        "notes": "",
+        "id": "14ba9f19-2792-42d7-abd2-bb5741eaa8c3"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "17ca596a-fe82-4502-81fb-e3d7b9a66113"
+      ],
+      "value": {
+        "recordId": "716a3598-f447-4e5d-8d2c-8039a16030a3",
+        "name": "امير جرجس",
+        "type": "بوفيه",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "199a6627-7828-41cf-b73d-135491d74a88"
+      ],
+      "value": {
+        "recordId": "5fb6d598-33be-40f6-b6d4-c7d7af0d1fd5",
+        "name": "حسين خلاوى",
+        "type": "صنايعى",
+        "amount": 400,
+        "location": "كاكتس b و  كاكتس a",
+        "deduction": 0,
+        "notes": "تقفيل بعد السلالم الحديد نقاشة ",
+        "id": "199a6627-7828-41cf-b73d-135491d74a88"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "1b88085e-e294-4f43-a702-55684688e7a2"
+      ],
+      "value": {
+        "recordId": "71635f7f-c8d4-4f49-9d86-438131300d79",
+        "name": "محمد سالم",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "1b88085e-e294-4f43-a702-55684688e7a2"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "1f1c3c20-9574-44ef-a69a-cc5496083a00"
+      ],
+      "value": {
+        "recordId": "2b0183e4-8f14-4e48-9e04-0bb15f1e6670",
+        "name": "امير جرجس",
+        "type": "بوفيه",
+        "amount": 350,
+        "location": "البوفيه",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "1ff7dc69-b5f2-449f-b167-ba8e7e3f7882"
+      ],
+      "value": {
+        "recordId": "2d6d6486-cd3c-4150-92fd-4a40615ec6f9",
+        "name": "سليمان عبد السيد",
+        "type": "نحات",
+        "amount": 400,
+        "location": "بدروم ",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "20cfd3c8-394a-49e4-88be-374e241c3449"
+      ],
+      "value": {
+        "recordId": "45e2bb2f-164d-4f42-b48e-420f9c6162b5",
+        "name": "طه محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "20cfd3c8-394a-49e4-88be-374e241c3449"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "24a08706-2276-41f6-8711-7f58a5c54a2e"
+      ],
+      "value": {
+        "recordId": "5439c088-d2aa-4046-8607-f8404a544d47",
+        "name": "امير جرجس",
+        "type": "بوفيه",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "252ff454-8ee6-4cfc-8bb5-d2e2e4763d6c"
+      ],
+      "value": {
+        "recordId": "7949bd7d-aa45-4949-98bb-9b124f2517ad",
+        "name": "عياد محروس",
+        "type": "صنايعي",
+        "amount": 600,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "252ff454-8ee6-4cfc-8bb5-d2e2e4763d6c"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "26f91fd3-757f-4fe2-9620-363a85a75c63"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "فادى سلامه",
+        "type": "عامل",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "297a0a88-4ed5-40af-92a6-3808caaee293"
+      ],
+      "value": {
+        "recordId": "9d405e74-01c8-4cb2-a417-e3f12b0ad5f8",
+        "name": "طه محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D ",
+        "deduction": 0,
+        "notes": "",
+        "id": "297a0a88-4ed5-40af-92a6-3808caaee293"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "2d5bf639-ed7b-428a-898f-c6ec6d55cbef"
+      ],
+      "value": {
+        "recordId": "2a1a75cf-30e9-4f56-a02d-2c701ec5cf69",
+        "name": "محمد محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "2d5bf639-ed7b-428a-898f-c6ec6d55cbef"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "2eff5670-9c02-4dc8-95d5-ec24cfab39a5"
+      ],
+      "value": {
+        "recordId": "e31d7d6d-20d8-4aec-87cc-99db1daf7415",
+        "name": "مصطفى محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "2eff5670-9c02-4dc8-95d5-ec24cfab39a5"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "34006e5e-1344-4b06-bbdf-7de3ead00950"
+      ],
+      "value": {
+        "recordId": "01122ded-9e88-4abf-9038-d7598a74ba0c",
+        "name": "مصطفي عبد الوكيل",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "34a37e10-b276-4f37-9cc8-46a9aaca0be3"
+      ],
+      "value": {
+        "recordId": "613e6479-c130-47cc-b94f-cbe28513d569",
+        "name": "محمد سالم",
+        "type": "عامل",
+        "amount": 400,
+        "location": "نظافه شقق للتسليم في Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "34a37e10-b276-4f37-9cc8-46a9aaca0be3"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "352de816-d29f-4ec8-926d-3186b91cfb47"
+      ],
+      "value": {
+        "recordId": "35640488-5acd-4a9f-82b8-7b2ecab629b7",
+        "name": "نشأت عيسى",
+        "type": "عامل",
+        "amount": 350,
+        "location": "المخزن",
+        "deduction": 0,
+        "notes": "",
+        "id": "352de816-d29f-4ec8-926d-3186b91cfb47"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "3602257c-868f-4d21-ab19-aa3120e77def"
+      ],
+      "value": {
+        "recordId": "e31d7d6d-20d8-4aec-87cc-99db1daf7415",
+        "name": "محمد محمود يحيى",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Cassia A",
+        "deduction": 0,
+        "notes": "",
+        "id": "3602257c-868f-4d21-ab19-aa3120e77def"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "369bab37-1fcf-4212-9fb0-34fad40dc5f2"
+      ],
+      "value": {
+        "recordId": "7ae6bb1f-daeb-4e2a-8fc3-b6d5eb68c1d9",
+        "name": "مينا عاطف نعيم",
+        "type": "عامل",
+        "amount": 350,
+        "location": "لانتانا A",
+        "deduction": 0,
+        "notes": "",
+        "id": "369bab37-1fcf-4212-9fb0-34fad40dc5f2"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "372dfa4b-b391-4f42-8be2-bf2377807870"
+      ],
+      "value": {
+        "recordId": "8b0f28b0-7a5e-4f56-8036-90fc6798883a",
+        "name": "مصطفى على",
+        "type": "نحات",
+        "amount": 400,
+        "location": "نحاته في لانتانا A",
+        "deduction": 0,
+        "notes": "اشراف استاذ ياسر"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "38ee52ad-4d2a-4aba-ab92-b42ad7e85e5d"
+      ],
+      "value": {
+        "recordId": "42a6513e-4910-4649-a01f-74b48e92d24b",
+        "name": "نشأت عيسى",
+        "type": "عامل",
+        "amount": 350,
+        "location": "المخزن",
+        "deduction": 0,
+        "notes": "",
+        "id": "38ee52ad-4d2a-4aba-ab92-b42ad7e85e5d"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "398b343f-4a3c-4055-81f0-893a2aaac833"
+      ],
+      "value": {
+        "recordId": "2b818ae3-24c1-4159-afa5-da3328f4d0d5",
+        "name": "نشأت عيسى",
+        "type": "عامل",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "398d4d52-c0ff-4a42-8807-5f1c9fe18841"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "ابو العلى",
+        "type": "مشرف عمال",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "3c8fc873-6aad-46a0-a2de-5c2a0c1668a3"
+      ],
+      "value": {
+        "recordId": "7cdb5622-dd4a-4358-aa02-a910727d5928",
+        "name": "حسين فتحى",
+        "type": "نحات",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "3e2ac3a9-ba10-4989-9db4-57d3e1cf4e7f"
+      ],
+      "value": {
+        "recordId": "8b0f28b0-7a5e-4f56-8036-90fc6798883a",
+        "name": "بلال عيد",
+        "type": "عامل",
+        "amount": 400,
+        "location": "كاكتس A",
+        "deduction": 0,
+        "notes": "اشراف استاذ ياسر"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "3e5391a7-c393-4868-89eb-8c6d9f4eceb8"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "فادى مكرم",
+        "type": "عامل",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "3ff36838-2e0b-463f-a5bb-8b8f4cdf6b2a"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "محمد سالم",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "40675a62-d2d2-4546-98f2-3e6ec1581ee1"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "عياد محروس",
+        "type": "صنايعى",
+        "amount": 600,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "4094daf3-8484-4d96-b43f-6d40537fd112"
+      ],
+      "value": {
+        "recordId": "613e6479-c130-47cc-b94f-cbe28513d569",
+        "name": "محمد محمود فوزى",
+        "type": "عامل",
+        "amount": 400,
+        "location": "نظافه شقق للتسليم في  Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "4094daf3-8484-4d96-b43f-6d40537fd112"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "415aa819-7d82-4be2-b3d9-5483741d17e8"
+      ],
+      "value": {
+        "recordId": "01122ded-9e88-4abf-9038-d7598a74ba0c",
+        "name": "بلال عيد",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "4271fd59-a624-4710-b6ac-4c633db05b04"
+      ],
+      "value": {
+        "recordId": "e31d7d6d-20d8-4aec-87cc-99db1daf7415",
+        "name": "طه محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "4271fd59-a624-4710-b6ac-4c633db05b04"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "4525b26a-a8bd-42ff-887d-1f037cd367dd"
+      ],
+      "value": {
+        "recordId": "b8a70982-1ceb-4a6a-9758-ce52bb8b45fd",
+        "name": "دانيال أيمن",
+        "type": "عامل",
+        "amount": 350,
+        "location": "تنسيب خطوط الصرف ",
+        "deduction": 0,
+        "notes": "",
+        "id": "4525b26a-a8bd-42ff-887d-1f037cd367dd"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "47fd186a-6fca-4646-bdc1-6a19b56582e4"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "عبد الرحمن عبد الجابر",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "49e50e33-80aa-4644-b85a-f71f595dc031"
+      ],
+      "value": {
+        "recordId": "2779ccd6-6cf2-4cef-8e05-04a79d4e8f97",
+        "name": "امير جرجس",
+        "type": "بوفيه",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "49e50e33-80aa-4644-b85a-f71f595dc031"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "4b692593-51a5-4654-8d40-17ed03f3765a"
+      ],
+      "value": {
+        "recordId": "e31d7d6d-20d8-4aec-87cc-99db1daf7415",
+        "name": "محمد محمود فوزى",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Cassia A",
+        "deduction": 0,
+        "notes": "",
+        "id": "4b692593-51a5-4654-8d40-17ed03f3765a"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "4ccb8f22-103a-4993-a469-91afb50b519e"
+      ],
+      "value": {
+        "recordId": "45e2bb2f-164d-4f42-b48e-420f9c6162b5",
+        "name": "محمد سالم",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "4ccb8f22-103a-4993-a469-91afb50b519e"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "4db93b95-85c4-47f1-a238-3a41db4e9727"
+      ],
+      "value": {
+        "recordId": "2a49969e-2525-4d27-8b6d-713eec24e1cd",
+        "name": "صمؤيل وهبه",
+        "type": "عامل",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "516e75cc-6abe-48c7-a02b-dcf93f106b50"
+      ],
+      "value": {
+        "recordId": "046f587c-34a0-416d-b28f-81b387a4720c",
+        "name": "مصطفى على",
+        "type": "نحات",
+        "amount": 400,
+        "location": "ًلانتانا c",
+        "deduction": 0,
+        "notes": "",
+        "id": "516e75cc-6abe-48c7-a02b-dcf93f106b50"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "5296c29c-6817-4f39-b929-300054e90338"
+      ],
+      "value": {
+        "recordId": "7949bd7d-aa45-4949-98bb-9b124f2517ad",
+        "name": "عماد معوض",
+        "type": "صنايعي",
+        "amount": 550,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "5296c29c-6817-4f39-b929-300054e90338"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "53750317-2fe7-49b5-a2b5-67097d9ba016"
+      ],
+      "value": {
+        "recordId": "fbfd5534-f836-41df-962f-461fc583f737",
+        "name": "عياد محروس",
+        "type": "صنايعى",
+        "amount": 600,
+        "location": "كاسيا B",
+        "deduction": 0,
+        "notes": "",
+        "id": "53750317-2fe7-49b5-a2b5-67097d9ba016"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "544798e7-f5b8-4dd0-ba69-34b57618fd78"
+      ],
+      "value": {
+        "recordId": "b87dd6df-1b3d-4b44-8eef-02ace5f55d7e",
+        "name": "عماد معوض",
+        "type": "صنايعى",
+        "amount": 550,
+        "location": "كاكتس D",
+        "deduction": 0,
+        "notes": "",
+        "id": "544798e7-f5b8-4dd0-ba69-34b57618fd78"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "5a50f031-adf7-497a-800c-692f72baa753"
+      ],
+      "value": {
+        "recordId": "f03ab49c-b2e4-4a5e-8abd-dfd1466483d9",
+        "name": "عبد الرحمن عبد الجابر",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "5a50f031-adf7-497a-800c-692f72baa753"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "5b07957d-b6b8-4bfb-ba20-fc5cedba4d53"
+      ],
+      "value": {
+        "recordId": "cc97bf81-7ae3-4400-84fc-04c80b1ae863",
+        "name": "دانيال أيمن",
+        "type": "عامل",
+        "amount": 350,
+        "location": "غرفة الكهرباء 2 و club house",
+        "deduction": 0,
+        "notes": "",
+        "id": "5b07957d-b6b8-4bfb-ba20-fc5cedba4d53"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "5b8904b5-6760-43f6-add6-b79415b1a889"
+      ],
+      "value": {
+        "recordId": "01122ded-9e88-4abf-9038-d7598a74ba0c",
+        "name": "طه محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "5c52ca03-2d01-4332-a094-7b962bff978b"
+      ],
+      "value": {
+        "recordId": "dc90f526-c0b2-4006-b3ef-75ccef107c31",
+        "name": "دانيال أيمن",
+        "type": "عامل",
+        "amount": 350,
+        "location": "استكمال رفع البدروم",
+        "deduction": 0,
+        "notes": "",
+        "id": "5c52ca03-2d01-4332-a094-7b962bff978b"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "5d785285-2931-4356-b2b2-5ed1008fbbf7"
+      ],
+      "value": {
+        "recordId": "f03ab49c-b2e4-4a5e-8abd-dfd1466483d9",
+        "name": "محمد سالم",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "5d785285-2931-4356-b2b2-5ed1008fbbf7"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "619442bb-b97d-4703-98bf-ae81dcebfb97"
+      ],
+      "value": {
+        "recordId": "fbfd5534-f836-41df-962f-461fc583f737",
+        "name": "مصطفى محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "مع الكهربائية ",
+        "deduction": 0,
+        "notes": "",
+        "id": "619442bb-b97d-4703-98bf-ae81dcebfb97"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "636056e3-c081-44d0-8853-8f0125df4846"
+      ],
+      "value": {
+        "recordId": "71635f7f-c8d4-4f49-9d86-438131300d79",
+        "name": "محمد محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "636056e3-c081-44d0-8853-8f0125df4846"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "64d748ea-115b-49a6-887f-fc6afd19f5a7"
+      ],
+      "value": {
+        "recordId": "bb4fc18a-322e-4237-a46d-cc076f9d4bde",
+        "name": "طه محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "64d748ea-115b-49a6-887f-fc6afd19f5a7"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "66e0b250-814d-47f3-9083-71c69711cb2f"
+      ],
+      "value": {
+        "recordId": "bb4fc18a-322e-4237-a46d-cc076f9d4bde",
+        "name": "مصطفى محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "66e0b250-814d-47f3-9083-71c69711cb2f"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "680ac3bc-6fec-4b41-9be4-66084c2301b4"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "محمد محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "6fbbc413-390a-401b-a45c-ae3e87457122"
+      ],
+      "value": {
+        "recordId": "189992be-280e-4150-a46f-427fa436300b",
+        "name": "سليمان عبد السيد",
+        "type": "نحات",
+        "amount": 400,
+        "location": "بدروم",
+        "deduction": 0,
+        "notes": "",
+        "id": "6fbbc413-390a-401b-a45c-ae3e87457122"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "737a8c86-8436-4b2a-9f84-0e78c91f15d9"
+      ],
+      "value": {
+        "recordId": "2a1a75cf-30e9-4f56-a02d-2c701ec5cf69",
+        "name": "طه محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "بنزاي",
+        "deduction": 0,
+        "notes": "",
+        "id": "737a8c86-8436-4b2a-9f84-0e78c91f15d9"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "75755d27-0240-42d6-9582-a439f29f20a6"
+      ],
+      "value": {
+        "recordId": "2a1a75cf-30e9-4f56-a02d-2c701ec5cf69",
+        "name": "مصطفى محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "75755d27-0240-42d6-9582-a439f29f20a6"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "766de33c-8e3a-49f0-b6b7-f35120c5326c"
+      ],
+      "value": {
+        "recordId": "94bae72c-dda3-44ba-afee-bd436887db75",
+        "name": "عياد محروس",
+        "type": "صنايعى",
+        "amount": 600,
+        "location": "كاكتس D",
+        "deduction": 0,
+        "notes": "",
+        "id": "766de33c-8e3a-49f0-b6b7-f35120c5326c"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "76ceb974-34aa-470a-8385-e8bb84a6f6d8"
+      ],
+      "value": {
+        "recordId": "5fb6d598-33be-40f6-b6d4-c7d7af0d1fd5",
+        "name": "مصطفى على",
+        "type": "نحات",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "76ceb974-34aa-470a-8385-e8bb84a6f6d8"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "773ab845-0702-4eff-8adb-1c85e46016ea"
+      ],
+      "value": {
+        "recordId": "b0519900-ace2-4463-90c2-7a7e8a07bd49",
+        "name": "طه محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "773ab845-0702-4eff-8adb-1c85e46016ea"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "7906de34-56e9-4d29-b043-547c515b9dde"
+      ],
+      "value": {
+        "recordId": "f5cf78ce-ceae-4cea-94ef-0f151378e175",
+        "name": "حسين خلاوى",
+        "type": "صنايعى",
+        "amount": 400,
+        "location": "كا كتيس  A",
+        "deduction": 0,
+        "notes": "",
+        "id": "7906de34-56e9-4d29-b043-547c515b9dde"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "791a3c24-38c9-4530-8cad-5bcf242592a4"
+      ],
+      "value": {
+        "recordId": "e23eaa15-40a8-41ad-8f9c-1b23531d3d8d",
+        "name": "سليمان عبد السيد",
+        "type": "نحات",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "79d69dfe-8706-432f-8b26-381397f00e48"
+      ],
+      "value": {
+        "recordId": "bb4fc18a-322e-4237-a46d-cc076f9d4bde",
+        "name": "مصطفي عبد الوكيل",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "79d69dfe-8706-432f-8b26-381397f00e48"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "79f2bcf4-10e1-4488-871a-b57a1045839c"
+      ],
+      "value": {
+        "recordId": "9d405e74-01c8-4cb2-a417-e3f12b0ad5f8",
+        "name": "محمد محمود فوزى",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai A",
+        "deduction": 0,
+        "notes": "",
+        "id": "79f2bcf4-10e1-4488-871a-b57a1045839c"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "7a927473-f681-48e0-b81f-b86632c3ebe5"
+      ],
+      "value": {
+        "recordId": "be9a46c4-2045-4d87-a4b8-5525f4d08951",
+        "name": "ابو العلى",
+        "type": "مشرف عمال",
+        "amount": 500,
+        "location": "خدمه موقع",
+        "deduction": 0,
+        "notes": "",
+        "id": "7a927473-f681-48e0-b81f-b86632c3ebe5"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "7ab8293b-7439-48e7-aa2f-5e6a96a02c0c"
+      ],
+      "value": {
+        "recordId": "8be0edaf-6d0b-4068-b715-81892d514cd4",
+        "name": "سليمان عبد السيد",
+        "type": "نحات",
+        "amount": 400,
+        "location": "بدروم ",
+        "deduction": 0,
+        "notes": "",
+        "id": "7ab8293b-7439-48e7-aa2f-5e6a96a02c0c"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "7cb99abd-9cd2-4475-b6a8-dd081904d06b"
+      ],
+      "value": {
+        "recordId": "b0519900-ace2-4463-90c2-7a7e8a07bd49",
+        "name": "محمد محمود فوزى",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Cassia A",
+        "deduction": 0,
+        "notes": "",
+        "id": "7cb99abd-9cd2-4475-b6a8-dd081904d06b"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "7cc04924-197e-4686-8642-a2530c085b68"
+      ],
+      "value": {
+        "recordId": "d33773e0-f54b-47ac-8056-32d4dfceb3bb",
+        "name": "حسين فتحى",
+        "type": "نحات",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "7cc04924-197e-4686-8642-a2530c085b68"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "7d282bac-dd77-4062-8ef1-179ab6c81d39"
+      ],
+      "value": {
+        "recordId": "9dbc62d6-6ffd-47fb-9c28-a977d7d904b7",
+        "name": "مصطفى على",
+        "type": "نحات",
+        "amount": 400,
+        "location": "لاتانا١",
+        "deduction": 0,
+        "notes": "",
+        "id": "7d282bac-dd77-4062-8ef1-179ab6c81d39"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "7e975264-9333-406b-901c-42b37514125b"
+      ],
+      "value": {
+        "recordId": "9dbc62d6-6ffd-47fb-9c28-a977d7d904b7",
+        "name": "حسين فتحى",
+        "type": "نحات",
+        "amount": 400,
+        "location": "لاتانا ١",
+        "deduction": 0,
+        "notes": "",
+        "id": "7e975264-9333-406b-901c-42b37514125b"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "7f23c9e9-1bbf-4988-bf0e-ca35f5a57ff6"
+      ],
+      "value": {
+        "recordId": "bb4fc18a-322e-4237-a46d-cc076f9d4bde",
+        "name": "محمد سالم",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "7f23c9e9-1bbf-4988-bf0e-ca35f5a57ff6"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "836599e9-183e-4921-8dba-9117f8068c01"
+      ],
+      "value": {
+        "recordId": "b0519900-ace2-4463-90c2-7a7e8a07bd49",
+        "name": "محمد محمود يحيى",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "836599e9-183e-4921-8dba-9117f8068c01"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "838401bc-4089-429f-963d-ba16f4ce90b8"
+      ],
+      "value": {
+        "recordId": "dc90f526-c0b2-4006-b3ef-75ccef107c31",
+        "name": "امير جرجس",
+        "type": "بوفيه",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "838401bc-4089-429f-963d-ba16f4ce90b8"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "87911191-bf81-48ba-9dc8-ab21504d1e90"
+      ],
+      "value": {
+        "recordId": "c928d771-d5c7-4dab-82a3-276063ab43e2",
+        "name": "ابو العلى",
+        "type": "مشرف عمال",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "892c26e1-c4b0-4e0b-b199-7be717bf4ccd"
+      ],
+      "value": {
+        "recordId": "14d00ead-cb45-460b-a2bb-8700f0f6cf5a",
+        "name": "عياد محروس",
+        "type": "صنايعى",
+        "amount": 600,
+        "location": "كاكتس D",
+        "deduction": 0,
+        "notes": "",
+        "id": "892c26e1-c4b0-4e0b-b199-7be717bf4ccd"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "899ca7c8-d166-498b-be4f-e29a0b3fc70a"
+      ],
+      "value": {
+        "recordId": "bae054a1-af4a-420c-8f12-ad6ac9a3c3b2",
+        "name": "فادى مكرم",
+        "type": "عامل",
+        "amount": 350,
+        "location": "warehouse",
+        "deduction": 0,
+        "notes": "",
+        "id": "899ca7c8-d166-498b-be4f-e29a0b3fc70a"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "8afd2d2f-622b-4d11-87ec-4b1f8a1c5f4a"
+      ],
+      "value": {
+        "recordId": "7949bd7d-aa45-4949-98bb-9b124f2517ad",
+        "name": "فادى سلامه",
+        "type": "عامل",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "8afd2d2f-622b-4d11-87ec-4b1f8a1c5f4a"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "8b84e063-f1a6-4a22-8d1b-a1a3d394e3fc"
+      ],
+      "value": {
+        "recordId": "f7dc0fbc-ea00-49a0-8a6f-006bccb43066",
+        "name": "حسين فتحى",
+        "type": "نحات",
+        "amount": 400,
+        "location": "لانتانا A",
+        "deduction": 0,
+        "notes": "عمال تبع استاذ ياسر",
+        "id": "8b84e063-f1a6-4a22-8d1b-a1a3d394e3fc"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "8c95f1a3-64a9-46ac-b486-e2c48d7bc2e2"
+      ],
+      "value": {
+        "recordId": "2b818ae3-24c1-4159-afa5-da3328f4d0d5",
+        "name": "فادى مكرم",
+        "type": "عامل",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "8cdd89d2-8052-44a2-ad83-1db6a0f3e203"
+      ],
+      "value": {
+        "recordId": "f03ab49c-b2e4-4a5e-8abd-dfd1466483d9",
+        "name": "مصطفي عبد الوكيل",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "8cdd89d2-8052-44a2-ad83-1db6a0f3e203"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "9012bb51-adca-44fb-8f7f-4b2af8818364"
+      ],
+      "value": {
+        "recordId": "abf48364-3c1c-439d-a164-0427f23e7075",
+        "name": "صمؤيل وهبه",
+        "type": "عامل",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "9012bb51-adca-44fb-8f7f-4b2af8818364"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "92322e2f-a697-49c0-a10b-06dd10732aff"
+      ],
+      "value": {
+        "recordId": "bae054a1-af4a-420c-8f12-ad6ac9a3c3b2",
+        "name": "نشأت عيسى",
+        "type": "عامل",
+        "amount": 350,
+        "location": "warehouse",
+        "deduction": 0,
+        "notes": "",
+        "id": "92322e2f-a697-49c0-a10b-06dd10732aff"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "97f90c07-3d36-4a13-9885-962428465505"
+      ],
+      "value": {
+        "recordId": "d33773e0-f54b-47ac-8056-32d4dfceb3bb",
+        "name": "مصطفى على",
+        "type": "نحات",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "97f90c07-3d36-4a13-9885-962428465505"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "98fb0405-a635-4c52-913c-183d35dafb07"
+      ],
+      "value": {
+        "recordId": "f5cf78ce-ceae-4cea-94ef-0f151378e175",
+        "name": "حسين فتحى",
+        "type": "نحات",
+        "amount": 400,
+        "location": "مع عم رمضان",
+        "deduction": 0,
+        "notes": "",
+        "id": "98fb0405-a635-4c52-913c-183d35dafb07"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "99b1c0c4-56b2-4b34-805e-50821de68360"
+      ],
+      "value": {
+        "recordId": "c57b6bb3-c784-436a-8e96-df1e47483717",
+        "name": "فادى سلامه",
+        "type": "عامل",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "99b1c0c4-56b2-4b34-805e-50821de68360"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "9ab03690-a2ad-458e-bebb-59f180085ae3"
+      ],
+      "value": {
+        "recordId": "d6f7cc1a-a368-4ac0-ae1e-66fa4863c5e1",
+        "name": "حسين خلاوى",
+        "type": "صنايعى",
+        "amount": 400,
+        "location": "لانتانا ا",
+        "deduction": 0,
+        "notes": "",
+        "id": "9ab03690-a2ad-458e-bebb-59f180085ae3"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "9b277b86-dec1-4db2-8270-d741f960fb25"
+      ],
+      "value": {
+        "recordId": "9d405e74-01c8-4cb2-a417-e3f12b0ad5f8",
+        "name": "مصطفى محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai A",
+        "deduction": 0,
+        "notes": "",
+        "id": "9b277b86-dec1-4db2-8270-d741f960fb25"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "9f8172b6-7fe2-42d1-9cde-24f8bf48c0ba"
+      ],
+      "value": {
+        "recordId": "2a1a75cf-30e9-4f56-a02d-2c701ec5cf69",
+        "name": "بلال عيد",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "9f8172b6-7fe2-42d1-9cde-24f8bf48c0ba"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "9fa1c3cc-e7f5-481e-9d63-84166eb4539e"
+      ],
+      "value": {
+        "recordId": "45e2bb2f-164d-4f42-b48e-420f9c6162b5",
+        "name": "محمد محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Cassia A +Bonasia D",
+        "deduction": 0,
+        "notes": "",
+        "id": "9fa1c3cc-e7f5-481e-9d63-84166eb4539e"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "9fcbee1e-0127-4151-a5d5-ef16a563f8f2"
+      ],
+      "value": {
+        "recordId": "0bb4f15f-fa01-40b4-8da6-9def279a83e3",
+        "name": "عياد محروس",
+        "type": "صنايعى",
+        "amount": 600,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "9febaad4-9764-4392-96e4-7ab1b44f140a"
+      ],
+      "value": {
+        "recordId": "b0519900-ace2-4463-90c2-7a7e8a07bd49",
+        "name": "مصطفي عبد الوكيل",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "9febaad4-9764-4392-96e4-7ab1b44f140a"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "a0d126f8-c42a-440d-a731-3c5c78450853"
+      ],
+      "value": {
+        "recordId": "3ab1e622-f4ae-4ada-b197-94587fb3b298",
+        "name": "عماد معوض",
+        "type": "صنايعى",
+        "amount": 550,
+        "location": "كاكتس D",
+        "deduction": 0,
+        "notes": "",
+        "id": "a0d126f8-c42a-440d-a731-3c5c78450853"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "a268a357-0367-44f5-9b97-be5ffc5d5cf0"
+      ],
+      "value": {
+        "recordId": "13d19558-e4ef-4cdf-a551-19479e94bc7c",
+        "name": "ابو العلى",
+        "type": "مشرف عمال",
+        "amount": 400,
+        "location": "موقع عام",
+        "deduction": 0,
+        "notes": "",
+        "id": "a268a357-0367-44f5-9b97-be5ffc5d5cf0"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "a4d6ab1c-19d5-42fc-a9e9-d3b27eefb436"
+      ],
+      "value": {
+        "recordId": "45e2bb2f-164d-4f42-b48e-420f9c6162b5",
+        "name": "مصطفى محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "a4d6ab1c-19d5-42fc-a9e9-d3b27eefb436"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "a5a2d38a-a80b-43ce-b77f-1439636243e8"
+      ],
+      "value": {
+        "recordId": "3c94c316-1e1b-47bd-9beb-276db46cf9e0",
+        "name": "امير جرجس",
+        "type": "بوفيه",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "a5a2d38a-a80b-43ce-b77f-1439636243e8"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "a5ddfe43-ee73-497f-9f98-fc06bbc28b38"
+      ],
+      "value": {
+        "recordId": "d6f7cc1a-a368-4ac0-ae1e-66fa4863c5e1",
+        "name": "حسين فتحى",
+        "type": "نحات",
+        "amount": 400,
+        "location": "لانتانا د",
+        "deduction": 0,
+        "notes": "",
+        "id": "a5ddfe43-ee73-497f-9f98-fc06bbc28b38"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "a6979a8f-7461-4b8f-b839-572cdc87a4f6"
+      ],
+      "value": {
+        "recordId": "e544a3b4-ee9b-4e16-9cae-894080ca9b6b",
+        "name": "مصطفى محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "مساعده الكهربائية ",
+        "deduction": 0,
+        "notes": "",
+        "id": "a6979a8f-7461-4b8f-b839-572cdc87a4f6"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "a6bef416-8ce5-4a8a-a7f2-1cd66ece9e25"
+      ],
+      "value": {
+        "recordId": "2b0183e4-8f14-4e48-9e04-0bb15f1e6670",
+        "name": "دانيال أيمن",
+        "type": "عامل",
+        "amount": 350,
+        "location": "توقيع خطوط الرى والتغذية",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "a6cfd5e1-a805-42ef-a1e1-06c1064eea4e"
+      ],
+      "value": {
+        "recordId": "fbfd5534-f836-41df-962f-461fc583f737",
+        "name": "عماد معوض",
+        "type": "صنايعى",
+        "amount": 550,
+        "location": "لانتانا a",
+        "deduction": 0,
+        "notes": "",
+        "id": "a6cfd5e1-a805-42ef-a1e1-06c1064eea4e"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "a8a79fc0-5b61-42aa-9392-41406400daa7"
+      ],
+      "value": {
+        "recordId": "f5cf78ce-ceae-4cea-94ef-0f151378e175",
+        "name": "مصطفى على",
+        "type": "نحات",
+        "amount": 400,
+        "location": "مع عم رمضان",
+        "deduction": 0,
+        "notes": "",
+        "id": "a8a79fc0-5b61-42aa-9392-41406400daa7"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "ab309abe-a421-4cd2-bc8b-2bb235e32812"
+      ],
+      "value": {
+        "recordId": "666fc6bd-5d7b-44fb-9f22-1c017822471c",
+        "name": "حسين خلاوى",
+        "type": "صنايعى",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "abfeb972-0e63-4e33-9249-0094393bb905"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "مصطفى على",
+        "type": "نحات",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "acd5002c-a130-47cb-981a-ceab74328d32"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "مصطفى محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "b02358e4-0d18-42f8-9082-faf277dfd519"
+      ],
+      "value": {
+        "recordId": "e31d7d6d-20d8-4aec-87cc-99db1daf7415",
+        "name": "مصطفي عبد الوكيل",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "b02358e4-0d18-42f8-9082-faf277dfd519"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "b04977c2-5a2e-466d-81c4-9d295a3c9804"
+      ],
+      "value": {
+        "recordId": "3a733f49-c9b1-4887-a4b9-24b211b0fda2",
+        "name": "سليمان عبد السيد",
+        "type": "نحات",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "b0a8bfcd-7be6-4f60-a5dc-067a7b9da654"
+      ],
+      "value": {
+        "recordId": "45e2bb2f-164d-4f42-b48e-420f9c6162b5",
+        "name": "مصطفي عبد الوكيل",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Cassia A + Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "b0a8bfcd-7be6-4f60-a5dc-067a7b9da654"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "b16eb444-11b1-4a2f-b4d0-f661d127dc90"
+      ],
+      "value": {
+        "recordId": "950fd821-967d-4a6f-a0f7-538a9a2942f3",
+        "name": "عياد محروس",
+        "type": "صنايعى",
+        "amount": 600,
+        "location": "بونساي DوكاكتسD",
+        "deduction": 0,
+        "notes": "لم يتم العمل فى BONSAI ",
+        "id": "b16eb444-11b1-4a2f-b4d0-f661d127dc90"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "b22a1274-2f1e-4ca6-a8d9-9203259d64e7"
+      ],
+      "value": {
+        "recordId": "e544a3b4-ee9b-4e16-9cae-894080ca9b6b",
+        "name": "عماد معوض",
+        "type": "صنايعى",
+        "amount": 550,
+        "location": "كاكتس D تعديل علب كهرباء مطابخ وحمامات ",
+        "deduction": 0,
+        "notes": "",
+        "id": "b22a1274-2f1e-4ca6-a8d9-9203259d64e7"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "b3a51c0a-4718-427a-9a56-2274cf739fa2"
+      ],
+      "value": {
+        "recordId": "2e236db0-ed64-4323-967a-19d7a3b97b07",
+        "name": "نشأت عيسى",
+        "type": "عامل",
+        "amount": 350,
+        "location": "اعمال المخازن",
+        "deduction": 0,
+        "notes": "",
+        "id": "b3a51c0a-4718-427a-9a56-2274cf739fa2"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "b79315ac-efb4-4c40-ba4b-156e702811a8"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "صمؤيل وهبه",
+        "type": "عامل",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "b91ab8a5-dc68-44e0-81f3-288fc4990384"
+      ],
+      "value": {
+        "recordId": "bb4fc18a-322e-4237-a46d-cc076f9d4bde",
+        "name": "محمد محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D ",
+        "deduction": 0,
+        "notes": "",
+        "id": "b91ab8a5-dc68-44e0-81f3-288fc4990384"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "b949b8bf-ee94-4acc-89d7-b339ebddcf85"
+      ],
+      "value": {
+        "recordId": "f03ab49c-b2e4-4a5e-8abd-dfd1466483d9",
+        "name": "مصطفى محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "b949b8bf-ee94-4acc-89d7-b339ebddcf85"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "bb904830-a07c-4049-a2bf-dd1adac5800d"
+      ],
+      "value": {
+        "recordId": "8bec467b-3845-4e11-baca-49024cecee3f",
+        "name": "ابو العلى",
+        "type": "أخرى",
+        "amount": 400,
+        "location": "خدمه موقع",
+        "deduction": 0,
+        "notes": "",
+        "id": "bb904830-a07c-4049-a2bf-dd1adac5800d"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "c03f9ed9-5c3b-4452-8c02-83080b3e8e6e"
+      ],
+      "value": {
+        "recordId": "9d405e74-01c8-4cb2-a417-e3f12b0ad5f8",
+        "name": "مصطفي عبد الوكيل",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D ",
+        "deduction": 0,
+        "notes": "",
+        "id": "c03f9ed9-5c3b-4452-8c02-83080b3e8e6e"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "c1aeb77c-4997-4718-88a8-138ad76be9d0"
+      ],
+      "value": {
+        "recordId": "bb4fc18a-322e-4237-a46d-cc076f9d4bde",
+        "name": "عبد الرحمن عبد الجابر",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "c1aeb77c-4997-4718-88a8-138ad76be9d0"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "c303c99d-a8d4-40a7-962d-38f63b5c282b"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "حسين فتحى",
+        "type": "نحات",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "c53c7683-68ba-4e0a-8315-371d167ae3a9"
+      ],
+      "value": {
+        "recordId": "71635f7f-c8d4-4f49-9d86-438131300d79",
+        "name": "مصطفى محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "c53c7683-68ba-4e0a-8315-371d167ae3a9"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "c6d6911e-e7e3-4eb4-8dd4-b1f43db9212f"
+      ],
+      "value": {
+        "recordId": "0bb4f15f-fa01-40b4-8da6-9def279a83e3",
+        "name": "فادى سلامه",
+        "type": "عامل",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "c84676aa-dadf-4c21-80d4-c31926ee32c0"
+      ],
+      "value": {
+        "recordId": "71635f7f-c8d4-4f49-9d86-438131300d79",
+        "name": "مصطفي عبد الوكيل",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "c84676aa-dadf-4c21-80d4-c31926ee32c0"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "c8750419-c140-497d-8ed5-3679c1cc1307"
+      ],
+      "value": {
+        "recordId": "01122ded-9e88-4abf-9038-d7598a74ba0c",
+        "name": "محمد سالم",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "c9452e6e-6248-4552-923b-c58761edbae6"
+      ],
+      "value": {
+        "recordId": "613e6479-c130-47cc-b94f-cbe28513d569",
+        "name": "مصطفي عبد الوكيل",
+        "type": "عامل",
+        "amount": 400,
+        "location": "نظافه شقق للتسليم في Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "c9452e6e-6248-4552-923b-c58761edbae6"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "ca256f52-f263-4f88-958b-b9d92332549a"
+      ],
+      "value": {
+        "recordId": "7febf65c-e46e-4914-bac6-c5f204c47ab1",
+        "name": "نشأت عيسى",
+        "type": "عامل",
+        "amount": 350,
+        "location": "المخزن",
+        "deduction": 0,
+        "notes": "",
+        "id": "ca256f52-f263-4f88-958b-b9d92332549a"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "cb572d61-fe04-4ebd-a554-fd91b6bb9cb3"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "عماد معوض",
+        "type": "صنايعى",
+        "amount": 550,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "ccc0fda4-7647-4d3c-99aa-74c7268176c8"
+      ],
+      "value": {
+        "recordId": "aeebb643-7b0b-4bbc-8d54-752fd92b6712",
+        "name": "ابو العلى",
+        "type": "مشرف عمال",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "cccd9f80-9aa7-41c1-8c89-ab8e51b4ac09"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "بلال عيد",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "ce2c2739-b285-416d-bde9-77d35c91f056"
+      ],
+      "value": {
+        "recordId": "16d959e2-c447-468e-954a-f81f7ce77612",
+        "name": "صمؤيل وهبه",
+        "type": "عامل",
+        "amount": 350,
+        "location": "البوابه ١ للمشروع",
+        "deduction": 0,
+        "notes": "",
+        "id": "ce2c2739-b285-416d-bde9-77d35c91f056"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "ce85490f-c3c4-412a-bd49-e69745f02c8c"
+      ],
+      "value": {
+        "recordId": "8b0f28b0-7a5e-4f56-8036-90fc6798883a",
+        "name": "مينا عاطف نعيم",
+        "type": "عامل",
+        "amount": 350,
+        "location": "كاكتس A",
+        "deduction": 0,
+        "notes": "اشراف استاذ ياسر"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "d1d19094-76d8-43f6-a84a-2ddfd7b2a86f"
+      ],
+      "value": {
+        "recordId": "b87dd6df-1b3d-4b44-8eef-02ace5f55d7e",
+        "name": "عياد محروس",
+        "type": "صنايعى",
+        "amount": 600,
+        "location": "كاسيا B",
+        "deduction": 0,
+        "notes": "",
+        "id": "d1d19094-76d8-43f6-a84a-2ddfd7b2a86f"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "d2f4262c-df2d-47c2-9087-1536a75495f4"
+      ],
+      "value": {
+        "recordId": "7ae6bb1f-daeb-4e2a-8fc3-b6d5eb68c1d9",
+        "name": "حسين خلاوى",
+        "type": "صنايعى",
+        "amount": 400,
+        "location": "كاكتسA",
+        "deduction": 0,
+        "notes": "",
+        "id": "d2f4262c-df2d-47c2-9087-1536a75495f4"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "d3eae150-540f-4b94-ace8-558d84f143d6"
+      ],
+      "value": {
+        "recordId": "f7dc0fbc-ea00-49a0-8a6f-006bccb43066",
+        "name": "مصطفى على",
+        "type": "نحات",
+        "amount": 400,
+        "location": "لانتانا A",
+        "deduction": 0,
+        "notes": "عمال تبع استاذ ياسر",
+        "id": "d3eae150-540f-4b94-ace8-558d84f143d6"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "d406867f-00c5-4ecb-b1d0-c5deb6ef0fd3"
+      ],
+      "value": {
+        "recordId": "71635f7f-c8d4-4f49-9d86-438131300d79",
+        "name": "عبد الرحمن عبد الجابر",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "d406867f-00c5-4ecb-b1d0-c5deb6ef0fd3"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "d4b6263d-f201-4352-908f-a8a2358d1a4a"
+      ],
+      "value": {
+        "recordId": "8b0f28b0-7a5e-4f56-8036-90fc6798883a",
+        "name": "حسين فتحى",
+        "type": "نحات",
+        "amount": 400,
+        "location": "نحاته في لانتانا A",
+        "deduction": 0,
+        "notes": "اشراف استاذ ياسر"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "d5af12d9-b579-4a98-94a2-9499ac04c3b6"
+      ],
+      "value": {
+        "recordId": "51344424-c2b7-4560-ab39-1f787b923c1d",
+        "name": "سليمان عبد السيد",
+        "type": "نحات",
+        "amount": 400,
+        "location": "بدروم",
+        "deduction": 0,
+        "notes": "",
+        "id": "d5af12d9-b579-4a98-94a2-9499ac04c3b6"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "d765ab79-fd4f-43f1-8a88-b3742bdcd0e2"
+      ],
+      "value": {
+        "recordId": "8b0f28b0-7a5e-4f56-8036-90fc6798883a",
+        "name": "حسين خلاوى",
+        "type": "صنايعى",
+        "amount": 400,
+        "location": "نقاشه في كاكتس A",
+        "deduction": 0,
+        "notes": "اشراف استاذ ياسر"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "d81194ef-5a31-4763-9681-0fbad27572fd"
+      ],
+      "value": {
+        "recordId": "d6f7cc1a-a368-4ac0-ae1e-66fa4863c5e1",
+        "name": "مصطفى على",
+        "type": "نحات",
+        "amount": 400,
+        "location": "  لانتانا س",
+        "deduction": 0,
+        "notes": "",
+        "id": "d81194ef-5a31-4763-9681-0fbad27572fd"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "d832d5a3-e9e3-4d68-96c4-448d8cac1791"
+      ],
+      "value": {
+        "recordId": "ba1bd140-53f8-4839-b947-360a92734751",
+        "name": "فادى مكرم",
+        "type": "عامل",
+        "amount": 350,
+        "location": "المخزن",
+        "deduction": 0,
+        "notes": "",
+        "id": "d832d5a3-e9e3-4d68-96c4-448d8cac1791"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "d89921a7-1b1a-41c2-a2ba-ec9f2cae750f"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "طه محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "d9189d22-88fd-4ba7-8e70-52b85dc966d7"
+      ],
+      "value": {
+        "recordId": "e544a3b4-ee9b-4e16-9cae-894080ca9b6b",
+        "name": "عياد محروس",
+        "type": "صنايعى",
+        "amount": 600,
+        "location": "بونساي Dمراجعه على الشقق وتعديل ملاحظات ",
+        "deduction": 0,
+        "notes": "",
+        "id": "d9189d22-88fd-4ba7-8e70-52b85dc966d7"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "d94145d8-9a3c-4cbd-b38a-c48ec24dedee"
+      ],
+      "value": {
+        "recordId": "9dbc62d6-6ffd-47fb-9c28-a977d7d904b7",
+        "name": "حسين خلاوى",
+        "type": "صنايعى",
+        "amount": 400,
+        "location": "كاكتيس ا",
+        "deduction": 0,
+        "notes": "",
+        "id": "d94145d8-9a3c-4cbd-b38a-c48ec24dedee"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "d980c64c-03e3-4552-b74a-5249c00ba083"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "امير جرجس",
+        "type": "بوفيه",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "da015678-5c24-4f65-9186-27c01af13e7d"
+      ],
+      "value": {
+        "recordId": "b3acb765-5391-46d5-b78d-ac9393b4abd5",
+        "name": "دانيال أيمن",
+        "type": "عامل",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "db445083-04f5-4770-b08f-846bf4c46690"
+      ],
+      "value": {
+        "recordId": "f34f8986-94f6-4810-b426-7a46d6bb0854",
+        "name": "امير جرجس",
+        "type": "بوفيه",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "db445083-04f5-4770-b08f-846bf4c46690"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "dcd741d1-3d1c-4734-90f8-b9bf53574417"
+      ],
+      "value": {
+        "recordId": "cf8d9a0c-2838-4801-ac3c-74a4cc6d0fe0",
+        "name": "Test",
+        "type": "عامل",
+        "amount": 0,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "dcd741d1-3d1c-4734-90f8-b9bf53574417"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "dcee2afc-40f0-4248-ace7-e90a0d61bc4f"
+      ],
+      "value": {
+        "recordId": "b8a70982-1ceb-4a6a-9758-ce52bb8b45fd",
+        "name": "امير جرجس",
+        "type": "بوفيه",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "dcee2afc-40f0-4248-ace7-e90a0d61bc4f"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "df8baf7c-b872-4c09-97df-8c8cf38d8262"
+      ],
+      "value": {
+        "recordId": "f03ab49c-b2e4-4a5e-8abd-dfd1466483d9",
+        "name": "محمد محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "df8baf7c-b872-4c09-97df-8c8cf38d8262"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "e077f111-de74-4661-8635-f0158ee7f380"
+      ],
+      "value": {
+        "recordId": "2a1a75cf-30e9-4f56-a02d-2c701ec5cf69",
+        "name": "محمد سالم",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "e077f111-de74-4661-8635-f0158ee7f380"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "e24313fc-ae94-4387-a818-f7166dd7db1b"
+      ],
+      "value": {
+        "recordId": "6d8beeb5-b7f1-4dae-9742-5b74c2f53835",
+        "name": "دانيال أيمن",
+        "type": "عامل",
+        "amount": 350,
+        "location": "رفع الخطوط وتنسيبها",
+        "deduction": 0,
+        "notes": "رفع مناسيب السور امام لانتانا",
+        "id": "e24313fc-ae94-4387-a818-f7166dd7db1b"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "e6275962-1c04-4159-b5dc-152ee09e0d84"
+      ],
+      "value": {
+        "recordId": "14d00ead-cb45-460b-a2bb-8700f0f6cf5a",
+        "name": "عماد معوض",
+        "type": "صنايعى",
+        "amount": 550,
+        "location": "لانتانا A",
+        "deduction": 0,
+        "notes": "",
+        "id": "e6275962-1c04-4159-b5dc-152ee09e0d84"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "e772c630-1db8-4ead-a803-b72d8fa9a864"
+      ],
+      "value": {
+        "recordId": "01122ded-9e88-4abf-9038-d7598a74ba0c",
+        "name": "عبد الرحمن عبد الجابر",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "e8ab374b-32a1-4180-8e1c-5310d27027ac"
+      ],
+      "value": {
+        "recordId": "01122ded-9e88-4abf-9038-d7598a74ba0c",
+        "name": "مصطفى محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "ea75db53-ceaf-4aa4-a42c-77a125938048"
+      ],
+      "value": {
+        "recordId": "613e6479-c130-47cc-b94f-cbe28513d569",
+        "name": "محمد محمود يحيى",
+        "type": "عامل",
+        "amount": 400,
+        "location": "نظافه شقق للتسليم في Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "ea75db53-ceaf-4aa4-a42c-77a125938048"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "eb32b899-2229-46d0-a066-93d3980be6b1"
+      ],
+      "value": {
+        "recordId": "df7d92c9-9e70-4eaf-8c8d-943b344b2966",
+        "name": "صمؤيل وهبه",
+        "type": "نحات",
+        "amount": 400,
+        "location": "البوابه ",
+        "deduction": 0,
+        "notes": "",
+        "id": "eb32b899-2229-46d0-a066-93d3980be6b1"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "eb4e6f1b-0788-4bbb-aab4-92bd1fe3a996"
+      ],
+      "value": {
+        "recordId": "3ab1e622-f4ae-4ada-b197-94587fb3b298",
+        "name": "عياد محروس",
+        "type": "صنايعى",
+        "amount": 600,
+        "location": "كاكتس D,B",
+        "deduction": 0,
+        "notes": "",
+        "id": "eb4e6f1b-0788-4bbb-aab4-92bd1fe3a996"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "ed836df2-df26-47c5-98da-9efc2758e081"
+      ],
+      "value": {
+        "recordId": "9d405e74-01c8-4cb2-a417-e3f12b0ad5f8",
+        "name": "محمد محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D ",
+        "deduction": 0,
+        "notes": "",
+        "id": "ed836df2-df26-47c5-98da-9efc2758e081"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "ef72f9e5-f9f2-4da9-8a52-49cc07989367"
+      ],
+      "value": {
+        "recordId": "94bae72c-dda3-44ba-afee-bd436887db75",
+        "name": "فادى سلامه",
+        "type": "عامل",
+        "amount": 350,
+        "location": "مع الكهربائية ",
+        "deduction": 0,
+        "notes": "",
+        "id": "ef72f9e5-f9f2-4da9-8a52-49cc07989367"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "ef7e0dd2-01fb-4132-9ec8-0b106de50f23"
+      ],
+      "value": {
+        "recordId": "7ae6bb1f-daeb-4e2a-8fc3-b6d5eb68c1d9",
+        "name": "حسين فتحى",
+        "type": "نحات",
+        "amount": 400,
+        "location": "لانتانا A",
+        "deduction": 0,
+        "notes": "",
+        "id": "ef7e0dd2-01fb-4132-9ec8-0b106de50f23"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "f0df776f-57d2-4e28-ab63-4aa141799d5d"
+      ],
+      "value": {
+        "recordId": "ba1bd140-53f8-4839-b947-360a92734751",
+        "name": "نشأت عيسى",
+        "type": "عامل",
+        "amount": 350,
+        "location": "المخزن",
+        "deduction": 0,
+        "notes": "",
+        "id": "f0df776f-57d2-4e28-ab63-4aa141799d5d"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "f17c1a96-7d9e-4735-b9a7-8f92b21df171"
+      ],
+      "value": {
+        "recordId": "f7dc0fbc-ea00-49a0-8a6f-006bccb43066",
+        "name": "مينا عاطف نعيم",
+        "type": "عامل",
+        "amount": 350,
+        "location": "لانتانا A",
+        "deduction": 0,
+        "notes": "عمال تبع استاذ ياسر",
+        "id": "f17c1a96-7d9e-4735-b9a7-8f92b21df171"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "f1cc5f5a-3737-45d6-907c-609c49011943"
+      ],
+      "value": {
+        "recordId": "13d19558-e4ef-4cdf-a551-19479e94bc7c",
+        "name": "سليمان عبد السيد",
+        "type": "نحات",
+        "amount": 400,
+        "location": "بدروم",
+        "deduction": 0,
+        "notes": "",
+        "id": "f1cc5f5a-3737-45d6-907c-609c49011943"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "f4bf39c6-cda0-4acd-a1e2-252dc692fa2b"
+      ],
+      "value": {
+        "recordId": "71635f7f-c8d4-4f49-9d86-438131300d79",
+        "name": "طه محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "ف شقق بونساي D مش",
+        "deduction": 0,
+        "notes": "",
+        "id": "f4bf39c6-cda0-4acd-a1e2-252dc692fa2b"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "f4d54988-06a6-4228-a11a-121d3bf4c340"
+      ],
+      "value": {
+        "recordId": "94889fd6-54bb-40fc-a2a8-c2162779020c",
+        "name": "عماد معوض",
+        "type": "صنايعى",
+        "amount": 550,
+        "location": "كاكتس B",
+        "deduction": 0,
+        "notes": "",
+        "id": "f4d54988-06a6-4228-a11a-121d3bf4c340"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "f5ee72fd-a3ad-4204-84b8-50ded40d431c"
+      ],
+      "value": {
+        "recordId": "046f587c-34a0-416d-b28f-81b387a4720c",
+        "name": "حسين فتحى",
+        "type": "نحات",
+        "amount": 400,
+        "location": "كاكتس d",
+        "deduction": 0,
+        "notes": "",
+        "id": "f5ee72fd-a3ad-4204-84b8-50ded40d431c"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "f6be20a1-e695-45e5-95df-3630c257e265"
+      ],
+      "value": {
+        "recordId": "e31d7d6d-20d8-4aec-87cc-99db1daf7415",
+        "name": "محمد سالم",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "f6be20a1-e695-45e5-95df-3630c257e265"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "f72eb6d4-a62e-47ef-9ba6-a8e6812cdb4b"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "مصطفي عبد الوكيل",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "f7551f02-05ae-4f6e-9b55-c8f1308a84a5"
+      ],
+      "value": {
+        "recordId": "5fb6d598-33be-40f6-b6d4-c7d7af0d1fd5",
+        "name": "حسين فتحى",
+        "type": "نحات",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "",
+        "id": "f7551f02-05ae-4f6e-9b55-c8f1308a84a5"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "faf7af50-7321-42f0-90d7-fbc409ba0ef9"
+      ],
+      "value": {
+        "recordId": "3dee57f8-b6df-4a12-b604-d5a1711ce1f9",
+        "name": "صمؤيل وهبه",
+        "type": "عامل",
+        "amount": 350,
+        "location": "C h",
+        "deduction": 0,
+        "notes": "نقل عدة بجوار المبني الخدمي بالخصم على الشركة العربية ",
+        "id": "faf7af50-7321-42f0-90d7-fbc409ba0ef9"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "fb8adb0c-115b-4c3b-b6fa-882c4a0cf721"
+      ],
+      "value": {
+        "recordId": "94bae72c-dda3-44ba-afee-bd436887db75",
+        "name": "عماد معوض",
+        "type": "صنايعى",
+        "amount": 550,
+        "location": "كاكتس D ",
+        "deduction": 0,
+        "notes": "",
+        "id": "fb8adb0c-115b-4c3b-b6fa-882c4a0cf721"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "fbaf2633-b7a6-4698-afe6-0128c9f3b1a7"
+      ],
+      "value": {
+        "recordId": "36b8636d-2402-4f85-9111-b8776840a0f7",
+        "name": "نشأت عيسى",
+        "type": "عامل",
+        "amount": 350,
+        "location": "",
+        "deduction": 0,
+        "notes": ""
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "fc19b4e6-662a-4b6f-b0ad-10e9c4ad9afc"
+      ],
+      "value": {
+        "recordId": "2779ccd6-6cf2-4cef-8e05-04a79d4e8f97",
+        "name": "دانيال أيمن",
+        "type": "عامل",
+        "amount": 350,
+        "location": "استكمال رفع البدروم",
+        "deduction": 0,
+        "notes": "",
+        "id": "fc19b4e6-662a-4b6f-b0ad-10e9c4ad9afc"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "fc83cb73-4c6e-47e2-81c5-be8e0713c594"
+      ],
+      "value": {
+        "recordId": "94889fd6-54bb-40fc-a2a8-c2162779020c",
+        "name": "عياد محروس",
+        "type": "صنايعى",
+        "amount": 600,
+        "location": "لانتانا A,وكاكتس D",
+        "deduction": 0,
+        "notes": "",
+        "id": "fc83cb73-4c6e-47e2-81c5-be8e0713c594"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "fd67d7df-06df-4881-9247-05b779cd18ee"
+      ],
+      "value": {
+        "recordId": "f03ab49c-b2e4-4a5e-8abd-dfd1466483d9",
+        "name": "طه محمود",
+        "type": "عامل",
+        "amount": 400,
+        "location": "Bonsai D",
+        "deduction": 0,
+        "notes": "",
+        "id": "fd67d7df-06df-4881-9247-05b779cd18ee"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "fdadd503-cf18-45ad-a81f-cfed71c8e382"
+      ],
+      "value": {
+        "recordId": "ddd63b70-0be3-4a25-be06-163e61e0526e",
+        "name": "ابو العلى",
+        "type": "مشرف عمال",
+        "amount": 400,
+        "location": "موقع عام",
+        "deduction": 0,
+        "notes": "",
+        "id": "fdadd503-cf18-45ad-a81f-cfed71c8e382"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "fdadf78e-dbb5-453e-bcb1-3f4cff1b9cc5"
+      ],
+      "value": {
+        "recordId": "2ab75945-75b4-4966-b548-fb7891a3f2d4",
+        "name": "محمد سالم",
+        "type": "عامل",
+        "amount": 400,
+        "location": "",
+        "deduction": 0,
+        "notes": "نقل سقالات + معالجة خرسانة ",
+        "id": "fdadf78e-dbb5-453e-bcb1-3f4cff1b9cc5"
+      }
+    },
+    {
+      "key": [
+        "workers",
+        "feaac482-5a32-4628-9c96-f830d7880bf8"
+      ],
+      "value": {
+        "recordId": "7febf65c-e46e-4914-bac6-c5f204c47ab1",
+        "name": "فادى مكرم",
+        "type": "عامل",
+        "amount": 350,
+        "location": "المخزن",
+        "deduction": 0,
+        "notes": "",
+        "id": "feaac482-5a32-4628-9c96-f830d7880bf8"
+      }
+    }
+  ],
+  "worker_directory": [
+    {
+      "key": [
+        "worker_directory",
+        "0d48c5bb-4b50-41e3-a4f7-a9ed6cdab4cf"
+      ],
+      "value": {
+        "name": "فادى سلامه",
+        "type": "عامل",
+        "defaultAmount": "350"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "0e527e8f-dfe6-42c4-9e9a-eb084eefe8d7"
+      ],
+      "value": {
+        "name": "مصطفى على",
+        "type": "نحات",
+        "defaultAmount": "400"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "1e74f71e-d081-4548-81d8-8c05018c5a27"
+      ],
+      "value": {
+        "name": "طه محمود",
+        "type": "عامل",
+        "defaultAmount": "400"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "25538f8e-c46d-433a-91a8-2356b252c5ec"
+      ],
+      "value": {
+        "name": "Test",
+        "type": "عامل",
+        "defaultAmount": "0"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "3836f1a8-89e8-4f48-ae3f-b2d47351651b"
+      ],
+      "value": {
+        "name": "حسين خلاوى",
+        "type": "صنايعى",
+        "defaultAmount": "400"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "39063f60-3ff5-4465-baf8-8f89ac462f68"
+      ],
+      "value": {
+        "name": "مصطفي عبد الوكيل",
+        "type": "عامل",
+        "defaultAmount": "400"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "5ba57786-13d7-478d-9bec-04face99bffa"
+      ],
+      "value": {
+        "name": "محمد محمود يحيى",
+        "type": "عامل",
+        "defaultAmount": "400",
+        "id": "5ba57786-13d7-478d-9bec-04face99bffa"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "5c7f8f9c-51d8-4012-a79b-ba056495d691"
+      ],
+      "value": {
+        "name": "محمد سالم",
+        "type": "عامل",
+        "defaultAmount": "400"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "5d438d6c-ec07-4dff-a6f1-5f2008151837"
+      ],
+      "value": {
+        "name": "محمد محمود فوزى",
+        "type": "عامل",
+        "defaultAmount": "400"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "752c88b2-8b41-4cee-8c54-94766cbbb384"
+      ],
+      "value": {
+        "name": "فادى مكرم",
+        "type": "عامل",
+        "defaultAmount": "350"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "7c10a056-c742-41b8-b814-6d202403266e"
+      ],
+      "value": {
+        "name": "عياد محروس",
+        "type": "صنايعي",
+        "defaultAmount": "600"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "93bf3e92-9b35-40d6-9452-8ac83ec057b4"
+      ],
+      "value": {
+        "name": "رومانى شحاته",
+        "type": "عامل",
+        "defaultAmount": "350"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "9dd9cab6-10a4-45b9-891d-c83566cee346"
+      ],
+      "value": {
+        "name": "بلال عيد",
+        "type": "عامل",
+        "defaultAmount": "400"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "9fc4e0cb-2f3c-4261-8105-5e3f57855e4f"
+      ],
+      "value": {
+        "name": "مؤمن على",
+        "type": "عامل",
+        "defaultAmount": "350"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "a833ac55-cb42-4970-a587-b4a6df461306"
+      ],
+      "value": {
+        "name": "عبد الرحمن عبد الجابر",
+        "type": "عامل",
+        "defaultAmount": "400",
+        "id": "a833ac55-cb42-4970-a587-b4a6df461306"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "b2ff2783-748c-4d55-95cb-30054cc288fe"
+      ],
+      "value": {
+        "name": "سليمان عبد السيد",
+        "type": "نحات",
+        "defaultAmount": "400"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "b6e466d9-dc91-41ca-95d1-da5ea9d6bc19"
+      ],
+      "value": {
+        "name": "مصطفى محمود",
+        "type": "عامل",
+        "defaultAmount": "400"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "bdad1328-ef1b-4483-a707-46245ad5a869"
+      ],
+      "value": {
+        "name": "رومانى عبد المسيح",
+        "type": "عامل",
+        "defaultAmount": "350"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "c06efda0-063c-4dca-b72b-f4b61326a351"
+      ],
+      "value": {
+        "name": "دانيال أيمن",
+        "type": "عامل",
+        "defaultAmount": "350"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "c1ae9d48-227d-4e23-ba10-94e86d3ac2b2"
+      ],
+      "value": {
+        "name": "صلاح عيد",
+        "type": "عامل",
+        "defaultAmount": "350"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "ce0cc5a0-5994-4dcb-bd80-fa5950ef4d02"
+      ],
+      "value": {
+        "name": "عماد معوض",
+        "type": "صنايعي",
+        "defaultAmount": "550"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "cedb74c9-31ec-4fe1-8139-770bca9257f0"
+      ],
+      "value": {
+        "name": "حسين فتحى",
+        "type": "نحات",
+        "defaultAmount": "400"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "d188ddf2-5cc2-40d5-a077-c0e1cbcfae68"
+      ],
+      "value": {
+        "name": "عبد المسيح",
+        "type": "عامل",
+        "defaultAmount": "350"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "d34bb380-3c4d-4a88-9464-dbcc6ce8ac90"
+      ],
+      "value": {
+        "name": "نشأت عيسى",
+        "type": "عامل",
+        "defaultAmount": "350"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "d50e4e94-356a-4abc-8c9d-3f1574a6b0f2"
+      ],
+      "value": {
+        "name": "امير جرجس",
+        "type": "بوفيه",
+        "defaultAmount": "350"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "dea68e6a-6ecb-4165-bc8d-70b03ee64687"
+      ],
+      "value": {
+        "name": "مينا عاطف نعيم",
+        "type": "عامل",
+        "defaultAmount": "350"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "e1fec50f-b251-45bd-a2aa-dfef81c4595e"
+      ],
+      "value": {
+        "name": "صمؤيل وهبه",
+        "type": "عامل",
+        "defaultAmount": "350"
+      }
+    },
+    {
+      "key": [
+        "worker_directory",
+        "fa9e2d87-53ba-42eb-9b56-2ba74c150d49"
+      ],
+      "value": {
+        "name": "ابو العلى",
+        "type": "مشرف عمال",
+        "defaultAmount": "500",
+        "id": "fa9e2d87-53ba-42eb-9b56-2ba74c150d49"
+      }
+    }
+  ]
+}

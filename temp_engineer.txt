@@ -1,0 +1,53 @@
+
+> index_backup_pre_offline.html:1009:            <section id="view-engineer" class="view hidden">
+  index_backup_pre_offline.html:1010:                <header class="view-header flex-between" style="align-items: center; margin-bottom: 20px;">
+  index_backup_pre_offline.html:1011:                    <h2><i class="fas fa-check-double"></i> اعتماد السراكي</h2>
+  index_backup_pre_offline.html:1012:                    <div style="display: flex; gap: 10px; align-items: center;">
+  index_backup_pre_offline.html:1013:                                                                        <select id="engineer-status-filter" class="modal-input" style="width: auto; margin-bottom: 0; padding: 5px 15px;" onchange="app.loadEngineerData()">
+  index_backup_pre_offline.html:1014:                            <option value="all">الكل</option>
+  index_backup_pre_offline.html:1015:                            <option value="pending" selected>قيد الانتظار</option>
+  index_backup_pre_offline.html:1016:                            <option value="approved">معتمد</option>
+  index_backup_pre_offline.html:1017:                            <option value="rejected">مرفوض</option>
+  index_backup_pre_offline.html:1018:                        </select>
+  index_backup_pre_offline.html:1019:                        <input type="date" id="engineer-date-filter" class="modal-input" style="width: auto; margin-bottom: 0; padding: 5px 15px;" onchange="app.loadEngineerData()">
+  index_backup_pre_offline.html:1020:
+  index_backup_pre_offline.html:1021:                    </div>
+  index_backup_pre_offline.html:1022:                </header>
+  index_backup_pre_offline.html:1023:                <div id="engineer-records-container" class="records-container">
+  index_backup_pre_offline.html:1024:                    <!-- Records populated dynamically -->
+  index_backup_pre_offline.html:1025:                </div>
+  index_backup_pre_offline.html:1026:                
+  index_backup_pre_offline.html:1027:                <!-- Record Details Modal -->
+  index_backup_pre_offline.html:1028:                <div id="record-modal" class="modal hidden">
+  index_backup_pre_offline.html:1029:                    <div class="modal-content card">
+  index_backup_pre_offline.html:1030:                        <div class="modal-header">
+  index_backup_pre_offline.html:1031:                            <h3>تفاصيل السركي</h3>
+  index_backup_pre_offline.html:1032:                            <button id="close-modal-btn" class="btn-icon"><i class="fas fa-times"></i></button>
+  index_backup_pre_offline.html:1033:                        </div>
+  index_backup_pre_offline.html:1034:                        <div class="modal-body" id="record-modal-body">
+  index_backup_pre_offline.html:1035:                            <!-- Details loaded here -->
+  index_backup_pre_offline.html:1036:                        </div>
+  index_backup_pre_offline.html:1037:                        <div class="modal-footer" id="record-modal-footer">
+  index_backup_pre_offline.html:1038:                            <button id="approve-record-btn" class="btn btn-success"><i class="fas fa-check"></i> اعتماد السركي</button>
+  index_backup_pre_offline.html:1039:                            <button id="reject-record-btn" class="btn btn-danger"><i class="fas fa-times"></i> رفض السركي</button>
+  index_backup_pre_offline.html:1040:                        </div>
+  index_backup_pre_offline.html:1041:                    </div>
+  index_backup_pre_offline.html:1042:                </div>
+  index_backup_pre_offline.html:1043:            </section>
+  index_backup_pre_offline.html:1044:
+  index_backup_pre_offline.html:1045:            <!-- Reports View -->
+  index_backup_pre_offline.html:1046:            <section id="view-reports" class="view hidden">
+  index_backup_pre_offline.html:1047:                <header class="view-header" style="display: flex; justify-content: space-between; align-items: center;">
+  index_backup_pre_offline.html:1048:                    <h2><i class="fas fa-chart-bar"></i> التقارير المجمعة</h2>
+  index_backup_pre_offline.html:1049:                    <button class="btn btn-success" onclick="app.exportStyledExcel()" style="display: flex; align-items: center; gap: 5px; background-color: #217346; color: white;">
+  index_backup_pre_offline.html:1050:                        <i class="fas fa-file-excel"></i> إكسيل <i class="fas fa-download"></i>
+  index_backup_pre_offline.html:1051:                    </button>
+  index_backup_pre_offline.html:1052:                </header>
+  index_backup_pre_offline.html:1053:                <div class="card filter-card">
+  index_backup_pre_offline.html:1054:                    <form id="filter-form" class="inline-form">
+  index_backup_pre_offline.html:1055:                        <div class="form-group">
+  index_backup_pre_offline.html:1056:                            <label for="filter-start-date">من تاريخ</label>
+  index_backup_pre_offline.html:1057:                            <input type="date" id="filter-start-date">
+  index_backup_pre_offline.html:1058:                        </div>
+  index_backup_pre_offline.html:1059:                        <div class="form-group">
+
