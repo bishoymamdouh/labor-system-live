@@ -3197,8 +3197,14 @@ class UI {
             }
         });
         
-        document.getElementById('total-workers-count').innerText = count;
+                document.getElementById('total-workers-count').innerText = count;
         document.getElementById('total-amount').innerText = total.toLocaleString();
+        
+        // Force hide total amount for non-admins/engineers
+        if (typeof auth !== 'undefined' && auth.getRole() !== 'admin' && auth.getRole() !== 'engineer') {
+            const container = document.getElementById('total-amount-container');
+            if (container) container.style.display = 'none';
+        }
     }
     
     async submitRecord() {
@@ -4421,6 +4427,7 @@ document.addEventListener('click', (e) => {
 </script>
 </body>
 </html>
+
 
 
 
