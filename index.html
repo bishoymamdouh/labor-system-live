@@ -958,7 +958,7 @@ h1, h2, h3, h4 {
                                 <tr>
                                     <th>اسم العامل</th>
                                     <th>النوع</th>
-                                    <th>اليومية</th>
+                                    <th class="wage-col">اليومية</th>
                                     <th>إجراءات</th>
                                 </tr>
                             </thead>
@@ -1715,7 +1715,7 @@ class UI {
                         <tr>
                             <th>الاسم</th>
                             <th>النوع</th>
-                            <th>اليومية</th>
+                            <th class="wage-col">اليومية</th>
                             <th>المكان</th>
                             <th>خصم</th>
                             <th>ملاحظات</th>
@@ -1897,7 +1897,7 @@ class UI {
                     <tr>
                         <th>الاسم</th>
                         <th>النوع</th>
-                        <th>اليومية</th>
+                        <th class="wage-col">اليومية</th>
                         <th>مكان العمل</th>
                         <th>خصم</th>
                         <th>ملاحظات</th>
@@ -2833,9 +2833,25 @@ class UI {
 
     async setupWorkspace() {
         const role = auth.getRole();
-        if (role === 'supervisor') {
+        if (role !== 'admin' && role !== 'engineer') {
             if (!document.getElementById('supervisor-hide-wage')) {
-                document.head.insertAdjacentHTML('beforeend', '<style id="supervisor-hide-wage">#workers-table th:nth-child(3), #workers-table td:nth-child(3), #summary-total-amount { display: none !important; }</style>');
+                document.head.insertAdjacentHTML('beforeend', '<style id="supervisor-hide-wage">
+    /* Hide wage column in Directory table */
+    #directory-table th:nth-child(3), #directory-table td:nth-child(3),
+    /* Hide wage column in Add Record table */
+    #workers-table th:nth-child(3), #workers-table td:nth-child(3),
+    /* Hide wage, deduction, net columns in Report Details */
+    #report-details-table th:nth-child(3), #report-details-table td:nth-child(3),
+    #report-details-table th:nth-child(5), #report-details-table td:nth-child(5),
+    #report-details-table th:nth-child(6), #report-details-table td:nth-child(6),
+    /* Hide wage, deduction, net columns in Admin Records list */
+    #engineer-records-list td:nth-child(4), #engineer-records-list th:nth-child(4),
+    #engineer-records-list td:nth-child(5), #engineer-records-list th:nth-child(5),
+    #engineer-records-list td:nth-child(6), #engineer-records-list th:nth-child(6),
+    /* Hide total amounts */
+    #summary-total-amount, .summary-row
+    { display: none !important; }
+</style>');
             }
         } else {
             const styleNode = document.getElementById('supervisor-hide-wage');
@@ -3546,7 +3562,7 @@ class UI {
                 } else if (role === 'engineer') {
                     await this.loadEngineerData();
                     await this.generateReport();
-                } else if (role === 'supervisor') {
+                } else if (role !== 'admin' && role !== 'engineer') {
                     await this.loadSupervisorData();
                 }
             
@@ -3604,7 +3620,7 @@ class UI {
                 } else if (role === 'engineer') {
                     await this.loadEngineerData();
                     await this.generateReport();
-                } else if (role === 'supervisor') {
+                } else if (role !== 'admin' && role !== 'engineer') {
                     await this.loadSupervisorData();
                 }
             
@@ -3735,7 +3751,7 @@ class UI {
                 } else if (role === 'engineer') {
                     await this.loadEngineerData();
                     await this.generateReport();
-                } else if (role === 'supervisor') {
+                } else if (role !== 'admin' && role !== 'engineer') {
                     await this.loadSupervisorData();
                 }
                 
@@ -3854,7 +3870,7 @@ class UI {
                 // Fetch and render records again to ensure it is in the DOM
                 const records = await db.getRecordsWithDetails(null, null, role === 'admin' ? null : auth.currentUser.id, { start: record.date, end: record.date });
                 UI.renderEngineerRecords(records, role);
-            } else if (role === 'supervisor') {
+            } else if (role !== 'admin' && role !== 'engineer') {
                 UI.showView('view-supervisor');
                 document.querySelectorAll('#nav-links a').forEach(l => l.classList.remove('active'));
                 const targetLink = document.querySelector('a[data-view="view-supervisor"]');
@@ -4421,6 +4437,9 @@ document.addEventListener('click', (e) => {
 </script>
 </body>
 </html>
+
+
+
 
 
 
