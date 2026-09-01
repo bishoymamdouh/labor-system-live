@@ -12,7 +12,7 @@ const isDeploy = !!Deno.env.get("DENO_REGION") || !!Deno.env.get("DENO_DEPLOYMEN
 let kv;
 async function handler(req: Request): Promise<Response> {
     if (!kv) {
-        kv = isDeploy ? await Deno.openKv() : await Deno.openKv("./database.sqlite");
+        kv = isDeploy ? await Deno.openKv() : await Deno.openKv(Deno.env.get("DENO_REGION") ? undefined : "./database.sqlite");
     }
     const url = new URL(req.url);
     const method = req.method;
