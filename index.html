@@ -1742,7 +1742,7 @@ class UI {
                                 <option value="اخرى" ${w.type==='اخرى'?'selected':''}>اخرى</option>
                             </select>
                         </td>
-                        <td><input type="number" id="${view}-card-amount-${w.id}" value="${w.amount}" class="modal-input" style="width: 75px;"></td>
+                        <td class="wage-col"><input type="number" id="${view}-card-amount-${w.id}" value="${w.amount}" class="modal-input" style="width: 75px;"></td>
                         <td><input type="text" id="${view}-card-location-${w.id}" value="${w.location || ''}" class="modal-input" style="width: 110px;"></td>
                         <td><input type="number" id="${view}-card-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="width: 75px;"></td>
                         <td><input type="text" id="${view}-card-notes-${w.id}" value="${w.notes || ''}" class="modal-input" style="min-width: 130px; width: 100%;"></td>
@@ -1763,7 +1763,7 @@ class UI {
                     <tr style="${deletedStyle}">
                         <td>${w.name} ${deletedBadge}</td>
                         <td>${w.type}</td>
-                        <td>${w.amount}</td>
+                        <td class="wage-col">${w.amount}</td>
                         <td>${w.location || '-'}</td>
                         <td>${deductionBadge ? deductionBadge : deductionVal}</td>
                         <td>${w.notes || '-'}</td>
@@ -1778,7 +1778,7 @@ class UI {
                 </table>
             </div>
             <div class="flex-between mb-10">
-                <strong>الإجمالي: ${currentTotal.toLocaleString()} جنية</strong>
+                <strong class="wage-col">الإجمالي: ${currentTotal.toLocaleString()} جنية</strong>
                 <small>العمال: ${r.totalWorkers}</small>
             </div>
         `;
@@ -1912,7 +1912,7 @@ class UI {
                     <tr>
                         <td>${w.name}</td>
                         <td>${w.type}</td>
-                        <td>${w.amount}</td>
+                        <td class="wage-col">${w.amount}</td>
                         <td>${w.location || ''}</td>
                         <td>${w.deduction || 0}</td>
                         <td>${w.notes || ''}</td>
@@ -4427,6 +4427,8 @@ document.addEventListener('click', (e) => {
 </script>
 </body>
 </html>
+
+
 
 
 
