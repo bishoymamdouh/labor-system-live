@@ -111,7 +111,7 @@ async function handler(req: Request): Promise<Response> {
 
         if (url.pathname === "/api/export" && method === "GET") {
             const data: any = {};
-            for (const collection of ["users", "records", "workers", "worker_directory"]) {
+            for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions"]) {
                 data[collection] = [];
                 const entries = kv.list({ prefix: [collection] });
                 for await (const entry of entries) {
@@ -163,7 +163,7 @@ async function handler(req: Request): Promise<Response> {
 
         if (url.pathname === "/api/import" && method === "POST") {
             const data = await req.json();
-            for (const collection of ["users", "records", "workers", "worker_directory"]) {
+            for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions"]) {
                 if (data[collection]) {
                     for (const item of data[collection]) {
                         await kv.set(item.key, item.value);
@@ -174,7 +174,7 @@ async function handler(req: Request): Promise<Response> {
         }
 
         // Ensure collection exists
-        if (!["users", "records", "workers", "worker_directory"].includes(collection) && collection !== "recordDetails" && collection !== "allRecordsDetails") {
+        if (!["users", "records", "workers", "worker_directory", "push_subscriptions"].includes(collection) && collection !== "recordDetails" && collection !== "allRecordsDetails") {
             return new Response("Not found", { status: 404 });
         }
 
