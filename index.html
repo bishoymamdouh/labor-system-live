@@ -938,7 +938,7 @@ h1, h2, h3, h4 {
                                 <option value="عامل">عامل</option>
                                 <option value="نحات">نحات</option>
                                 <option value="صنايعي">صنايعي</option>
-                                <option value="مشرف عمال">مشرف عمال</option>
+                                <option value="رئيس عمال">رئيس عمال</option>
                                 <option value="بوفيه">بوفيه</option>
                                 <option value="أخرى">أخرى</option>
                             </select>
@@ -3109,7 +3109,7 @@ class UI {
                     <option value="عامل">عامل</option>
                     <option value="نحات">نحات</option>
                     <option value="صنايعي">صنايعي</option>
-                    <option value="مشرف عمال">مشرف عمال</option>
+                    <option value="رئيس عمال">رئيس عمال</option>
                     <option value="بوفيه">بوفيه</option>
                     <option value="أخرى">أخرى</option>
                 </select>
@@ -3160,18 +3160,7 @@ class UI {
             return;
         }
         
-        const rates = {
-            'عامل': 350,
-            'نحات': 400,
-            'صنايعي': 550,
-            'بوفيه': 350,
-            'أخرى': 350
-        };
         
-        if (rates[selectedType] !== undefined) {
-            amountInput.value = rates[selectedType];
-            this.updateTotals();
-        }
     }
     
     removeWorkerRow(id) {
@@ -3501,17 +3490,7 @@ class UI {
             return;
         }
         
-        const rates = {
-            'عامل': 350,
-            'نحات': 400,
-            'صنايعي': 550,
-            'بوفيه': 350,
-            'أخرى': 350
-        };
         
-        if (rates[selectedType] !== undefined) {
-            amountInput.value = rates[selectedType];
-        }
     }
     
     async removeWorkerFromRecord(recordId, workerId) {
@@ -4427,6 +4406,7 @@ document.addEventListener('click', (e) => {
 </script>
 </body>
 </html>
+
 
 
 
