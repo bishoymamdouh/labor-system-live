@@ -3153,11 +3153,25 @@ class UI {
         
         const worker = this.directoryWorkers.find(w => w.id === selectedWorkerId);
         
-        if (worker && selectedType === worker.type) {
+                if (worker && selectedType === worker.type) {
             // If the supervisor selects the worker's native type, restore their custom native rate
             amountInput.value = worker.defaultAmount;
             this.updateTotals();
             return;
+        }
+        
+        const rates = {
+            'عامل': 350,
+            'نحات': 400,
+            'صنايعي': 550,
+            'رئيس عمال': 450,
+            'بوفيه': 350,
+            'أخرى': 350
+        };
+        
+        if (rates[selectedType] !== undefined) {
+            amountInput.value = rates[selectedType];
+            this.updateTotals();
         }
         
         
@@ -3485,9 +3499,22 @@ class UI {
         const selectedType = typeSelect.value;
         
         const worker = this.directoryWorkers.find(w => w.name === name);
-        if (worker && selectedType === worker.type) {
+                if (worker && selectedType === worker.type) {
             amountInput.value = worker.defaultAmount;
             return;
+        }
+        
+        const rates = {
+            'عامل': 350,
+            'نحات': 400,
+            'صنايعي': 550,
+            'رئيس عمال': 450,
+            'بوفيه': 350,
+            'أخرى': 350
+        };
+        
+        if (rates[selectedType] !== undefined) {
+            amountInput.value = rates[selectedType];
         }
         
         
@@ -4406,6 +4433,8 @@ document.addEventListener('click', (e) => {
 </script>
 </body>
 </html>
+
+
 
 
 
