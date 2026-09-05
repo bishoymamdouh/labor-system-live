@@ -934,14 +934,11 @@ h1, h2, h3, h4 {
                             <input type="text" id="dir-worker-name" required placeholder="اسم العامل">
                         </div>
                         <div class="form-group">
-                            <select id="dir-worker-type" required>
-                                <option value="عامل">عامل</option>
-                                <option value="نحات">نحات</option>
-                                <option value="صنايعي">صنايعي</option>
-                                <option value="رئيس عمال">رئيس عمال</option>
-                                <option value="بوفيه">بوفيه</option>
-                                <option value="أخرى">أخرى</option>
-                            </select>
+                            
+<select id="dir-worker-type" required onchange="if(this.value==='أخرى') { document.getElementById('dir-worker-type-other').style.display='block'; document.getElementById('dir-worker-type-other').required=true; } else { document.getElementById('dir-worker-type-other').style.display='none'; document.getElementById('dir-worker-type-other').required=false; document.getElementById('dir-worker-type-other').value=''; }">
+</select>
+<input type="text" id="dir-worker-type-other" placeholder="مسمى النوع الجديد" style="display:none; margin-top: 10px; width: 100%;" class="modal-input">
+
                         </div>
                         <div class="form-group">
                             <input type="number" id="dir-worker-amount" required min="0" placeholder="اليومية الافتراضية">
@@ -1526,6 +1523,38 @@ const auth = new Auth();
 // UI Helpers and Components
 
 class UI {
+
+    getWorkerTypeOptionsHtml(selectedValue = null, includePlaceholder = false) {
+        const standardTypes = ['عامل', 'نحات', 'صنايعي', 'رئيس عمال', 'بوفيه'];
+        const uniqueTypes = new Set(standardTypes);
+        if (this.directoryWorkers) {
+            this.directoryWorkers.forEach(w => {
+                if (w.type && w.type.trim() !== '' && w.type !== 'أخرى') {
+                    uniqueTypes.add(w.type);
+                }
+            });
+        }
+        if (selectedValue && selectedValue !== 'أخرى' && !uniqueTypes.has(selectedValue)) {
+            uniqueTypes.add(selectedValue);
+        }
+        
+        let htmlStr = '';
+        if (includePlaceholder) {
+            htmlStr += `<option value="" disabled ${!selectedValue ? 'selected' : ''}>النوع</option>`;
+        }
+        
+        uniqueTypes.forEach(type => {
+            const isSelected = type === selectedValue ? 'selected' : '';
+            htmlStr += `<option value="${type}" ${isSelected}>${type}</option>`;
+        });
+        
+        // Always add 'أخرى' at the end
+        const isOtherSelected = selectedValue === 'أخرى' ? 'selected' : '';
+        htmlStr += `<option value="أخرى" ${isOtherSelected}>أخرى</option>`;
+        
+        return htmlStr;
+    }
+
     static showView(viewId) {
         localStorage.setItem('labor_app_current_view', viewId);
         document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
@@ -1734,12 +1763,7 @@ class UI {
                         <td>${w.name}</td>
                         <td>
                             <select id="${view}-card-type-${w.id}" class="modal-input" style="width: 110px;" onchange="app.onModalTypeChange('${w.id}', '${w.name}', '${view}-card')">
-                                <option value="عامل" ${w.type==='عامل'?'selected':''}>عامل</option>
-                                <option value="نحات" ${w.type==='نحات'?'selected':''}>نحات</option>
-                                <option value="صنايعي" ${w.type==='صنايعي'?'selected':''}>صنايعي</option>
-                                <option value="مشرف عمال" ${w.type==='مشرف عمال'?'selected':''}>مشرف عمال</option>
-                                <option value="بوفيه" ${w.type==='بوفيه'?'selected':''}>بوفيه</option>
-                                <option value="أخرى" ${w.type==='اخرى'?'selected':''}>أخرى</option>
+                                ${this.getWorkerTypeOptionsHtml(w.type, false)}
                             </select>
                         </td>
                         <td class="wage-col"><input type="number" id="${view}-card-amount-${w.id}" value="${w.amount}" class="modal-input" style="width: 75px;"></td>
@@ -1924,12 +1948,7 @@ class UI {
                         <td>${w.name}</td>
                         <td>
                             <select id="modal-type-${w.id}" class="modal-input" style="width: 110px;" onchange="app.onModalTypeChange('${w.id}', '${w.name}')">
-                                <option value="عامل" ${w.type==='عامل'?'selected':''}>عامل</option>
-                                <option value="نحات" ${w.type==='نحات'?'selected':''}>نحات</option>
-                                <option value="صنايعي" ${w.type==='صنايعي'?'selected':''}>صنايعي</option>
-                                <option value="مشرف عمال" ${w.type==='مشرف عمال'?'selected':''}>مشرف عمال</option>
-                                <option value="بوفيه" ${w.type==='بوفيه'?'selected':''}>بوفيه</option>
-                                <option value="أخرى" ${w.type==='اخرى'?'selected':''}>أخرى</option>
+                                ${this.getWorkerTypeOptionsHtml(w.type, false)}
                             </select>
                         </td>
                         <td><input type="number" id="modal-amount-${w.id}" value="${w.amount}" class="modal-input" style="width: 75px;"></td>
@@ -2761,7 +2780,13 @@ class UI {
         document.getElementById('add-dir-worker-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('dir-worker-name').value.trim();
-            const type = document.getElementById('dir-worker-type').value;
+            
+            let type = document.getElementById('dir-worker-type').value;
+            if (type === 'أخرى') {
+                type = document.getElementById('dir-worker-type-other').value.trim();
+                if (!type) { alert('يرجى إدخال مسمى النوع الجديد'); return; }
+            }
+
             const amount = document.getElementById('dir-worker-amount').value;
             
             try {
@@ -2911,6 +2936,12 @@ class UI {
         let dirWorkers = await db.getAll('worker_directory');
         dirWorkers.sort((a, b) => customSort(a, b, false));
         UI.renderDirWorkersTable(dirWorkers);
+        const dirSelect = document.getElementById('dir-worker-type');
+        if (dirSelect) {
+            this.directoryWorkers = dirWorkers;
+            dirSelect.innerHTML = this.getWorkerTypeOptionsHtml(null, false);
+        }
+
     }
 
     async deleteUser(id) {
@@ -3023,12 +3054,7 @@ class UI {
         nameCell.innerHTML = `<input type="text" id="edit-dir-name-${id}" value="${currentName}" style="width:100%; padding: 5px;">`;
         typeCell.innerHTML = `
             <select id="edit-dir-type-${id}" style="width:100%; padding: 5px;">
-                <option value="عامل" ${currentType==='عامل'?'selected':''}>عامل</option>
-                <option value="نحات" ${currentType==='نحات'?'selected':''}>نحات</option>
-                <option value="صنايعي" ${currentType==='صنايعي'?'selected':''}>صنايعي</option>
-                <option value="مشرف عمال" ${currentType==='مشرف عمال'?'selected':''}>مشرف عمال</option>
-                <option value="بوفيه" ${currentType==='بوفيه'?'selected':''}>بوفيه</option>
-                <option value="أخرى" ${currentType==='اخرى'?'selected':''}>أخرى</option>
+                ${this.getWorkerTypeOptionsHtml(currentType, false)}
             </select>
         `;
         amountCell.innerHTML = `<input type="number" id="edit-dir-amount-${id}" value="${currentAmount}" style="width: 80px; padding: 5px;">`;
@@ -3105,13 +3131,7 @@ class UI {
             </td>
             <td>
                 <select id="worker-type-${workerId}" required onchange="app.onWorkerTypeChange(${workerId})">
-                    <option value="" disabled selected>النوع</option>
-                    <option value="عامل">عامل</option>
-                    <option value="نحات">نحات</option>
-                    <option value="صنايعي">صنايعي</option>
-                    <option value="رئيس عمال">رئيس عمال</option>
-                    <option value="بوفيه">بوفيه</option>
-                    <option value="أخرى">أخرى</option>
+                    ${this.getWorkerTypeOptionsHtml(null, true)}
                 </select>
             </td>
             <td>
