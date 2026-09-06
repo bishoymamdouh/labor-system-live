@@ -1730,13 +1730,13 @@ class UI {
                     <tr>
                         <td>${w.name}</td>
                         <td>
-                            <select id="${view}-card-type-${w.id}" class="modal-input" style="width: 110px;" onchange="app.onModalTypeChange('${w.id}', '${w.name}', '${view}-card')">
+                            <select id="${view}-card-type-${w.id}" class="modal-input" style="min-width: max-content; width: 100%;" onchange="app.onModalTypeChange('${w.id}', '${w.name}', '${view}-card')">
                                 ${app.getWorkerTypeOptionsHtml(w.type, false)}
                             </select>
                         </td>
-                        <td class="wage-col"><input type="number" id="${view}-card-amount-${w.id}" value="${w.amount}" class="modal-input" style="width: 75px;"></td>
-                        <td><input type="text" id="${view}-card-location-${w.id}" value="${w.location || ''}" class="modal-input" style="width: 110px;"></td>
-                        <td><input type="number" id="${view}-card-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="width: 75px;"></td>
+                        <td class="wage-col"><input type="number" id="${view}-card-amount-${w.id}" value="${w.amount}" class="modal-input" style="min-width: 75px; width: 100%;"></td>
+                        <td><input type="text" id="${view}-card-location-${w.id}" value="${w.location || ''}" class="modal-input" style="min-width: 110px; width: 100%;"></td>
+                        <td><input type="number" id="${view}-card-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="min-width: 75px; width: 100%;"></td>
                         <td><input type="text" id="${view}-card-notes-${w.id}" value="${w.notes || ''}" class="modal-input" style="min-width: 130px; width: 100%;"></td>
                         <td>
                             <button type="button" class="btn-icon text-danger" onclick="app.removeWorkerFromRecord('${r.id}', '${w.id}')" title="حذف العامل"><i class="fas fa-trash"></i></button>
@@ -1915,13 +1915,13 @@ class UI {
                     <tr>
                         <td>${w.name}</td>
                         <td>
-                            <select id="modal-type-${w.id}" class="modal-input" style="width: 110px;" onchange="app.onModalTypeChange('${w.id}', '${w.name}')">
+                            <select id="modal-type-${w.id}" class="modal-input" style="min-width: max-content; width: 100%;" onchange="app.onModalTypeChange('${w.id}', '${w.name}')">
                                 ${app.getWorkerTypeOptionsHtml(w.type, false)}
                             </select>
                         </td>
-                        <td><input type="number" id="modal-amount-${w.id}" value="${w.amount}" class="modal-input" style="width: 75px;"></td>
-                        <td><input type="text" id="modal-location-${w.id}" value="${w.location || ''}" class="modal-input" style="width: 110px;"></td>
-                        <td><input type="number" id="modal-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="width: 75px;"></td>
+                        <td><input type="number" id="modal-amount-${w.id}" value="${w.amount}" class="modal-input" style="min-width: 75px; width: 100%;"></td>
+                        <td><input type="text" id="modal-location-${w.id}" value="${w.location || ''}" class="modal-input" style="min-width: 110px; width: 100%;"></td>
+                        <td><input type="number" id="modal-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="min-width: 75px; width: 100%;"></td>
                         <td><input type="text" id="modal-notes-${w.id}" value="${w.notes || ''}" class="modal-input" style="min-width: 130px; width: 100%;"></td>
                     </tr>
                 `;
@@ -2989,10 +2989,10 @@ class UI {
         const currentPass = passCell.getAttribute('data-pass');
         const currentRole = roleCell.querySelector('span').getAttribute('data-role');
         
-        nameCell.innerHTML = `<input type="text" id="edit-user-name-${id}" value="${currentName}" style="width:100%; padding: 5px;">`;
-        passCell.innerHTML = `<input type="text" id="edit-user-pass-${id}" value="${currentPass}" placeholder="باسورد جديد" style="width:100%; padding: 5px;">`;
+        nameCell.innerHTML = `<input type="text" id="edit-user-name-${id}" value="${currentName}" style="min-width: max-content; width: 100%; padding: 5px;">`;
+        passCell.innerHTML = `<input type="text" id="edit-user-pass-${id}" value="${currentPass}" placeholder="باسورد جديد" style="min-width: max-content; width: 100%; padding: 5px;">`;
         roleCell.innerHTML = `
-            <select id="edit-user-role-${id}" style="width:100%; padding: 5px;">
+            <select id="edit-user-role-${id}" style="min-width: max-content; width: 100%; padding: 5px;">
                 <option value="supervisor" ${currentRole==='supervisor'?'selected':''}>مشرف</option>
                 <option value="surveyor" ${currentRole==='surveyor'?'selected':''}>مساح</option>
                 <option value="warehouse_manager" ${currentRole==='warehouse_manager'?'selected':''}>مدير مخزن</option>
@@ -3050,13 +3050,13 @@ class UI {
         const currentType = typeCell.innerText;
         const currentAmount = amountCell.innerText;
         
-        nameCell.innerHTML = `<input type="text" id="edit-dir-name-${id}" value="${currentName}" style="width:100%; padding: 5px;">`;
+        nameCell.innerHTML = `<input type="text" id="edit-dir-name-${id}" value="${currentName}" style="min-width: max-content; width: 100%; padding: 5px;">`;
         typeCell.innerHTML = `
-            <select id="edit-dir-type-${id}" style="width:100%; padding: 5px;">
+            <select id="edit-dir-type-${id}" style="min-width: max-content; width: 100%; padding: 5px;">
                 ${app.getWorkerTypeOptionsHtml(currentType, false)}
             </select>
         `;
-        amountCell.innerHTML = `<input type="number" id="edit-dir-amount-${id}" value="${currentAmount}" style="width: 80px; padding: 5px;">`;
+        amountCell.innerHTML = `<input type="number" id="edit-dir-amount-${id}" value="${currentAmount}" style="min-width: 80px; width: 100%; padding: 5px;">`;
         
         actionsCell.innerHTML = `
             <button class="btn-icon text-success" onclick="app.saveDirWorker('${id}')" title="حفظ"><i class="fas fa-save"></i></button>
@@ -3124,23 +3124,23 @@ class UI {
         
         tr.innerHTML = `
             <td>
-                <select id="worker-name-${workerId}" required onchange="app.onWorkerSelectChange(${workerId})">
+                <select id="worker-name-${workerId}" class="modal-input" style="min-width: max-content; width: 100%;" required onchange="app.onWorkerSelectChange(${workerId})">
                     ${optionsHtml}
                 </select>
             </td>
             <td>
-                <select id="worker-type-${workerId}" required onchange="app.onWorkerTypeChange(${workerId})">
+                <select id="worker-type-${workerId}" class="modal-input" style="min-width: max-content; width: 100%;" required onchange="app.onWorkerTypeChange(${workerId})">
                     ${app.getWorkerTypeOptionsHtml(null, true)}
                 </select>
             </td>
             <td>
-                <input type="number" id="worker-amount-${workerId}" required min="0" ${auth.getRole() === "admin" || auth.getRole() === "engineer" ? "" : "readonly"} placeholder="اليومية" oninput="app.updateTotals()">
+                <input type="number" id="worker-amount-${workerId}" class="modal-input" style="min-width: 80px; width: 100%;" required min="0" ${auth.getRole() === "admin" || auth.getRole() === "engineer" ? "" : "readonly"} placeholder="اليومية" oninput="app.updateTotals()">
             </td>
             <td>
-                <input type="text" id="worker-location-${workerId}" placeholder="مكان العمل">
+                <input type="text" id="worker-location-${workerId}" class="modal-input" style="min-width: 110px; width: 100%;" placeholder="مكان العمل">
             </td>
             <td>
-                <input type="text" id="worker-notes-${workerId}" placeholder="ملاحظات">
+                <input type="text" id="worker-notes-${workerId}" class="modal-input" style="min-width: 130px; width: 100%;" placeholder="ملاحظات">
             </td>
             <td>
                 <button type="button" class="btn-icon text-danger" onclick="app.removeWorkerRow(${workerId})"><i class="fas fa-trash"></i></button>
