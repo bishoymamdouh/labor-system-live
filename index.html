@@ -303,6 +303,8 @@ h1, h2, h3, h4 {
 }
 
 .form-group input, .form-group select {
+    text-align: center;
+    text-align-last: center;
     width: 100%;
     padding: 12px 15px;
     border: 1px solid var(--border-color);
@@ -365,6 +367,8 @@ h1, h2, h3, h4 {
 }
 
 .modal-input {
+    field-sizing: content;
+    text-align-last: center;
     width: 100%;
     padding: 8px;
     border: 1px solid var(--border-color);
@@ -1246,11 +1250,11 @@ h1, h2, h3, h4 {
                 </header>
                 <div class="card filter-card">
                     <form id="filter-form" class="inline-form" style="width: 100%; display: flex; align-items: flex-end; gap: 15px; justify-content: space-between;">
-                        <div class="form-group" style="flex: 1; min-width: 130px; margin-bottom: 0;">
+                        <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
                             <label for="filter-start-date">من تاريخ</label>
                             <input type="date" id="filter-start-date" style="width: 100%;">
                         </div>
-                        <div class="form-group" style="flex: 1; min-width: 130px; margin-bottom: 0;">
+                        <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
                             <label for="filter-end-date">إلى تاريخ</label>
                             <input type="date" id="filter-end-date" style="width: 100%;">
                         </div>
@@ -1734,10 +1738,10 @@ class UI {
                                 ${app.getWorkerTypeOptionsHtml(w.type, false)}
                             </select>
                         </td>
-                        <td class="wage-col"><input type="number" id="${view}-card-amount-${w.id}" value="${w.amount}" class="modal-input" style="min-width: 75px; width: 100%;"></td>
-                        <td><textarea id="${view}-card-location-${w.id}" class="modal-input" style="min-width: 110px; width: 100%; resize: vertical;" rows="2">${w.location || ''}</textarea></td>
-                        <td><input type="number" id="${view}-card-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="min-width: 75px; width: 100%;"></td>
-                        <td><textarea id="${view}-card-notes-${w.id}" class="modal-input" style="min-width: 130px; width: 100%; resize: vertical;" rows="2">${w.notes || ''}</textarea></td>
+                        <td class="wage-col"><input type="number" id="${view}-card-amount-${w.id}" value="${w.amount}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
+                        <td><textarea id="${view}-card-location-${w.id}" class="modal-input" style="min-width: 150px; width: 100%; resize: vertical;" rows="2">${w.location || ''}</textarea></td>
+                        <td><input type="number" id="${view}-card-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
+                        <td><textarea id="${view}-card-notes-${w.id}" class="modal-input" style="min-width: 200px; width: 100%; resize: vertical;" rows="2">${w.notes || ''}</textarea></td>
                         <td>
                             <button type="button" class="btn-icon text-danger" onclick="app.removeWorkerFromRecord('${r.id}', '${w.id}')" title="حذف العامل"><i class="fas fa-trash"></i></button>
                         </td>
@@ -1919,10 +1923,10 @@ class UI {
                                 ${app.getWorkerTypeOptionsHtml(w.type, false)}
                             </select>
                         </td>
-                        <td><input type="number" id="modal-amount-${w.id}" value="${w.amount}" class="modal-input" style="min-width: 75px; width: 100%;"></td>
-                        <td><textarea id="modal-location-${w.id}" class="modal-input" style="min-width: 110px; width: 100%; resize: vertical;" rows="2">${w.location || ''}</textarea></td>
-                        <td><input type="number" id="modal-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="min-width: 75px; width: 100%;"></td>
-                        <td><textarea id="modal-notes-${w.id}" class="modal-input" style="min-width: 130px; width: 100%; resize: vertical;" rows="2">${w.notes || ''}</textarea></td>
+                        <td><input type="number" id="modal-amount-${w.id}" value="${w.amount}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
+                        <td><textarea id="modal-location-${w.id}" class="modal-input" style="min-width: 150px; width: 100%; resize: vertical;" rows="2">${w.location || ''}</textarea></td>
+                        <td><input type="number" id="modal-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
+                        <td><textarea id="modal-notes-${w.id}" class="modal-input" style="min-width: 200px; width: 100%; resize: vertical;" rows="2">${w.notes || ''}</textarea></td>
                     </tr>
                 `;
             }
@@ -3056,7 +3060,7 @@ class UI {
                 ${app.getWorkerTypeOptionsHtml(currentType, false)}
             </select>
         `;
-        amountCell.innerHTML = `<input type="number" id="edit-dir-amount-${id}" value="${currentAmount}" style="min-width: 80px; width: 100%; padding: 5px;">`;
+        amountCell.innerHTML = `<input type="number" id="edit-dir-amount-${id}" value="${currentAmount}" style="min-width: 50px; width: 100%; padding: 5px;">`;
         
         actionsCell.innerHTML = `
             <button class="btn-icon text-success" onclick="app.saveDirWorker('${id}')" title="حفظ"><i class="fas fa-save"></i></button>
@@ -3134,13 +3138,13 @@ class UI {
                 </select>
             </td>
             <td>
-                <input type="number" id="worker-amount-${workerId}" class="modal-input" style="min-width: 80px; width: 100%;" required min="0" ${auth.getRole() === "admin" || auth.getRole() === "engineer" ? "" : "readonly"} placeholder="اليومية" oninput="app.updateTotals()">
+                <input type="number" id="worker-amount-${workerId}" class="modal-input" style="min-width: 50px; width: 100%;" required min="0" ${auth.getRole() === "admin" || auth.getRole() === "engineer" ? "" : "readonly"} placeholder="اليومية" oninput="app.updateTotals()">
             </td>
             <td>
-                <textarea id="worker-location-${workerId}" class="modal-input" style="min-width: 110px; width: 100%; resize: vertical;" rows="2" placeholder="مكان العمل"></textarea>
+                <textarea id="worker-location-${workerId}" class="modal-input" style="min-width: 150px; width: 100%; resize: vertical;" rows="2" placeholder="مكان العمل"></textarea>
             </td>
             <td>
-                <textarea id="worker-notes-${workerId}" class="modal-input" style="min-width: 130px; width: 100%; resize: vertical;" rows="2" placeholder="ملاحظات"></textarea>
+                <textarea id="worker-notes-${workerId}" class="modal-input" style="min-width: 200px; width: 100%; resize: vertical;" rows="2" placeholder="ملاحظات"></textarea>
             </td>
             <td>
                 <button type="button" class="btn-icon text-danger" onclick="app.removeWorkerRow(${workerId})"><i class="fas fa-trash"></i></button>
