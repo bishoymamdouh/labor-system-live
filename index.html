@@ -1919,7 +1919,7 @@ class UI {
                     <tr>
                         <td>${w.name}</td>
                         <td>
-                            <select id="modal-type-${w.id}" class="modal-input" style="min-width: max-content; width: 100%;" onchange="app.onModalTypeChange('${w.id}', '${w.name}')">
+                            <select id="modal-type-${w.id}" class="modal-input" style="min-width: max-content; width: 100%;" onchange="app.onModalTypeChange('${w.id}', '${w.name}', 'modal')">
                                 ${app.getWorkerTypeOptionsHtml(w.type, false)}
                             </select>
                         </td>
@@ -3512,8 +3512,8 @@ class UI {
         }
     }
     
-    onModalTypeChange(id, name) {
-        let prefix = window.currentCardPrefix || 'card';
+    onModalTypeChange(id, name, passedPrefix = null) {
+        let prefix = passedPrefix || window.currentCardPrefix || 'card';
         const typeSelect = document.getElementById(`${prefix}-type-${id}`);
         const amountInput = document.getElementById(`${prefix}-amount-${id}`);
         const selectedType = typeSelect.value;
