@@ -1735,9 +1735,9 @@ class UI {
                             </select>
                         </td>
                         <td class="wage-col"><input type="number" id="${view}-card-amount-${w.id}" value="${w.amount}" class="modal-input" style="min-width: 75px; width: 100%;"></td>
-                        <td><input type="text" id="${view}-card-location-${w.id}" value="${w.location || ''}" class="modal-input" style="min-width: 110px; width: 100%;"></td>
+                        <td><textarea id="${view}-card-location-${w.id}" class="modal-input" style="min-width: 110px; width: 100%; resize: vertical;" rows="2">${w.location || ''}</textarea></td>
                         <td><input type="number" id="${view}-card-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="min-width: 75px; width: 100%;"></td>
-                        <td><input type="text" id="${view}-card-notes-${w.id}" value="${w.notes || ''}" class="modal-input" style="min-width: 130px; width: 100%;"></td>
+                        <td><textarea id="${view}-card-notes-${w.id}" class="modal-input" style="min-width: 130px; width: 100%; resize: vertical;" rows="2">${w.notes || ''}</textarea></td>
                         <td>
                             <button type="button" class="btn-icon text-danger" onclick="app.removeWorkerFromRecord('${r.id}', '${w.id}')" title="حذف العامل"><i class="fas fa-trash"></i></button>
                         </td>
@@ -1920,9 +1920,9 @@ class UI {
                             </select>
                         </td>
                         <td><input type="number" id="modal-amount-${w.id}" value="${w.amount}" class="modal-input" style="min-width: 75px; width: 100%;"></td>
-                        <td><input type="text" id="modal-location-${w.id}" value="${w.location || ''}" class="modal-input" style="min-width: 110px; width: 100%;"></td>
+                        <td><textarea id="modal-location-${w.id}" class="modal-input" style="min-width: 110px; width: 100%; resize: vertical;" rows="2">${w.location || ''}</textarea></td>
                         <td><input type="number" id="modal-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="min-width: 75px; width: 100%;"></td>
-                        <td><input type="text" id="modal-notes-${w.id}" value="${w.notes || ''}" class="modal-input" style="min-width: 130px; width: 100%;"></td>
+                        <td><textarea id="modal-notes-${w.id}" class="modal-input" style="min-width: 130px; width: 100%; resize: vertical;" rows="2">${w.notes || ''}</textarea></td>
                     </tr>
                 `;
             }
@@ -3137,10 +3137,10 @@ class UI {
                 <input type="number" id="worker-amount-${workerId}" class="modal-input" style="min-width: 80px; width: 100%;" required min="0" ${auth.getRole() === "admin" || auth.getRole() === "engineer" ? "" : "readonly"} placeholder="اليومية" oninput="app.updateTotals()">
             </td>
             <td>
-                <input type="text" id="worker-location-${workerId}" class="modal-input" style="min-width: 110px; width: 100%;" placeholder="مكان العمل">
+                <textarea id="worker-location-${workerId}" class="modal-input" style="min-width: 110px; width: 100%; resize: vertical;" rows="2" placeholder="مكان العمل"></textarea>
             </td>
             <td>
-                <input type="text" id="worker-notes-${workerId}" class="modal-input" style="min-width: 130px; width: 100%;" placeholder="ملاحظات">
+                <textarea id="worker-notes-${workerId}" class="modal-input" style="min-width: 130px; width: 100%; resize: vertical;" rows="2" placeholder="ملاحظات"></textarea>
             </td>
             <td>
                 <button type="button" class="btn-icon text-danger" onclick="app.removeWorkerRow(${workerId})"><i class="fas fa-trash"></i></button>
