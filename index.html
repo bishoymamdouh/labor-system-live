@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام إدارة العمالة (تحديث التنسيق)</title>
+    <title>نظام إدارة العمالة (إصلاح الآيفون 2)</title>
     
     <!-- PWA Settings -->
     <link rel="manifest" href="/manifest.json?v=2">
@@ -683,7 +683,7 @@ h1, h2, h3, h4 {
     }
     .table-container, .table-responsive, [style*="overflow-x:auto"], [style*="overflow-x: auto"] {
         overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+        
         margin-bottom: 15px;
     }
     table {
@@ -766,6 +766,19 @@ h1, h2, h3, h4 {
     body.light-mode .btn-logout:hover {
         background-color: #fecaca;
     }
+
+
+/* iOS Safari Select Dropdown Fixes */
+select {
+    cursor: pointer !important;
+    position: relative !important;
+    z-index: 100 !important;
+    -webkit-tap-highlight-color: transparent !important;
+    touch-action: manipulation !important;
+}
+.table-container, .table-responsive, [style*="overflow-x:auto"], [style*="overflow-x: auto"] {
+    -webkit-overflow-scrolling: auto !important;
+}
 
 </style>
     <script>
