@@ -768,6 +768,7 @@ h1, h2, h3, h4 {
     }
 
 
+
 /* iOS Safari Select Dropdown Fixes */
 select {
     cursor: pointer !important;
@@ -775,7 +776,13 @@ select {
     z-index: 100 !important;
     -webkit-tap-highlight-color: transparent !important;
     touch-action: manipulation !important;
+    -webkit-appearance: menulist-button !important;
+    appearance: menulist-button !important;
+    font-size: 16px !important; /* Prevent iOS Auto-Zoom */
+    opacity: 1 !important;
+    pointer-events: auto !important;
 }
+
 .table-container, .table-responsive, [style*="overflow-x:auto"], [style*="overflow-x: auto"] {
     -webkit-overflow-scrolling: auto !important;
 }
