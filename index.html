@@ -576,11 +576,24 @@ h1, h2, h3, h4 {
         display: none !important;
     }
 
+    
+    /* Print margin hack for every page when @page margin is 0 */
+    thead::before {
+        content: "";
+        display: table-row;
+        height: 0.8cm;
+    }
+    tfoot::after {
+        content: "";
+        display: table-row;
+        height: 0.8cm;
+    }
+
     #print-area {
         position: static !important;
         width: 100%;
         margin: 0 !important;
-        padding: 1.5cm !important;
+        padding: 0.8cm !important;
         box-sizing: border-box;
     }
     
@@ -4296,7 +4309,7 @@ document.addEventListener('click', (e) => {
                 body { font-family: 'Cairo', sans-serif, Arial; margin: 0; padding: 0; background: #fff; color: #000; }
                 .receipt-page { 
                     width: 100%; 
-                    padding: 1.5cm; 
+                    padding: 0.8cm; 
                     box-sizing: border-box; 
                     display: flex;
                     flex-direction: column;
