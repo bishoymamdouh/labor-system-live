@@ -556,7 +556,7 @@ h1, h2, h3, h4 {
 @media print {
     @page {
         size: landscape;
-        margin: 1.5cm;
+        margin: 0;
     }
     body {
         margin: 0 !important;
@@ -580,7 +580,8 @@ h1, h2, h3, h4 {
         position: static !important;
         width: 100%;
         margin: 0 !important;
-        padding: 0 !important;
+        padding: 1.5cm !important;
+        box-sizing: border-box;
     }
     
     .print-header {
@@ -4288,18 +4289,18 @@ document.addEventListener('click', (e) => {
             <style>
                 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
                 @media print {
-                    @page { margin: 1.5cm; size: landscape; }
+                    @page { margin: 0; size: landscape; }
                     .receipt-page { page-break-after: always; }
                     .receipt-page:last-child { page-break-after: auto; }
                 }
                 body { font-family: 'Cairo', sans-serif, Arial; margin: 0; padding: 0; background: #fff; color: #000; }
                 .receipt-page { 
                     width: 100%; 
-                    padding: 0; 
+                    padding: 1.5cm; 
                     box-sizing: border-box; 
                     display: flex;
                     flex-direction: column;
-                    min-height: 95vh;
+                    min-height: 100vh;
                 }
                 .header { position: relative; text-align: center; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 15px; }
                 .header h1 { margin: 8px 0; font-size: 24px; font-weight: bold; }
