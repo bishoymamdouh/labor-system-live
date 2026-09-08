@@ -1300,7 +1300,10 @@ select {
                             <button type="submit" class="btn btn-primary" style="flex: 1; padding: 10px 5px;"><i class="fas fa-filter"></i> تصفية</button>
                             <button type="button" id="clear-filter-btn" class="btn btn-danger" style="flex: 1; padding: 10px 5px;"><i class="fas fa-times"></i> إلغاء</button>
                             <button type="button" id="print-report-btn" class="btn btn-secondary" style="flex: 1; padding: 10px 5px;"><i class="fas fa-print"></i> الجدول</button>
-                            <button type="button" onclick="window.printWorkerReceipts()" class="btn" style="flex: 1.5; padding: 10px 5px; background-color: #ffd700 !important; color: #000 !important; font-weight: bold; border: none; white-space: nowrap;"><i class="fas fa-file-invoice-dollar"></i> سركي العامل</button>
+                            
+<button type="button" onclick="window.printWorkerReceipts()" class="btn" style="flex: 1; padding: 10px 5px; background-color: #ffd700 !important; color: #000 !important; font-weight: bold; border: none; white-space: nowrap;" title="سراكى العمال (PDF)"><i class="fas fa-file-pdf"></i> (PDF)</button>
+<button type="button" onclick="window.exportWorkerReceiptsExcel()" class="btn" style="flex: 1; padding: 10px 5px; background-color: #217346 !important; color: #fff !important; font-weight: bold; border: none; white-space: nowrap;" title="سراكى العمال (Excel)"><i class="fas fa-file-excel"></i> (Excel)</button>
+
                         </div>
                     </form>
                 </div>
