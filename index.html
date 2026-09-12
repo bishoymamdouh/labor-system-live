@@ -736,94 +736,68 @@ h1, h2, h3, h4 {
     }
     #reports-table-full th, 
     #reports-table-full td {
-        padding: 5px 4px !important;
+        padding: 6px 4px !important;
         border: 1px solid var(--border-color) !important;
         vertical-align: middle !important;
         text-align: center !important;
-        line-height: 1.2 !important;
+        line-height: 1.25 !important;
         box-sizing: border-box !important;
     }
     #reports-table-full th {
-        font-size: 0.81rem !important;
+        font-size: 0.82rem !important;
         font-weight: 700 !important;
         background-color: var(--secondary-color) !important;
         color: var(--primary-color) !important;
-        padding: 6px 3px !important;
-        white-space: normal !important;
+        padding: 6px 4px !important;
+        white-space: nowrap !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
     }
-    /* Compact auto-fit columns: size strictly to content */
-    #reports-table-full th:nth-child(2), 
-    #reports-table-full td:nth-child(2) {
-        width: 1% !important;
-        white-space: nowrap !important;
-    } /* النوع */
 
-    #reports-table-full th:nth-child(4), 
-    #reports-table-full td:nth-child(4) {
-        width: 1% !important;
-        white-space: nowrap !important;
-        font-size: 0.76rem !important;
-    } /* التاريخ */
+    /* Column headers: ensure full title is always 100% visible without truncation */
+    #reports-table-full th:nth-child(1) { min-width: 90px !important; } /* اسم العامل */
+    #reports-table-full th:nth-child(2) { min-width: 55px !important; } /* النوع */
+    #reports-table-full th:nth-child(3) { min-width: 75px !important; } /* المشرف */
+    #reports-table-full th:nth-child(4) { min-width: 85px !important; white-space: nowrap !important; } /* التاريخ */
+    #reports-table-full th:nth-child(5) { min-width: 55px !important; white-space: nowrap !important; } /* اليومية */
+    #reports-table-full th:nth-child(6) { min-width: 50px !important; white-space: nowrap !important; } /* الخصم */
+    #reports-table-full th:nth-child(7) { min-width: 55px !important; white-space: nowrap !important; } /* الصافي */
+    #reports-table-full th:nth-child(8) { min-width: 110px !important; } /* المهندس المعتمد */
+    #reports-table-full th:nth-child(9) { min-width: 85px !important; } /* مكان العمل */
+    #reports-table-full th:nth-child(10) { min-width: 95px !important; } /* بند العمل (بالتفصيل) */
+    #reports-table-full th:nth-child(11) { min-width: 90px !important; } /* خصم على مقاول */
+    #reports-table-full th:nth-child(12) { min-width: 75px !important; } /* الملاحظات */
 
-    #reports-table-full th:nth-child(5), 
+    /* Data rows: compact numbers and flexible text wrapping to-fit */
+    #reports-table-full td:nth-child(2),
+    #reports-table-full td:nth-child(4),
     #reports-table-full td:nth-child(5),
-    #reports-table-full th:nth-child(6), 
     #reports-table-full td:nth-child(6),
-    #reports-table-full th:nth-child(7), 
     #reports-table-full td:nth-child(7) {
-        width: 1% !important;
         white-space: nowrap !important;
         font-variant-numeric: tabular-nums !important;
-    } /* اليومية، الخصم، الصافي */
+    }
+    #reports-table-full td:nth-child(4) {
+        font-size: 0.77rem !important;
+    }
 
-    /* Text columns: auto-fit to content with smart word-break */
-    #reports-table-full td:nth-child(1) {
-        word-break: break-word !important;
-        overflow-wrap: break-word !important;
-        min-width: 80px !important;
-    } /* اسم العامل */
-
-    #reports-table-full td:nth-child(3) {
-        word-break: break-word !important;
-        overflow-wrap: break-word !important;
-        min-width: 70px !important;
-    } /* المشرف */
-
-    #reports-table-full td:nth-child(8) {
-        word-break: break-word !important;
-        overflow-wrap: break-word !important;
-        min-width: 75px !important;
-    } /* المهندس المعتمد */
-
-    #reports-table-full td:nth-child(9) {
-        word-break: break-word !important;
-        overflow-wrap: break-word !important;
-        min-width: 80px !important;
-    } /* مكان العمل */
-
-    #reports-table-full td:nth-child(10) {
-        word-break: break-word !important;
-        overflow-wrap: break-word !important;
-        min-width: 90px !important;
-    } /* بند العمل */
-
-    #reports-table-full td:nth-child(11) {
-        word-break: break-word !important;
-        overflow-wrap: break-word !important;
-        min-width: 80px !important;
-    } /* خصم على مقاول */
-
+    #reports-table-full td:nth-child(1),
+    #reports-table-full td:nth-child(3),
+    #reports-table-full td:nth-child(8),
+    #reports-table-full td:nth-child(9),
+    #reports-table-full td:nth-child(10),
+    #reports-table-full td:nth-child(11),
     #reports-table-full td:nth-child(12) {
         word-break: break-word !important;
         overflow-wrap: break-word !important;
-        min-width: 75px !important;
-    } /* الملاحظات */
+    }
 
+    /* Filter dropdown inside th: never truncate with dots */
     #reports-table-full th .report-col-filter {
-        max-width: 100% !important;
-        width: 100% !important;
-        text-overflow: ellipsis !important;
-        overflow: hidden !important;
+        max-width: none !important;
+        width: auto !important;
+        text-overflow: clip !important;
+        overflow: visible !important;
         white-space: nowrap !important;
     }
 
@@ -2308,8 +2282,7 @@ class UI {
                     container.style.display = 'inline-flex';
                     container.style.alignItems = 'center';
                     container.style.justifyContent = 'center';
-                    container.style.maxWidth = '100%';
-                    container.style.width = '100%';
+                    container.style.width = 'auto';
                     
                     const select = document.createElement('select');
                     select.className = 'report-col-filter';
@@ -2323,13 +2296,13 @@ class UI {
                     select.style.fontFamily = 'inherit';
                     select.style.cursor = 'pointer';
                     select.style.outline = 'none';
-                    select.style.paddingLeft = '12px';
+                    select.style.paddingLeft = '14px';
+                    select.style.paddingRight = '2px';
                     select.style.textAlign = 'center';
-                    select.style.maxWidth = '100%';
-                    select.style.width = '100%';
-                    select.style.textOverflow = 'ellipsis';
-                    select.style.overflow = 'hidden';
                     select.style.whiteSpace = 'nowrap';
+                    select.style.width = 'auto';
+                    select.style.overflow = 'visible';
+                    select.style.textOverflow = 'clip';
                     select.innerHTML = `<option value="">${originalText}</option>`;
                     
                     const icon = document.createElement('i');
@@ -4391,20 +4364,43 @@ document.addEventListener('click', (e) => {
 
 
 </script>
-<button id="floating-refresh" style="position: fixed; top: 10px; left: 10px; background: var(--primary-color); border: none; color: white; border-radius: 50%; width: 32px; height: 32px; font-size: 0.8rem; cursor: pointer; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;"><i class="fas fa-sync-alt"></i></button>
+<button id="floating-refresh" style="position: fixed; top: 10px; left: 10px; background: var(--primary-color); border: none; color: white; border-radius: 50%; width: 34px; height: 34px; font-size: 0.85rem; cursor: pointer; z-index: 999999; box-shadow: 0 4px 10px rgba(0,0,0,0.35); display: flex !important; align-items: center; justify-content: center; pointer-events: auto !important;"><i class="fas fa-sync-alt"></i></button>
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const btn = document.getElementById('floating-refresh');
         if (!btn) return;
         
+        const ensureInBounds = () => {
+            const btnW = btn.offsetWidth || 34;
+            const btnH = btn.offsetHeight || 34;
+            const maxX = Math.max(10, window.innerWidth - btnW - 10);
+            const maxY = Math.max(10, window.innerHeight - btnH - 10);
+            let currentLeft = parseFloat(btn.style.left);
+            let currentTop = parseFloat(btn.style.top);
+            
+            if (isNaN(currentLeft) || currentLeft < 10) currentLeft = 10;
+            if (isNaN(currentTop) || currentTop < 10) currentTop = 10;
+            if (currentLeft > maxX) currentLeft = maxX;
+            if (currentTop > maxY) currentTop = maxY;
+            
+            btn.style.left = currentLeft + 'px';
+            btn.style.top = currentTop + 'px';
+        };
+
         // Restore position
         const savedPos = localStorage.getItem('refreshBtnPos');
         if (savedPos) {
-            const pos = JSON.parse(savedPos);
-            btn.style.left = pos.left;
-            btn.style.top = pos.top;
+            try {
+                const pos = JSON.parse(savedPos);
+                if (pos && pos.left && pos.top) {
+                    btn.style.left = pos.left;
+                    btn.style.top = pos.top;
+                }
+            } catch(e) {}
         }
+        ensureInBounds();
+        window.addEventListener('resize', ensureInBounds);
 
         let isDragging = false;
         let startX, startY;
@@ -4434,8 +4430,8 @@ document.addEventListener('click', (e) => {
             const maxX = window.innerWidth - btn.offsetWidth;
             const maxY = window.innerHeight - btn.offsetHeight;
             
-            if (newLeft < 0) newLeft = 0;
-            if (newTop < 0) newTop = 0;
+            if (newLeft < 10) newLeft = 10;
+            if (newTop < 10) newTop = 10;
             if (newLeft > maxX) newLeft = maxX;
             if (newTop > maxY) newTop = maxY;
             
@@ -4447,6 +4443,7 @@ document.addEventListener('click', (e) => {
             if (!isDragging) return;
             isDragging = false;
             btn.style.transition = 'top 0.3s, left 0.3s';
+            ensureInBounds();
             localStorage.setItem('refreshBtnPos', JSON.stringify({
                 left: btn.style.left,
                 top: btn.style.top
