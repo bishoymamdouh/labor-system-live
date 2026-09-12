@@ -10,6 +10,53 @@ webPush.setVapidDetails("mailto:admin@example.com", VAPID_PUBLIC, VAPID_PRIVATE)
 
 const isDeploy = !!Deno.env.get("DENO_REGION") || !!Deno.env.get("DENO_DEPLOYMENT_ID");
 let kv;
+
+let memoryPendingIndex: { [recordId: string]: string } | null = null;
+let lastPendingIndexFetch = 0;
+
+async function getPendingIndex(kvInstance: any) {
+    const now = Date.now();
+    if (memoryPendingIndex && (now - lastPendingIndexFetch < 45000)) {
+        return memoryPendingIndex;
+    }
+    
+    try {
+        const entry = await kvInstance.get(["system", "pending_index"]);
+        if (entry && entry.value) {
+            memoryPendingIndex = entry.value;
+            lastPendingIndexFetch = now;
+            return memoryPendingIndex;
+        }
+    } catch(e) {
+        console.error("Error reading pending_index:", e);
+    }
+    
+    // Initial build of index if not exists (runs only once)
+    const index: { [recordId: string]: string } = {};
+    const recordsIter = kvInstance.list({ prefix: ["records"] });
+    for await (const r of recordsIter) {
+        if (r.value && r.value.status === 'pending') {
+            index[String(r.key[1])] = String(r.value.engineerId || '');
+        }
+    }
+    await kvInstance.set(["system", "pending_index"], index);
+    memoryPendingIndex = index;
+    lastPendingIndexFetch = now;
+    return memoryPendingIndex;
+}
+
+async function updatePendingIndexOnSave(kvInstance: any, recordId: string, status: string, engineerId?: string) {
+    const index = await getPendingIndex(kvInstance);
+    if (status === 'pending') {
+        index[String(recordId)] = String(engineerId || '');
+    } else {
+        delete index[String(recordId)];
+    }
+    memoryPendingIndex = index;
+    lastPendingIndexFetch = Date.now();
+    await kvInstance.set(["system", "pending_index"], index);
+}
+
 async function handler(req: Request): Promise<Response> {
     if (!kv) {
         kv = isDeploy ? await Deno.openKv() : await Deno.openKv(Deno.env.get("DENO_REGION") ? undefined : "./database.sqlite");
@@ -65,13 +112,11 @@ async function handler(req: Request): Promise<Response> {
         
         if (url.pathname === "/api/pendingCount" && method === "GET") {
             const engineerId = url.searchParams.get("engineerId");
+            const index = await getPendingIndex(kv);
             let count = 0;
-            const recordsIter = kv.list({ prefix: ["records"] });
-            for await (const entry of recordsIter) {
-                if (entry.value && entry.value.status === 'pending') {
-                    if (!engineerId || String(entry.value.engineerId) === String(engineerId)) {
-                        count++;
-                    }
+            for (const rId in index) {
+                if (!engineerId || index[rId] === String(engineerId)) {
+                    count++;
                 }
             }
             return new Response(JSON.stringify({ count }), { 
@@ -302,6 +347,9 @@ async function handler(req: Request): Promise<Response> {
             delete body.id;
             
             await kv.set([collection, id], body);
+            if (collection === "records") {
+                await updatePendingIndexOnSave(kv, id, body.status, body.engineerId);
+            }
             
             // Send Push Notification if pending record
             if (collection === "records" && body.status === "pending") {
@@ -320,11 +368,9 @@ async function handler(req: Request): Promise<Response> {
                 
                 for (const targetId of targetIds) {
                     let pendingCount = 0;
-                    const recordsIter = kv.list({ prefix: ["records"] });
-                    for await (const entry of recordsIter) {
-                        if (entry.value.status === 'pending' && entry.value.engineerId === targetId) {
-                            pendingCount++;
-                        }
+                    const index = await getPendingIndex(kv);
+                    for (const rId in index) {
+                        if (index[rId] === targetId) pendingCount++;
                     }
 
                     const subEntries = kv.list({ prefix: ["push_subscriptions", targetId] });
@@ -354,6 +400,11 @@ async function handler(req: Request): Promise<Response> {
             if (!current.value) return new Response("Not found", { status: 404 });
 
             await kv.set([collection, id], { ...current.value, ...body });
+            if (collection === "records") {
+                const newStatus = body.status !== undefined ? body.status : current.value.status;
+                const engId = body.engineerId !== undefined ? body.engineerId : current.value.engineerId;
+                await updatePendingIndexOnSave(kv, id, newStatus, engId);
+            }
             
             // Send Push Notification to supervisor if record status changed
             if (collection === "records" && body.status && body.status !== current.value.status) {
@@ -386,6 +437,9 @@ async function handler(req: Request): Promise<Response> {
             if (!id) return new Response("Missing id", { status: 400 });
 
             await kv.delete([collection, id]);
+            if (collection === "records") {
+                await updatePendingIndexOnSave(kv, id, 'deleted');
+            }
             return new Response(JSON.stringify({ success: true }), { status: 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
         }
 
