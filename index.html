@@ -1431,104 +1431,6 @@ select {
             </div>
         </div>
 
-        <!-- Cloud Quota Comprehensive Report Modal -->
-        <div id="modal-cloud-quota" class="modal" onclick="if(event.target===this)this.style.display='none'" style="display: none; z-index: 10000;">
-            <div class="card" style="width: 100%; max-width: 760px; max-height: 90vh; overflow-y: auto; position: relative; padding: 22px 25px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);">
-                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-cloud text-primary" style="font-size: 1.5rem; color: #0284c7;"></i>
-                        <div>
-                            <h3 style="margin: 0; font-size: 1.25rem;">تقرير استهلاك وحالة سيرفر Deno Cloud</h3>
-                            <span style="font-size: 0.8rem; color: var(--text-muted);">متابعة دورية مباشرة لحدود الاستهلاك والأمان</span>
-                        </div>
-                    </div>
-                    <button type="button" onclick="document.getElementById('modal-cloud-quota').style.display='none'" style="font-size: 1.6rem; color: #888; background: none; border: none; cursor: pointer; line-height: 1; padding: 4px 8px;">&times;</button>
-                </div>
-                
-                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; border-radius: 8px; padding: 12px 16px; margin-bottom: 18px;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-shield-alt" style="color: #10b981; font-size: 1.3rem;"></i>
-                        <span style="font-weight: 700; color: #065f46; font-size: 0.95rem;">حالة السيرفر: مستقر ومحمي من الاستنزاف ✅</span>
-                    </div>
-                    <span style="font-size: 0.85rem; font-weight: 600; color: #047857;" id="modal-quota-renewal-date">تجديد الحصة بالكامل: 1 أكتوبر 2026 (متبقي 18 يوماً)</span>
-                </div>
-
-                <div style="overflow-x: auto; margin-bottom: 18px; border: 1px solid var(--border-color); border-radius: 8px;">
-                    <table style="width: 100%; border-collapse: collapse; text-align: right; font-size: 0.88rem;">
-                        <thead>
-                            <tr style="background: var(--bg-body); border-bottom: 2px solid var(--border-color);">
-                                <th style="padding: 10px 14px;">البند / المورد السحابي</th>
-                                <th style="padding: 10px 14px;">الحد الشهري المجاني</th>
-                                <th style="padding: 10px 14px;">الاستهلاك الحالي</th>
-                                <th style="padding: 10px 14px;">نسبة الاستهلاك</th>
-                                <th style="padding: 10px 14px;">تقييم الأمان</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 11px 14px; font-weight: 600;"><i class="fas fa-book-reader" style="color: #d97706; margin-left: 6px;"></i> قراءات الداتابيز (KV Reads)</td>
-                                <td style="padding: 11px 14px;">500,000 قراءة</td>
-                                <td style="padding: 11px 14px; font-weight: 700; color: #d97706;">452,024</td>
-                                <td style="padding: 11px 14px; font-weight: 700; color: #d97706;">90.4%</td>
-                                <td style="padding: 11px 14px;"><span style="background: #10b981; color: #fff; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: 600;">محمي بذاكرة RAM Cache ✅</span></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 11px 14px; font-weight: 600;"><i class="fas fa-network-wired" style="color: #0284c7; margin-left: 6px;"></i> نقل البيانات الخارجة (Bandwidth)</td>
-                                <td style="padding: 11px 14px;">100 GiB</td>
-                                <td style="padding: 11px 14px; font-weight: 700; color: #0284c7;">9.3 GiB</td>
-                                <td style="padding: 11px 14px; font-weight: 700; color: #0284c7;">9.3%</td>
-                                <td style="padding: 11px 14px;"><span style="background: #e0f2fe; color: #0369a1; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: 600;">آمن ومستقر جداً ✅</span></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 11px 14px; font-weight: 600;"><i class="fas fa-globe" style="color: #10b981; margin-left: 6px;"></i> إجمالي الطلبات (HTTP Requests)</td>
-                                <td style="padding: 11px 14px;">1,000,000 طلب</td>
-                                <td style="padding: 11px 14px;">18,854</td>
-                                <td style="padding: 11px 14px; font-weight: 700; color: #10b981;">1.9%</td>
-                                <td style="padding: 11px 14px;"><span style="background: #e0f2fe; color: #0369a1; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: 600;">متبقي أكثر من 98% ✅</span></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 11px 14px; font-weight: 600;"><i class="fas fa-microchip" style="color: #8b5cf6; margin-left: 6px;"></i> وقت المعالج (CPU Time)</td>
-                                <td style="padding: 11px 14px;">باقة مفتوحة للاستخدام</td>
-                                <td style="padding: 11px 14px;">53.3 دقيقة</td>
-                                <td style="padding: 11px 14px; font-weight: 700; color: #10b981;">&lt; 3%</td>
-                                <td style="padding: 11px 14px;"><span style="background: #e0f2fe; color: #0369a1; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: 600;">خفيف وسريع جداً ✅</span></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 11px 14px; font-weight: 600;"><i class="fas fa-pen" style="color: #f59e0b; margin-left: 6px;"></i> كتابات الداتابيز (KV Writes)</td>
-                                <td style="padding: 11px 14px;">100,000 عملية</td>
-                                <td style="padding: 11px 14px;">2,866</td>
-                                <td style="padding: 11px 14px; font-weight: 700; color: #10b981;">2.8%</td>
-                                <td style="padding: 11px 14px;"><span style="background: #e0f2fe; color: #0369a1; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: 600;">طبيعي عند الحفظ فقط ✅</span></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 11px 14px; font-weight: 600;"><i class="fas fa-database" style="color: #06b6d4; margin-left: 6px;"></i> مساحة تخزين البيانات (KV Storage)</td>
-                                <td style="padding: 11px 14px;">1,000 MB (1 GiB)</td>
-                                <td style="padding: 11px 14px;">أقل من 15 MB</td>
-                                <td style="padding: 11px 14px; font-weight: 700; color: #10b981;">1.5%</td>
-                                <td style="padding: 11px 14px;"><span style="background: #e0f2fe; color: #0369a1; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: 600;">تكفي لسنوات طويلة ✅</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div style="background: var(--bg-body); border-radius: 8px; padding: 12px 16px; margin-bottom: 18px; font-size: 0.85rem; border: 1px solid var(--border-color); line-height: 1.6;">
-                    <div style="font-weight: 700; margin-bottom: 6px; color: var(--text-main);"><i class="fas fa-info-circle text-primary" style="margin-left: 6px;"></i> كيف تعمل دورة التجديد ونظام الحماية؟</div>
-                    <ul style="margin: 0; padding-right: 20px; color: var(--text-muted);">
-                        <li><strong>تجديد الحصة شهرياً:</strong> في أول يوم من كل شهر ميلادي (الساعة 12:00 ص بتوقيت UTC)، تتصفر جميع عدادات القراءات، الكتابات، الطلبات، والباندويث مجاناً وتعود الحصص كاملة 100%.</li>
-                        <li><strong>إجراءات الحماية النشطة:</strong> تم تفعيل الذاكرة المؤقتة (RAM Cache) وتخفيف استعلام الطلبات المعلقة مع وضع السكون التلقائي بعد 15 دقيقة خمول لمنع أي استنزاف إضافي.</li>
-                        <li><strong>متابعة حية:</strong> يمكنك دائماً فتح لوحة Deno الرسمية عبر الزر أدناه لمشاهدة الرسوم البيانية اللحظية.</li>
-                    </ul>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                    <a href="https://console.deno.com/bishoymamdouh/~/metrics" target="_blank" rel="noopener noreferrer" class="btn" style="background: #0284c7; color: #fff; text-decoration: none; padding: 9px 18px; border-radius: 6px; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
-                        <i class="fas fa-external-link-alt"></i> فتح لوحة تحكم Deno الرسمية المباشرة (Live Metrics)
-                    </a>
-                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('modal-cloud-quota').style.display='none'" style="padding: 9px 22px;">إغلاق النافذة</button>
-                </div>
-            </div>
-        </div>
-
             
             <section id="view-supervisor" class="view hidden">
                 <header class="view-header">
@@ -1724,22 +1626,20 @@ select {
 
                     <!-- Cloud Server Quota & Renewal Monitor Widget (Screen Only) -->
                     <div class="screen-only" style="display: inline-flex; align-items: center; flex-wrap: wrap; gap: 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 14px; font-size: 0.85rem; box-shadow: var(--shadow-sm);">
-                        <div onclick="UI.openCloudQuotaModal()" style="display: flex; align-items: center; gap: 6px; color: var(--primary); cursor: pointer; padding: 3px 8px; border-radius: 6px; background: rgba(2, 132, 199, 0.08); border: 1px dashed var(--primary); transition: all 0.2s ease;" onmouseover="this.style.background='rgba(2, 132, 199, 0.16)'" onmouseout="this.style.background='rgba(2, 132, 199, 0.08)'" title="اضغط هنا لعرض التقرير الشامل لحصص وحالة السيرفر 📊">
+                        <div style="display: flex; align-items: center; gap: 6px; color: var(--primary);">
                             <i class="fas fa-cloud"></i>
-                            <span style="font-weight: 700; text-decoration: underline;">سيرفر Deno Cloud:</span>
-                            <i class="fas fa-chart-pie" style="font-size: 0.8rem;"></i>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 10px;">
-                            <span style="color: var(--text-muted, #64748b);">قراءات الداتابيز (KV Reads):</span>
-                            <span style="font-weight: 700; color: #d97706;" id="cloud-kv-reads-display" title="452,024 قراءة مستهلكة من أصل 500,000 قراءة شهرية مجانية">90.4% (452k / 500k)</span>
+                            <span style="font-weight: 700;">سيرفر Deno Cloud:</span>
                             <span style="background: #10b981; color: #fff; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 600;" title="تم إيقاف الاستنزاف بنجاح واستهلاك السيرفر الآن شبه معدوم بفضل الكاش">مستقر ومحمي ✅</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 10px;">
-                            <span style="color: var(--text-muted, #64748b);">نقل البيانات (Bandwidth):</span>
-                            <span style="font-weight: 700; color: #0284c7;" id="cloud-bandwidth-display" title="9.3 جيجابايت من أصل 100 جيجابايت شهرية">9.3GB / 100GB (9.3%)</span>
+                            <a href="https://console.deno.com/bishoymamdouh/~/metrics" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; color: #d97706; text-decoration: none; font-weight: 700; padding: 3px 10px; border-radius: 6px; background: rgba(217, 119, 6, 0.08); border: 1px dashed #d97706; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(217, 119, 6, 0.18)'" onmouseout="this.style.background='rgba(217, 119, 6, 0.08)'" title="اضغط هنا لفتح صفحة قراءات الداتابيز والتفاصيل الحية مباشرة على سيرفر Deno">
+                                <i class="fas fa-book-reader"></i>
+                                <span style="text-decoration: underline;">قراءات الداتابيز (KV Reads): اضغط لعرض التفاصيل المباشرة</span>
+                                <i class="fas fa-external-link-alt" style="font-size: 0.75rem;"></i>
+                            </a>
                         </div>
                         <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 10px;">
-                            <span style="color: var(--text-muted, #64748b);">تاريخ تجديد الحصة:</span>
+                            <span style="color: var(--text-muted, #64748b);">تاريخ التجديد وتصفير العداد:</span>
                             <span style="font-weight: 700; color: #059669;" id="cloud-renewal-date-display">1 أكتوبر 2026 (متبقي 18 يوماً)</span>
                         </div>
                     </div>
@@ -2149,10 +2049,7 @@ class UI {
 
     static updateCloudQuotaDisplay() {
         const el = document.getElementById('cloud-renewal-date-display');
-        const modalRenewalEl = document.getElementById('modal-quota-renewal-date');
-        const kvReadsEl = document.getElementById('cloud-kv-reads-display');
-        const bandwidthEl = document.getElementById('cloud-bandwidth-display');
-        
+        if (!el) return;
         const now = new Date();
         const nextMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0));
         const msDiff = nextMonth.getTime() - now.getTime();
@@ -2160,32 +2057,7 @@ class UI {
         const monthsAr = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
         const targetMonth = monthsAr[nextMonth.getUTCMonth()];
         const targetYear = nextMonth.getUTCFullYear();
-        const renewalText = `1 ${targetMonth} ${targetYear} (متبقي ${daysLeft} يوماً)`;
-        
-        if (el) el.innerText = renewalText;
-        if (modalRenewalEl) modalRenewalEl.innerText = `تجديد الحصة بالكامل: ${renewalText}`;
-
-        // Auto-detect when new billing cycle starts (1 October 2026 or later)
-        // Deno Deploy resets all counters to zero on 1st of every month UTC.
-        const isPastSeptember2026 = (now.getUTCFullYear() > 2026 || (now.getUTCFullYear() === 2026 && now.getUTCMonth() >= 9));
-        if (isPastSeptember2026) {
-            if (kvReadsEl) {
-                kvReadsEl.innerHTML = `<span style="color: #10b981;">0.1% (دورة جديدة)</span>`;
-                kvReadsEl.title = "تم تصفير وتجديد الحصة المجانية بالكامل مع بداية الشهر الجديد";
-            }
-            if (bandwidthEl) {
-                bandwidthEl.innerHTML = `<span style="color: #10b981;">0 GB / 100 GB</span>`;
-                bandwidthEl.title = "تم تصفير حركة البيانات للشهر الجديد";
-            }
-        }
-    }
-
-    static openCloudQuotaModal() {
-        UI.updateCloudQuotaDisplay();
-        const modal = document.getElementById('modal-cloud-quota');
-        if (modal) {
-            modal.style.display = 'flex';
-        }
+        el.innerText = `1 ${targetMonth} ${targetYear} (متبقي ${daysLeft} يوماً)`;
     }
 
     static updateNavigation(role) {
