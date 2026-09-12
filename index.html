@@ -719,9 +719,9 @@ h1, h2, h3, h4 {
     }
 }
 
-    /* Auto-fit and dynamic cell sizing for reports table (100% zoom visibility) */
+    /* Super-compact 100% zoom fixed fit for reports table */
     #view-reports #print-area {
-        padding: 14px 8px !important;
+        padding: 10px 4px !important;
     }
     #view-reports .table-responsive {
         width: 100% !important;
@@ -730,58 +730,56 @@ h1, h2, h3, h4 {
     #reports-table-full {
         width: 100% !important;
         max-width: 100% !important;
-        table-layout: auto !important;
-        font-size: 0.79rem !important;
+        table-layout: fixed !important;
+        font-size: 0.74rem !important;
         border-collapse: collapse !important;
     }
     #reports-table-full th, 
     #reports-table-full td {
-        padding: 5px 3px !important;
+        padding: 4px 2px !important;
         border: 1px solid var(--border-color) !important;
         vertical-align: middle !important;
         text-align: center !important;
-        line-height: 1.25 !important;
+        line-height: 1.2 !important;
         box-sizing: border-box !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
     }
     #reports-table-full th {
-        font-size: 0.8rem !important;
+        font-size: 0.76rem !important;
         font-weight: 700 !important;
         background-color: var(--secondary-color) !important;
         color: var(--primary-color) !important;
-        padding: 6px 3px !important;
-        line-height: 1.2 !important;
+        padding: 5px 2px !important;
+        line-height: 1.15 !important;
         vertical-align: middle !important;
+        white-space: normal !important;
     }
+    #reports-table-full th:nth-child(1) { width: 13% !important; }
+    #reports-table-full th:nth-child(2) { width: 4.5% !important; }
+    #reports-table-full th:nth-child(3) { width: 8.5% !important; }
+    #reports-table-full th:nth-child(4) { width: 7.5% !important; }
+    #reports-table-full th:nth-child(5) { width: 4.5% !important; }
+    #reports-table-full th:nth-child(6) { width: 4% !important; }
+    #reports-table-full th:nth-child(7) { width: 4.5% !important; }
+    #reports-table-full th:nth-child(8) { width: 9% !important; }
+    #reports-table-full th:nth-child(9) { width: 11.5% !important; }
+    #reports-table-full th:nth-child(10) { width: 12.5% !important; }
+    #reports-table-full th:nth-child(11) { width: 11% !important; }
+    #reports-table-full th:nth-child(12) { width: 9.5% !important; }
 
-    /* Fixed compact columns */
-    #reports-table-full th:nth-child(2), 
+    /* Numbers & short columns: extra compact, nowrap */
     #reports-table-full td:nth-child(2),
-    #reports-table-full th:nth-child(4), 
     #reports-table-full td:nth-child(4),
-    #reports-table-full th:nth-child(5), 
     #reports-table-full td:nth-child(5),
-    #reports-table-full th:nth-child(6), 
     #reports-table-full td:nth-child(6),
-    #reports-table-full th:nth-child(7), 
     #reports-table-full td:nth-child(7) {
         white-space: nowrap !important;
-        width: 1% !important;
         font-variant-numeric: tabular-nums !important;
     }
     #reports-table-full td:nth-child(4) {
-        font-size: 0.75rem !important;
-    }
-
-    /* Flexible text columns: wrap words naturally to fit screen */
-    #reports-table-full td:nth-child(1),
-    #reports-table-full td:nth-child(3),
-    #reports-table-full td:nth-child(8),
-    #reports-table-full td:nth-child(9),
-    #reports-table-full td:nth-child(10),
-    #reports-table-full td:nth-child(11),
-    #reports-table-full td:nth-child(12) {
-        word-break: break-word !important;
-        overflow-wrap: break-word !important;
+        font-size: 0.70rem !important;
+        letter-spacing: -0.3px;
     }
 
     /* Light Mode Theme */
@@ -1415,18 +1413,18 @@ select {
                         <table class="data-table" id="reports-table-full">
                             <thead style="background-color: var(--secondary-color);">
                                 <tr>
-                                    <th>اسم العامل</th>
-                                    <th>النوع</th>
-                                    <th>المشرف</th>
-                                    <th>التاريخ</th>
-                                    <th>اليومية<br><span style="font-size:0.8em; font-weight:normal;">(ج.م)</span></th>
-                                    <th>الخصم<br><span style="font-size:0.8em; font-weight:normal;">(ج.م)</span></th>
-                                    <th>الصافي<br><span style="font-size:0.8em; font-weight:normal;">(ج.م)</span></th>
-                                    <th>المهندس<br>المعتمد</th>
-                                    <th>مكان العمل</th>
-                                    <th>بند العمل<br><span style="font-size:0.8em; font-weight:normal;">(بالتفصيل)</span></th>
-                                    <th>خصم مقاول<br><span style="font-size:0.8em; font-weight:normal;">(اسم المقاول)</span></th>
-                                    <th>الملاحظات</th>
+                                    <th style="width: 13%;">اسم العامل</th>
+                                    <th style="width: 4.5%;">النوع</th>
+                                    <th style="width: 8.5%;">المشرف</th>
+                                    <th style="width: 7.5%;">التاريخ</th>
+                                    <th style="width: 4.5%;">اليومية</th>
+                                    <th style="width: 4%;">الخصم</th>
+                                    <th style="width: 4.5%;">الصافي</th>
+                                    <th style="width: 9%;">المهندس المعتمد</th>
+                                    <th style="width: 11.5%;">مكان العمل</th>
+                                    <th style="width: 12.5%;">بند العمل</th>
+                                    <th style="width: 11%;">خصم مقاول</th>
+                                    <th style="width: 9.5%;">ملاحظات</th>
                                 </tr>
                             </thead>
                             <tbody id="report-results-list">
@@ -1438,6 +1436,7 @@ select {
                                     <td id="report-footer-total-amount">0</td>
                                     <td id="report-footer-total-deduction">0</td>
                                     <td id="report-footer-net-amount" style="color: var(--primary-color); font-weight: bold; font-size: 1.1em;">0</td>
+                                    <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
@@ -2202,6 +2201,8 @@ class UI {
         if (oldSearch) oldSearch.remove();
         
         let totalDays = 0;
+        let totalGross = 0;
+        let totalDeduction = 0;
         let totalAmount = 0;
 
         if (workers.length === 0) {
@@ -2217,6 +2218,8 @@ class UI {
                     const netAmount = amount - deduction;
 
                     totalDays += 1;
+                    totalGross += amount;
+                    totalDeduction += deduction;
                     totalAmount += netAmount;
                     
                     tbody.innerHTML += `
@@ -2228,7 +2231,7 @@ class UI {
                             <td>${amount}</td>
                             <td>${deduction}</td>
                             <td><strong>${netAmount}</strong></td>
-                            <td style="white-space: nowrap;"><span class="badge-glow badge-glow-supervisor" style="font-size: 0.7em; padding: 2px 4px; font-weight: normal;"><i class="fas fa-hard-hat"></i> ${engineerName}</span></td>
+                            <td ><span class="badge-glow badge-glow-supervisor" style="font-size: 0.7em; padding: 2px 4px; font-weight: normal;"><i class="fas fa-hard-hat"></i> ${engineerName}</span></td>
                             <td>${w.location || ''}</td>
                             <td>${w.task || ''}</td>
                             <td>${w.contractor ? `<span class="badge badge-pending" style="font-weight:bold;">${w.contractor}</span>` : ''}</td>
@@ -2242,161 +2245,12 @@ class UI {
         document.getElementById('report-total-days').innerText = totalDays;
         document.getElementById('report-total-amount').innerText = totalAmount.toLocaleString();
         
-        // Apply column filters (Excel style)
-        setTimeout(() => this.applyExcelFilters(tbody), 0);
-    }
-    
-    static applyExcelFilters(tbody) {
-        const table = tbody.closest('table');
-        const theadRow = table.querySelector('thead tr');
-        
-        // Initialize filter selects if not already there
-        if (!theadRow.dataset.filtersInit) {
-            theadRow.dataset.filtersInit = "true";
-            Array.from(theadRow.children).forEach((th, index) => {
-                // Add filter for Name (0), Type (1), Supervisor (2), Date (3), Engineer (7)
-                if ([0, 1, 2, 3, 7].includes(index)) {
-                    const originalText = th.innerText.trim();
-                    th.innerHTML = '';
-                    
-                    const container = document.createElement('div');
-                    container.className = 'screen-only';
-                    container.style.position = 'relative';
-                    container.style.display = 'inline-flex';
-                    container.style.alignItems = 'center';
-                    container.style.justifyContent = 'center';
-                    container.style.gap = '3px';
-                    container.style.cursor = 'pointer';
-                    container.style.width = '100%';
-
-                    const labelSpan = document.createElement('span');
-                    labelSpan.className = 'th-filter-label';
-                    labelSpan.innerText = originalText;
-                    labelSpan.style.whiteSpace = 'nowrap';
-
-                    const icon = document.createElement('i');
-                    icon.className = 'fas fa-caret-down';
-                    icon.style.fontSize = '0.75em';
-                    icon.style.opacity = '0.7';
-                    icon.style.pointerEvents = 'none';
-
-                    const select = document.createElement('select');
-                    select.className = 'report-col-filter';
-                    select.dataset.colIndex = index;
-                    select.style.position = 'absolute';
-                    select.style.top = '0';
-                    select.style.left = '0';
-                    select.style.width = '100%';
-                    select.style.height = '100%';
-                    select.style.opacity = '0';
-                    select.style.cursor = 'pointer';
-                    select.style.zIndex = '2';
-                    select.title = `تصفية حسب ${originalText}`;
-                    select.innerHTML = `<option value="">(الكل - ${originalText})</option>`;
-                    
-                    container.appendChild(labelSpan);
-                    container.appendChild(icon);
-                    container.appendChild(select);
-                    
-                    const printSpan = document.createElement('span');
-                    printSpan.className = 'print-only-text';
-                    printSpan.innerText = originalText;
-                    
-                    th.appendChild(printSpan);
-                    th.appendChild(container);
-                    
-                    select.addEventListener('change', () => {
-                        if (select.value) {
-                            labelSpan.innerText = select.value;
-                            labelSpan.style.fontWeight = 'bold';
-                            labelSpan.style.color = 'var(--primary-color)';
-                            icon.className = 'fas fa-filter';
-                            icon.style.color = 'var(--primary-color)';
-                            icon.style.opacity = '1';
-                        } else {
-                            labelSpan.innerText = originalText;
-                            labelSpan.style.fontWeight = 'inherit';
-                            labelSpan.style.color = 'inherit';
-                            icon.className = 'fas fa-caret-down';
-                            icon.style.color = '';
-                            icon.style.opacity = '0.7';
-                        }
-                        this.filterExcelTable(tbody);
-                    });
-                }
-            });
-        }
-        
-        // Populate options based on current tbody content
-        const selects = theadRow.querySelectorAll('select.report-col-filter');
-        selects.forEach(select => {
-            const colIndex = parseInt(select.dataset.colIndex);
-            const uniqueValues = new Set();
-            
-            Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
-                if (tr.children.length > 1) { // Ignore empty rows
-                    let text = tr.children[colIndex].innerText.trim();
-                    if(colIndex === 0) text = tr.children[colIndex].querySelector('strong') ? tr.children[colIndex].querySelector('strong').innerText.trim() : text;
-                    if (text && text !== '-') uniqueValues.add(text);
-                }
-            });
-            
-            const firstOptText = select.options[0] ? select.options[0].innerText : '(الكل)';
-            const currentValue = select.value;
-            select.innerHTML = `<option value="">${firstOptText}</option>`;
-            Array.from(uniqueValues).sort((a, b) => a.localeCompare(b, 'ar')).forEach(val => {
-                const opt = document.createElement('option');
-                opt.value = val;
-                opt.innerText = val;
-                if (val === currentValue) opt.selected = true;
-                select.appendChild(opt);
-            });
-        });
-        
-        // Run initial filter to update counts
-        this.filterExcelTable(tbody);
-    }
-    
-    static filterExcelTable(tbody) {
-        const selects = tbody.closest('table').querySelectorAll('thead select.report-col-filter');
-        const filters = Array.from(selects).map(s => ({ index: parseInt(s.dataset.colIndex), value: s.value }));
-        
-        let visibleCount = 0;
-        let visibleTotal = 0;
-        let visibleDeduction = 0;
-        
-        Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
-            if (tr.children.length <= 1) return; // empty row
-            
-            let show = true;
-            filters.forEach(f => {
-                if (f.value !== '') {
-                    let cellVal = tr.children[f.index].innerText.trim();
-                    if(f.index === 0) cellVal = tr.children[f.index].querySelector('strong').innerText.trim();
-                    if (cellVal !== f.value) show = false;
-                }
-            });
-            
-            tr.style.display = show ? '' : 'none';
-            
-            if (show) {
-                visibleCount++;
-                visibleTotal += parseFloat(tr.children[4].innerText.trim() || 0);
-                visibleDeduction += parseFloat(tr.children[5].innerText.trim() || 0);
-            }
-        });
-        
-        const netTotal = visibleTotal - visibleDeduction;
-        
-        document.getElementById('report-total-days').innerText = visibleCount;
-        document.getElementById('report-total-amount').innerText = netTotal.toLocaleString();
-        
         const footerTotal = document.getElementById('report-footer-total-amount');
         const footerDeduction = document.getElementById('report-footer-total-deduction');
         const footerNet = document.getElementById('report-footer-net-amount');
-        if (footerTotal) footerTotal.innerText = visibleTotal.toLocaleString();
-        if (footerDeduction) footerDeduction.innerText = visibleDeduction.toLocaleString();
-        if (footerNet) footerNet.innerText = netTotal.toLocaleString();
+        if (footerTotal) footerTotal.innerText = totalGross.toLocaleString();
+        if (footerDeduction) footerDeduction.innerText = totalDeduction.toLocaleString();
+        if (footerNet) footerNet.innerText = totalAmount.toLocaleString();
     }
 }
 
