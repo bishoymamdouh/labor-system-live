@@ -721,7 +721,7 @@ h1, h2, h3, h4 {
 
     /* Auto-fit and dynamic cell sizing for reports table (100% zoom visibility) */
     #view-reports #print-area {
-        padding: 16px 12px !important;
+        padding: 14px 8px !important;
     }
     #view-reports .table-responsive {
         width: 100% !important;
@@ -731,12 +731,12 @@ h1, h2, h3, h4 {
         width: 100% !important;
         max-width: 100% !important;
         table-layout: auto !important;
-        font-size: 0.81rem !important;
+        font-size: 0.79rem !important;
         border-collapse: collapse !important;
     }
     #reports-table-full th, 
     #reports-table-full td {
-        padding: 6px 4px !important;
+        padding: 5px 3px !important;
         border: 1px solid var(--border-color) !important;
         vertical-align: middle !important;
         text-align: center !important;
@@ -744,43 +744,35 @@ h1, h2, h3, h4 {
         box-sizing: border-box !important;
     }
     #reports-table-full th {
-        font-size: 0.82rem !important;
+        font-size: 0.8rem !important;
         font-weight: 700 !important;
         background-color: var(--secondary-color) !important;
         color: var(--primary-color) !important;
-        padding: 6px 4px !important;
-        white-space: nowrap !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
+        padding: 6px 3px !important;
+        line-height: 1.2 !important;
+        vertical-align: middle !important;
     }
 
-    /* Column headers: ensure full title is always 100% visible without truncation */
-    #reports-table-full th:nth-child(1) { min-width: 90px !important; } /* اسم العامل */
-    #reports-table-full th:nth-child(2) { min-width: 55px !important; } /* النوع */
-    #reports-table-full th:nth-child(3) { min-width: 75px !important; } /* المشرف */
-    #reports-table-full th:nth-child(4) { min-width: 85px !important; white-space: nowrap !important; } /* التاريخ */
-    #reports-table-full th:nth-child(5) { min-width: 55px !important; white-space: nowrap !important; } /* اليومية */
-    #reports-table-full th:nth-child(6) { min-width: 50px !important; white-space: nowrap !important; } /* الخصم */
-    #reports-table-full th:nth-child(7) { min-width: 55px !important; white-space: nowrap !important; } /* الصافي */
-    #reports-table-full th:nth-child(8) { min-width: 110px !important; } /* المهندس المعتمد */
-    #reports-table-full th:nth-child(9) { min-width: 85px !important; } /* مكان العمل */
-    #reports-table-full th:nth-child(10) { min-width: 95px !important; } /* بند العمل (بالتفصيل) */
-    #reports-table-full th:nth-child(11) { min-width: 90px !important; } /* خصم على مقاول */
-    #reports-table-full th:nth-child(12) { min-width: 75px !important; } /* الملاحظات */
-
-    /* Data rows: compact numbers and flexible text wrapping to-fit */
+    /* Fixed compact columns */
+    #reports-table-full th:nth-child(2), 
     #reports-table-full td:nth-child(2),
+    #reports-table-full th:nth-child(4), 
     #reports-table-full td:nth-child(4),
+    #reports-table-full th:nth-child(5), 
     #reports-table-full td:nth-child(5),
+    #reports-table-full th:nth-child(6), 
     #reports-table-full td:nth-child(6),
+    #reports-table-full th:nth-child(7), 
     #reports-table-full td:nth-child(7) {
         white-space: nowrap !important;
+        width: 1% !important;
         font-variant-numeric: tabular-nums !important;
     }
     #reports-table-full td:nth-child(4) {
-        font-size: 0.77rem !important;
+        font-size: 0.75rem !important;
     }
 
+    /* Flexible text columns: wrap words naturally to fit screen */
     #reports-table-full td:nth-child(1),
     #reports-table-full td:nth-child(3),
     #reports-table-full td:nth-child(8),
@@ -790,15 +782,6 @@ h1, h2, h3, h4 {
     #reports-table-full td:nth-child(12) {
         word-break: break-word !important;
         overflow-wrap: break-word !important;
-    }
-
-    /* Filter dropdown inside th: never truncate with dots */
-    #reports-table-full th .report-col-filter {
-        max-width: none !important;
-        width: auto !important;
-        text-overflow: clip !important;
-        overflow: visible !important;
-        white-space: nowrap !important;
     }
 
     /* Light Mode Theme */
@@ -1439,10 +1422,10 @@ select {
                                     <th>اليومية<br><span style="font-size:0.8em; font-weight:normal;">(ج.م)</span></th>
                                     <th>الخصم<br><span style="font-size:0.8em; font-weight:normal;">(ج.م)</span></th>
                                     <th>الصافي<br><span style="font-size:0.8em; font-weight:normal;">(ج.م)</span></th>
-                                    <th>المهندس المعتمد</th>
+                                    <th>المهندس<br>المعتمد</th>
                                     <th>مكان العمل</th>
-                                    <th>بند العمل (بالتفصيل)</th>
-                                    <th>خصم على مقاول<br><span style="font-size:0.85em; font-weight:normal;">(اسم المقاول)</span></th>
+                                    <th>بند العمل<br><span style="font-size:0.8em; font-weight:normal;">(بالتفصيل)</span></th>
+                                    <th>خصم مقاول<br><span style="font-size:0.8em; font-weight:normal;">(اسم المقاول)</span></th>
                                     <th>الملاحظات</th>
                                 </tr>
                             </thead>
@@ -2282,39 +2265,38 @@ class UI {
                     container.style.display = 'inline-flex';
                     container.style.alignItems = 'center';
                     container.style.justifyContent = 'center';
-                    container.style.width = 'auto';
-                    
+                    container.style.gap = '3px';
+                    container.style.cursor = 'pointer';
+                    container.style.width = '100%';
+
+                    const labelSpan = document.createElement('span');
+                    labelSpan.className = 'th-filter-label';
+                    labelSpan.innerText = originalText;
+                    labelSpan.style.whiteSpace = 'nowrap';
+
+                    const icon = document.createElement('i');
+                    icon.className = 'fas fa-caret-down';
+                    icon.style.fontSize = '0.75em';
+                    icon.style.opacity = '0.7';
+                    icon.style.pointerEvents = 'none';
+
                     const select = document.createElement('select');
                     select.className = 'report-col-filter';
                     select.dataset.colIndex = index;
-                    select.style.appearance = 'none';
-                    select.style.border = 'none';
-                    select.style.background = 'transparent';
-                    select.style.color = 'inherit';
-                    select.style.fontWeight = 'inherit';
-                    select.style.fontSize = 'inherit';
-                    select.style.fontFamily = 'inherit';
+                    select.style.position = 'absolute';
+                    select.style.top = '0';
+                    select.style.left = '0';
+                    select.style.width = '100%';
+                    select.style.height = '100%';
+                    select.style.opacity = '0';
                     select.style.cursor = 'pointer';
-                    select.style.outline = 'none';
-                    select.style.paddingLeft = '14px';
-                    select.style.paddingRight = '2px';
-                    select.style.textAlign = 'center';
-                    select.style.whiteSpace = 'nowrap';
-                    select.style.width = 'auto';
-                    select.style.overflow = 'visible';
-                    select.style.textOverflow = 'clip';
-                    select.innerHTML = `<option value="">${originalText}</option>`;
+                    select.style.zIndex = '2';
+                    select.title = `تصفية حسب ${originalText}`;
+                    select.innerHTML = `<option value="">(الكل - ${originalText})</option>`;
                     
-                    const icon = document.createElement('i');
-                    icon.className = 'fas fa-caret-down';
-                    icon.style.position = 'absolute';
-                    icon.style.left = '0';
-                    icon.style.top = '50%';
-                    icon.style.transform = 'translateY(-50%)';
-                    icon.style.pointerEvents = 'none';
-                    
-                    container.appendChild(select);
+                    container.appendChild(labelSpan);
                     container.appendChild(icon);
+                    container.appendChild(select);
                     
                     const printSpan = document.createElement('span');
                     printSpan.className = 'print-only-text';
@@ -2323,7 +2305,24 @@ class UI {
                     th.appendChild(printSpan);
                     th.appendChild(container);
                     
-                    select.addEventListener('change', () => this.filterExcelTable(tbody));
+                    select.addEventListener('change', () => {
+                        if (select.value) {
+                            labelSpan.innerText = select.value;
+                            labelSpan.style.fontWeight = 'bold';
+                            labelSpan.style.color = 'var(--primary-color)';
+                            icon.className = 'fas fa-filter';
+                            icon.style.color = 'var(--primary-color)';
+                            icon.style.opacity = '1';
+                        } else {
+                            labelSpan.innerText = originalText;
+                            labelSpan.style.fontWeight = 'inherit';
+                            labelSpan.style.color = 'inherit';
+                            icon.className = 'fas fa-caret-down';
+                            icon.style.color = '';
+                            icon.style.opacity = '0.7';
+                        }
+                        this.filterExcelTable(tbody);
+                    });
                 }
             });
         }
@@ -2337,15 +2336,15 @@ class UI {
             Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
                 if (tr.children.length > 1) { // Ignore empty rows
                     let text = tr.children[colIndex].innerText.trim();
-                    if(colIndex === 0) text = tr.children[colIndex].querySelector('strong').innerText.trim();
-                    uniqueValues.add(text);
+                    if(colIndex === 0) text = tr.children[colIndex].querySelector('strong') ? tr.children[colIndex].querySelector('strong').innerText.trim() : text;
+                    if (text && text !== '-') uniqueValues.add(text);
                 }
             });
             
-            const firstOptText = select.options[0].innerText;
+            const firstOptText = select.options[0] ? select.options[0].innerText : '(الكل)';
             const currentValue = select.value;
             select.innerHTML = `<option value="">${firstOptText}</option>`;
-            Array.from(uniqueValues).sort().forEach(val => {
+            Array.from(uniqueValues).sort((a, b) => a.localeCompare(b, 'ar')).forEach(val => {
                 const opt = document.createElement('option');
                 opt.value = val;
                 opt.innerText = val;
