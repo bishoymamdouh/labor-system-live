@@ -366,6 +366,21 @@ h1, h2, h3, h4 {
     border-bottom: 1px solid var(--border-color);
 }
 
+.cell-type-text {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.15 !important;
+    max-height: 2.35em !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+}
+
 .modal-input {
     field-sizing: content;
     text-align-last: center;
@@ -744,6 +759,8 @@ h1, h2, h3, h4 {
         box-sizing: border-box !important;
         word-break: break-word !important;
         overflow-wrap: break-word !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
     #reports-table-full th {
         position: relative !important;
@@ -793,20 +810,19 @@ h1, h2, h3, h4 {
         font-size: 0.72rem !important;
     }
     #reports-table-full th:nth-child(1) { width: 13% !important; }
-    #reports-table-full th:nth-child(2) { width: 5% !important; }
+    #reports-table-full th:nth-child(2) { width: 6.5% !important; }
     #reports-table-full th:nth-child(3) { width: 8.5% !important; }
     #reports-table-full th:nth-child(4) { width: 8% !important; }
     #reports-table-full th:nth-child(5) { width: 5% !important; }
     #reports-table-full th:nth-child(6) { width: 4.5% !important; }
     #reports-table-full th:nth-child(7) { width: 5% !important; }
     #reports-table-full th:nth-child(8) { width: 9% !important; }
-    #reports-table-full th:nth-child(9) { width: 11% !important; }
-    #reports-table-full th:nth-child(10) { width: 12% !important; }
-    #reports-table-full th:nth-child(11) { width: 10.5% !important; }
+    #reports-table-full th:nth-child(9) { width: 10.5% !important; }
+    #reports-table-full th:nth-child(10) { width: 11.5% !important; }
+    #reports-table-full th:nth-child(11) { width: 10% !important; }
     #reports-table-full th:nth-child(12) { width: 8.5% !important; }
 
-    /* Numbers & short columns: extra compact, nowrap */
-    #reports-table-full td:nth-child(2),
+    /* Numbers & short date columns: extra compact, nowrap */
     #reports-table-full td:nth-child(4),
     #reports-table-full td:nth-child(5),
     #reports-table-full td:nth-child(6),
@@ -817,6 +833,34 @@ h1, h2, h3, h4 {
     #reports-table-full td:nth-child(4) {
         font-size: 0.70rem !important;
         letter-spacing: -0.3px;
+    }
+
+    /* Worker Type (النوع) column: compact, wraps cleanly on max 2 lines, no overflow */
+    #reports-table-full td:nth-child(2) {
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        line-height: 1.15 !important;
+        font-size: clamp(0.66rem, 0.72vw, 0.74rem) !important;
+        padding: 2px 2px !important;
+        vertical-align: middle !important;
+        text-align: center !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+    #reports-table-full td:nth-child(2) .cell-type-text {
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        line-height: 1.15 !important;
+        max-height: 2.35em !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        white-space: normal !important;
+        text-align: center !important;
+        margin: 0 auto !important;
     }
 
     /* Responsive Auto-scaling Toolbar for Action/Export Buttons */
@@ -1671,7 +1715,7 @@ select {
                                             <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
                                         </div>
                                     </th>
-                                    <th style="width: 5%;" data-col-index="1" onclick="UI.openColFilter(1, this)" title="انقر لتصفية عمود: النوع">
+                                    <th style="width: 6.5%;" data-col-index="1" onclick="UI.openColFilter(1, this)" title="انقر لتصفية عمود: النوع">
                                         <div class="th-content">
                                             <span class="th-text">النوع</span>
                                             <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
@@ -1713,19 +1757,19 @@ select {
                                             <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
                                         </div>
                                     </th>
-                                    <th style="width: 11%;" data-col-index="8" onclick="UI.openColFilter(8, this)" title="انقر لتصفية عمود: مكان العمل">
+                                    <th style="width: 10.5%;" data-col-index="8" onclick="UI.openColFilter(8, this)" title="انقر لتصفية عمود: مكان العمل">
                                         <div class="th-content">
                                             <span class="th-text">مكان العمل</span>
                                             <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
                                         </div>
                                     </th>
-                                    <th style="width: 12%;" data-col-index="9" onclick="UI.openColFilter(9, this)" title="انقر لتصفية عمود: بند العمل">
+                                    <th style="width: 11.5%;" data-col-index="9" onclick="UI.openColFilter(9, this)" title="انقر لتصفية عمود: بند العمل">
                                         <div class="th-content">
                                             <span class="th-text">بند العمل</span>
                                             <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
                                         </div>
                                     </th>
-                                    <th style="width: 10.5%;" data-col-index="10" onclick="UI.openColFilter(10, this)" title="انقر لتصفية عمود: خصم مقاول">
+                                    <th style="width: 10%;" data-col-index="10" onclick="UI.openColFilter(10, this)" title="انقر لتصفية عمود: خصم مقاول">
                                         <div class="th-content">
                                             <span class="th-text">خصم مقاول</span>
                                             <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
@@ -2194,7 +2238,7 @@ class UI {
                 workersHtml += `
                     <tr style="${deletedStyle}">
                         <td>${w.name} ${deletedBadge}</td>
-                        <td>${w.type}</td>
+                        <td><span class="cell-type-text" title="${w.type}">${w.type}</span></td>
                         <td class="wage-col">${w.amount}</td>
                         <td>${w.location || '-'}</td>
                         <td>${w.task || '-'}</td>
@@ -2347,7 +2391,7 @@ class UI {
                 html += `
                     <tr>
                         <td>${w.name}</td>
-                        <td>${w.type}</td>
+                        <td><span class="cell-type-text" title="${w.type}">${w.type}</span></td>
                         <td class="wage-col">${w.amount}</td>
                         <td>${w.location || ''}</td>
                         <td>${w.task || ''}</td>
@@ -2537,7 +2581,7 @@ class UI {
                     tbody.innerHTML += `
                         <tr>
                             <td><strong>${w.name}</strong></td>
-                            <td>${w.type}</td>
+                            <td><span class="cell-type-text" title="${w.type}">${w.type}</span></td>
                             <td>${supervisorName}</td>
                             <td style="white-space: nowrap;">${record.date}</td>
                             <td>${amount}</td>
