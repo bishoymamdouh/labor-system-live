@@ -1917,6 +1917,18 @@ class Database {
             return createdB - createdA;
         });
     }
+
+    async getPendingCount(engineerId = null) {
+        try {
+            const url = engineerId ? `/api/pendingCount?engineerId=${encodeURIComponent(engineerId)}` : '/api/pendingCount';
+            const res = await this.request(url);
+            const data = await res.json();
+            return typeof data.count === 'number' ? data.count : 0;
+        } catch (e) {
+            console.error('getPendingCount error:', e);
+            return null;
+        }
+    }
 }
 
 const db = new Database();
@@ -4710,24 +4722,31 @@ document.addEventListener('keydown', (e) => {
         
 
         
-        this.lastPendingCount = 0;
+        this.lastPendingCount = -1;
         
         const check = async () => {
             try {
+                // If tab is in background, skip periodic polling to conserve bandwidth
+                if (document.hidden) return;
+
                 const engineerId = role === 'admin' ? null : auth.currentUser?.id;
-                const records = await db.getRecordsWithDetails('pending', null, engineerId, null);
-                const currentCount = records.length;
+                const currentCount = await db.getPendingCount(engineerId);
+                if (currentCount === null) return;
                 
-                const badge = document.getElementById('nav-badge-engineer');
-                if (badge) {
+                const badges = document.querySelectorAll('#nav-badge-engineer');
+                badges.forEach(badge => {
                     if (currentCount > 0) {
                         badge.style.display = 'inline-block';
                         badge.innerText = currentCount;
-                        if ('setAppBadge' in navigator) {
-                            navigator.setAppBadge(currentCount).catch(console.error);
-                        }
                     } else {
                         badge.style.display = 'none';
+                    }
+                });
+
+                if ('setAppBadge' in navigator) {
+                    if (currentCount > 0) {
+                        navigator.setAppBadge(currentCount).catch(console.error);
+                    } else {
                         if ('clearAppBadge' in navigator) {
                             navigator.clearAppBadge().catch(console.error);
                         }
@@ -4735,26 +4754,31 @@ document.addEventListener('keydown', (e) => {
                 }
                 
                 if (currentCount > this.lastPendingCount && this.lastPendingCount !== -1) {
-                    if (document.getElementById('view-engineer').classList.contains('active')) {
+                    if (document.getElementById('view-engineer')?.classList.contains('active')) {
                         this.loadEngineerData().catch(e => console.error('Error reloading engineer data:', e));
                     }
                 }
                 
-                if (this.lastPendingCount === -1) {
-                    this.lastPendingCount = currentCount;
-                } else {
-                    this.lastPendingCount = currentCount;
-                }
+                this.lastPendingCount = currentCount;
             } catch (e) {
                 console.error("Polling error", e);
             }
         };
         
-        this.lastPendingCount = -1;
         if (this.notifInterval) clearInterval(this.notifInterval);
         
-        setTimeout(check, 2000);
-        this.notifInterval = setInterval(check, 10000);
+        // Initial check after 1.5 seconds
+        setTimeout(check, 1500);
+        // Micro-poll every 60 seconds (15 bytes payload instead of 450 KB!)
+        this.notifInterval = setInterval(check, 60000);
+
+        // Immediate refresh when user activates the tab
+        if (!this._visibilityBound) {
+            this._visibilityBound = true;
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) check();
+            });
+        }
     }
     
     playNotificationSound() {

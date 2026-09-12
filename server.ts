@@ -63,6 +63,23 @@ async function handler(req: Request): Promise<Response> {
             return new Response(VAPID_PUBLIC, { status: 200 });
         }
         
+        if (url.pathname === "/api/pendingCount" && method === "GET") {
+            const engineerId = url.searchParams.get("engineerId");
+            let count = 0;
+            const recordsIter = kv.list({ prefix: ["records"] });
+            for await (const entry of recordsIter) {
+                if (entry.value && entry.value.status === 'pending') {
+                    if (!engineerId || String(entry.value.engineerId) === String(engineerId)) {
+                        count++;
+                    }
+                }
+            }
+            return new Response(JSON.stringify({ count }), { 
+                status: 200, 
+                headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } 
+            });
+        }
+        
         if (url.pathname === "/api/updateWorkerName" && method === "POST") {
             try {
                 const body = await req.json();
@@ -377,18 +394,20 @@ async function handler(req: Request): Promise<Response> {
 
     // Serve static files
     const res = await serveDir(req, {
-        headers: ["Cache-Control: no-cache, no-store, must-revalidate", "Pragma: no-cache", "Expires: 0"],
         fsRoot: ".",
         urlRoot: "",
-        showDirListing: true,
+        showDirListing: false,
         enableCors: true,
     });
 
-    // Disable caching for root and JS/HTML so updates are visible
-    if (url.pathname === "/" || url.pathname.endsWith(".html") || url.pathname.endsWith(".js") || url.pathname.endsWith(".css")) {
-        res.headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
-        res.headers.set("Pragma", "no-cache");
-        res.headers.set("Expires", "0");
+    // Static assets (images, icons, audio, fonts, manifest) cache for 1 day
+    if (url.pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|webp|mp3|wav|ogg|woff|woff2|ttf|eot|webmanifest)$/i)) {
+        res.headers.set("Cache-Control", "public, max-age=86400");
+    } else {
+        // For HTML, JS, CSS: use "no-cache"
+        // "no-cache" allows browsers to revalidate using ETags (returning 304 Not Modified with 0 bytes transferred if unchanged)
+        // while still ensuring any new code changes are immediately downloaded.
+        res.headers.set("Cache-Control", "no-cache");
     }
 
     return res;
