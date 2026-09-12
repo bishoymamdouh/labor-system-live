@@ -1122,8 +1122,8 @@ select {
                                             <th>اسم العامل</th>
                                             <th>النوع</th>
                                             <th>اليومية (جنيه)</th>
-                                            <th>مكان العمل</th>
-                                            <th>بند العمل (بالتفصيل)</th>
+                                            <th>مكان العمل <span style="color: red;">*</span></th>
+                                            <th>بند العمل (بالتفصيل) <span style="color: red;">*</span></th>
                                             <th>خصم على مقاول<br><span style="font-size: 0.85em; font-weight: normal;">(اسم المقاول)</span></th>
                                             <th>ملاحظات</th>
                                             <th>إجراء</th>
@@ -3203,10 +3203,10 @@ class UI {
                 <input type="number" id="worker-amount-${workerId}" class="modal-input" style="min-width: 50px; width: 100%;" required min="0" ${auth.getRole() === "admin" || auth.getRole() === "engineer" ? "" : "readonly"} placeholder="اليومية" oninput="app.updateTotals()">
             </td>
             <td>
-                <textarea id="worker-location-${workerId}" class="modal-input" style="min-width: 120px; width: 100%; resize: vertical;" rows="2" placeholder="مكان العمل"></textarea>
+                <textarea id="worker-location-${workerId}" class="modal-input" style="min-width: 120px; width: 100%; resize: vertical;" rows="2" placeholder="مكان العمل (إجباري)" required></textarea>
             </td>
             <td>
-                <textarea id="worker-task-${workerId}" class="modal-input" style="min-width: 140px; width: 100%; resize: vertical;" rows="2" placeholder="بند العمل بالتفصيل"></textarea>
+                <textarea id="worker-task-${workerId}" class="modal-input" style="min-width: 140px; width: 100%; resize: vertical;" rows="2" placeholder="بند العمل بالتفصيل (إجباري)" required></textarea>
             </td>
             <td>
                 <input type="text" id="worker-contractor-${workerId}" class="modal-input" style="min-width: 120px; width: 100%;" placeholder="اسم المقاول (إن وجد)">
@@ -3331,9 +3331,17 @@ class UI {
             if (name && amount >= 0) {
                 if (!location.trim()) {
                     alert(`الرجاء إدخال مكان العمل للعامل: ${name}`);
+                    const locEl = document.getElementById(`worker-location-${id}`);
+                    if (locEl) { locEl.focus(); locEl.style.border = '2px solid red'; }
                     return;
                 }
-                workersData.push({ name, type, amount, location, task, contractor, deduction: 0, notes: notes });
+                if (!task.trim()) {
+                    alert(`الرجاء إدخال بند العمل (بالتفصيل) للعامل: ${name}`);
+                    const taskEl = document.getElementById(`worker-task-${id}`);
+                    if (taskEl) { taskEl.focus(); taskEl.style.border = '2px solid red'; }
+                    return;
+                }
+                workersData.push({ name, type, amount, location: location.trim(), task: task.trim(), contractor, deduction: 0, notes: notes });
                 totalAmount += amount;
                 validWorkersCount++;
             }
@@ -3809,10 +3817,38 @@ class UI {
                         const notesInput = document.getElementById(`${prefix}-notes-${worker.id}`);
                         
                         if (typeInput && amountInput) {
+                            const newLoc = locationInput ? locationInput.value.trim() : (worker.location || '').trim();
+                            const newTask = taskInput ? taskInput.value.trim() : (worker.task || '').trim();
+                            
+                            if (status === 'approved' || status === 'pending') {
+                                if (!newLoc) {
+                                    alert(`الرجاء إدخال مكان العمل للعامل: ${worker.name}`);
+                                    if (locationInput) { locationInput.focus(); locationInput.style.border = '2px solid red'; }
+                                    if (btn) {
+                                        btn.disabled = false;
+                                        btn.innerHTML = origHtml;
+                                        delete btn.dataset.processing;
+                                        btn.style.pointerEvents = '';
+                                    }
+                                    return;
+                                }
+                                if (!newTask) {
+                                    alert(`الرجاء إدخال بند العمل (بالتفصيل) للعامل: ${worker.name}`);
+                                    if (taskInput) { taskInput.focus(); taskInput.style.border = '2px solid red'; }
+                                    if (btn) {
+                                        btn.disabled = false;
+                                        btn.innerHTML = origHtml;
+                                        delete btn.dataset.processing;
+                                        btn.style.pointerEvents = '';
+                                    }
+                                    return;
+                                }
+                            }
+
                             worker.type = typeInput.value;
                             worker.amount = Number(amountInput.value);
-                            worker.location = locationInput ? locationInput.value : (worker.location || '');
-                            worker.task = taskInput ? taskInput.value : (worker.task || '');
+                            worker.location = newLoc;
+                            worker.task = newTask;
                             worker.contractor = contractorInput ? contractorInput.value.trim() : (worker.contractor || '');
                             worker.deduction = deductionInput ? Number(deductionInput.value) : 0;
                             worker.notes = notesInput ? notesInput.value : (worker.notes || '');
