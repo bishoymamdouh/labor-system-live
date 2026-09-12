@@ -4723,11 +4723,50 @@ document.addEventListener('keydown', (e) => {
 
         
         this.lastPendingCount = -1;
+        this.isAppSleeping = false;
+        this.hiddenStartTime = 0;
         
+        const showSleepOverlay = () => {
+            if (document.getElementById('sleep-overlay')) return;
+            this.isAppSleeping = true;
+            if (this.notifInterval) clearInterval(this.notifInterval);
+            
+            const overlay = document.createElement('div');
+            overlay.id = 'sleep-overlay';
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(15,23,42,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;color:#fff;direction:rtl;padding:20px;font-family:inherit;';
+            overlay.innerHTML = `
+                <div style="background:#1e293b;border:1px solid #334155;border-radius:18px;padding:32px 24px;max-width:400px;width:95%;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);text-align:center;">
+                    <div style="width:64px;height:64px;background:rgba(245,158,11,0.15);color:#f59e0b;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                    <h3 style="font-size:1.25rem;font-weight:bold;margin-bottom:10px;color:#f8fafc;">وضع توفير البيانات والبطارية</h3>
+                    <p style="color:#94a3b8;font-size:0.92rem;line-height:1.6;margin-bottom:24px;">تم إيقاف التطبيق مؤقتاً لتوفير استهلاك البيانات والبطارية بعد بقائه في الخلفية لأكثر من 15 دقيقة.</p>
+                    <button id="resume-app-btn" class="btn btn-primary" style="width:100%;padding:12px;font-size:1rem;border-radius:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;">
+                        <i class="fas fa-redo-alt"></i> استئناف العمل وتحديث البيانات
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            
+            document.getElementById('resume-app-btn').onclick = () => {
+                overlay.remove();
+                this.isAppSleeping = false;
+                this.hiddenStartTime = 0;
+                if (this.notifInterval) clearInterval(this.notifInterval);
+                this.notifInterval = setInterval(check, 120000);
+                check();
+                if (role === 'engineer' || role === 'admin') {
+                    if (document.getElementById('view-engineer')?.classList.contains('active')) {
+                        this.loadEngineerData().catch(console.error);
+                    }
+                }
+            };
+        };
+
         const check = async () => {
             try {
-                // If tab is in background, skip periodic polling to conserve bandwidth
-                if (document.hidden) return;
+                // If tab is in background or sleeping, skip polling to conserve bandwidth
+                if (document.hidden || this.isAppSleeping) return;
 
                 const engineerId = role === 'admin' ? null : auth.currentUser?.id;
                 const currentCount = await db.getPendingCount(engineerId);
@@ -4769,14 +4808,23 @@ document.addEventListener('keydown', (e) => {
         
         // Initial check after 1.5 seconds
         setTimeout(check, 1500);
-        // Micro-poll every 60 seconds (15 bytes payload instead of 450 KB!)
-        this.notifInterval = setInterval(check, 60000);
+        // Micro-poll every 120 seconds (2 minutes)
+        this.notifInterval = setInterval(check, 120000);
 
-        // Immediate refresh when user activates the tab
+        // Visibility and 15-minute background sleep tracker
         if (!this._visibilityBound) {
             this._visibilityBound = true;
             document.addEventListener('visibilitychange', () => {
-                if (!document.hidden) check();
+                if (document.hidden) {
+                    this.hiddenStartTime = Date.now();
+                } else {
+                    if (this.hiddenStartTime && (Date.now() - this.hiddenStartTime >= 15 * 60 * 1000)) {
+                        showSleepOverlay();
+                    } else {
+                        this.hiddenStartTime = 0;
+                        if (!this.isAppSleeping) check();
+                    }
+                }
             });
         }
     }

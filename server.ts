@@ -57,6 +57,30 @@ async function updatePendingIndexOnSave(kvInstance: any, recordId: string, statu
     await kvInstance.set(["system", "pending_index"], index);
 }
 
+let memoryAllRecordsDetails: any = null;
+let lastAllRecordsDetailsFetch = 0;
+
+let memoryUsers: any = null;
+let lastUsersFetch = 0;
+
+let memoryWorkerDirectory: any = null;
+let lastWorkerDirectoryFetch = 0;
+
+function invalidateCache(collection?: string) {
+    if (!collection || collection === "records" || collection === "workers") {
+        memoryAllRecordsDetails = null;
+        lastAllRecordsDetailsFetch = 0;
+    }
+    if (!collection || collection === "users") {
+        memoryUsers = null;
+        lastUsersFetch = 0;
+    }
+    if (!collection || collection === "worker_directory") {
+        memoryWorkerDirectory = null;
+        lastWorkerDirectoryFetch = 0;
+    }
+}
+
 async function handler(req: Request): Promise<Response> {
     if (!kv) {
         kv = isDeploy ? await Deno.openKv() : await Deno.openKv(Deno.env.get("DENO_REGION") ? undefined : "./database.sqlite");
@@ -139,6 +163,10 @@ async function handler(req: Request): Promise<Response> {
                         await kv.set(entry.key, updated);
                         count++;
                     }
+                }
+                if (count > 0) {
+                    invalidateCache('workers');
+                    invalidateCache('records');
                 }
                 return new Response(JSON.stringify({ success: true, updatedCount: count }), { status: 200, headers: { "Content-Type": "application/json" } });
             } catch (err) {
@@ -266,6 +294,11 @@ async function handler(req: Request): Promise<Response> {
         }
 
         if (collection === "allRecordsDetails" && method === "GET") {
+            const now = Date.now();
+            if (memoryAllRecordsDetails && (now - lastAllRecordsDetailsFetch < 45000)) {
+                return new Response(JSON.stringify(memoryAllRecordsDetails), { status: 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+            }
+
             const recordsEntries = kv.list({ prefix: ["records"] });
             const records = [];
             for await (const r of recordsEntries) {
@@ -303,6 +336,9 @@ async function handler(req: Request): Promise<Response> {
                 workers: workersByRecord[r.id] || []
             }));
 
+            memoryAllRecordsDetails = detailedRecords;
+            lastAllRecordsDetailsFetch = now;
+
             return new Response(JSON.stringify(detailedRecords), { status: 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
         }
 
@@ -313,6 +349,17 @@ async function handler(req: Request): Promise<Response> {
                 const result = await kv.get([collection, id]);
                 return new Response(JSON.stringify(result.value ? { id, ...result.value } : null), { status: 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
             } else {
+                const isPlainGetAll = Array.from(url.searchParams.keys()).length === 0;
+                const now = Date.now();
+
+                if (isPlainGetAll && collection === "users" && memoryUsers && (now - lastUsersFetch < 120000)) {
+                    return new Response(JSON.stringify(memoryUsers), { status: 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+                }
+
+                if (isPlainGetAll && collection === "worker_directory" && memoryWorkerDirectory && (now - lastWorkerDirectoryFetch < 120000)) {
+                    return new Response(JSON.stringify(memoryWorkerDirectory), { status: 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+                }
+
                 // Get all
                 const entries = kv.list({ prefix: [collection] });
                 const list = [];
@@ -334,6 +381,17 @@ async function handler(req: Request): Promise<Response> {
                         list.push({ id: entry.key[1], ...entry.value });
                     }
                 }
+
+                if (isPlainGetAll) {
+                    if (collection === "users") {
+                        memoryUsers = list;
+                        lastUsersFetch = now;
+                    } else if (collection === "worker_directory") {
+                        memoryWorkerDirectory = list;
+                        lastWorkerDirectoryFetch = now;
+                    }
+                }
+
                 return new Response(JSON.stringify(list), { status: 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
             }
         }
@@ -347,6 +405,7 @@ async function handler(req: Request): Promise<Response> {
             delete body.id;
             
             await kv.set([collection, id], body);
+            invalidateCache(collection);
             if (collection === "records") {
                 await updatePendingIndexOnSave(kv, id, body.status, body.engineerId);
             }
@@ -400,6 +459,7 @@ async function handler(req: Request): Promise<Response> {
             if (!current.value) return new Response("Not found", { status: 404 });
 
             await kv.set([collection, id], { ...current.value, ...body });
+            invalidateCache(collection);
             if (collection === "records") {
                 const newStatus = body.status !== undefined ? body.status : current.value.status;
                 const engId = body.engineerId !== undefined ? body.engineerId : current.value.engineerId;
@@ -437,6 +497,7 @@ async function handler(req: Request): Promise<Response> {
             if (!id) return new Response("Missing id", { status: 400 });
 
             await kv.delete([collection, id]);
+            invalidateCache(collection);
             if (collection === "records") {
                 await updatePendingIndexOnSave(kv, id, 'deleted');
             }
