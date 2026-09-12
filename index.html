@@ -819,6 +819,51 @@ h1, h2, h3, h4 {
         letter-spacing: -0.3px;
     }
 
+    /* Responsive Auto-scaling Toolbar for Action/Export Buttons */
+    .reports-actions-toolbar {
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .reports-actions-toolbar .btn-action-report {
+        flex: 1 1 calc(16.666% - 10px);
+        min-width: 130px;
+        padding: 9px 8px;
+        font-size: clamp(0.70rem, 0.78vw, 0.82rem);
+        font-weight: 700;
+        border-radius: 6px;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        white-space: nowrap;
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+        box-sizing: border-box;
+    }
+    .reports-actions-toolbar .btn-action-report:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+        box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    }
+    @media (max-width: 960px) {
+        .reports-actions-toolbar .btn-action-report {
+            flex: 1 1 calc(33.333% - 10px);
+        }
+    }
+    @media (max-width: 600px) {
+        .reports-actions-toolbar .btn-action-report {
+            flex: 1 1 100%;
+        }
+    }
+
     /* Professional Large Column Filter Popover */
     .col-filter-popover {
         position: fixed;
@@ -1551,35 +1596,38 @@ select {
                                 <input type="text" id="filter-worker-name" placeholder="بحث باسم العامل..." style="width: 100%; height: 38px; border-radius: 6px;">
                             </div>
                             <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 0;">
-                                <button type="submit" class="btn btn-primary" style="height: 38px; padding: 0 18px; display: inline-flex; align-items: center; gap: 6px; font-weight: bold; border-radius: 6px;">
-                                    <i class="fas fa-filter"></i> تصفية
+                                <button type="submit" id="filter-submit-btn" class="btn btn-primary" style="height: 38px; padding: 0 16px; display: inline-flex; align-items: center; gap: 6px; font-weight: bold; border-radius: 6px; transition: all 0.25s ease;" title="تصفية البيانات">
+                                    <i class="fas fa-filter"></i> <span id="filter-submit-btn-text">تصفية</span>
                                 </button>
-                                <button type="button" id="clear-filter-btn" class="btn btn-danger" style="height: 38px; padding: 0 16px; display: inline-flex; align-items: center; gap: 6px; font-weight: bold; border-radius: 6px;">
+                                <button type="button" id="clear-filter-btn" class="btn btn-danger" style="height: 38px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px; font-weight: bold; border-radius: 6px;" title="إلغاء التصفية وإعادة تعيين الحقول">
                                     <i class="fas fa-times"></i> إلغاء
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Row 2: Unified Organized Actions & Exports -->
-                        <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                        <!-- Row 2: Unified Organized Actions & Exports (Auto-scaled flex buttons) -->
+                        <div class="reports-actions-toolbar">
                             <!-- جدول العمالة (PDF & Excel) -->
-                            <button type="button" id="print-report-btn" class="btn" style="background-color: #334155; color: white; display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; font-weight: bold; border-radius: 6px; border: none;" title="طباعة جدول تفاصيل العمالة (PDF)">
+                            <button type="button" id="print-report-btn" class="btn btn-action-report" style="background-color: #334155; color: white;" title="طباعة جدول تفاصيل العمالة (PDF)">
                                 <i class="fas fa-file-pdf"></i> جدول العمالة (PDF)
                             </button>
-                            <button type="button" onclick="app.exportStyledExcel()" class="btn" style="background-color: #217346; color: white; display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; font-weight: bold; border-radius: 6px; border: none;" title="تصدير جدول تفاصيل العمالة (Excel)">
+                            <button type="button" onclick="app.exportStyledExcel()" class="btn btn-action-report" style="background-color: #217346; color: white;" title="تصدير جدول تفاصيل العمالة (Excel)">
                                 <i class="fas fa-file-excel"></i> جدول العمالة (Excel)
                             </button>
 
                             <!-- سركي العامل (PDF & Excel) -->
-                            <button type="button" onclick="window.printWorkerReceipts()" class="btn" style="background-color: #ffd700 !important; color: #000000 !important; display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; font-weight: bold; border-radius: 6px; border: none; white-space: nowrap;" title="طباعة سركي العامل (PDF)">
+                            <button type="button" onclick="window.printWorkerReceipts()" class="btn btn-action-report" style="background-color: #ffd700 !important; color: #000000 !important;" title="طباعة سركي العامل (PDF)">
                                 <i class="fas fa-file-pdf"></i> سركي العامل (PDF)
                             </button>
-                            <button type="button" onclick="window.exportWorkerReceiptsExcel()" class="btn" style="background-color: #107c41 !important; color: #ffffff !important; display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; font-weight: bold; border-radius: 6px; border: none; white-space: nowrap;" title="تصدير سركي العامل (Excel)">
+                            <button type="button" onclick="window.exportWorkerReceiptsExcel()" class="btn btn-action-report" style="background-color: #107c41 !important; color: #ffffff !important;" title="تصدير سركي العامل (Excel)">
                                 <i class="fas fa-file-excel"></i> سركي العامل (Excel)
                             </button>
 
-                            <!-- خصومات المقاولين (Excel) -->
-                            <button type="button" onclick="window.exportContractorDeductionsExcel()" class="btn" style="background-color: #7b1fa2 !important; color: #ffffff !important; display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; font-weight: bold; border-radius: 6px; border: none; white-space: nowrap;" title="تصدير تقرير خصومات المقاولين (Excel)">
+                            <!-- خصومات المقاولين (PDF & Excel) -->
+                            <button type="button" onclick="window.printContractorDeductionsPDF()" class="btn btn-action-report" style="background-color: #9c27b0 !important; color: #ffffff !important;" title="طباعة تقرير خصومات المقاولين (PDF)">
+                                <i class="fas fa-file-pdf"></i> خصومات المقاولين (PDF)
+                            </button>
+                            <button type="button" onclick="window.exportContractorDeductionsExcel()" class="btn btn-action-report" style="background-color: #7b1fa2 !important; color: #ffffff !important;" title="تصدير تقرير خصومات المقاولين (Excel)">
                                 <i class="fas fa-hand-holding-usd"></i> خصومات المقاولين (Excel)
                             </button>
                         </div>
@@ -3395,18 +3443,48 @@ document.addEventListener('keydown', (e) => {
         });
         
         // Reports: Filter
+        // Reports: Filter Form Submit
         document.getElementById('filter-form').addEventListener('submit', (e) => {
             e.preventDefault();
+            this.updateFilterButtonState();
             this.generateReport();
         });
         
         // Reports: Clear Filter
         document.getElementById('clear-filter-btn').addEventListener('click', () => {
             document.getElementById('filter-form').reset();
+            this.updateFilterButtonState();
             this.generateReport();
         });
-        
-        // Reports: Print
+
+        // Reports: Automatic Filtering on Date Changes & Worker Name Input
+        const triggerAutoFilter = () => {
+            this.updateFilterButtonState();
+            this.generateReport();
+        };
+
+        const filterStartInput = document.getElementById('filter-start-date');
+        const filterEndInput = document.getElementById('filter-end-date');
+        const filterWorkerInput = document.getElementById('filter-worker-name');
+
+        if (filterStartInput) {
+            filterStartInput.addEventListener('change', triggerAutoFilter);
+            filterStartInput.addEventListener('input', triggerAutoFilter);
+        }
+        if (filterEndInput) {
+            filterEndInput.addEventListener('change', triggerAutoFilter);
+            filterEndInput.addEventListener('input', triggerAutoFilter);
+        }
+        if (filterWorkerInput) {
+            let workerDebounce = null;
+            filterWorkerInput.addEventListener('input', () => {
+                clearTimeout(workerDebounce);
+                workerDebounce = setTimeout(() => {
+                    triggerAutoFilter();
+                }, 250);
+            });
+        }
+
         document.getElementById('print-report-btn').addEventListener('click', () => {
             window.print();
         });
@@ -4402,7 +4480,36 @@ document.addEventListener('keydown', (e) => {
         }
     }
     // --- Reports Functions ---
+    updateFilterButtonState() {
+        const startDate = document.getElementById('filter-start-date')?.value;
+        const endDate = document.getElementById('filter-end-date')?.value;
+        const workerName = document.getElementById('filter-worker-name')?.value?.trim();
+        const btn = document.getElementById('filter-submit-btn');
+        const textSpan = document.getElementById('filter-submit-btn-text');
+        if (!btn) return;
+
+        const isFiltered = !!(startDate || endDate || workerName);
+        if (isFiltered) {
+            btn.style.backgroundColor = '#10b981';
+            btn.style.borderColor = '#059669';
+            btn.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.45)';
+            if (textSpan) textSpan.innerText = 'مفلتر';
+            const icon = btn.querySelector('i');
+            if (icon) icon.className = 'fas fa-check-circle';
+            btn.title = 'تم تطبيق التصفية تلقائياً';
+        } else {
+            btn.style.backgroundColor = '';
+            btn.style.borderColor = '';
+            btn.style.boxShadow = '';
+            if (textSpan) textSpan.innerText = 'تصفية';
+            const icon = btn.querySelector('i');
+            if (icon) icon.className = 'fas fa-filter';
+            btn.title = 'تصفية البيانات';
+        }
+    }
+
     async generateReport() {
+        this.updateFilterButtonState();
         const startDate = document.getElementById('filter-start-date').value;
         const endDate = document.getElementById('filter-end-date').value;
         const workerName = document.getElementById('filter-worker-name').value.trim().toLowerCase();
@@ -5502,6 +5609,247 @@ document.addEventListener('click', (e) => {
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
+    };
+
+    // --- New Feature: Contractor Deductions PDF Export/Print ---
+    window.printContractorDeductionsPDF = function() {
+        const rows = Array.from(document.querySelectorAll('#report-results-list tr'));
+        const visibleRows = rows.filter(r => r.style.display !== 'none' && r.cells.length > 5);
+        
+        if (visibleRows.length === 0) {
+            alert('لا توجد بيانات متاحة للطباعة');
+            return;
+        }
+
+        const contractorRecords = [];
+        visibleRows.forEach((row) => {
+            const workerName = row.cells[0].innerText.trim();
+            const type = row.cells[1].innerText.trim();
+            const supervisor = row.cells[2].innerText.trim();
+            const date = row.cells[3].innerText.trim();
+            const grossAmount = parseFloat(row.cells[4].innerText.replace(/,/g, '').trim()) || 0;
+            const deduction = parseFloat(row.cells[5].innerText.replace(/,/g, '').trim()) || 0;
+            const netAmount = parseFloat(row.cells[6].innerText.replace(/,/g, '').trim()) || 0;
+            const engineer = row.cells[7] ? row.cells[7].innerText.trim() : '';
+            const location = row.cells[8] ? row.cells[8].innerText.trim() : '';
+            const task = row.cells[9] ? row.cells[9].innerText.trim() : '';
+            const contractor = row.cells[10] ? row.cells[10].innerText.trim() : '';
+            const notes = row.cells[11] ? row.cells[11].innerText.trim() : '';
+
+            if (contractor && contractor !== '-' && contractor !== 'لا يوجد') {
+                contractorRecords.push({
+                    contractor: contractor,
+                    workerName: workerName,
+                    type: type,
+                    supervisor: supervisor,
+                    date: date,
+                    amount: grossAmount,
+                    netAmount: netAmount,
+                    deduction: deduction,
+                    location: location,
+                    task: task,
+                    notes: notes
+                });
+            }
+        });
+
+        if (contractorRecords.length === 0) {
+            alert('لا توجد خصومات مسجلة على مقاولين في البيانات المعروضة حالياً');
+            return;
+        }
+
+        // Group records by contractor
+        const contractorGroups = {};
+        contractorRecords.forEach(r => {
+            if (!contractorGroups[r.contractor]) {
+                contractorGroups[r.contractor] = {
+                    records: [],
+                    totalAmount: 0,
+                    totalCount: 0
+                };
+            }
+            contractorGroups[r.contractor].records.push(r);
+            contractorGroups[r.contractor].totalAmount += r.amount;
+            contractorGroups[r.contractor].totalCount += 1;
+        });
+
+        const sortedContractors = Object.keys(contractorGroups).sort((a, b) => a.localeCompare(b, 'ar'));
+        const dateRange = document.getElementById('print-date-range') ? document.getElementById('print-date-range').innerText : 'جميع السجلات';
+
+        let grandTotalAmount = 0;
+        let grandTotalDays = 0;
+        let globalIndex = 1;
+        let tableRowsHtml = '';
+
+        sortedContractors.forEach(contractorKey => {
+            const group = contractorGroups[contractorKey];
+            grandTotalAmount += group.totalAmount;
+            grandTotalDays += group.totalCount;
+
+            group.records.forEach((r, idx) => {
+                tableRowsHtml += '<tr>';
+                tableRowsHtml += `<td>${globalIndex++}</td>`;
+                if (idx === 0) {
+                    tableRowsHtml += `<td rowspan="${group.records.length}" style="vertical-align: middle; font-weight: bold; font-size: 12px; color: #4a148c; background: #faf5ff;">${r.contractor}</td>`;
+                }
+                tableRowsHtml += `<td>${r.supervisor}</td>`;
+                tableRowsHtml += `<td style="white-space: nowrap;">${r.date}</td>`;
+                tableRowsHtml += `<td><strong>${r.workerName}</strong></td>`;
+                tableRowsHtml += `<td>${r.type}</td>`;
+                tableRowsHtml += `<td>${r.location || ''}</td>`;
+                tableRowsHtml += `<td>${r.task || ''}</td>`;
+                tableRowsHtml += `<td style="font-weight: bold; font-variant-numeric: tabular-nums;">${r.amount.toLocaleString()}</td>`;
+                tableRowsHtml += `<td>${r.notes || ''}</td>`;
+                tableRowsHtml += '</tr>';
+            });
+
+            // Subtotal row for this contractor
+            tableRowsHtml += `
+                <tr style="background-color: #e8f5e9; font-weight: bold;">
+                    <td colspan="8" style="text-align: right; padding-right: 15px; color: #1b5e20;">
+                        إجمالي خصم المقاول (${contractorKey}) - عدد ${group.totalCount} يومية:
+                    </td>
+                    <td style="color: #1b5e20; font-size: 12px; font-variant-numeric: tabular-nums;">
+                        ${group.totalAmount.toLocaleString()} ج.م
+                    </td>
+                    <td></td>
+                </tr>
+            `;
+        });
+
+        // Grand total row
+        tableRowsHtml += `
+            <tr style="background-color: #ede7f6; font-weight: bold; font-size: 13px; border-top: 2px solid #4a148c;">
+                <td colspan="8" style="text-align: right; padding-right: 15px; color: #4a148c;">
+                    الإجمالي العام لجميع خصومات المقاولين (عدد ${grandTotalDays} يومية):
+                </td>
+                <td style="color: #4a148c; font-size: 14px; font-variant-numeric: tabular-nums;">
+                    ${grandTotalAmount.toLocaleString()} ج.م
+                </td>
+                <td></td>
+            </tr>
+        `;
+
+        const printHtml = `
+        <!DOCTYPE html>
+        <html dir="rtl" lang="ar">
+        <head>
+            <meta charset="UTF-8">
+            <title>تقرير خصومات المقاولين</title>
+            <base href="${window.location.origin}">
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+                @media print {
+                    @page { margin: 0.6cm; size: landscape; }
+                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                }
+                body { font-family: 'Cairo', sans-serif, Arial; margin: 0; padding: 0.6cm; background: #fff; color: #000; direction: rtl; }
+                .header { position: relative; text-align: center; margin-bottom: 12px; border-bottom: 2px solid #4a148c; padding-bottom: 10px; }
+                .header h1 { margin: 6px 0; font-size: 22px; font-weight: 800; color: #4a148c; }
+                .project-title-box {
+                    background-color: #eef5fb;
+                    color: #003366;
+                    padding: 6px 18px;
+                    border-radius: 6px;
+                    display: inline-block;
+                    font-size: 14px;
+                    font-weight: bold;
+                    border: 1px solid #b8d4f0;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
+                .header p { margin: 4px 0 0 0; font-size: 13px; color: #444; font-weight: 600; }
+                .logo-img { position: absolute; right: 0; top: 0; max-height: 55px; }
+                
+                table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 15px; font-size: 11px; }
+                th, td { border: 1px solid #777; padding: 5px 4px; text-align: center; vertical-align: middle; word-wrap: break-word; }
+                th { background-color: #4a148c; color: #ffffff; font-weight: 700; font-size: 11.5px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                
+                .summary-box { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 15px; font-weight: bold; border: 1px solid #4a148c; padding: 8px 15px; background: #f3e5f5; border-radius: 6px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                
+                .signatures { display: flex; justify-content: space-between; margin-top: 30px; page-break-inside: avoid; }
+                .sig-box { text-align: center; width: 18%; font-size: 12px; font-weight: bold; color: #222; }
+                .sig-line { border-bottom: 1px solid #000; margin-top: 35px; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <img src="/logo.png?v=2" class="logo-img" alt="Logo" onerror="this.style.display='none'">
+                <div class="project-title-box">Cornerstone Development - Project: The Curve</div>
+                <h1>تقرير مجمع لخصومات العمالة على المقاولين</h1>
+                <p>${dateRange}</p>
+            </div>
+
+            <div class="summary-box">
+                <div>إجمالي عدد المقاولين المخصوم عليهم: ${sortedContractors.length} مقاول</div>
+                <div>إجمالي عدد يوميات الخصم: ${grandTotalDays} يومية</div>
+                <div>إجمالي مبالغ الخصومات: ${grandTotalAmount.toLocaleString()} جنيه مصري</div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 3%;">م</th>
+                        <th style="width: 14%;">اسم المقاول</th>
+                        <th style="width: 11%;">المشرف (مسجل السركي)</th>
+                        <th style="width: 9%;">التاريخ</th>
+                        <th style="width: 13%;">اسم العامل</th>
+                        <th style="width: 8%;">المهنة</th>
+                        <th style="width: 11%;">مكان العمل</th>
+                        <th style="width: 13%;">بند العمل (بالتفصيل)</th>
+                        <th style="width: 9%;">يومية العامل (المخصوم)</th>
+                        <th style="width: 9%;">ملاحظات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRowsHtml}
+                </tbody>
+            </table>
+
+            <div class="signatures">
+                <div class="sig-box">
+                    <div>مشرف البند</div>
+                    <div class="sig-line"></div>
+                </div>
+                <div class="sig-box">
+                    <div>مهندس الموقع</div>
+                    <div class="sig-line"></div>
+                </div>
+                <div class="sig-box">
+                    <div>محاسب المشروع</div>
+                    <div class="sig-line"></div>
+                </div>
+                <div class="sig-box">
+                    <div>مدير المشروع</div>
+                    <div class="sig-line"></div>
+                </div>
+                <div class="sig-box">
+                    <div>المدير المالي</div>
+                    <div class="sig-line"></div>
+                </div>
+            </div>
+        </body>
+        </html>
+        `;
+
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = 'none';
+        iframe.style.visibility = 'hidden';
+        iframe.srcdoc = printHtml;
+        document.body.appendChild(iframe);
+        
+        iframe.onload = function() {
+            setTimeout(() => {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                }, 5000);
+            }, 500);
+        };
     };
 
     window.printWorkerReceipts = function() {
