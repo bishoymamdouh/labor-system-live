@@ -719,15 +719,113 @@ h1, h2, h3, h4 {
     }
 }
 
-    /* Custom fit for reports table */
-    #reports-table-full { font-size: 0.85em !important; }
-    #reports-table-full th, #reports-table-full td { padding: 4px 6px !important; border: 1px solid var(--border-color) !important; }
-    #reports-table-full td:nth-child(9), #reports-table-full td:nth-child(10) { 
-        max-width: 150px; 
-        white-space: normal; 
-        word-wrap: break-word; 
+    /* Auto-fit and dynamic cell sizing for reports table (100% zoom visibility) */
+    #view-reports #print-area {
+        padding: 16px 12px !important;
     }
-    #reports-table-full td:nth-child(4) { white-space: nowrap; }
+    #view-reports .table-responsive {
+        width: 100% !important;
+        overflow-x: auto !important;
+    }
+    #reports-table-full {
+        width: 100% !important;
+        max-width: 100% !important;
+        table-layout: auto !important;
+        font-size: 0.81rem !important;
+        border-collapse: collapse !important;
+    }
+    #reports-table-full th, 
+    #reports-table-full td {
+        padding: 5px 4px !important;
+        border: 1px solid var(--border-color) !important;
+        vertical-align: middle !important;
+        text-align: center !important;
+        line-height: 1.2 !important;
+        box-sizing: border-box !important;
+    }
+    #reports-table-full th {
+        font-size: 0.81rem !important;
+        font-weight: 700 !important;
+        background-color: var(--secondary-color) !important;
+        color: var(--primary-color) !important;
+        padding: 6px 3px !important;
+        white-space: normal !important;
+    }
+    /* Compact auto-fit columns: size strictly to content */
+    #reports-table-full th:nth-child(2), 
+    #reports-table-full td:nth-child(2) {
+        width: 1% !important;
+        white-space: nowrap !important;
+    } /* النوع */
+
+    #reports-table-full th:nth-child(4), 
+    #reports-table-full td:nth-child(4) {
+        width: 1% !important;
+        white-space: nowrap !important;
+        font-size: 0.76rem !important;
+    } /* التاريخ */
+
+    #reports-table-full th:nth-child(5), 
+    #reports-table-full td:nth-child(5),
+    #reports-table-full th:nth-child(6), 
+    #reports-table-full td:nth-child(6),
+    #reports-table-full th:nth-child(7), 
+    #reports-table-full td:nth-child(7) {
+        width: 1% !important;
+        white-space: nowrap !important;
+        font-variant-numeric: tabular-nums !important;
+    } /* اليومية، الخصم، الصافي */
+
+    /* Text columns: auto-fit to content with smart word-break */
+    #reports-table-full td:nth-child(1) {
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        min-width: 80px !important;
+    } /* اسم العامل */
+
+    #reports-table-full td:nth-child(3) {
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        min-width: 70px !important;
+    } /* المشرف */
+
+    #reports-table-full td:nth-child(8) {
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        min-width: 75px !important;
+    } /* المهندس المعتمد */
+
+    #reports-table-full td:nth-child(9) {
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        min-width: 80px !important;
+    } /* مكان العمل */
+
+    #reports-table-full td:nth-child(10) {
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        min-width: 90px !important;
+    } /* بند العمل */
+
+    #reports-table-full td:nth-child(11) {
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        min-width: 80px !important;
+    } /* خصم على مقاول */
+
+    #reports-table-full td:nth-child(12) {
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        min-width: 75px !important;
+    } /* الملاحظات */
+
+    #reports-table-full th .report-col-filter {
+        max-width: 100% !important;
+        width: 100% !important;
+        text-overflow: ellipsis !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+    }
 
     /* Light Mode Theme */
     body.light-mode {
@@ -1360,18 +1458,18 @@ select {
                         <table class="data-table" id="reports-table-full">
                             <thead style="background-color: var(--secondary-color);">
                                 <tr>
-                                    <th style="color: var(--primary-color);">اسم العامل</th>
-                                    <th style="color: var(--primary-color);">النوع</th>
-                                    <th style="color: var(--primary-color);">المشرف</th>
-                                    <th style="color: var(--primary-color); white-space: nowrap;">التاريخ</th>
-                                    <th style="color: var(--primary-color);">اليومية (جنيه)</th>
-                                    <th style="color: var(--primary-color);">الخصم (جنيه)</th>
-                                    <th style="color: var(--primary-color);">الصافي (جنيه)</th>
-                                    <th style="color: var(--primary-color); white-space: nowrap;">المهندس المعتمد</th>
-                                    <th style="color: var(--primary-color);">مكان العمل</th>
-                                    <th style="color: var(--primary-color);">بند العمل (بالتفصيل)</th>
-                                    <th style="color: var(--primary-color); white-space: nowrap;">خصم على مقاول<br><span style="font-size:0.85em; font-weight:normal;">(اسم المقاول)</span></th>
-                                    <th style="color: var(--primary-color);">الملاحظات</th>
+                                    <th>اسم العامل</th>
+                                    <th>النوع</th>
+                                    <th>المشرف</th>
+                                    <th>التاريخ</th>
+                                    <th>اليومية<br><span style="font-size:0.8em; font-weight:normal;">(ج.م)</span></th>
+                                    <th>الخصم<br><span style="font-size:0.8em; font-weight:normal;">(ج.م)</span></th>
+                                    <th>الصافي<br><span style="font-size:0.8em; font-weight:normal;">(ج.م)</span></th>
+                                    <th>المهندس المعتمد</th>
+                                    <th>مكان العمل</th>
+                                    <th>بند العمل (بالتفصيل)</th>
+                                    <th>خصم على مقاول<br><span style="font-size:0.85em; font-weight:normal;">(اسم المقاول)</span></th>
+                                    <th>الملاحظات</th>
                                 </tr>
                             </thead>
                             <tbody id="report-results-list">
@@ -2207,7 +2305,11 @@ class UI {
                     const container = document.createElement('div');
                     container.className = 'screen-only';
                     container.style.position = 'relative';
-                    container.style.display = 'inline-block';
+                    container.style.display = 'inline-flex';
+                    container.style.alignItems = 'center';
+                    container.style.justifyContent = 'center';
+                    container.style.maxWidth = '100%';
+                    container.style.width = '100%';
                     
                     const select = document.createElement('select');
                     select.className = 'report-col-filter';
@@ -2221,8 +2323,13 @@ class UI {
                     select.style.fontFamily = 'inherit';
                     select.style.cursor = 'pointer';
                     select.style.outline = 'none';
-                    select.style.paddingLeft = '15px';
+                    select.style.paddingLeft = '12px';
                     select.style.textAlign = 'center';
+                    select.style.maxWidth = '100%';
+                    select.style.width = '100%';
+                    select.style.textOverflow = 'ellipsis';
+                    select.style.overflow = 'hidden';
+                    select.style.whiteSpace = 'nowrap';
                     select.innerHTML = `<option value="">${originalText}</option>`;
                     
                     const icon = document.createElement('i');
