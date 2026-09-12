@@ -2552,6 +2552,8 @@ class UI {
                         amount: worker.amount,
                         deduction: worker.deduction,
                         location: worker.location,
+                        task: worker.task || '',
+                        contractor: worker.contractor || '',
                         notes: worker.notes
                     });
                 }
@@ -3203,10 +3205,10 @@ class UI {
                 <input type="number" id="worker-amount-${workerId}" class="modal-input" style="min-width: 50px; width: 100%;" required min="0" ${auth.getRole() === "admin" || auth.getRole() === "engineer" ? "" : "readonly"} placeholder="اليومية" oninput="app.updateTotals()">
             </td>
             <td>
-                <textarea id="worker-location-${workerId}" class="modal-input" style="min-width: 120px; width: 100%; resize: vertical;" rows="2" placeholder="مكان العمل (إجباري)" required></textarea>
+                <textarea id="worker-location-${workerId}" class="modal-input" style="min-width: 120px; width: 100%; resize: vertical;" rows="2" placeholder="مكان العمل (إجباري)" required oninput="this.style.border=''"></textarea>
             </td>
             <td>
-                <textarea id="worker-task-${workerId}" class="modal-input" style="min-width: 140px; width: 100%; resize: vertical;" rows="2" placeholder="بند العمل بالتفصيل (إجباري)" required></textarea>
+                <textarea id="worker-task-${workerId}" class="modal-input" style="min-width: 140px; width: 100%; resize: vertical;" rows="2" placeholder="بند العمل بالتفصيل (إجباري)" required oninput="this.style.border=''"></textarea>
             </td>
             <td>
                 <input type="text" id="worker-contractor-${workerId}" class="modal-input" style="min-width: 120px; width: 100%;" placeholder="اسم المقاول (إن وجد)">
@@ -3323,25 +3325,31 @@ class UI {
             const name = workerObj ? workerObj.name : selectEl.options[selectEl.selectedIndex].text;
             const type = document.getElementById(`worker-type-${id}`).value;
             const amount = Number(document.getElementById(`worker-amount-${id}`).value);
-            const location = document.getElementById(`worker-location-${id}`).value;
-            const task = document.getElementById(`worker-task-${id}`) ? document.getElementById(`worker-task-${id}`).value : '';
-            const contractor = document.getElementById(`worker-contractor-${id}`) ? document.getElementById(`worker-contractor-${id}`).value.trim() : '';
-            const notes = document.getElementById(`worker-notes-${id}`).value || '';
+            const locEl = document.getElementById(`worker-location-${id}`);
+            const location = (locEl ? locEl.value : '').trim();
+            const taskEl = document.getElementById(`worker-task-${id}`);
+            const task = (taskEl ? taskEl.value : '').trim();
+            const contractor = (document.getElementById(`worker-contractor-${id}`) ? document.getElementById(`worker-contractor-${id}`).value : '').trim();
+            const notes = (document.getElementById(`worker-notes-${id}`) ? document.getElementById(`worker-notes-${id}`).value : '').trim();
             
             if (name && amount >= 0) {
-                if (!location.trim()) {
-                    alert(`الرجاء إدخال مكان العمل للعامل: ${name}`);
-                    const locEl = document.getElementById(`worker-location-${id}`);
+                if (!location && !task) {
+                    alert(`خطأ: يجب ملء كل من "مكان العمل" و "بند العمل (بالتفصيل)" للعامل: ${name}\nالخانتان إجباريتان معاً ولا يمكن ترك أي منهما فارغة!`);
+                    if (locEl) { locEl.focus(); locEl.style.border = '2px solid red'; }
+                    if (taskEl) { taskEl.style.border = '2px solid red'; }
+                    return;
+                }
+                if (!location) {
+                    alert(`خطأ: خانة "مكان العمل" إجبارية للعامل: ${name}\nلا يمكن تركها فارغة حتى لو تم إدخال بند العمل. يجب ملء الخانتين معاً!`);
                     if (locEl) { locEl.focus(); locEl.style.border = '2px solid red'; }
                     return;
                 }
-                if (!task.trim()) {
-                    alert(`الرجاء إدخال بند العمل (بالتفصيل) للعامل: ${name}`);
-                    const taskEl = document.getElementById(`worker-task-${id}`);
+                if (!task) {
+                    alert(`خطأ: خانة "بند العمل (بالتفصيل)" إجبارية للعامل: ${name}\nلا يمكن تركها فارغة حتى لو تم إدخال مكان العمل. يجب ملء الخانتين معاً!`);
                     if (taskEl) { taskEl.focus(); taskEl.style.border = '2px solid red'; }
                     return;
                 }
-                workersData.push({ name, type, amount, location: location.trim(), task: task.trim(), contractor, deduction: 0, notes: notes });
+                workersData.push({ name, type, amount, location, task, contractor, deduction: 0, notes: notes });
                 totalAmount += amount;
                 validWorkersCount++;
             }
@@ -3821,8 +3829,20 @@ class UI {
                             const newTask = taskInput ? taskInput.value.trim() : (worker.task || '').trim();
                             
                             if (status === 'approved' || status === 'pending') {
+                                if (!newLoc && !newTask) {
+                                    alert(`خطأ: يجب ملء كل من "مكان العمل" و "بند العمل (بالتفصيل)" للعامل: ${worker.name}\nالخانتان إجباريتان معاً ولا يمكن ترك أي منهما فارغة!`);
+                                    if (locationInput) { locationInput.focus(); locationInput.style.border = '2px solid red'; }
+                                    if (taskInput) { taskInput.style.border = '2px solid red'; }
+                                    if (btn) {
+                                        btn.disabled = false;
+                                        btn.innerHTML = origHtml;
+                                        delete btn.dataset.processing;
+                                        btn.style.pointerEvents = '';
+                                    }
+                                    return;
+                                }
                                 if (!newLoc) {
-                                    alert(`الرجاء إدخال مكان العمل للعامل: ${worker.name}`);
+                                    alert(`خطأ: خانة "مكان العمل" إجبارية للعامل: ${worker.name}\nلا يمكن تركها فارغة حتى لو تم إدخال بند العمل. يجب ملء الخانتين معاً!`);
                                     if (locationInput) { locationInput.focus(); locationInput.style.border = '2px solid red'; }
                                     if (btn) {
                                         btn.disabled = false;
@@ -3833,7 +3853,7 @@ class UI {
                                     return;
                                 }
                                 if (!newTask) {
-                                    alert(`الرجاء إدخال بند العمل (بالتفصيل) للعامل: ${worker.name}`);
+                                    alert(`خطأ: خانة "بند العمل (بالتفصيل)" إجبارية للعامل: ${worker.name}\nلا يمكن تركها فارغة حتى لو تم إدخال مكان العمل. يجب ملء الخانتين معاً!`);
                                     if (taskInput) { taskInput.focus(); taskInput.style.border = '2px solid red'; }
                                     if (btn) {
                                         btn.disabled = false;
