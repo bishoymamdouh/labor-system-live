@@ -751,59 +751,46 @@ h1, h2, h3, h4 {
         font-weight: 700 !important;
         background-color: var(--secondary-color) !important;
         color: var(--primary-color) !important;
-        padding: 5px 2px !important;
+        padding: 6px 2px !important;
         line-height: 1.15 !important;
         vertical-align: middle !important;
         white-space: normal !important;
         text-align: center !important;
+        cursor: pointer !important;
+        user-select: none !important;
+        transition: background-color 0.2s, color 0.2s !important;
+    }
+    #reports-table-full th:hover {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        filter: brightness(1.1);
+    }
+    #reports-table-full th .th-content {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        width: 100%;
+        pointer-events: none;
     }
     #reports-table-full th .th-text {
-        display: inline-block;
         text-align: center;
         word-break: break-word;
         overflow-wrap: break-word;
     }
-    .th-filter-arrow {
-        position: absolute;
-        left: 2px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 12px;
-        height: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 5;
-        color: var(--text-muted);
-        opacity: 0.55;
-        transition: opacity 0.2s, color 0.2s;
-    }
-    .th-filter-arrow:hover {
-        opacity: 1;
-        color: var(--primary-color);
-    }
-    .th-filter-arrow.is-filtered {
-        opacity: 1 !important;
+    #reports-table-full th.is-filtered-col {
         color: #f59e0b !important;
+        background-color: rgba(245, 158, 11, 0.15) !important;
+        box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.4) !important;
     }
-    .th-filter-arrow i {
-        font-size: 8.5px;
-        pointer-events: none;
+    #reports-table-full th.is-filtered-col .th-text {
+        color: #f59e0b !important;
+        font-weight: 800 !important;
+        text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
     }
-    .th-filter-arrow select.th-filter-select {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        cursor: pointer;
-        z-index: 6;
-        border: none;
-        background: transparent;
-        padding: 0;
-        margin: 0;
+    #reports-table-full th.is-filtered-col .th-filter-icon {
+        display: inline-block !important;
+        color: #f59e0b !important;
+        font-size: 0.72rem !important;
     }
     #reports-table-full th:nth-child(1) { width: 13% !important; }
     #reports-table-full th:nth-child(2) { width: 5% !important; }
@@ -830,6 +817,169 @@ h1, h2, h3, h4 {
     #reports-table-full td:nth-child(4) {
         font-size: 0.70rem !important;
         letter-spacing: -0.3px;
+    }
+
+    /* Professional Large Column Filter Popover */
+    .col-filter-popover {
+        position: fixed;
+        z-index: 9999;
+        width: 290px;
+        max-width: calc(100vw - 20px);
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.25);
+        display: flex;
+        flex-direction: column;
+        padding: 12px;
+        gap: 10px;
+        font-family: inherit;
+        animation: filterPopIn 0.15s ease-out;
+        box-sizing: border-box;
+    }
+    @keyframes filterPopIn {
+        from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .col-filter-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 8px;
+    }
+    .col-filter-title {
+        font-size: 0.88rem;
+        font-weight: bold;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .col-filter-close {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        cursor: pointer;
+        line-height: 1;
+        padding: 0 4px;
+        border-radius: 4px;
+    }
+    .col-filter-close:hover {
+        color: var(--text-main);
+        background: rgba(255, 255, 255, 0.1);
+    }
+    .col-filter-search-wrap {
+        position: relative;
+        width: 100%;
+    }
+    .col-filter-search-input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 7px 10px 7px 28px;
+        font-size: 0.8rem;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background: var(--bg-main);
+        color: var(--text-main);
+        outline: none;
+    }
+    .col-filter-search-input:focus {
+        border-color: var(--primary-color);
+    }
+    .col-filter-search-icon {
+        position: absolute;
+        left: 9px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        pointer-events: none;
+    }
+    .col-filter-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        padding: 0 2px;
+    }
+    .col-filter-actions button {
+        background: transparent;
+        border: none;
+        color: var(--primary-color);
+        cursor: pointer;
+        padding: 2px 4px;
+        border-radius: 4px;
+        font-size: inherit;
+        font-weight: 600;
+    }
+    .col-filter-actions button:hover {
+        text-decoration: underline;
+    }
+    .col-filter-actions button.btn-danger-link {
+        color: #ef4444;
+    }
+    .col-filter-list {
+        max-height: 190px;
+        overflow-y: auto;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 4px;
+        background: var(--bg-main);
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    .col-filter-list::-webkit-scrollbar {
+        width: 5px;
+    }
+    .col-filter-list::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+    }
+    .col-filter-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        color: var(--text-main);
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.15s;
+    }
+    .col-filter-item:hover {
+        background: var(--secondary-color);
+    }
+    .col-filter-item input[type="checkbox"] {
+        cursor: pointer;
+        accent-color: var(--primary-color);
+        width: 15px;
+        height: 15px;
+        margin: 0;
+    }
+    .col-filter-item-text {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .col-filter-item-count {
+        font-size: 0.7rem;
+        padding: 1px 6px;
+        border-radius: 10px;
+        background: var(--border-color);
+        color: var(--text-muted);
+    }
+    .col-filter-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        border-top: 1px solid var(--border-color);
+        padding-top: 8px;
     }
 
     /* Light Mode Theme */
@@ -1466,53 +1616,77 @@ select {
                         <table class="data-table" id="reports-table-full">
                             <thead style="background-color: var(--secondary-color);">
                                 <tr>
-                                    <th style="width: 13%;">
-                                        <span class="th-text">اسم العامل</span>
-                                        <span class="th-filter-arrow screen-only" title="تصفية حسب اسم العامل"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="0"><option value="">(الكل)</option></select></span>
+                                    <th style="width: 13%;" data-col-index="0" onclick="UI.openColFilter(0, this)" title="انقر لتصفية عمود: اسم العامل">
+                                        <div class="th-content">
+                                            <span class="th-text">اسم العامل</span>
+                                            <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
+                                        </div>
                                     </th>
-                                    <th style="width: 5%;">
-                                        <span class="th-text">النوع</span>
-                                        <span class="th-filter-arrow screen-only" title="تصفية حسب النوع"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="1"><option value="">(الكل)</option></select></span>
+                                    <th style="width: 5%;" data-col-index="1" onclick="UI.openColFilter(1, this)" title="انقر لتصفية عمود: النوع">
+                                        <div class="th-content">
+                                            <span class="th-text">النوع</span>
+                                            <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
+                                        </div>
                                     </th>
-                                    <th style="width: 8.5%;">
-                                        <span class="th-text">المشرف</span>
-                                        <span class="th-filter-arrow screen-only" title="تصفية حسب المشرف"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="2"><option value="">(الكل)</option></select></span>
+                                    <th style="width: 8.5%;" data-col-index="2" onclick="UI.openColFilter(2, this)" title="انقر لتصفية عمود: المشرف">
+                                        <div class="th-content">
+                                            <span class="th-text">المشرف</span>
+                                            <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
+                                        </div>
                                     </th>
-                                    <th style="width: 8%;">
-                                        <span class="th-text">التاريخ</span>
-                                        <span class="th-filter-arrow screen-only" title="تصفية حسب التاريخ"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="3"><option value="">(الكل)</option></select></span>
+                                    <th style="width: 8%;" data-col-index="3" onclick="UI.openColFilter(3, this)" title="انقر لتصفية عمود: التاريخ">
+                                        <div class="th-content">
+                                            <span class="th-text">التاريخ</span>
+                                            <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
+                                        </div>
                                     </th>
-                                    <th style="width: 5%;">
-                                        <span class="th-text">اليومية</span>
-                                        <span class="th-filter-arrow screen-only" title="تصفية حسب اليومية"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="4"><option value="">(الكل)</option></select></span>
+                                    <th style="width: 5%;" data-col-index="4" onclick="UI.openColFilter(4, this)" title="انقر لتصفية عمود: اليومية">
+                                        <div class="th-content">
+                                            <span class="th-text">اليومية</span>
+                                            <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
+                                        </div>
                                     </th>
-                                    <th style="width: 4.5%;">
-                                        <span class="th-text">الخصم</span>
-                                        <span class="th-filter-arrow screen-only" title="تصفية حسب الخصم"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="5"><option value="">(الكل)</option></select></span>
+                                    <th style="width: 4.5%;" data-col-index="5" onclick="UI.openColFilter(5, this)" title="انقر لتصفية عمود: الخصم">
+                                        <div class="th-content">
+                                            <span class="th-text">الخصم</span>
+                                            <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
+                                        </div>
                                     </th>
-                                    <th style="width: 5%;">
-                                        <span class="th-text">الصافي</span>
-                                        <span class="th-filter-arrow screen-only" title="تصفية حسب الصافي"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="6"><option value="">(الكل)</option></select></span>
+                                    <th style="width: 5%;" data-col-index="6" onclick="UI.openColFilter(6, this)" title="انقر لتصفية عمود: الصافي">
+                                        <div class="th-content">
+                                            <span class="th-text">الصافي</span>
+                                            <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
+                                        </div>
                                     </th>
-                                    <th style="width: 9%;">
-                                        <span class="th-text">المهندس المعتمد</span>
-                                        <span class="th-filter-arrow screen-only" title="تصفية حسب المهندس المعتمد"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="7"><option value="">(الكل)</option></select></span>
+                                    <th style="width: 9%;" data-col-index="7" onclick="UI.openColFilter(7, this)" title="انقر لتصفية عمود: المهندس المعتمد">
+                                        <div class="th-content">
+                                            <span class="th-text">المهندس المعتمد</span>
+                                            <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
+                                        </div>
                                     </th>
-                                    <th style="width: 11%;">
-                                        <span class="th-text">مكان العمل</span>
-                                        <span class="th-filter-arrow screen-only" title="تصفية حسب مكان العمل"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="8"><option value="">(الكل)</option></select></span>
+                                    <th style="width: 11%;" data-col-index="8" onclick="UI.openColFilter(8, this)" title="انقر لتصفية عمود: مكان العمل">
+                                        <div class="th-content">
+                                            <span class="th-text">مكان العمل</span>
+                                            <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
+                                        </div>
                                     </th>
-                                    <th style="width: 12%;">
-                                        <span class="th-text">بند العمل</span>
-                                        <span class="th-filter-arrow screen-only" title="تصفية حسب بند العمل"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="9"><option value="">(الكل)</option></select></span>
+                                    <th style="width: 12%;" data-col-index="9" onclick="UI.openColFilter(9, this)" title="انقر لتصفية عمود: بند العمل">
+                                        <div class="th-content">
+                                            <span class="th-text">بند العمل</span>
+                                            <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
+                                        </div>
                                     </th>
-                                    <th style="width: 10.5%;">
-                                        <span class="th-text">خصم مقاول</span>
-                                        <span class="th-filter-arrow screen-only" title="تصفية حسب خصم مقاول"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="10"><option value="">(الكل)</option></select></span>
+                                    <th style="width: 10.5%;" data-col-index="10" onclick="UI.openColFilter(10, this)" title="انقر لتصفية عمود: خصم مقاول">
+                                        <div class="th-content">
+                                            <span class="th-text">خصم مقاول</span>
+                                            <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
+                                        </div>
                                     </th>
-                                    <th style="width: 8.5%;">
-                                        <span class="th-text">ملاحظات</span>
-                                        <span class="th-filter-arrow screen-only" title="تصفية حسب ملاحظات"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="11"><option value="">(الكل)</option></select></span>
+                                    <th style="width: 8.5%;" data-col-index="11" onclick="UI.openColFilter(11, this)" title="انقر لتصفية عمود: ملاحظات">
+                                        <div class="th-content">
+                                            <span class="th-text">ملاحظات</span>
+                                            <i class="fas fa-filter th-filter-icon" style="display: none;"></i>
+                                        </div>
                                     </th>
                                 </tr>
                             </thead>
@@ -2341,98 +2515,206 @@ class UI {
         if (footerDeduction) footerDeduction.innerText = totalDeduction.toLocaleString();
         if (footerNet) footerNet.innerText = totalAmount.toLocaleString();
 
-        // Populate edge-filter dropdowns and reset states
-        this.populateTableFilters(tbody);
+        // Reset any existing column filters on new search and update display
+        UI.activeColumnFilters = {};
+        UI.updateTableFilters();
     }
 
-    static populateTableFilters(tbody) {
-        const table = tbody.closest('table');
-        if (!table) return;
-        const thead = table.querySelector('thead');
-        if (!thead) return;
+    static openColFilter(colIndex, thElement) {
+        let popover = document.getElementById('col-filter-popover');
+        if (!popover) {
+            popover = document.createElement('div');
+            popover.id = 'col-filter-popover';
+            popover.className = 'col-filter-popover screen-only';
+            document.body.appendChild(popover);
+        }
 
-        const rows = Array.from(tbody.querySelectorAll('tr')).filter(tr => tr.children.length > 1 && tr.id !== 'no-filter-results-row');
-        const selects = thead.querySelectorAll('select.th-filter-select');
+        UI.currentFilterColIndex = colIndex;
+        const colName = thElement.querySelector('.th-text')?.innerText.trim() || thElement.innerText.trim();
+        const table = thElement.closest('table');
+        const tbody = table.querySelector('tbody#report-results-list');
+        const allRows = Array.from(tbody.querySelectorAll('tr')).filter(tr => tr.children.length > 1 && tr.id !== 'no-filter-results-row');
 
-        selects.forEach(select => {
-            const colIndex = parseInt(select.dataset.colIndex, 10);
-            const uniqueValues = new Set();
-
-            rows.forEach(tr => {
-                const cell = tr.children[colIndex];
-                if (cell) {
-                    const text = cell.innerText.trim();
-                    if (text && text !== '-') {
-                        uniqueValues.add(text);
-                    }
+        const valueCounts = new Map();
+        allRows.forEach(tr => {
+            const cell = tr.children[colIndex];
+            if (cell) {
+                const text = cell.innerText.trim();
+                if (text && text !== '-') {
+                    valueCounts.set(text, (valueCounts.get(text) || 0) + 1);
                 }
-            });
-
-            select.innerHTML = '<option value="">(الكل)</option>';
-            select.value = '';
-
-            const sortedValues = Array.from(uniqueValues).sort((a, b) => {
-                const numA = Number(a);
-                const numB = Number(b);
-                if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-                return a.localeCompare(b, 'ar');
-            });
-
-            sortedValues.forEach(val => {
-                const opt = document.createElement('option');
-                opt.value = val;
-                opt.innerText = val;
-                select.appendChild(opt);
-            });
-
-            if (!select.dataset.hasListener) {
-                select.dataset.hasListener = 'true';
-                select.addEventListener('change', () => {
-                    UI.applyActiveFilters(tbody);
-                });
             }
         });
 
-        this.applyActiveFilters(tbody);
+        const sortedValues = Array.from(valueCounts.keys()).sort((a, b) => {
+            const numA = Number(a);
+            const numB = Number(b);
+            if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+            return a.localeCompare(b, 'ar');
+        });
+
+        const activeSet = UI.activeColumnFilters && UI.activeColumnFilters[colIndex];
+        const isFiltered = !!(activeSet && activeSet.size > 0);
+
+        popover.innerHTML = `
+            <div class="col-filter-header">
+                <div class="col-filter-title">
+                    <i class="fas fa-filter" style="color: var(--primary-color);"></i>
+                    <span>تصفية: <strong>${colName}</strong></span>
+                </div>
+                <button type="button" class="col-filter-close" onclick="UI.closeColFilter()">&times;</button>
+            </div>
+            <div class="col-filter-search-wrap">
+                <input type="text" id="col-filter-search-input" class="col-filter-search-input" placeholder="بحث سريع في القيم..." oninput="UI.filterPopoverList(this.value)">
+                <i class="fas fa-search col-filter-search-icon"></i>
+            </div>
+            <div class="col-filter-actions">
+                <div>
+                    <button type="button" onclick="UI.selectAllPopoverItems(true)">تحديد الكل</button>
+                    <span style="color: var(--border-color); margin: 0 2px;">|</span>
+                    <button type="button" onclick="UI.selectAllPopoverItems(false)">إلغاء التحديد</button>
+                </div>
+                ${isFiltered ? `<button type="button" class="btn-danger-link" onclick="UI.clearColFilter(${colIndex})"><i class="fas fa-undo"></i> إلغاء التصفية</button>` : ''}
+            </div>
+            <div class="col-filter-list" id="col-filter-items-list">
+                ${sortedValues.length === 0 ? '<div style="padding: 12px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">لا توجد بيانات مطابقة في هذا العمود</div>' : ''}
+                ${sortedValues.map(val => {
+                    const isChecked = !isFiltered || activeSet.has(val);
+                    const count = valueCounts.get(val);
+                    const escapedVal = val.replace(/"/g, '&quot;');
+                    return `
+                        <label class="col-filter-item" data-val="${escapedVal}">
+                            <input type="checkbox" value="${escapedVal}" ${isChecked ? 'checked' : ''}>
+                            <span class="col-filter-item-text" title="${escapedVal}">${val}</span>
+                            <span class="col-filter-item-count">${count}</span>
+                        </label>
+                    `;
+                }).join('')}
+            </div>
+            <div class="col-filter-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="UI.applyColFilter(${colIndex})"><i class="fas fa-check"></i> تطبيق</button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="UI.closeColFilter()">إغلاق</button>
+            </div>
+        `;
+
+        popover.style.display = 'flex';
+
+        // Position popover gracefully
+        const rect = thElement.getBoundingClientRect();
+        const popoverWidth = 290;
+        let left = rect.right - popoverWidth;
+        if (left < 10) left = 10;
+        if (left + popoverWidth > window.innerWidth - 10) {
+            left = window.innerWidth - popoverWidth - 10;
+        }
+
+        let top = rect.bottom + 6;
+        const estimatedHeight = 350;
+        if (top + estimatedHeight > window.innerHeight - 10 && rect.top > estimatedHeight + 10) {
+            top = rect.top - estimatedHeight - 6;
+        }
+
+        popover.style.left = `${left}px`;
+        popover.style.top = `${top}px`;
+
+        setTimeout(() => {
+            const input = document.getElementById('col-filter-search-input');
+            if (input) input.focus();
+        }, 50);
     }
 
-    static applyActiveFilters(tbody) {
-        const table = tbody.closest('table') || document.getElementById('reports-table-full');
+    static filterPopoverList(query) {
+        const popover = document.getElementById('col-filter-popover');
+        if (!popover) return;
+        const q = (query || '').toLowerCase().trim();
+        const items = popover.querySelectorAll('.col-filter-item');
+        items.forEach(item => {
+            const val = item.dataset.val.toLowerCase();
+            item.style.display = (!q || val.includes(q)) ? 'flex' : 'none';
+        });
+    }
+
+    static selectAllPopoverItems(check) {
+        const popover = document.getElementById('col-filter-popover');
+        if (!popover) return;
+        const items = popover.querySelectorAll('.col-filter-item');
+        items.forEach(item => {
+            if (item.style.display !== 'none') {
+                const cb = item.querySelector('input[type="checkbox"]');
+                if (cb) cb.checked = check;
+            }
+        });
+    }
+
+    static applyColFilter(colIndex) {
+        const popover = document.getElementById('col-filter-popover');
+        if (!popover) return;
+        const checkboxes = Array.from(popover.querySelectorAll('#col-filter-items-list input[type="checkbox"]'));
+        const totalCount = checkboxes.length;
+        const checkedBoxes = checkboxes.filter(cb => cb.checked);
+
+        if (!UI.activeColumnFilters) UI.activeColumnFilters = {};
+
+        if (checkedBoxes.length === 0 || checkedBoxes.length === totalCount) {
+            delete UI.activeColumnFilters[colIndex];
+        } else {
+            UI.activeColumnFilters[colIndex] = new Set(checkedBoxes.map(cb => cb.value));
+        }
+
+        UI.closeColFilter();
+        UI.updateTableFilters();
+    }
+
+    static clearColFilter(colIndex) {
+        if (UI.activeColumnFilters) {
+            delete UI.activeColumnFilters[colIndex];
+        }
+        UI.closeColFilter();
+        UI.updateTableFilters();
+    }
+
+    static clearAllTableFilters() {
+        UI.activeColumnFilters = {};
+        UI.closeColFilter();
+        UI.updateTableFilters();
+    }
+
+    static closeColFilter() {
+        const popover = document.getElementById('col-filter-popover');
+        if (popover) {
+            popover.style.display = 'none';
+        }
+        UI.currentFilterColIndex = null;
+    }
+
+    static updateTableFilters() {
+        const table = document.getElementById('reports-table-full');
         if (!table) return;
-        const thead = table.querySelector('thead');
-        if (!thead) return;
+        const tbody = document.getElementById('report-results-list');
+        if (!tbody) return;
 
-        const selects = Array.from(thead.querySelectorAll('select.th-filter-select'));
-        const activeFilters = [];
+        if (!UI.activeColumnFilters) UI.activeColumnFilters = {};
+        const activeColIndices = Object.keys(UI.activeColumnFilters).map(Number);
+        const hasActiveFilters = activeColIndices.length > 0;
 
-        selects.forEach(select => {
-            const colIndex = parseInt(select.dataset.colIndex, 10);
-            const arrowContainer = select.closest('.th-filter-arrow');
-            const icon = arrowContainer ? arrowContainer.querySelector('i') : null;
-
-            if (select.value) {
-                activeFilters.push({ colIndex, value: select.value });
-                if (arrowContainer) {
-                    arrowContainer.classList.add('is-filtered');
-                    arrowContainer.title = `مصفى حسب: ${select.value} (انقر للإلغاء أو التغيير)`;
-                }
-                if (icon) {
-                    icon.className = 'fas fa-filter';
-                }
+        const thElements = table.querySelectorAll('thead th');
+        thElements.forEach((th, idx) => {
+            const isColFiltered = UI.activeColumnFilters[idx] && UI.activeColumnFilters[idx].size > 0;
+            if (isColFiltered) {
+                th.classList.add('is-filtered-col');
+                const valuesList = Array.from(UI.activeColumnFilters[idx]).slice(0, 3).join('، ');
+                const extra = UI.activeColumnFilters[idx].size > 3 ? ` و ${UI.activeColumnFilters[idx].size - 3} آخرين` : '';
+                th.title = `مصفى حسب: ${valuesList}${extra} (انقر للتعديل أو الإلغاء)`;
             } else {
-                if (arrowContainer) {
-                    arrowContainer.classList.remove('is-filtered');
-                    arrowContainer.title = 'تصفية';
-                }
-                if (icon) {
-                    icon.className = 'fas fa-caret-down';
-                }
+                th.classList.remove('is-filtered-col');
+                const colName = th.querySelector('.th-text')?.innerText.trim() || '';
+                th.title = `انقر لتصفية عمود: ${colName}`;
             }
         });
 
         const clearBtn = document.getElementById('btn-clear-table-filters');
         if (clearBtn) {
-            clearBtn.style.display = activeFilters.length > 0 ? 'inline-flex' : 'none';
+            clearBtn.style.display = hasActiveFilters ? 'inline-flex' : 'none';
         }
 
         let visibleCount = 0;
@@ -2444,11 +2726,13 @@ class UI {
 
         rows.forEach(tr => {
             let show = true;
-            for (const f of activeFilters) {
-                const cell = tr.children[f.colIndex];
+            for (const colIdx of activeColIndices) {
+                const allowedSet = UI.activeColumnFilters[colIdx];
+                if (!allowedSet || allowedSet.size === 0) continue;
+                const cell = tr.children[colIdx];
                 if (!cell) continue;
                 const text = cell.innerText.trim();
-                if (text !== f.value) {
+                if (!allowedSet.has(text)) {
                     show = false;
                     break;
                 }
@@ -2493,16 +2777,18 @@ class UI {
         if (footerDeduction) footerDeduction.innerText = visibleDeduction.toLocaleString();
         if (footerNet) footerNet.innerText = visibleNet.toLocaleString();
     }
-
-    static clearAllTableFilters() {
-        const table = document.getElementById('reports-table-full');
-        if (!table) return;
-        const tbody = document.getElementById('report-results-list');
-        const selects = table.querySelectorAll('thead select.th-filter-select');
-        selects.forEach(s => { s.value = ''; });
-        this.applyActiveFilters(tbody);
-    }
 }
+
+// Global click & esc listener to close column filter popover
+document.addEventListener('click', (e) => {
+    const popover = document.getElementById('col-filter-popover');
+    if (!popover || popover.style.display === 'none') return;
+    if (popover.contains(e.target) || e.target.closest('#reports-table-full th')) return;
+    UI.closeColFilter();
+});
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') UI.closeColFilter();
+});
 
 // Main Application Logic
 
@@ -2583,6 +2869,7 @@ class UI {
             if (!table) throw new Error("Table not found");
             const clone = table.cloneNode(true);
             clone.querySelectorAll('.screen-only').forEach(el => el.remove());
+            clone.querySelectorAll('.th-filter-icon').forEach(el => el.remove());
 
             // 3. Create ExcelJS Workbook
             const wb = new ExcelJS.Workbook();
