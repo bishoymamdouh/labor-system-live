@@ -836,22 +836,23 @@ h1, h2, h3, h4 {
         padding: 9px 8px;
         font-size: clamp(0.70rem, 0.78vw, 0.82rem);
         font-weight: 700;
-        border-radius: 6px;
+        border-radius: 7px;
         border: none;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 5px;
+        gap: 6px;
         white-space: nowrap;
         cursor: pointer;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
         transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
         box-sizing: border-box;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.25);
     }
     .reports-actions-toolbar .btn-action-report:hover {
-        filter: brightness(1.08);
-        transform: translateY(-1px);
-        box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        filter: brightness(1.12);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.22);
     }
     @media (max-width: 960px) {
         .reports-actions-toolbar .btn-action-report {
@@ -1608,27 +1609,27 @@ select {
                         <!-- Row 2: Unified Organized Actions & Exports (Auto-scaled flex buttons) -->
                         <div class="reports-actions-toolbar">
                             <!-- جدول العمالة (PDF & Excel) -->
-                            <button type="button" id="print-report-btn" class="btn btn-action-report" style="background-color: #334155; color: white;" title="طباعة جدول تفاصيل العمالة (PDF)">
-                                <i class="fas fa-file-pdf"></i> جدول العمالة (PDF)
+                            <button type="button" id="print-report-btn" class="btn btn-action-report" style="background: linear-gradient(135deg, #1e40af, #2563eb) !important; color: #ffffff !important;" title="طباعة جدول تفاصيل العمالة (PDF)">
+                                <i class="fas fa-file-pdf" style="color: #93c5fd;"></i> جدول العمالة (PDF)
                             </button>
-                            <button type="button" onclick="app.exportStyledExcel()" class="btn btn-action-report" style="background-color: #217346; color: white;" title="تصدير جدول تفاصيل العمالة (Excel)">
-                                <i class="fas fa-file-excel"></i> جدول العمالة (Excel)
+                            <button type="button" onclick="app.exportStyledExcel()" class="btn btn-action-report" style="background: linear-gradient(135deg, #15803d, #16a34a) !important; color: #ffffff !important;" title="تصدير جدول تفاصيل العمالة (Excel)">
+                                <i class="fas fa-file-excel" style="color: #86efac;"></i> جدول العمالة (Excel)
                             </button>
 
                             <!-- سركي العامل (PDF & Excel) -->
-                            <button type="button" onclick="window.printWorkerReceipts()" class="btn btn-action-report" style="background-color: #ffd700 !important; color: #000000 !important;" title="طباعة سركي العامل (PDF)">
-                                <i class="fas fa-file-pdf"></i> سركي العامل (PDF)
+                            <button type="button" onclick="window.printWorkerReceipts()" class="btn btn-action-report" style="background: linear-gradient(135deg, #d97706, #f59e0b) !important; color: #ffffff !important;" title="طباعة سركي العامل (PDF)">
+                                <i class="fas fa-file-pdf" style="color: #fef08a;"></i> سركي العامل (PDF)
                             </button>
-                            <button type="button" onclick="window.exportWorkerReceiptsExcel()" class="btn btn-action-report" style="background-color: #107c41 !important; color: #ffffff !important;" title="تصدير سركي العامل (Excel)">
-                                <i class="fas fa-file-excel"></i> سركي العامل (Excel)
+                            <button type="button" onclick="window.exportWorkerReceiptsExcel()" class="btn btn-action-report" style="background: linear-gradient(135deg, #047857, #059669) !important; color: #ffffff !important;" title="تصدير سركي العامل (Excel)">
+                                <i class="fas fa-file-excel" style="color: #6ee7b7;"></i> سركي العامل (Excel)
                             </button>
 
                             <!-- خصومات المقاولين (PDF & Excel) -->
-                            <button type="button" onclick="window.printContractorDeductionsPDF()" class="btn btn-action-report" style="background-color: #9c27b0 !important; color: #ffffff !important;" title="طباعة تقرير خصومات المقاولين (PDF)">
-                                <i class="fas fa-file-pdf"></i> خصومات المقاولين (PDF)
+                            <button type="button" onclick="window.printContractorDeductionsPDF()" class="btn btn-action-report" style="background: linear-gradient(135deg, #9f1239, #be123c) !important; color: #ffffff !important;" title="طباعة تقرير خصومات المقاولين (PDF)">
+                                <i class="fas fa-file-pdf" style="color: #fecdd3;"></i> خصومات المقاولين (PDF)
                             </button>
-                            <button type="button" onclick="window.exportContractorDeductionsExcel()" class="btn btn-action-report" style="background-color: #7b1fa2 !important; color: #ffffff !important;" title="تصدير تقرير خصومات المقاولين (Excel)">
-                                <i class="fas fa-hand-holding-usd"></i> خصومات المقاولين (Excel)
+                            <button type="button" onclick="window.exportContractorDeductionsExcel()" class="btn btn-action-report" style="background: linear-gradient(135deg, #581c87, #7c3aed) !important; color: #ffffff !important;" title="تصدير تقرير خصومات المقاولين (Excel)">
+                                <i class="fas fa-file-excel" style="color: #ddd6fe;"></i> خصومات المقاولين (Excel)
                             </button>
                         </div>
                     </form>
