@@ -746,6 +746,7 @@ h1, h2, h3, h4 {
         overflow-wrap: break-word !important;
     }
     #reports-table-full th {
+        position: relative !important;
         font-size: 0.76rem !important;
         font-weight: 700 !important;
         background-color: var(--secondary-color) !important;
@@ -754,19 +755,68 @@ h1, h2, h3, h4 {
         line-height: 1.15 !important;
         vertical-align: middle !important;
         white-space: normal !important;
+        text-align: center !important;
+    }
+    #reports-table-full th .th-text {
+        display: inline-block;
+        text-align: center;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+    .th-filter-arrow {
+        position: absolute;
+        left: 2px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 12px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 5;
+        color: var(--text-muted);
+        opacity: 0.55;
+        transition: opacity 0.2s, color 0.2s;
+    }
+    .th-filter-arrow:hover {
+        opacity: 1;
+        color: var(--primary-color);
+    }
+    .th-filter-arrow.is-filtered {
+        opacity: 1 !important;
+        color: #f59e0b !important;
+    }
+    .th-filter-arrow i {
+        font-size: 8.5px;
+        pointer-events: none;
+    }
+    .th-filter-arrow select.th-filter-select {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 6;
+        border: none;
+        background: transparent;
+        padding: 0;
+        margin: 0;
     }
     #reports-table-full th:nth-child(1) { width: 13% !important; }
-    #reports-table-full th:nth-child(2) { width: 4.5% !important; }
+    #reports-table-full th:nth-child(2) { width: 5% !important; }
     #reports-table-full th:nth-child(3) { width: 8.5% !important; }
-    #reports-table-full th:nth-child(4) { width: 7.5% !important; }
-    #reports-table-full th:nth-child(5) { width: 4.5% !important; }
-    #reports-table-full th:nth-child(6) { width: 4% !important; }
-    #reports-table-full th:nth-child(7) { width: 4.5% !important; }
+    #reports-table-full th:nth-child(4) { width: 8% !important; }
+    #reports-table-full th:nth-child(5) { width: 5% !important; }
+    #reports-table-full th:nth-child(6) { width: 4.5% !important; }
+    #reports-table-full th:nth-child(7) { width: 5% !important; }
     #reports-table-full th:nth-child(8) { width: 9% !important; }
-    #reports-table-full th:nth-child(9) { width: 11.5% !important; }
-    #reports-table-full th:nth-child(10) { width: 12.5% !important; }
-    #reports-table-full th:nth-child(11) { width: 11% !important; }
-    #reports-table-full th:nth-child(12) { width: 9.5% !important; }
+    #reports-table-full th:nth-child(9) { width: 11% !important; }
+    #reports-table-full th:nth-child(10) { width: 12% !important; }
+    #reports-table-full th:nth-child(11) { width: 10.5% !important; }
+    #reports-table-full th:nth-child(12) { width: 8.5% !important; }
 
     /* Numbers & short columns: extra compact, nowrap */
     #reports-table-full td:nth-child(2),
@@ -1408,23 +1458,62 @@ select {
                         </div>
                     </div>
                     
-                    <h3 class="mt-20 mb-10">تفاصيل العمالة</h3>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">تفاصيل العمالة</h3>
+                        <button id="btn-clear-table-filters" class="btn btn-sm btn-secondary screen-only" style="display: none; font-size: 0.78rem; padding: 3px 10px; border-radius: 6px;" onclick="UI.clearAllTableFilters()"><i class="fas fa-undo"></i> إلغاء تصفية الأعمدة</button>
+                    </div>
                     <div class="table-responsive">
                         <table class="data-table" id="reports-table-full">
                             <thead style="background-color: var(--secondary-color);">
                                 <tr>
-                                    <th style="width: 13%;">اسم العامل</th>
-                                    <th style="width: 4.5%;">النوع</th>
-                                    <th style="width: 8.5%;">المشرف</th>
-                                    <th style="width: 7.5%;">التاريخ</th>
-                                    <th style="width: 4.5%;">اليومية</th>
-                                    <th style="width: 4%;">الخصم</th>
-                                    <th style="width: 4.5%;">الصافي</th>
-                                    <th style="width: 9%;">المهندس المعتمد</th>
-                                    <th style="width: 11.5%;">مكان العمل</th>
-                                    <th style="width: 12.5%;">بند العمل</th>
-                                    <th style="width: 11%;">خصم مقاول</th>
-                                    <th style="width: 9.5%;">ملاحظات</th>
+                                    <th style="width: 13%;">
+                                        <span class="th-text">اسم العامل</span>
+                                        <span class="th-filter-arrow screen-only" title="تصفية حسب اسم العامل"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="0"><option value="">(الكل)</option></select></span>
+                                    </th>
+                                    <th style="width: 5%;">
+                                        <span class="th-text">النوع</span>
+                                        <span class="th-filter-arrow screen-only" title="تصفية حسب النوع"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="1"><option value="">(الكل)</option></select></span>
+                                    </th>
+                                    <th style="width: 8.5%;">
+                                        <span class="th-text">المشرف</span>
+                                        <span class="th-filter-arrow screen-only" title="تصفية حسب المشرف"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="2"><option value="">(الكل)</option></select></span>
+                                    </th>
+                                    <th style="width: 8%;">
+                                        <span class="th-text">التاريخ</span>
+                                        <span class="th-filter-arrow screen-only" title="تصفية حسب التاريخ"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="3"><option value="">(الكل)</option></select></span>
+                                    </th>
+                                    <th style="width: 5%;">
+                                        <span class="th-text">اليومية</span>
+                                        <span class="th-filter-arrow screen-only" title="تصفية حسب اليومية"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="4"><option value="">(الكل)</option></select></span>
+                                    </th>
+                                    <th style="width: 4.5%;">
+                                        <span class="th-text">الخصم</span>
+                                        <span class="th-filter-arrow screen-only" title="تصفية حسب الخصم"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="5"><option value="">(الكل)</option></select></span>
+                                    </th>
+                                    <th style="width: 5%;">
+                                        <span class="th-text">الصافي</span>
+                                        <span class="th-filter-arrow screen-only" title="تصفية حسب الصافي"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="6"><option value="">(الكل)</option></select></span>
+                                    </th>
+                                    <th style="width: 9%;">
+                                        <span class="th-text">المهندس المعتمد</span>
+                                        <span class="th-filter-arrow screen-only" title="تصفية حسب المهندس المعتمد"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="7"><option value="">(الكل)</option></select></span>
+                                    </th>
+                                    <th style="width: 11%;">
+                                        <span class="th-text">مكان العمل</span>
+                                        <span class="th-filter-arrow screen-only" title="تصفية حسب مكان العمل"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="8"><option value="">(الكل)</option></select></span>
+                                    </th>
+                                    <th style="width: 12%;">
+                                        <span class="th-text">بند العمل</span>
+                                        <span class="th-filter-arrow screen-only" title="تصفية حسب بند العمل"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="9"><option value="">(الكل)</option></select></span>
+                                    </th>
+                                    <th style="width: 10.5%;">
+                                        <span class="th-text">خصم مقاول</span>
+                                        <span class="th-filter-arrow screen-only" title="تصفية حسب خصم مقاول"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="10"><option value="">(الكل)</option></select></span>
+                                    </th>
+                                    <th style="width: 8.5%;">
+                                        <span class="th-text">ملاحظات</span>
+                                        <span class="th-filter-arrow screen-only" title="تصفية حسب ملاحظات"><i class="fas fa-caret-down"></i><select class="th-filter-select" data-col-index="11"><option value="">(الكل)</option></select></span>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody id="report-results-list">
@@ -2251,6 +2340,167 @@ class UI {
         if (footerTotal) footerTotal.innerText = totalGross.toLocaleString();
         if (footerDeduction) footerDeduction.innerText = totalDeduction.toLocaleString();
         if (footerNet) footerNet.innerText = totalAmount.toLocaleString();
+
+        // Populate edge-filter dropdowns and reset states
+        this.populateTableFilters(tbody);
+    }
+
+    static populateTableFilters(tbody) {
+        const table = tbody.closest('table');
+        if (!table) return;
+        const thead = table.querySelector('thead');
+        if (!thead) return;
+
+        const rows = Array.from(tbody.querySelectorAll('tr')).filter(tr => tr.children.length > 1 && tr.id !== 'no-filter-results-row');
+        const selects = thead.querySelectorAll('select.th-filter-select');
+
+        selects.forEach(select => {
+            const colIndex = parseInt(select.dataset.colIndex, 10);
+            const uniqueValues = new Set();
+
+            rows.forEach(tr => {
+                const cell = tr.children[colIndex];
+                if (cell) {
+                    const text = cell.innerText.trim();
+                    if (text && text !== '-') {
+                        uniqueValues.add(text);
+                    }
+                }
+            });
+
+            select.innerHTML = '<option value="">(الكل)</option>';
+            select.value = '';
+
+            const sortedValues = Array.from(uniqueValues).sort((a, b) => {
+                const numA = Number(a);
+                const numB = Number(b);
+                if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                return a.localeCompare(b, 'ar');
+            });
+
+            sortedValues.forEach(val => {
+                const opt = document.createElement('option');
+                opt.value = val;
+                opt.innerText = val;
+                select.appendChild(opt);
+            });
+
+            if (!select.dataset.hasListener) {
+                select.dataset.hasListener = 'true';
+                select.addEventListener('change', () => {
+                    UI.applyActiveFilters(tbody);
+                });
+            }
+        });
+
+        this.applyActiveFilters(tbody);
+    }
+
+    static applyActiveFilters(tbody) {
+        const table = tbody.closest('table') || document.getElementById('reports-table-full');
+        if (!table) return;
+        const thead = table.querySelector('thead');
+        if (!thead) return;
+
+        const selects = Array.from(thead.querySelectorAll('select.th-filter-select'));
+        const activeFilters = [];
+
+        selects.forEach(select => {
+            const colIndex = parseInt(select.dataset.colIndex, 10);
+            const arrowContainer = select.closest('.th-filter-arrow');
+            const icon = arrowContainer ? arrowContainer.querySelector('i') : null;
+
+            if (select.value) {
+                activeFilters.push({ colIndex, value: select.value });
+                if (arrowContainer) {
+                    arrowContainer.classList.add('is-filtered');
+                    arrowContainer.title = `مصفى حسب: ${select.value} (انقر للإلغاء أو التغيير)`;
+                }
+                if (icon) {
+                    icon.className = 'fas fa-filter';
+                }
+            } else {
+                if (arrowContainer) {
+                    arrowContainer.classList.remove('is-filtered');
+                    arrowContainer.title = 'تصفية';
+                }
+                if (icon) {
+                    icon.className = 'fas fa-caret-down';
+                }
+            }
+        });
+
+        const clearBtn = document.getElementById('btn-clear-table-filters');
+        if (clearBtn) {
+            clearBtn.style.display = activeFilters.length > 0 ? 'inline-flex' : 'none';
+        }
+
+        let visibleCount = 0;
+        let visibleGross = 0;
+        let visibleDeduction = 0;
+        let visibleNet = 0;
+
+        const rows = Array.from(tbody.querySelectorAll('tr')).filter(tr => tr.children.length > 1 && tr.id !== 'no-filter-results-row');
+
+        rows.forEach(tr => {
+            let show = true;
+            for (const f of activeFilters) {
+                const cell = tr.children[f.colIndex];
+                if (!cell) continue;
+                const text = cell.innerText.trim();
+                if (text !== f.value) {
+                    show = false;
+                    break;
+                }
+            }
+
+            tr.style.display = show ? '' : 'none';
+
+            if (show) {
+                visibleCount++;
+                const gross = parseFloat(tr.children[4]?.innerText.trim()) || 0;
+                const deduction = parseFloat(tr.children[5]?.innerText.trim()) || 0;
+                const net = parseFloat(tr.children[6]?.innerText.trim()) || 0;
+                visibleGross += gross;
+                visibleDeduction += deduction;
+                visibleNet += net;
+            }
+        });
+
+        let noResultsTr = tbody.querySelector('#no-filter-results-row');
+        if (visibleCount === 0 && rows.length > 0) {
+            if (!noResultsTr) {
+                noResultsTr = document.createElement('tr');
+                noResultsTr.id = 'no-filter-results-row';
+                noResultsTr.innerHTML = '<td colspan="12" class="text-center" style="padding: 12px; color: var(--text-muted); font-size: 0.85rem;"><i class="fas fa-info-circle"></i> لا توجد بيانات تطابق التصفية المختارة</td>';
+                tbody.appendChild(noResultsTr);
+            } else {
+                noResultsTr.style.display = '';
+            }
+        } else if (noResultsTr) {
+            noResultsTr.style.display = 'none';
+        }
+
+        const totalDaysEl = document.getElementById('report-total-days');
+        const totalAmountEl = document.getElementById('report-total-amount');
+        const footerTotal = document.getElementById('report-footer-total-amount');
+        const footerDeduction = document.getElementById('report-footer-total-deduction');
+        const footerNet = document.getElementById('report-footer-net-amount');
+
+        if (totalDaysEl) totalDaysEl.innerText = visibleCount;
+        if (totalAmountEl) totalAmountEl.innerText = visibleNet.toLocaleString();
+        if (footerTotal) footerTotal.innerText = visibleGross.toLocaleString();
+        if (footerDeduction) footerDeduction.innerText = visibleDeduction.toLocaleString();
+        if (footerNet) footerNet.innerText = visibleNet.toLocaleString();
+    }
+
+    static clearAllTableFilters() {
+        const table = document.getElementById('reports-table-full');
+        if (!table) return;
+        const tbody = document.getElementById('report-results-list');
+        const selects = table.querySelectorAll('thead select.th-filter-select');
+        selects.forEach(s => { s.value = ''; });
+        this.applyActiveFilters(tbody);
     }
 }
 
@@ -2347,6 +2597,7 @@ class UI {
             // 4. Iterate over rows
             const rows = clone.querySelectorAll('tr');
             rows.forEach((tr, rIndex) => {
+                if (tr.style.display === 'none' || tr.id === 'no-filter-results-row') return;
                 const excelRow = ws.addRow([]);
                 let colIndex = 1;
                 
