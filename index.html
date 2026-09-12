@@ -1625,19 +1625,23 @@ select {
                     <h2 style="margin: 0;"><i class="fas fa-chart-bar"></i> التقارير المجمعة</h2>
 
                     <!-- Cloud Server Quota & Renewal Monitor Widget (Screen Only) -->
-                    <div class="screen-only" style="display: inline-flex; align-items: center; flex-wrap: wrap; gap: 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 14px; font-size: 0.85rem; box-shadow: var(--shadow-sm);">
+                    <div class="screen-only" style="display: inline-flex; align-items: center; flex-wrap: wrap; gap: 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 14px; font-size: 0.85rem; box-shadow: var(--shadow-sm);">
                         <div style="display: flex; align-items: center; gap: 6px; color: var(--primary);">
                             <i class="fas fa-cloud"></i>
                             <span style="font-weight: 700;">سيرفر Deno Cloud:</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 10px;">
-                            <span style="color: var(--text-muted, #64748b);">الاستهلاك (KV Reads):</span>
-                            <span style="font-weight: 700; color: #f59e0b;">~80% (0.4M / 0.5M)</span>
-                            <span style="background: #10b981; color: #fff; font-size: 0.72rem; padding: 1px 6px; border-radius: 4px; font-weight: 600;" title="تم إيقاف الاستنزاف واستهلاك السيرفر الآن شبه معدوم">مستقر ومحمي ✅</span>
+                            <span style="color: var(--text-muted, #64748b);">قراءات الداتابيز (KV Reads):</span>
+                            <span style="font-weight: 700; color: #d97706;" title="452,024 قراءة مستهلكة من أصل 500,000 قراءة شهرية مجانية">90.4% (452k / 500k)</span>
+                            <span style="background: #10b981; color: #fff; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 600;" title="تم إيقاف الاستنزاف بنجاح واستهلاك السيرفر الآن شبه معدوم بفضل الكاش">مستقر ومحمي ✅</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 10px;">
-                            <span style="color: var(--text-muted, #64748b);">تاريخ التجديد:</span>
-                            <span style="font-weight: 700; color: #0284c7;" id="cloud-renewal-date-display">1 أكتوبر 2026 (متبقي 18 يوماً)</span>
+                            <span style="color: var(--text-muted, #64748b);">نقل البيانات (Bandwidth):</span>
+                            <span style="font-weight: 700; color: #0284c7;" title="9.3 جيجابايت من أصل 100 جيجابايت شهرية">9.3GB / 100GB (9.3%)</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 10px;">
+                            <span style="color: var(--text-muted, #64748b);">تاريخ تجديد الحصة:</span>
+                            <span style="font-weight: 700; color: #059669;" id="cloud-renewal-date-display">1 أكتوبر 2026 (متبقي 18 يوماً)</span>
                         </div>
                     </div>
                 </header>
