@@ -11,7 +11,39 @@ webPush.setVapidDetails("mailto:admin@example.com", VAPID_PUBLIC, VAPID_PRIVATE)
 const isDeploy = !!Deno.env.get("DENO_REGION") || !!Deno.env.get("DENO_DEPLOYMENT_ID");
 let kv;
 
-let memoryPendingIndex: { [recordId: string]: string } | null = null;
+interface PendingIndexEntry {
+    engineerId: string;
+    createdAt: string;
+    date?: string;
+    lastReminderSentAt?: string | null;
+}
+
+function parsePendingEntry(val: any): PendingIndexEntry {
+    if (typeof val === 'string') {
+        return {
+            engineerId: val,
+            createdAt: new Date().toISOString(),
+            date: '',
+            lastReminderSentAt: null
+        };
+    }
+    if (val && typeof val === 'object') {
+        return {
+            engineerId: String(val.engineerId || ''),
+            createdAt: val.createdAt || new Date().toISOString(),
+            date: val.date || '',
+            lastReminderSentAt: val.lastReminderSentAt || null
+        };
+    }
+    return {
+        engineerId: '',
+        createdAt: new Date().toISOString(),
+        date: '',
+        lastReminderSentAt: null
+    };
+}
+
+let memoryPendingIndex: { [recordId: string]: any } | null = null;
 let lastPendingIndexFetch = 0;
 
 async function getPendingIndex(kvInstance: any) {
@@ -32,11 +64,16 @@ async function getPendingIndex(kvInstance: any) {
     }
     
     // Initial build of index if not exists (runs only once)
-    const index: { [recordId: string]: string } = {};
+    const index: { [recordId: string]: any } = {};
     const recordsIter = kvInstance.list({ prefix: ["records"] });
     for await (const r of recordsIter) {
         if (r.value && r.value.status === 'pending') {
-            index[String(r.key[1])] = String(r.value.engineerId || '');
+            index[String(r.key[1])] = {
+                engineerId: String(r.value.engineerId || ''),
+                createdAt: r.value.createdAt || new Date().toISOString(),
+                date: r.value.date || '',
+                lastReminderSentAt: r.value.lastReminderSentAt || null
+            };
         }
     }
     await kvInstance.set(["system", "pending_index"], index);
@@ -45,16 +82,63 @@ async function getPendingIndex(kvInstance: any) {
     return memoryPendingIndex;
 }
 
-async function updatePendingIndexOnSave(kvInstance: any, recordId: string, status: string, engineerId?: string) {
+async function updatePendingIndexOnSave(kvInstance: any, recordId: string, status: string, engineerId?: string, createdAt?: string, date?: string) {
     const index = await getPendingIndex(kvInstance);
     if (status === 'pending') {
-        index[String(recordId)] = String(engineerId || '');
+        const existing = index[String(recordId)] ? parsePendingEntry(index[String(recordId)]) : null;
+        index[String(recordId)] = {
+            engineerId: String(engineerId || (existing ? existing.engineerId : '')),
+            createdAt: createdAt || (existing ? existing.createdAt : new Date().toISOString()),
+            date: date || (existing ? existing.date : ''),
+            lastReminderSentAt: existing ? existing.lastReminderSentAt : null
+        };
     } else {
         delete index[String(recordId)];
     }
     memoryPendingIndex = index;
     lastPendingIndexFetch = Date.now();
     await kvInstance.set(["system", "pending_index"], index);
+}
+
+let memoryNotificationsConfig: any = null;
+let lastNotificationsConfigFetch = 0;
+
+async function getNotificationsConfig(kvInstance: any) {
+    const now = Date.now();
+    if (memoryNotificationsConfig && (now - lastNotificationsConfigFetch < 60000)) {
+        return memoryNotificationsConfig;
+    }
+    try {
+        const entry = await kvInstance.get(["system", "notificationsConfig"]);
+        if (entry && entry.value) {
+            memoryNotificationsConfig = entry.value;
+            lastNotificationsConfigFetch = now;
+            return memoryNotificationsConfig;
+        }
+    } catch (e) {
+        console.error("Error reading notificationsConfig:", e);
+    }
+    const defaultConfig = {
+        systemReminders: {
+            pendingReminder: {
+                isActive: true,
+                hours: 3,
+                text: "يوجد سركي معلق بانتظار اعتمادك منذ أكثر من {hours} ساعات، يرجى مراجعته."
+            }
+        },
+        scheduled: [{
+            id: "default-daily",
+            title: "تذكير يومي بالسراكي",
+            message: "برجاء تسجيل السراكي واليوميات الخاصة باليوم ومراجعة المهام.",
+            time: "10:00 AM",
+            targets: { roles: ["supervisor", "warehouse_manager", "surveyor", "operator_supervisor"], users: [] },
+            isActive: true,
+            lastSentDate: null
+        }]
+    };
+    memoryNotificationsConfig = defaultConfig;
+    lastNotificationsConfigFetch = now;
+    return defaultConfig;
 }
 
 let memoryAllRecordsDetails: any = null;
@@ -106,28 +190,21 @@ async function handler(req: Request): Promise<Response> {
         
         
         if (url.pathname === "/api/notificationsConfig" && method === "GET") {
-            const entry = await kv.get(["system", "notificationsConfig"]);
-            const defaultConfig = {
-                scheduled: [{
-                    id: "default-daily",
-                    title: "تذكير يومي",
-                    message: "برجاء تسجيل السراكي واليوميات الخاصة باليوم.",
-                    time: "10:00 AM",
-                    targets: { roles: ["supervisor", "warehouse_manager", "surveyor", "operator_supervisor"], users: [] },
-                    isActive: true
-                }],
-                system: {
-                    pendingReminderActive: true,
-                    pendingReminderText: "يوجد طلب/سركي معلق لم تقم بالرد عليه منذ أكثر من 3 ساعات، يرجى مراجعته."
-                }
-            };
-            return new Response(JSON.stringify(entry.value || defaultConfig), { status: 200, headers: { "Content-Type": "application/json" } });
+            const config = await getNotificationsConfig(kv);
+            return new Response(JSON.stringify(config), { status: 200, headers: { "Content-Type": "application/json" } });
         }
         
         if (url.pathname === "/api/notificationsConfig" && method === "POST") {
             const body = await req.json();
             await kv.set(["system", "notificationsConfig"], body);
+            memoryNotificationsConfig = body;
+            lastNotificationsConfigFetch = Date.now();
             return new Response(JSON.stringify({ success: true }), { status: 200, headers: { "Content-Type": "application/json" } });
+        }
+
+        if (url.pathname === "/api/triggerNotificationTasks" && method === "POST") {
+            const result = await runNotificationTasks();
+            return new Response(JSON.stringify({ success: true, result }), { status: 200, headers: { "Content-Type": "application/json" } });
         }
 
         if (url.pathname === "/api/vapidPublicKey" && method === "GET") {
@@ -139,7 +216,8 @@ async function handler(req: Request): Promise<Response> {
             const index = await getPendingIndex(kv);
             let count = 0;
             for (const rId in index) {
-                if (!engineerId || index[rId] === String(engineerId)) {
+                const item = parsePendingEntry(index[rId]);
+                if (!engineerId || item.engineerId === String(engineerId)) {
                     count++;
                 }
             }
@@ -407,7 +485,7 @@ async function handler(req: Request): Promise<Response> {
             await kv.set([collection, id], body);
             invalidateCache(collection);
             if (collection === "records") {
-                await updatePendingIndexOnSave(kv, id, body.status, body.engineerId);
+                await updatePendingIndexOnSave(kv, id, body.status, body.engineerId, body.createdAt, body.date);
             }
             
             // Send Push Notification if pending record
@@ -429,7 +507,8 @@ async function handler(req: Request): Promise<Response> {
                     let pendingCount = 0;
                     const index = await getPendingIndex(kv);
                     for (const rId in index) {
-                        if (index[rId] === targetId) pendingCount++;
+                        const item = parsePendingEntry(index[rId]);
+                        if (item.engineerId === targetId) pendingCount++;
                     }
 
                     const subEntries = kv.list({ prefix: ["push_subscriptions", targetId] });
@@ -463,7 +542,9 @@ async function handler(req: Request): Promise<Response> {
             if (collection === "records") {
                 const newStatus = body.status !== undefined ? body.status : current.value.status;
                 const engId = body.engineerId !== undefined ? body.engineerId : current.value.engineerId;
-                await updatePendingIndexOnSave(kv, id, newStatus, engId);
+                const createdAt = body.createdAt !== undefined ? body.createdAt : current.value.createdAt;
+                const date = body.date !== undefined ? body.date : current.value.date;
+                await updatePendingIndexOnSave(kv, id, newStatus, engId, createdAt, date);
             }
             
             // Send Push Notification to supervisor if record status changed
@@ -552,53 +633,211 @@ async function performDailyBackup() {
 }
 
 
-async function checkPendingReminders(now, config) {
-    if (!config.system.pendingReminderActive) return;
-    
-    const recordsIter = kv.list({ prefix: ["records"] });
-    const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
-    
-    for await (const entry of recordsIter) {
-        const record = entry.value;
-        if (record.status === 'pending' && record.createdAt && record.engineerId) {
-            const createdTime = new Date(record.createdAt).getTime();
-            const nowTime = now.getTime();
-            const elapsed = nowTime - createdTime;
-            
-            if (elapsed >= THREE_HOURS_MS) {
-                const lastReminder = record.lastReminderSentAt ? new Date(record.lastReminderSentAt).getTime() : createdTime;
-                
-                if (nowTime - lastReminder >= THREE_HOURS_MS) {
-                    record.lastReminderSentAt = now.toISOString();
-                    await kv.set(entry.key, record);
-                    
-                    const targetId = record.engineerId;
-                    const engineerUser = await kv.get(["users", targetId]);
-                    const engineerName = engineerUser.value ? engineerUser.value.name : "يا هندسة";
-                    
-                    const subEntries = kv.list({ prefix: ["push_subscriptions", targetId] });
-                    for await (const subEntry of subEntries) {
-                        try {
-                            const bodyText = config.system.pendingReminderText.replace('{name}', engineerName);
-                            await webPush.sendNotification(
-                                subEntry.value,
-                                JSON.stringify({ 
-                                    title: "تذكير: طلب قيد الانتظار", 
-                                    body: bodyText, 
-                                    url: "/?view_record=" + entry.key[1] 
-                                })
-                            );
-                        } catch (err) {
-                            if (err.statusCode === 410) await kv.delete(subEntry.key);
-                        }
-                    }
-                }
-            }
-        }
+function getCairoTimeParts() {
+    const now = new Date();
+    try {
+        const dtf = new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Africa/Cairo",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        });
+        const parts = dtf.formatToParts(now);
+        const map: any = {};
+        parts.forEach(p => map[p.type] = p.value);
+        const dateStr = `${map.year}-${map.month}-${map.day}`;
+        const hour = parseInt(map.hour, 10);
+        const minute = parseInt(map.minute, 10);
+        return { dateStr, hour, minute };
+    } catch (_e) {
+        const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const cairoDate = new Date(utcMs + (2 * 60 * 60 * 1000));
+        const dateStr = cairoDate.toISOString().split("T")[0];
+        return { dateStr, hour: cairoDate.getHours(), minute: cairoDate.getMinutes() };
     }
 }
 
+async function runNotificationTasks() {
+    if (!kv) {
+        kv = isDeploy ? await Deno.openKv() : await Deno.openKv(Deno.env.get("DENO_REGION") ? undefined : "./database.sqlite");
+    }
+    const config = await getNotificationsConfig(kv);
+    const results = { pendingSent: 0, scheduledSent: 0, errors: [] };
 
+    // 1. Check Pending Reminders (Zero KV overhead: uses memoryPendingIndex, only writes if changed)
+    try {
+        const pendingConfig = config.systemReminders?.pendingReminder || {
+            isActive: config.system?.pendingReminderActive ?? true,
+            hours: config.system?.pendingReminderHours ?? 3,
+            text: config.system?.pendingReminderText || "يوجد سركي معلق بانتظار اعتمادك منذ أكثر من {hours} ساعات، يرجى مراجعته."
+        };
+
+        if (pendingConfig.isActive) {
+            const hours = Number(pendingConfig.hours) || 3;
+            const reminderIntervalMs = hours * 60 * 60 * 1000;
+            const index = await getPendingIndex(kv);
+            let indexUpdated = false;
+            const nowTime = Date.now();
+
+            for (const recordId in index) {
+                const entry = parsePendingEntry(index[recordId]);
+                if (!entry.engineerId) continue;
+
+                const createdTime = new Date(entry.createdAt).getTime();
+                if (isNaN(createdTime) || (nowTime - createdTime < reminderIntervalMs)) {
+                    continue;
+                }
+
+                const lastSent = entry.lastReminderSentAt ? new Date(entry.lastReminderSentAt).getTime() : createdTime;
+                if (nowTime - lastSent < reminderIntervalMs) {
+                    continue;
+                }
+
+                // Time to send reminder to engineer
+                entry.lastReminderSentAt = new Date().toISOString();
+                index[recordId] = entry;
+                indexUpdated = true;
+
+                const targetId = entry.engineerId;
+                const subEntries = kv.list({ prefix: ["push_subscriptions", targetId] });
+                const bodyText = (pendingConfig.text || "يوجد سركي معلق بانتظار اعتمادك منذ أكثر من {hours} ساعات، يرجى مراجعته.")
+                    .replace(/\{hours\}/g, String(hours));
+
+                for await (const subEntry of subEntries) {
+                    try {
+                        await webPush.sendNotification(
+                            subEntry.value,
+                            JSON.stringify({
+                                title: "⏰ تذكير: سركي معلق بانتظار الاعتماد",
+                                body: bodyText,
+                                url: "/?view_record=" + recordId
+                            })
+                        );
+                        results.pendingSent++;
+                    } catch (err) {
+                        if (err.statusCode === 410) await kv.delete(subEntry.key);
+                        results.errors.push(`WebPush error (${targetId}): ${err.message}`);
+                    }
+                }
+            }
+
+            if (indexUpdated) {
+                memoryPendingIndex = index;
+                lastPendingIndexFetch = nowTime;
+                await kv.set(["system", "pending_index"], index);
+            }
+        }
+    } catch (e) {
+        console.error("Pending reminders check failed:", e);
+        results.errors.push(`Pending check failed: ${e.message}`);
+    }
+
+    // 2. Check Cairo Daily Scheduled Notifications
+    try {
+        const cairo = getCairoTimeParts();
+        const currentMins = cairo.hour * 60 + cairo.minute;
+        let configUpdated = false;
+
+        const scheduledList = config.scheduled || [];
+        for (const item of scheduledList) {
+            if (item.isActive === false || !item.time) continue;
+
+            // Skip if already sent today
+            if (item.lastSentDate === cairo.dateStr) continue;
+
+            // Parse time string e.g. "10:00 AM", "02:30 PM", or "10:00", "14:00"
+            let itemHour = 0;
+            let itemMin = 0;
+            const timeStr = String(item.time).trim().toUpperCase();
+            if (timeStr.includes("AM") || timeStr.includes("PM")) {
+                const parts = timeStr.split(" ");
+                const hm = (parts[0] || "").split(":");
+                itemHour = parseInt(hm[0] || "0", 10);
+                itemMin = parseInt(hm[1] || "0", 10);
+                if (parts[1] === "PM" && itemHour < 12) itemHour += 12;
+                if (parts[1] === "AM" && itemHour === 12) itemHour = 0;
+            } else {
+                const hm = timeStr.split(":");
+                itemHour = parseInt(hm[0] || "0", 10);
+                itemMin = parseInt(hm[1] || "0", 10);
+            }
+
+            const targetMins = itemHour * 60 + itemMin;
+
+            // Trigger if current Cairo time has reached the scheduled time
+            // (Window: currentMins >= targetMins and within 120 minutes)
+            if (currentMins >= targetMins && currentMins <= targetMins + 120) {
+                const targetIds = new Set();
+
+                const explicitUsers = item.targets?.users || item.targets?.userIds || [];
+                explicitUsers.forEach((uId) => targetIds.add(String(uId)));
+
+                const targetRoles = item.targets?.roles || [];
+                if (targetRoles.length > 0) {
+                    const usersIter = kv.list({ prefix: ["users"] });
+                    for await (const u of usersIter) {
+                        if (u.value && targetRoles.includes(u.value.role)) {
+                            targetIds.add(String(u.key[1]));
+                        }
+                    }
+                }
+
+                for (const uId of targetIds) {
+                    const subEntries = kv.list({ prefix: ["push_subscriptions", uId] });
+                    for await (const subEntry of subEntries) {
+                        try {
+                            await webPush.sendNotification(
+                                subEntry.value,
+                                JSON.stringify({
+                                    title: item.title || "تذكير يومي",
+                                    body: item.message || "",
+                                    url: "/"
+                                })
+                            );
+                            results.scheduledSent++;
+                        } catch (err) {
+                            if (err.statusCode === 410) await kv.delete(subEntry.key);
+                            results.errors.push(`Scheduled WebPush error (${uId}): ${err.message}`);
+                        }
+                    }
+                }
+
+                item.lastSentDate = cairo.dateStr;
+                configUpdated = true;
+            }
+        }
+
+        if (configUpdated) {
+            memoryNotificationsConfig = config;
+            lastNotificationsConfigFetch = Date.now();
+            await kv.set(["system", "notificationsConfig"], config);
+        }
+    } catch (e: any) {
+        console.error("Scheduled notifications check failed:", e);
+        results.errors.push(`Scheduled check failed: ${e.message}`);
+    }
+
+    return results;
+}
+
+// Check every 60 seconds
+setInterval(() => {
+    runNotificationTasks().catch(e => console.error("Periodic notification runner error:", e));
+}, 60000);
+
+// Also register Deno.cron if available in Deno Deploy environment
+if (typeof (Deno as any).cron === "function") {
+    try {
+        (Deno as any).cron("Check Notifications", "*/15 * * * *", () => {
+            return runNotificationTasks();
+        });
+    } catch (e) {
+        console.log("Deno.cron notice:", e.message);
+    }
+}
 
 performDailyBackup();
 console.log("Server running on http://localhost:8000");
