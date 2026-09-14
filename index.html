@@ -1502,6 +1502,12 @@ select {
                     <small id="current-role">الدور</small>
                 </div>
                 
+                <!-- Universal Device Notification Button (Visible for all users) -->
+                <button type="button" id="sidebar-device-push-btn" style="width: 100%; margin-bottom: 14px; padding: 8px 10px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); transition: all 0.2s ease;" title="تفعيل استقبال الإشعارات على هذا الجهاز (كمبيوتر / هاتف)">
+                    <i class="fas fa-bell"></i>
+                    <span id="sidebar-device-push-label">إشعارات هذا الجهاز</span>
+                </button>
+
                 <div class="theme-toggle-container" style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px; gap: 10px;">
                     <i class="fas fa-moon" style="color: #6366f1; font-size: 1.1rem;" title="الوضع الليلي"></i>
                     <label class="theme-switch" style="position: relative; display: inline-block; width: 46px; height: 24px;" title="تغيير المظهر">
@@ -1518,6 +1524,27 @@ select {
 
         <!-- Main Content Area -->
         <main class="main-content">
+            <!-- Global Device Push Banner (shown if notifications not yet enabled) -->
+            <div id="global-device-push-banner" style="display: none; margin-bottom: 18px; padding: 12px 18px; border-radius: 10px; background: rgba(99, 102, 241, 0.08); border: 1.5px solid #6366f1; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: #6366f1; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div>
+                        <strong style="font-size: 0.95rem; color: var(--text-main); display: block;">تفعيل استقبال الإشعارات على هذا الجهاز (كمبيوتر / هاتف)</strong>
+                        <span style="font-size: 0.82rem; color: var(--text-muted);">اضغط هنا لتصلك تنبيهات السراكي اليومية والاعتمادات فوراً على متصفحك.</span>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button type="button" class="btn btn-primary btn-sm" id="btn-banner-enable-push" style="padding: 7px 16px; font-size: 0.85rem; font-weight: bold;">
+                        <i class="fas fa-check"></i> تفعيل الإشعارات الآن
+                    </button>
+                    <button type="button" id="btn-banner-dismiss-push" style="background: none; border: none; font-size: 1.3rem; color: var(--text-muted); cursor: pointer; padding: 4px 8px;" title="إغلاق التنبيه">
+                        &times;
+                    </button>
+                </div>
+            </div>
+
             <!-- Login View -->
             <section id="view-login" class="view active">
                 <div class="login-card">
@@ -4119,6 +4146,29 @@ document.addEventListener('keydown', (e) => {
             });
         }
 
+        const btnSidebarPush = document.getElementById('sidebar-device-push-btn');
+        if (btnSidebarPush) {
+            btnSidebarPush.addEventListener('click', () => {
+                this.toggleDeviceNotificationPermission();
+            });
+        }
+
+        const btnBannerEnable = document.getElementById('btn-banner-enable-push');
+        if (btnBannerEnable) {
+            btnBannerEnable.addEventListener('click', () => {
+                this.toggleDeviceNotificationPermission();
+            });
+        }
+
+        const btnBannerDismiss = document.getElementById('btn-banner-dismiss-push');
+        if (btnBannerDismiss) {
+            btnBannerDismiss.addEventListener('click', () => {
+                sessionStorage.setItem('push_banner_dismissed', '1');
+                const banner = document.getElementById('global-device-push-banner');
+                if (banner) banner.style.display = 'none';
+            });
+        }
+
         const btnTriggerNotifs = document.getElementById('btn-trigger-notifs-now');
         if (btnTriggerNotifs) {
             btnTriggerNotifs.addEventListener('click', () => {
@@ -4341,6 +4391,7 @@ document.addEventListener('keydown', (e) => {
         
         UI.updateNavigation(role);
         this.startNotificationPoller();
+        this.updateDeviceNotificationStatus();
         
         if (role === 'admin') {
             this.loadAdminData();
@@ -5904,35 +5955,50 @@ document.addEventListener('keydown', (e) => {
     }
 
     async updateDeviceNotificationStatus() {
-        const btn = document.getElementById('btn-device-push-toggle');
-        const label = document.getElementById('device-push-label');
-        if (!btn || !label) return;
+        const adminBtn = document.getElementById('btn-device-push-toggle');
+        const adminLabel = document.getElementById('device-push-label');
+        const sidebarBtn = document.getElementById('sidebar-device-push-btn');
+        const sidebarLabel = document.getElementById('sidebar-device-push-label');
+        const banner = document.getElementById('global-device-push-banner');
+
+        const applyState = (text, bg, color, border, title, isGranted, isDenied) => {
+            if (adminLabel) adminLabel.innerText = text;
+            if (adminBtn) {
+                adminBtn.style.background = bg;
+                adminBtn.style.color = color;
+                adminBtn.style.borderColor = border;
+                adminBtn.title = title;
+            }
+            if (sidebarLabel) sidebarLabel.innerText = text;
+            if (sidebarBtn) {
+                sidebarBtn.style.background = bg;
+                sidebarBtn.style.color = color;
+                sidebarBtn.style.borderColor = border;
+                sidebarBtn.title = title;
+            }
+            if (banner) {
+                if (isGranted || isDenied || sessionStorage.getItem('push_banner_dismissed') === '1' || !auth.isLoggedIn()) {
+                    banner.style.display = 'none';
+                } else {
+                    banner.style.display = 'flex';
+                }
+            }
+        };
 
         if (!('Notification' in window)) {
-            label.innerText = 'المتصفح لا يدعم الإشعارات';
-            btn.style.opacity = '0.6';
-            btn.style.pointerEvents = 'none';
+            applyState('المتصفح لا يدعم الإشعارات', 'rgba(100, 116, 139, 0.15)', '#64748b', '#64748b', 'متصفحك لا يدعم خاصية Web Notifications', false, true);
             return;
         }
 
         if (Notification.permission === 'granted') {
-            label.innerText = 'إشعارات هذا الجهاز مفعلة ✅';
-            btn.style.background = 'rgba(16, 185, 129, 0.15)';
-            btn.style.color = '#10b981';
-            btn.style.borderColor = '#10b981';
-            btn.title = 'الإشعارات مفعلة بالفعل على هذا الجهاز. اضغط لإعادة المزامنة.';
+            applyState('إشعارات هذا الجهاز مفعلة ✅', 'rgba(16, 185, 129, 0.15)', '#10b981', '#10b981', 'الإشعارات مفعلة بالفعل على هذا الجهاز. اضغط لإعادة المزامنة.', true, false);
+            if (auth.isLoggedIn()) {
+                this.subscribeUserToPush();
+            }
         } else if (Notification.permission === 'denied') {
-            label.innerText = 'الإشعارات محظورة بالمتصفح ❌';
-            btn.style.background = 'rgba(239, 68, 68, 0.15)';
-            btn.style.color = '#ef4444';
-            btn.style.borderColor = '#ef4444';
-            btn.title = 'يرجى السماح بالإشعارات من إعدادات المتصفح بجوار الرابط.';
+            applyState('الإشعارات محظورة بالمتصفح ❌', 'rgba(239, 68, 68, 0.15)', '#ef4444', '#ef4444', 'يرجى السماح بالإشعارات من إعدادات المتصفح بجوار الرابط.', false, true);
         } else {
-            label.innerText = 'تفعيل إشعارات هذا الجهاز (كمبيوتر / هاتف) 🔔';
-            btn.style.background = 'rgba(99, 102, 241, 0.15)';
-            btn.style.color = '#6366f1';
-            btn.style.borderColor = '#6366f1';
-            btn.title = 'اضغط للسماح باستقبال التنبيهات الفورية على هذا الجهاز.';
+            applyState('تفعيل إشعارات هذا الجهاز 🔔', 'rgba(99, 102, 241, 0.12)', '#6366f1', '#6366f1', 'اضغط للسماح باستقبال التنبيهات الفورية على هذا الجهاز (كمبيوتر / هاتف).', false, false);
         }
     }
 
@@ -5951,8 +6017,9 @@ document.addEventListener('keydown', (e) => {
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
                 await this.subscribeUserToPush();
+                sessionStorage.setItem('push_banner_dismissed', '1');
                 this.updateDeviceNotificationStatus();
-                alert('تم تفعيل استقبال الإشعارات بنجاح على هذا الجهاز! 🎉\nستصلك جميع التنبيهات والإشعارات المجدولة.');
+                alert('تم تفعيل استقبال الإشعارات بنجاح على هذا الجهاز! 🎉\nستصلك جميع التنبيهات والإشعارات فوراً.');
                 try {
                     new Notification('نظام السراكي', {
                         body: 'تم تفعيل إشعارات هذا الجهاز بنجاح! ستصلك التنبيهات هنا.',
