@@ -1881,6 +1881,7 @@ select {
                     <h2 style="margin: 0; font-size: 1.5rem;"><i class="fas fa-bell text-primary"></i> مركز إدارة وتحكم الإشعارات</h2>
                     <p style="color: var(--text-muted); margin: 4px 0 0; font-size: 0.9rem;">التحكم الشامل في تذكيرات النظام التلقائية، الإشعارات المجدولة اليومية، وبث التنبيهات المباشرة</p>
                 </div>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                     <div class="device-push-pill" style="display: flex; align-items: center; gap: 8px; padding: 5px 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px;" title="تفعيل أو إلغاء استقبال الإشعارات على هذا الجهاز">
                         <div style="display: flex; align-items: center; gap: 6px; font-size: 0.83rem; font-weight: 600; color: var(--text-main);">
                             <i class="fas fa-desktop" style="color: #10b981;"></i>
@@ -2043,7 +2044,7 @@ select {
                                 </button>
                             </div>
                         </div>
-                        <div id="instant-alerts-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px;">
+                        <div id="instant-alerts-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 14px; width: 100%; box-sizing: border-box;">
                             <!-- Populated dynamically by app.renderInstantAlerts() -->
                         </div>
                     </div>
@@ -5929,7 +5930,7 @@ document.addEventListener('keydown', (e) => {
             card.className = 'card instant-alert-card';
             card.dataset.id = alert.id || ('alert_' + index);
             card.dataset.isBuiltin = alert.isBuiltIn ? 'true' : 'false';
-            card.style.cssText = 'padding: 14px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 8px; display: flex; flex-direction: column; gap: 10px; position: relative;';
+            card.style.cssText = 'padding: 14px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 8px; display: flex; flex-direction: column; gap: 10px; position: relative; box-sizing: border-box; width: 100%;';
 
             const meta = triggerIcons[alert.trigger] || { icon: 'fa-bell', color: '#6366f1', bg: 'rgba(99, 102, 241, 0.15)' };
 
