@@ -491,37 +491,51 @@ async function handler(req: Request): Promise<Response> {
             
             // Send Push Notification if pending record
             if (collection === "records" && body.status === "pending") {
-                let supervisorName = "مشرف";
-                if (body.supervisorId) {
-                    const usersIter = kv.list({ prefix: ["users"] });
-                    for await (const u of usersIter) {
-                        if (u.key[1] === String(body.supervisorId)) {
-                            supervisorName = u.value.username;
-                            break;
+                const notifCfg = await getNotificationsConfig(kv);
+                const newRecordCfg = notifCfg.builtInAlerts?.newRecord || {
+                    isActive: true,
+                    title: "طلب اعتماد جديد",
+                    text: "يوجد سركي جديد من {supervisor} بانتظار الاعتماد (المعلق: {count})"
+                };
+
+                if (newRecordCfg.isActive !== false) {
+                    let supervisorName = "مشرف";
+                    if (body.supervisorId) {
+                        const usersIter = kv.list({ prefix: ["users"] });
+                        for await (const u of usersIter) {
+                            if (u.key[1] === String(body.supervisorId)) {
+                                supervisorName = u.value.name || u.value.username;
+                                break;
+                            }
                         }
                     }
-                }
-                const targetIds = new Set();
-                if (body.engineerId) targetIds.add(body.engineerId);
-                
-                for (const targetId of targetIds) {
-                    let pendingCount = 0;
-                    const index = await getPendingIndex(kv);
-                    for (const rId in index) {
-                        const item = parsePendingEntry(index[rId]);
-                        if (item.engineerId === targetId) pendingCount++;
-                    }
+                    const targetIds = new Set();
+                    if (body.engineerId) targetIds.add(body.engineerId);
+                    
+                    for (const targetId of targetIds) {
+                        let pendingCount = 0;
+                        const index = await getPendingIndex(kv);
+                        for (const rId in index) {
+                            const item = parsePendingEntry(index[rId]);
+                            if (item.engineerId === targetId) pendingCount++;
+                        }
 
-                    const subEntries = kv.list({ prefix: ["push_subscriptions", targetId] });
-                    for await (const subEntry of subEntries) {
-                        try {
-                            await webPush.sendNotification(
-                                subEntry.value,
-                                JSON.stringify({ title: "طلب اعتماد جديد", body: `يوجد سركي جديد من ${supervisorName} بانتظار الاعتماد`, url: "/?view_record=" + id, badgeCount: pendingCount })
-                            );
-                        } catch (err) {
-                            if (err.statusCode === 410) await kv.delete(subEntry.key);
-                            console.error("Push Error:", err);
+                        const titleText = newRecordCfg.title || "طلب اعتماد جديد";
+                        const bodyText = (newRecordCfg.text || "يوجد سركي جديد من {supervisor} بانتظار الاعتماد (المعلق: {count})")
+                            .replace(/\{supervisor\}/g, supervisorName)
+                            .replace(/\{count\}/g, String(pendingCount));
+
+                        const subEntries = kv.list({ prefix: ["push_subscriptions", targetId] });
+                        for await (const subEntry of subEntries) {
+                            try {
+                                await webPush.sendNotification(
+                                    subEntry.value,
+                                    JSON.stringify({ title: titleText, body: bodyText, url: "/?view_record=" + id, badgeCount: pendingCount })
+                                );
+                            } catch (err) {
+                                if (err.statusCode === 410) await kv.delete(subEntry.key);
+                                console.error("Push Error:", err);
+                            }
                         }
                     }
                 }
@@ -548,24 +562,79 @@ async function handler(req: Request): Promise<Response> {
                 await updatePendingIndexOnSave(kv, id, newStatus, engId, createdAt, date);
             }
             
-            // Send Push Notification to supervisor if record status changed
+            const notifCfg = await getNotificationsConfig(kv);
+
+            // 1. Send Push Notification to supervisor if record status changed (approved or rejected)
             if (collection === "records" && body.status && body.status !== current.value.status) {
-                const supervisorId = current.value.supervisorId;
-                if (supervisorId) {
-                    const statusText = body.status === 'approved' ? 'اعتماد' : 'رفض';
-                    const titleText = `تم ${statusText} طلبك`;
-                    const bodyText = `تم ${statusText} السركي الخاص بيوم ${current.value.date}`;
-                    
-                    const subEntries = kv.list({ prefix: ["push_subscriptions", supervisorId] });
-                    for await (const subEntry of subEntries) {
-                        try {
-                            await webPush.sendNotification(
-                                subEntry.value,
-                                JSON.stringify({ title: titleText, body: bodyText, url: "/?view_record=" + id })
-                            );
-                        } catch (err) {
-                            if (err.statusCode === 410) await kv.delete(subEntry.key);
-                            console.error("Push Error:", err);
+                const reviewCfg = notifCfg.builtInAlerts?.recordReview || {
+                    isActive: true,
+                    title: "تم {status} طلبك",
+                    text: "تم {status} السركي الخاص بيوم {date}"
+                };
+
+                if (reviewCfg.isActive !== false) {
+                    const supervisorId = current.value.supervisorId;
+                    if (supervisorId) {
+                        const statusText = body.status === 'approved' ? 'اعتماد' : 'رفض';
+                        const titleText = (reviewCfg.title || "تم {status} طلبك").replace(/\{status\}/g, statusText);
+                        const bodyText = (reviewCfg.text || "تم {status} السركي الخاص بيوم {date}")
+                            .replace(/\{status\}/g, statusText)
+                            .replace(/\{date\}/g, current.value.date || "");
+                        
+                        const subEntries = kv.list({ prefix: ["push_subscriptions", supervisorId] });
+                        for await (const subEntry of subEntries) {
+                            try {
+                                await webPush.sendNotification(
+                                    subEntry.value,
+                                    JSON.stringify({ title: titleText, body: bodyText, url: "/?view_record=" + id })
+                                );
+                            } catch (err) {
+                                if (err.statusCode === 410) await kv.delete(subEntry.key);
+                                console.error("Push Error:", err);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 2. Send Push Notification to engineer if previously rejected record was resubmitted
+            if (collection === "records" && current.value.status === "rejected" && body.status === "pending") {
+                const resubmitCfg = notifCfg.builtInAlerts?.recordResubmit || {
+                    isActive: true,
+                    title: "إعادة تقديم سركي",
+                    text: "قام المشرف {supervisor} بتعديل وإعادة تقديم السركي الخاص بيوم {date}"
+                };
+
+                if (resubmitCfg.isActive !== false) {
+                    let supervisorName = "مشرف";
+                    if (current.value.supervisorId) {
+                        const usersIter = kv.list({ prefix: ["users"] });
+                        for await (const u of usersIter) {
+                            if (u.key[1] === String(current.value.supervisorId)) {
+                                supervisorName = u.value.name || u.value.username;
+                                break;
+                            }
+                        }
+                    }
+
+                    const targetEngId = body.engineerId || current.value.engineerId;
+                    if (targetEngId) {
+                        const titleText = resubmitCfg.title || "إعادة تقديم سركي";
+                        const bodyText = (resubmitCfg.text || "قام المشرف {supervisor} بتعديل وإعادة تقديم السركي الخاص بيوم {date}")
+                            .replace(/\{supervisor\}/g, supervisorName)
+                            .replace(/\{date\}/g, body.date || current.value.date || "");
+
+                        const subEntries = kv.list({ prefix: ["push_subscriptions", targetEngId] });
+                        for await (const subEntry of subEntries) {
+                            try {
+                                await webPush.sendNotification(
+                                    subEntry.value,
+                                    JSON.stringify({ title: titleText, body: bodyText, url: "/?view_record=" + id })
+                                );
+                            } catch (err) {
+                                if (err.statusCode === 410) await kv.delete(subEntry.key);
+                                console.error("Push Error:", err);
+                            }
                         }
                     }
                 }
@@ -784,53 +853,69 @@ async function runNotificationTasks(forceRun = false) {
 
         const scheduledList = config.scheduled || [];
         for (const item of scheduledList) {
-            if (item.isActive === false || !item.time) continue;
+            if (item.isActive === false) continue;
+            const timesList: string[] = (Array.isArray(item.times) && item.times.length > 0)
+                ? item.times
+                : (item.time ? [String(item.time)] : []);
+            if (timesList.length === 0) continue;
 
-            // Skip if already sent today (unless forced)
-            if (!forceRun && item.lastSentDate === cairo.dateStr) continue;
-
-            const targetMins = parseTimeToMinutes(item.time);
-
-            // Trigger if current Cairo time has reached the scheduled time
-            // (Window: currentMins >= targetMins and within 120 minutes, or forceRun is true)
-            if (forceRun || (currentMins >= targetMins && currentMins <= targetMins + 120)) {
-                const targetIds = new Set<string>();
-
-                const explicitUsers = item.targets?.users || item.targets?.userIds || [];
-                explicitUsers.forEach((uId: any) => targetIds.add(String(uId)));
-
-                const targetRoles = item.targets?.roles || [];
-                if (targetRoles.length > 0) {
-                    const usersIter = kv.list({ prefix: ["users"] });
-                    for await (const u of usersIter) {
-                        if (u.value && targetRoles.includes(u.value.role)) {
-                            targetIds.add(String(u.key[1]));
-                        }
-                    }
-                }
-
-                for (const uId of targetIds) {
-                    const subEntries = kv.list({ prefix: ["push_subscriptions", uId] });
-                    for await (const subEntry of subEntries) {
-                        try {
-                            await webPush.sendNotification(
-                                subEntry.value,
-                                JSON.stringify({
-                                    title: item.title || "تذكير يومي",
-                                    body: item.message || "",
-                                    url: "/"
-                                })
-                            );
-                            results.scheduledSent++;
-                        } catch (err: any) {
-                            if (err.statusCode === 410) await kv.delete(subEntry.key);
-                            results.errors.push(`Scheduled WebPush error (${uId}): ${err.message}`);
-                        }
-                    }
-                }
-
+            if (!Array.isArray(item.sentTimesToday)) {
+                item.sentTimesToday = [];
+            }
+            if (item.lastSentDate !== cairo.dateStr) {
+                item.sentTimesToday = [];
                 item.lastSentDate = cairo.dateStr;
                 configUpdated = true;
+            }
+
+            for (const timeStr of timesList) {
+                if (!forceRun && item.sentTimesToday.includes(timeStr)) continue;
+
+                const targetMins = parseTimeToMinutes(timeStr);
+
+                // Trigger if current Cairo time has reached the scheduled time
+                // (Window: currentMins >= targetMins and within 120 minutes, or forceRun is true)
+                if (forceRun || (currentMins >= targetMins && currentMins <= targetMins + 120)) {
+                    const targetIds = new Set<string>();
+
+                    const explicitUsers = item.targets?.users || item.targets?.userIds || [];
+                    explicitUsers.forEach((uId: any) => targetIds.add(String(uId)));
+
+                    const targetRoles = item.targets?.roles || [];
+                    if (targetRoles.length > 0) {
+                        const usersIter = kv.list({ prefix: ["users"] });
+                        for await (const u of usersIter) {
+                            if (u.value && targetRoles.includes(u.value.role)) {
+                                targetIds.add(String(u.key[1]));
+                            }
+                        }
+                    }
+
+                    for (const uId of targetIds) {
+                        const subEntries = kv.list({ prefix: ["push_subscriptions", uId] });
+                        for await (const subEntry of subEntries) {
+                            try {
+                                await webPush.sendNotification(
+                                    subEntry.value,
+                                    JSON.stringify({
+                                        title: item.title || "تذكير يومي",
+                                        body: item.message || "",
+                                        url: "/"
+                                    })
+                                );
+                                results.scheduledSent++;
+                            } catch (err: any) {
+                                if (err.statusCode === 410) await kv.delete(subEntry.key);
+                                results.errors.push(`Scheduled WebPush error (${uId}): ${err.message}`);
+                            }
+                        }
+                    }
+
+                    if (!item.sentTimesToday.includes(timeStr)) {
+                        item.sentTimesToday.push(timeStr);
+                    }
+                    configUpdated = true;
+                }
             }
         }
 

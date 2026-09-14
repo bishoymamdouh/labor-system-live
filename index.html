@@ -1342,60 +1342,100 @@ select {
 }
 .user-cards-scroll {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: 8px;
-    max-height: 250px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+    max-height: 290px;
     overflow-y: auto;
-    padding: 2px;
+    overflow-x: hidden;
+    padding: 4px;
 }
 .user-pick-card {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 7px 10px;
-    border-radius: 7px;
+    gap: 12px;
+    padding: 9px 14px;
+    border-radius: 10px;
     background: var(--bg-card);
     border: 1.5px solid var(--border-color);
     cursor: pointer;
-    transition: all 0.18s ease;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
+    box-sizing: border-box;
+    min-height: 58px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
 }
 .user-pick-card:hover {
-    border-color: var(--primary-color);
+    border-color: #6366f1;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(99, 102, 241, 0.12);
 }
 .user-pick-card.checked {
     border-color: #6366f1;
-    background: rgba(99, 102, 241, 0.12);
+    background: rgba(99, 102, 241, 0.08);
+    box-shadow: 0 0 0 1px #6366f1;
+}
+.user-pick-avatar-wrap {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .user-pick-avatar {
-    width: 28px;
-    height: 28px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     object-fit: cover;
-    flex-shrink: 0;
+    border: 1.5px solid rgba(99, 102, 241, 0.25);
+    background: var(--bg-main);
 }
 .user-pick-info {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    text-align: right;
 }
 .user-pick-name {
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.92rem;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.25;
+}
+.user-pick-role-badge {
+    font-size: 0.73rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+    max-width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.user-pick-role-badge {
-    font-size: 0.7rem;
-    padding: 1px 6px;
-    border-radius: 10px;
-    display: inline-block;
+.user-pick-check-wrap {
+    margin-inline-start: auto;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-inline-start: 6px;
 }
 .user-pick-checkbox {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     accent-color: #6366f1;
     cursor: pointer;
+    margin: 0;
 }
 
 </style>
@@ -1638,18 +1678,14 @@ select {
                 </div>
                 
                 <div class="form-group" style="margin-bottom: 16px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">وقت الإرسال اليومي <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;">(بتوقيت القاهرة)</span></label>
-                    <div style="display: flex; gap: 8px; align-items: center; direction: ltr;">
-                        <select id="sched-hour" class="time-picker-select" style="border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-main); flex: 1;">
-                            <option value="01">01</option><option value="02">02</option><option value="03">03</option><option value="04">04</option><option value="05">05</option><option value="06">06</option><option value="07">07</option><option value="08">08</option><option value="09">09</option><option value="10" selected>10</option><option value="11">11</option><option value="12">12</option>
-                        </select>
-                        <span style="font-weight: bold; font-size: 1.2rem;">:</span>
-                        <select id="sched-min" class="time-picker-select" style="border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-main); flex: 1;">
-                            <option value="00" selected>00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option>
-                        </select>
-                        <select id="sched-ampm" class="time-picker-select" style="border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-main); flex: 1.3;">
-                            <option value="AM" selected>صباحاً (AM)</option><option value="PM">مساءً (PM)</option>
-                        </select>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <label style="font-weight: bold; margin: 0;">أوقات الإرسال اليومي <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;">(بتوقيت القاهرة)</span></label>
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-add-sched-time" style="padding: 4px 10px; font-size: 0.82rem; border-color: #6366f1; color: #6366f1; background: rgba(99, 102, 241, 0.08);">
+                            <i class="fas fa-plus"></i> إضافة وقت إرسال آخر
+                        </button>
+                    </div>
+                    <div id="sched-times-container" style="display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Time rows populated dynamically -->
                     </div>
                 </div>
                 
@@ -1806,9 +1842,14 @@ select {
                     <h2 style="margin: 0; font-size: 1.5rem;"><i class="fas fa-bell text-primary"></i> مركز إدارة وتحكم الإشعارات</h2>
                     <p style="color: var(--text-muted); margin: 4px 0 0; font-size: 0.9rem;">التحكم الشامل في تذكيرات النظام التلقائية، الإشعارات المجدولة اليومية، وبث التنبيهات المباشرة</p>
                 </div>
-                <button type="button" class="btn btn-secondary btn-sm" id="btn-trigger-notifs-now" style="background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid #6366f1;" title="فحص مستحقات التذكيرات والإشعارات المجدولة وتشغيلها على الفور">
-                    <i class="fas fa-bolt"></i> فحص وإرسال المستحق الآن ⚡
-                </button>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-device-push-toggle" style="background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid #10b981; font-weight: 600;" title="تفعيل استقبال الإشعارات على هذا الجهاز (كمبيوتر / هاتف)">
+                        <i class="fas fa-desktop"></i> <span id="device-push-label">تفعيل إشعارات هذا الجهاز</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-trigger-notifs-now" style="background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid #6366f1;" title="فحص مستحقات التذكيرات والإشعارات المجدولة وتشغيلها على الفور">
+                        <i class="fas fa-bolt"></i> فحص وإرسال المستحق الآن ⚡
+                    </button>
+                </div>
             </div>
             
             <div style="display: flex; flex-direction: column; gap: 24px;">
@@ -1937,31 +1978,95 @@ select {
                         </div>
                     </div>
 
-                    <!-- Informational Cards for Built-in Alerts -->
-                    <div>
-                        <div style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted); margin-bottom: 8px;">
-                            <i class="fas fa-info-circle"></i> تنبيهات النظام الفورية المدمجة (تعمل تلقائياً عند اتخاذ أي إجراء):
+                    <!-- Interactive Controls for Built-in Alerts -->
+                    <div style="margin-top: 22px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+                            <div style="font-size: 0.95rem; font-weight: bold; color: var(--text-main);">
+                                <i class="fas fa-sliders-h text-primary"></i> تنبيهات النظام الفورية المدمجة (تحكم مخصص وتعديل النصوص):
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm" id="btn-save-builtin-alerts" style="padding: 6px 16px;">
+                                <i class="fas fa-save"></i> حفظ إعدادات التنبيهات الفورية
+                            </button>
                         </div>
-                        <div class="system-info-grid">
-                            <div class="system-info-card">
-                                <i class="fas fa-paper-plane system-info-icon" style="color: #0ea5e9;"></i>
-                                <div>
-                                    <strong style="font-size: 0.9rem; display: block; margin-bottom: 3px;">طلب اعتماد سركي جديد</strong>
-                                    <span style="font-size: 0.8rem; color: var(--text-muted);">يصل فوراً للمهندس المختص فور إرسال المشرف للسركي، متضمناً عداد السراكي المعلقة.</span>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px;">
+                            <!-- Alert 1: New Record -->
+                            <div class="card" style="padding: 14px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(14, 165, 233, 0.15); color: #0ea5e9; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </div>
+                                        <strong style="font-size: 0.92rem;">طلب اعتماد سركي جديد</strong>
+                                    </div>
+                                    <label class="notif-toggle-switch" title="تفعيل / إيقاف هذا الإشعار">
+                                        <input type="checkbox" id="builtin-new-record-active" checked>
+                                        <span class="notif-slider"></span>
+                                    </label>
+                                </div>
+                                <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">
+                                    يصل فوراً للمهندس المختص عند رفع المشرف للسركي.
+                                </div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label style="display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 4px;">عنوان التنبيه:</label>
+                                    <input type="text" id="builtin-new-record-title" style="width: 100%; padding: 6px 10px; font-size: 0.85rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--bg-main); color: var(--text-main);" value="طلب اعتماد سركي جديد">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label style="display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 4px;">قالب الرسالة: <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">({supervisor} المشرف، {count} السراكي المعلقة)</span></label>
+                                    <textarea id="builtin-new-record-text" style="width: 100%; min-height: 52px; padding: 6px 10px; font-size: 0.85rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--bg-main); color: var(--text-main); font-family: inherit;">قام المشرف {supervisor} بتقديم سركي جديد بانتظار اعتمادك (إجمالي المعلق: {count})</textarea>
                                 </div>
                             </div>
-                            <div class="system-info-card">
-                                <i class="fas fa-check-circle system-info-icon" style="color: #10b981;"></i>
-                                <div>
-                                    <strong style="font-size: 0.9rem; display: block; margin-bottom: 3px;">نتيجة مراجعة السركي</strong>
-                                    <span style="font-size: 0.8rem; color: var(--text-muted);">يصل فوراً للمشرف عند قيام المهندس باعتماد أو رفض السركي مع توضيح تاريخ السركي.</span>
+
+                            <!-- Alert 2: Record Review Result -->
+                            <div class="card" style="padding: 14px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(16, 185, 129, 0.15); color: #10b981; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <strong style="font-size: 0.92rem;">نتيجة مراجعة السركي</strong>
+                                    </div>
+                                    <label class="notif-toggle-switch" title="تفعيل / إيقاف هذا الإشعار">
+                                        <input type="checkbox" id="builtin-review-active" checked>
+                                        <span class="notif-slider"></span>
+                                    </label>
+                                </div>
+                                <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">
+                                    يصل فوراً للمشرف عند قيام المهندس باعتماد أو رفض السركي.
+                                </div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label style="display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 4px;">عنوان التنبيه:</label>
+                                    <input type="text" id="builtin-review-title" style="width: 100%; padding: 6px 10px; font-size: 0.85rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--bg-main); color: var(--text-main);" value="نتيجة مراجعة السركي">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label style="display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 4px;">قالب الرسالة: <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">({status} اعتماد/رفض، {date} التاريخ)</span></label>
+                                    <textarea id="builtin-review-text" style="width: 100%; min-height: 52px; padding: 6px 10px; font-size: 0.85rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--bg-main); color: var(--text-main); font-family: inherit;">تم {status} السركي الخاص بيوم {date}</textarea>
                                 </div>
                             </div>
-                            <div class="system-info-card">
-                                <i class="fas fa-sync-alt system-info-icon" style="color: #f59e0b;"></i>
-                                <div>
-                                    <strong style="font-size: 0.9rem; display: block; margin-bottom: 3px;">إعادة إرسال أو تعديل</strong>
-                                    <span style="font-size: 0.8rem; color: var(--text-muted);">إشعار فوري لمهندس البند في حال قام المشرف بتعديل سركي كان مرفوضاً وإعادة رفعه.</span>
+
+                            <!-- Alert 3: Record Resubmit -->
+                            <div class="card" style="padding: 14px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-sync-alt"></i>
+                                        </div>
+                                        <strong style="font-size: 0.92rem;">إعادة إرسال أو تعديل</strong>
+                                    </div>
+                                    <label class="notif-toggle-switch" title="تفعيل / إيقاف هذا الإشعار">
+                                        <input type="checkbox" id="builtin-resubmit-active" checked>
+                                        <span class="notif-slider"></span>
+                                    </label>
+                                </div>
+                                <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">
+                                    يصل فوراً للمهندس عند قيام المشرف بتعديل سركي كان مرفوضاً.
+                                </div>
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <label style="display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 4px;">عنوان التنبيه:</label>
+                                    <input type="text" id="builtin-resubmit-title" style="width: 100%; padding: 6px 10px; font-size: 0.85rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--bg-main); color: var(--text-main);" value="إعادة تقديم سركي">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label style="display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 4px;">قالب الرسالة: <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">({supervisor} المشرف، {date} التاريخ)</span></label>
+                                    <textarea id="builtin-resubmit-text" style="width: 100%; min-height: 52px; padding: 6px 10px; font-size: 0.85rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--bg-main); color: var(--text-main); font-family: inherit;">قام المشرف {supervisor} بتعديل وإعادة تقديم السركي الخاص بيوم {date}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -3553,13 +3658,13 @@ document.addEventListener('keydown', (e) => {
                 return;
             }
 
-            const roleBadgeColors = {
-                'admin': 'background: rgba(168, 85, 247, 0.15); color: #a855f7;',
-                'engineer': 'background: rgba(2, 132, 199, 0.15); color: #0284c7;',
-                'supervisor': 'background: rgba(5, 150, 105, 0.15); color: #059669;',
-                'warehouse_manager': 'background: rgba(217, 119, 6, 0.15); color: #d97706;',
-                'surveyor': 'background: rgba(219, 39, 119, 0.15); color: #db2777;',
-                'operator_supervisor': 'background: rgba(124, 58, 237, 0.15); color: #7c3aed;'
+            const roleMeta = {
+                'admin': { label: 'مدير النظام', icon: 'fas fa-user-shield', color: '#a855f7', bg: 'rgba(168, 85, 247, 0.15)' },
+                'engineer': { label: 'مهندس موقع', icon: 'fas fa-hard-hat', color: '#0284c7', bg: 'rgba(2, 132, 199, 0.15)' },
+                'supervisor': { label: 'مشرف موقع', icon: 'fas fa-user-tie', color: '#059669', bg: 'rgba(5, 150, 105, 0.15)' },
+                'warehouse_manager': { label: 'مدير مخزن', icon: 'fas fa-warehouse', color: '#d97706', bg: 'rgba(217, 119, 6, 0.15)' },
+                'surveyor': { label: 'مساح', icon: 'fas fa-drafting-compass', color: '#db2777', bg: 'rgba(219, 39, 119, 0.15)' },
+                'operator_supervisor': { label: 'مشرف مشغلين', icon: 'fas fa-cogs', color: '#7c3aed', bg: 'rgba(124, 58, 237, 0.15)' }
             };
 
             filtered.forEach(user => {
@@ -3568,17 +3673,26 @@ document.addEventListener('keydown', (e) => {
                 card.className = `user-pick-card ${isChecked ? 'checked' : ''}`;
                 card.dataset.userId = user.id;
 
-                const name = user.username === 'admin' ? 'Bishoy Mamdouh' : (user.username || 'مستخدم');
-                const roleName = auth ? auth.getRoleNameAr(user.role) : user.role;
-                const userPic = user.profilePic ? `<img src="${user.profilePic}" class="user-pick-avatar">` : `<i class="fas fa-user-circle user-pick-avatar" style="font-size: 28px; color: var(--text-muted);"></i>`;
-                const roleStyle = roleBadgeColors[user.role] || 'background: var(--bg-main); color: var(--text-muted);';
+                const name = (user.username === 'admin') ? 'Bishoy Mamdouh' : (user.name || user.username || 'مستخدم');
+                const rMeta = roleMeta[user.role] || { label: (auth ? auth.getRoleNameAr(user.role) : user.role), icon: 'fas fa-user', color: '#64748b', bg: 'rgba(100, 116, 139, 0.15)' };
+                
+                const userPic = user.profilePic 
+                    ? `<img src="${user.profilePic}" class="user-pick-avatar" alt="${name}">` 
+                    : `<div class="user-pick-avatar" style="display:flex; align-items:center; justify-content:center; color:${rMeta.color}; background:${rMeta.bg}; font-size:1.15rem;"><i class="${rMeta.icon}"></i></div>`;
 
                 card.innerHTML = `
-                    <input type="checkbox" class="user-pick-checkbox" ${isChecked ? 'checked' : ''}>
-                    ${userPic}
+                    <div class="user-pick-avatar-wrap">
+                        ${userPic}
+                    </div>
                     <div class="user-pick-info">
                         <div class="user-pick-name" title="${name}">${name}</div>
-                        <span class="user-pick-role-badge" style="${roleStyle}">${roleName}</span>
+                        <div class="user-pick-role-badge" style="background:${rMeta.bg}; color:${rMeta.color};">
+                            <i class="${rMeta.icon}"></i>
+                            <span>${rMeta.label}</span>
+                        </div>
+                    </div>
+                    <div class="user-pick-check-wrap">
+                        <input type="checkbox" class="user-pick-checkbox" ${isChecked ? 'checked' : ''}>
                     </div>
                 `;
 
@@ -3991,6 +4105,20 @@ document.addEventListener('keydown', (e) => {
             });
         }
 
+        const btnSaveBuiltin = document.getElementById('btn-save-builtin-alerts');
+        if (btnSaveBuiltin) {
+            btnSaveBuiltin.addEventListener('click', () => {
+                this.saveBuiltinAlertsConfig();
+            });
+        }
+
+        const btnDevicePush = document.getElementById('btn-device-push-toggle');
+        if (btnDevicePush) {
+            btnDevicePush.addEventListener('click', () => {
+                this.toggleDeviceNotificationPermission();
+            });
+        }
+
         const btnTriggerNotifs = document.getElementById('btn-trigger-notifs-now');
         if (btnTriggerNotifs) {
             btnTriggerNotifs.addEventListener('click', () => {
@@ -4002,6 +4130,13 @@ document.addEventListener('keydown', (e) => {
         if (btnAddSched) {
             btnAddSched.addEventListener('click', () => {
                 this.openScheduledModal();
+            });
+        }
+
+        const btnAddSchedTime = document.getElementById('btn-add-sched-time');
+        if (btnAddSchedTime) {
+            btnAddSchedTime.addEventListener('click', () => {
+                this.addSchedTimeRow();
             });
         }
 
@@ -5626,6 +5761,32 @@ document.addEventListener('keydown', (e) => {
 
                 // 4. Render Scheduled List
                 this.renderScheduledList(config.scheduled || []);
+
+                // 5. Populate Built-in Alerts Config
+                const builtIn = config.builtInAlerts || {};
+                const nrActive = document.getElementById('builtin-new-record-active');
+                const nrTitle = document.getElementById('builtin-new-record-title');
+                const nrText = document.getElementById('builtin-new-record-text');
+                if (nrActive && builtIn.newRecord?.isActive !== undefined) nrActive.checked = builtIn.newRecord.isActive !== false;
+                if (nrTitle && builtIn.newRecord?.title) nrTitle.value = builtIn.newRecord.title;
+                if (nrText && builtIn.newRecord?.text) nrText.value = builtIn.newRecord.text;
+
+                const rrActive = document.getElementById('builtin-review-active');
+                const rrTitle = document.getElementById('builtin-review-title');
+                const rrText = document.getElementById('builtin-review-text');
+                if (rrActive && builtIn.recordReview?.isActive !== undefined) rrActive.checked = builtIn.recordReview.isActive !== false;
+                if (rrTitle && builtIn.recordReview?.title) rrTitle.value = builtIn.recordReview.title;
+                if (rrText && builtIn.recordReview?.text) rrText.value = builtIn.recordReview.text;
+
+                const rsActive = document.getElementById('builtin-resubmit-active');
+                const rsTitle = document.getElementById('builtin-resubmit-title');
+                const rsText = document.getElementById('builtin-resubmit-text');
+                if (rsActive && builtIn.recordResubmit?.isActive !== undefined) rsActive.checked = builtIn.recordResubmit.isActive !== false;
+                if (rsTitle && builtIn.recordResubmit?.title) rsTitle.value = builtIn.recordResubmit.title;
+                if (rsText && builtIn.recordResubmit?.text) rsText.value = builtIn.recordResubmit.text;
+
+                // 6. Update device notification badge status
+                this.updateDeviceNotificationStatus();
             }
         } catch (e) {
             console.error("Failed to load notifications manager:", e);
@@ -5689,6 +5850,125 @@ document.addEventListener('keydown', (e) => {
         }
     }
 
+    async saveBuiltinAlertsConfig() {
+        const btn = document.getElementById('btn-save-builtin-alerts');
+        const origHtml = btn ? btn.innerHTML : '';
+        if (btn) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+            btn.disabled = true;
+        }
+
+        try {
+            const config = window.notifConfig || { scheduled: [], systemReminders: {}, builtInAlerts: {} };
+            if (!config.builtInAlerts) config.builtInAlerts = {};
+
+            config.builtInAlerts.newRecord = {
+                isActive: document.getElementById('builtin-new-record-active')?.checked ?? true,
+                title: document.getElementById('builtin-new-record-title')?.value.trim() || 'طلب اعتماد سركي جديد',
+                text: document.getElementById('builtin-new-record-text')?.value.trim() || 'قام المشرف {supervisor} بتقديم سركي جديد بانتظار اعتمادك (إجمالي المعلق: {count})'
+            };
+
+            config.builtInAlerts.recordReview = {
+                isActive: document.getElementById('builtin-review-active')?.checked ?? true,
+                title: document.getElementById('builtin-review-title')?.value.trim() || 'نتيجة مراجعة السركي',
+                text: document.getElementById('builtin-review-text')?.value.trim() || 'تم {status} السركي الخاص بيوم {date}'
+            };
+
+            config.builtInAlerts.recordResubmit = {
+                isActive: document.getElementById('builtin-resubmit-active')?.checked ?? true,
+                title: document.getElementById('builtin-resubmit-title')?.value.trim() || 'إعادة تقديم سركي',
+                text: document.getElementById('builtin-resubmit-text')?.value.trim() || 'قام المشرف {supervisor} بتعديل وإعادة تقديم السركي الخاص بيوم {date}'
+            };
+
+            const res = await fetch('/api/notificationsConfig', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+            });
+
+            if (res.ok) {
+                window.notifConfig = config;
+                alert('تم حفظ إعدادات تنبيهات النظام الفورية بنجاح! ✅');
+            } else {
+                alert('فشل في حفظ إعدادات التنبيهات على السيرفر.');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('حدث خطأ أثناء الاتصال بالخادم: ' + err.message);
+        } finally {
+            if (btn) {
+                btn.innerHTML = origHtml;
+                btn.disabled = false;
+            }
+        }
+    }
+
+    async updateDeviceNotificationStatus() {
+        const btn = document.getElementById('btn-device-push-toggle');
+        const label = document.getElementById('device-push-label');
+        if (!btn || !label) return;
+
+        if (!('Notification' in window)) {
+            label.innerText = 'المتصفح لا يدعم الإشعارات';
+            btn.style.opacity = '0.6';
+            btn.style.pointerEvents = 'none';
+            return;
+        }
+
+        if (Notification.permission === 'granted') {
+            label.innerText = 'إشعارات هذا الجهاز مفعلة ✅';
+            btn.style.background = 'rgba(16, 185, 129, 0.15)';
+            btn.style.color = '#10b981';
+            btn.style.borderColor = '#10b981';
+            btn.title = 'الإشعارات مفعلة بالفعل على هذا الجهاز. اضغط لإعادة المزامنة.';
+        } else if (Notification.permission === 'denied') {
+            label.innerText = 'الإشعارات محظورة بالمتصفح ❌';
+            btn.style.background = 'rgba(239, 68, 68, 0.15)';
+            btn.style.color = '#ef4444';
+            btn.style.borderColor = '#ef4444';
+            btn.title = 'يرجى السماح بالإشعارات من إعدادات المتصفح بجوار الرابط.';
+        } else {
+            label.innerText = 'تفعيل إشعارات هذا الجهاز (كمبيوتر / هاتف) 🔔';
+            btn.style.background = 'rgba(99, 102, 241, 0.15)';
+            btn.style.color = '#6366f1';
+            btn.style.borderColor = '#6366f1';
+            btn.title = 'اضغط للسماح باستقبال التنبيهات الفورية على هذا الجهاز.';
+        }
+    }
+
+    async toggleDeviceNotificationPermission() {
+        if (!('Notification' in window)) {
+            alert('متصفحك لا يدعم خاصية Web Notifications.');
+            return;
+        }
+
+        if (Notification.permission === 'denied') {
+            alert('الإشعارات محظورة في هذا المتصفح.\nلتفعيلها:\n1. اضغط على أيقونة القفل أو الإعدادات بجانب شريط العنوان (URL).\n2. قم بتغيير إذن الإشعارات إلى "سماح" (Allow).\n3. أعد تحميل الصفحة.');
+            return;
+        }
+
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                await this.subscribeUserToPush();
+                this.updateDeviceNotificationStatus();
+                alert('تم تفعيل استقبال الإشعارات بنجاح على هذا الجهاز! 🎉\nستصلك جميع التنبيهات والإشعارات المجدولة.');
+                try {
+                    new Notification('نظام السراكي', {
+                        body: 'تم تفعيل إشعارات هذا الجهاز بنجاح! ستصلك التنبيهات هنا.',
+                        icon: '/logo.png'
+                    });
+                } catch(e) {}
+            } else {
+                this.updateDeviceNotificationStatus();
+                alert('لم يتم منح إذن الإشعارات.');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('حدث خطأ أثناء طلب تفعيل الإشعارات: ' + err.message);
+        }
+    }
+
     renderScheduledList(scheduledItems) {
         const list = document.getElementById('scheduled-list');
         if (!list) return;
@@ -5722,10 +6002,15 @@ document.addEventListener('keydown', (e) => {
             const usersCount = (item.targets?.userIds || item.targets?.users || []).length;
             const usersBadge = usersCount > 0 ? `<span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 0.75rem; padding: 2px 7px; border-radius: 10px;">${usersCount} مستخدم محدد</span>` : '';
 
+            const timesList = (Array.isArray(item.times) && item.times.length > 0)
+                ? item.times
+                : (item.time ? [item.time] : ['10:00 AM']);
+            const timesHtml = timesList.map(t => `<span class="scheduled-time-pill"><i class="fas fa-clock"></i> ${t}</span>`).join(' ');
+
             card.innerHTML = `
                 <div style="flex: 1; min-width: 250px;">
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap;">
-                        <span class="scheduled-time-pill"><i class="fas fa-clock"></i> ${item.time}</span>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                        ${timesHtml}
                         <h4 style="margin: 0; font-size: 1.05rem;">${item.title || 'إشعار مجدول'}</h4>
                     </div>
                     <p style="margin: 0 0 8px; font-size: 0.9rem; color: var(--text-main);">${item.message}</p>
@@ -5753,6 +6038,55 @@ document.addEventListener('keydown', (e) => {
         });
     }
 
+    addSchedTimeRow(timeStr = '10:00 AM') {
+        const container = document.getElementById('sched-times-container');
+        if (!container) return;
+
+        let hourVal = '10', minVal = '00', ampmVal = 'AM';
+        if (timeStr && (timeStr.includes('AM') || timeStr.includes('PM'))) {
+            const parts = timeStr.trim().split(' ');
+            const hm = (parts[0] || '10:00').split(':');
+            hourVal = (hm[0] || '10').padStart(2, '0');
+            minVal = (hm[1] || '00').padStart(2, '0');
+            ampmVal = parts[1] || 'AM';
+        }
+
+        const row = document.createElement('div');
+        row.className = 'sched-time-row';
+        row.style.cssText = 'display: flex; gap: 8px; align-items: center; direction: ltr; margin-bottom: 6px;';
+
+        const hours = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+        const mins = ['00','05','10','15','20','25','30','35','40','45','50','55'];
+
+        row.innerHTML = `
+            <select class="time-picker-select sched-time-hour" style="border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-main); flex: 1;">
+                ${hours.map(h => `<option value="${h}" ${h === hourVal ? 'selected' : ''}>${h}</option>`).join('')}
+            </select>
+            <span style="font-weight: bold; font-size: 1.2rem;">:</span>
+            <select class="time-picker-select sched-time-min" style="border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-main); flex: 1;">
+                ${mins.map(m => `<option value="${m}" ${m === minVal ? 'selected' : ''}>${m}</option>`).join('')}
+            </select>
+            <select class="time-picker-select sched-time-ampm" style="border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-main); flex: 1.3;">
+                <option value="AM" ${ampmVal === 'AM' ? 'selected' : ''}>صباحاً (AM)</option>
+                <option value="PM" ${ampmVal === 'PM' ? 'selected' : ''}>مساءً (PM)</option>
+            </select>
+            <button type="button" class="btn-icon text-danger btn-remove-sched-time" title="حذف هذا التوقيت" style="padding: 6px 10px; font-size: 1.05rem; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border: none; cursor: pointer;">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        `;
+
+        row.querySelector('.btn-remove-sched-time').onclick = () => {
+            const allRows = container.querySelectorAll('.sched-time-row');
+            if (allRows.length <= 1) {
+                alert('يجب الإبقاء على وقت إرسال واحد على الأقل.');
+                return;
+            }
+            row.remove();
+        };
+
+        container.appendChild(row);
+    }
+
     async openScheduledModal(schedId = null) {
         const users = await this.getUsersList();
         if (!this.modalUserSelector) {
@@ -5764,10 +6098,9 @@ document.addEventListener('keydown', (e) => {
         const idInput = document.getElementById('sched-id');
         const titleInput = document.getElementById('sched-title');
         const messageInput = document.getElementById('sched-message');
-        const hourSelect = document.getElementById('sched-hour');
-        const minSelect = document.getElementById('sched-min');
-        const ampmSelect = document.getElementById('sched-ampm');
         const activeCb = document.getElementById('sched-active');
+        const container = document.getElementById('sched-times-container');
+        if (container) container.innerHTML = '';
 
         if (schedId) {
             const config = window.notifConfig || {};
@@ -5778,14 +6111,11 @@ document.addEventListener('keydown', (e) => {
             titleInput.value = sched.title || '';
             messageInput.value = sched.message || '';
 
-            let timeStr = String(sched.time || '10:00 AM').trim();
-            if (timeStr.includes('AM') || timeStr.includes('PM')) {
-                const parts = timeStr.split(' ');
-                const hm = (parts[0] || '10:00').split(':');
-                hourSelect.value = (hm[0] || '10').padStart(2, '0');
-                minSelect.value = (hm[1] || '00').padStart(2, '0');
-                ampmSelect.value = parts[1] || 'AM';
-            }
+            const timesList = (Array.isArray(sched.times) && sched.times.length > 0)
+                ? sched.times
+                : (sched.time ? [sched.time] : ['10:00 AM']);
+
+            timesList.forEach(t => this.addSchedTimeRow(t));
 
             activeCb.checked = sched.isActive !== false;
             titleEl.innerHTML = '<i class="fas fa-edit text-primary"></i> تعديل إشعار مجدول';
@@ -5797,9 +6127,7 @@ document.addEventListener('keydown', (e) => {
             idInput.value = '';
             titleInput.value = '';
             messageInput.value = '';
-            hourSelect.value = '10';
-            minSelect.value = '00';
-            ampmSelect.value = 'AM';
+            this.addSchedTimeRow('10:00 AM');
             activeCb.checked = true;
             titleEl.innerHTML = '<i class="fas fa-clock text-primary"></i> إضافة إشعار مجدول جديد';
             this.modalUserSelector.setUsers(users);
@@ -5811,9 +6139,6 @@ document.addEventListener('keydown', (e) => {
     async saveScheduledNotification() {
         const title = document.getElementById('sched-title').value.trim();
         const message = document.getElementById('sched-message').value.trim();
-        const hour = document.getElementById('sched-hour').value;
-        const min = document.getElementById('sched-min').value;
-        const ampm = document.getElementById('sched-ampm').value;
         const isActive = document.getElementById('sched-active').checked;
         const id = document.getElementById('sched-id').value || ('sched-' + Date.now());
 
@@ -5822,10 +6147,26 @@ document.addEventListener('keydown', (e) => {
             return;
         }
 
+        const rows = document.querySelectorAll('#sched-times-container .sched-time-row');
+        const times = [];
+        rows.forEach(r => {
+            const h = r.querySelector('.sched-time-hour')?.value || '10';
+            const m = r.querySelector('.sched-time-min')?.value || '00';
+            const a = r.querySelector('.sched-time-ampm')?.value || 'AM';
+            const formatted = `${h}:${m} ${a}`;
+            if (!times.includes(formatted)) {
+                times.push(formatted);
+            }
+        });
+
+        if (times.length === 0) {
+            times.push('10:00 AM');
+        }
+
         const selectedUserIds = this.modalUserSelector ? this.modalUserSelector.getSelectedUserIds() : [];
         const selectedRoles = this.modalUserSelector ? this.modalUserSelector.getSelectedRoles() : [];
 
-        if (selectedUserIds.length === 0) {
+        if (selectedUserIds.length === 0 && selectedRoles.length === 0) {
             alert('الرجاء تحديد مستهدف واحد على الأقل لهذا الإشعار.');
             return;
         }
@@ -5845,7 +6186,8 @@ document.addEventListener('keydown', (e) => {
                 id,
                 title,
                 message,
-                time: `${hour}:${min} ${ampm}`,
+                time: times[0],
+                times: times,
                 targets: {
                     roles: selectedRoles,
                     userIds: selectedUserIds

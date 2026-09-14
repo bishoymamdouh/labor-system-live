@@ -24,7 +24,9 @@ self.addEventListener('push', e => {
         body: data.body,
         icon: '/logo.png',
         badge: '/logo.png',
-        data: data.url
+        data: data.url,
+        requireInteraction: true,
+        vibrate: [200, 100, 200]
     };
     e.waitUntil(
         self.registration.showNotification(data.title, options)
