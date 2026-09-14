@@ -1853,6 +1853,66 @@ select {
                             </div>
                         </div>
 
+                        <!-- Working / Operational Hours Window for Pending Reminders -->
+                        <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; padding: 14px 16px; margin-bottom: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-business-time text-primary" style="font-size: 1.15rem;"></i>
+                                    <div>
+                                        <strong style="font-size: 0.95rem; color: var(--text-main);">فترة وساعات عمل التذكير اليومية:</strong>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted);">تحديد ساعات معينة من اليوم لإرسال التذكيرات خلالها (مثلاً خلال مواعيد الدوام وساعات العمل)</div>
+                                    </div>
+                                </div>
+                                <label class="notif-toggle-switch" style="margin: 0;">
+                                    <input type="checkbox" id="pending-window-active">
+                                    <span class="notif-slider"></span>
+                                    <span style="font-weight: bold; font-size: 0.88rem;" id="pending-window-status-label">طوال اليوم (24 ساعة)</span>
+                                </label>
+                            </div>
+
+                            <div id="pending-window-controls" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; align-items: center; transition: all 0.2s ease;">
+                                <div class="form-group" style="margin: 0;">
+                                    <label style="display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.86rem;">
+                                        <i class="fas fa-play" style="font-size: 0.75rem; color: #10b981;"></i> يبدأ التذكير من الساعة:
+                                    </label>
+                                    <div style="display: flex; gap: 6px; align-items: center;">
+                                        <select id="pending-start-hour" style="padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-main); flex: 1; font-weight: bold;">
+                                            <option value="01">01</option><option value="02">02</option><option value="03">03</option><option value="04">04</option><option value="05">05</option><option value="06">06</option><option value="07">07</option><option value="08" selected>08</option><option value="09">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                                        </select>
+                                        <span style="font-weight: bold;">:</span>
+                                        <select id="pending-start-min" style="padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-main); flex: 1; font-weight: bold;">
+                                            <option value="00" selected>00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option>
+                                        </select>
+                                        <select id="pending-start-ampm" style="padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-main); flex: 1.2; font-weight: bold;">
+                                            <option value="AM" selected>صباحاً (AM)</option><option value="PM">مساءً (PM)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="margin: 0;">
+                                    <label style="display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.86rem;">
+                                        <i class="fas fa-stop" style="font-size: 0.75rem; color: #ef4444;"></i> يتوقف التذكير في الساعة:
+                                    </label>
+                                    <div style="display: flex; gap: 6px; align-items: center;">
+                                        <select id="pending-end-hour" style="padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-main); flex: 1; font-weight: bold;">
+                                            <option value="01">01</option><option value="02">02</option><option value="03">03</option><option value="04">04</option><option value="05">05</option><option value="06">06</option><option value="07">07</option><option value="08">08</option><option value="09">09</option><option value="10" selected>10</option><option value="11">11</option><option value="12">12</option>
+                                        </select>
+                                        <span style="font-weight: bold;">:</span>
+                                        <select id="pending-end-min" style="padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-main); flex: 1; font-weight: bold;">
+                                            <option value="00" selected>00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option>
+                                        </select>
+                                        <select id="pending-end-ampm" style="padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-main); flex: 1.2; font-weight: bold;">
+                                            <option value="AM">صباحاً (AM)</option><option value="PM" selected>مساءً (PM)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px; font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-info-circle text-primary"></i>
+                                <span id="pending-window-summary">التذكير يعمل على مدار 24 ساعة دون تقييد لمواعيد محددة.</span>
+                            </div>
+                        </div>
+
                         <div style="display: flex; justify-content: flex-end;">
                             <button type="button" class="btn btn-primary btn-sm" id="btn-save-pending-reminder" style="padding: 8px 18px;">
                                 <i class="fas fa-save"></i> حفظ إعدادات التذكير
@@ -5460,7 +5520,10 @@ document.addEventListener('keydown', (e) => {
                 const pendingConfig = config.systemReminders?.pendingReminder || {
                     isActive: config.system?.pendingReminderActive ?? true,
                     hours: config.system?.pendingReminderHours ?? 3,
-                    text: config.system?.pendingReminderText || "يوجد سركي معلق بانتظار اعتمادك منذ أكثر من {hours} ساعات، يرجى مراجعته."
+                    text: config.system?.pendingReminderText || "يوجد سركي معلق بانتظار اعتمادك منذ أكثر من {hours} ساعات، يرجى مراجعته.",
+                    windowActive: false,
+                    startTime: "08:00 AM",
+                    endTime: "10:00 PM"
                 };
 
                 const activeCb = document.getElementById('pending-remind-active');
@@ -5477,6 +5540,72 @@ document.addEventListener('keydown', (e) => {
                 }
                 if (hoursSelect) hoursSelect.value = String(pendingConfig.hours || 3);
                 if (textInput) textInput.value = pendingConfig.text || "يوجد سركي معلق بانتظار اعتمادك منذ أكثر من {hours} ساعات، يرجى مراجعته.";
+
+                // Operational Hours Window
+                const winCb = document.getElementById('pending-window-active');
+                const winControls = document.getElementById('pending-window-controls');
+                const winLabel = document.getElementById('pending-window-status-label');
+                const winSummary = document.getElementById('pending-window-summary');
+
+                const updateWindowUI = () => {
+                    const isWin = winCb && winCb.checked;
+                    if (winLabel) winLabel.innerText = isWin ? 'مفعل (ساعات محددة) ⏰' : 'طوال اليوم (24 ساعة)';
+                    if (winControls) {
+                        winControls.style.opacity = isWin ? '1' : '0.45';
+                        winControls.style.pointerEvents = isWin ? 'auto' : 'none';
+                    }
+                    if (winSummary) {
+                        if (isWin) {
+                            const sh = document.getElementById('pending-start-hour')?.value || '08';
+                            const sm = document.getElementById('pending-start-min')?.value || '00';
+                            const sa = document.getElementById('pending-start-ampm')?.value === 'AM' ? 'صباحاً' : 'مساءً';
+                            const eh = document.getElementById('pending-end-hour')?.value || '10';
+                            const em = document.getElementById('pending-end-min')?.value || '00';
+                            const ea = document.getElementById('pending-end-ampm')?.value === 'AM' ? 'صباحاً' : 'مساءً';
+                            winSummary.innerHTML = `يتم إرسال التذكيرات فقط بين الساعة <strong style="color:var(--primary);">${sh}:${sm} ${sa}</strong> وحتى <strong style="color:var(--primary);">${eh}:${em} ${ea}</strong> بتوقيت القاهرة.`;
+                        } else {
+                            winSummary.innerText = 'التذكير يعمل على مدار 24 ساعة دون تقييد لمواعيد محددة.';
+                        }
+                    }
+                };
+
+                if (winCb) {
+                    winCb.checked = !!pendingConfig.windowActive;
+                    winCb.onchange = updateWindowUI;
+                }
+
+                // Parse Start Time
+                let sTime = String(pendingConfig.startTime || '08:00 AM').trim();
+                if (sTime.includes('AM') || sTime.includes('PM')) {
+                    const parts = sTime.split(' ');
+                    const hm = (parts[0] || '08:00').split(':');
+                    const elH = document.getElementById('pending-start-hour');
+                    const elM = document.getElementById('pending-start-min');
+                    const elA = document.getElementById('pending-start-ampm');
+                    if (elH) elH.value = (hm[0] || '08').padStart(2, '0');
+                    if (elM) elM.value = (hm[1] || '00').padStart(2, '0');
+                    if (elA) elA.value = parts[1] || 'AM';
+                }
+
+                // Parse End Time
+                let eTime = String(pendingConfig.endTime || '10:00 PM').trim();
+                if (eTime.includes('AM') || eTime.includes('PM')) {
+                    const parts = eTime.split(' ');
+                    const hm = (parts[0] || '10:00').split(':');
+                    const elH = document.getElementById('pending-end-hour');
+                    const elM = document.getElementById('pending-end-min');
+                    const elA = document.getElementById('pending-end-ampm');
+                    if (elH) elH.value = (hm[0] || '10').padStart(2, '0');
+                    if (elM) elM.value = (hm[1] || '00').padStart(2, '0');
+                    if (elA) elA.value = parts[1] || 'PM';
+                }
+
+                ['pending-start-hour', 'pending-start-min', 'pending-start-ampm', 'pending-end-hour', 'pending-end-min', 'pending-end-ampm'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.onchange = updateWindowUI;
+                });
+
+                updateWindowUI();
 
                 // 4. Render Scheduled List
                 this.renderScheduledList(config.scheduled || []);
@@ -5499,9 +5628,27 @@ document.addEventListener('keydown', (e) => {
             const hours = parseInt(document.getElementById('pending-remind-hours').value, 10) || 3;
             const text = document.getElementById('pending-remind-text').value.trim();
 
+            const windowActive = document.getElementById('pending-window-active')?.checked || false;
+            const startHour = document.getElementById('pending-start-hour')?.value || '08';
+            const startMin = document.getElementById('pending-start-min')?.value || '00';
+            const startAmpm = document.getElementById('pending-start-ampm')?.value || 'AM';
+            const startTime = `${startHour}:${startMin} ${startAmpm}`;
+
+            const endHour = document.getElementById('pending-end-hour')?.value || '10';
+            const endMin = document.getElementById('pending-end-min')?.value || '00';
+            const endAmpm = document.getElementById('pending-end-ampm')?.value || 'PM';
+            const endTime = `${endHour}:${endMin} ${endAmpm}`;
+
             const config = window.notifConfig || { scheduled: [], systemReminders: {} };
             if (!config.systemReminders) config.systemReminders = {};
-            config.systemReminders.pendingReminder = { isActive, hours, text };
+            config.systemReminders.pendingReminder = { 
+                isActive, 
+                hours, 
+                text,
+                windowActive,
+                startTime,
+                endTime
+            };
 
             const res = await fetch('/api/notificationsConfig', {
                 method: 'POST',
@@ -5510,7 +5657,7 @@ document.addEventListener('keydown', (e) => {
             });
 
             if (res.ok) {
-                alert('تم حفظ إعدادات تذكير السراكي المعلقة بنجاح! ✅');
+                alert('تم حفظ إعدادات تذكير السراكي المعلقة وساعات العمل بنجاح! ✅');
             } else {
                 alert('فشل في حفظ الإعدادات على السيرفر.');
             }
