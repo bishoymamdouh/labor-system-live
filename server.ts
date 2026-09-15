@@ -415,9 +415,87 @@ async function handler(req: Request): Promise<Response> {
         }
         // -------------------------------
 
+        if (url.pathname === "/api/backup") {
+            const nowIso = new Date().toISOString();
+            await kv.set(["system", "lastBackup"], nowIso);
+
+            if (method === "GET" || url.searchParams.get("download") === "true") {
+                const data: any = {};
+                for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system"]) {
+                    data[collection] = [];
+                    const entries = kv.list({ prefix: [collection] });
+                    for await (const entry of entries) {
+                        data[collection].push({ key: entry.key, value: entry.value });
+                    }
+                }
+                const dateStr = nowIso.split("T")[0];
+                return new Response(JSON.stringify(data, null, 2), {
+                    status: 200,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Content-Disposition": `attachment; filename="labor_backup_${dateStr}.json"`,
+                        "Cache-Control": "no-store"
+                    }
+                });
+            }
+
+            return new Response(JSON.stringify({ success: true, lastBackup: nowIso }), {
+                status: 200,
+                headers: { "Content-Type": "application/json", "Cache-Control": "no-store" }
+            });
+        }
+
+        if (url.pathname === "/api/backupConfig" && method === "GET") {
+            const entry = await kv.get(["system", "backupConfig"]);
+            const config = entry?.value || {
+                autoBackupActive: true,
+                onExcelExport: true,
+                onRecordApprove: true,
+                dailyAuto: true,
+                dailyTime: "11:00 PM"
+            };
+            return new Response(JSON.stringify(config), {
+                status: 200,
+                headers: { "Content-Type": "application/json", "Cache-Control": "no-store" }
+            });
+        }
+
+        if (url.pathname === "/api/backupConfig" && method === "POST") {
+            const body = await req.json();
+            await kv.set(["system", "backupConfig"], body);
+            return new Response(JSON.stringify({ success: true }), {
+                status: 200,
+                headers: { "Content-Type": "application/json", "Cache-Control": "no-store" }
+            });
+        }
+
+        if (url.pathname === "/api/backupStats" && method === "GET") {
+            let userCount = 0;
+            for await (const _ of kv.list({ prefix: ["users"] })) userCount++;
+            let recordCount = 0;
+            for await (const _ of kv.list({ prefix: ["records"] })) recordCount++;
+            let workerCount = 0;
+            for await (const _ of kv.list({ prefix: ["workers"] })) workerCount++;
+            let dirCount = 0;
+            for await (const _ of kv.list({ prefix: ["worker_directory"] })) dirCount++;
+            const lastBackupEntry = await kv.get(["system", "lastBackup"]);
+            const lastBackup = lastBackupEntry?.value || null;
+
+            return new Response(JSON.stringify({
+                users: userCount,
+                records: recordCount,
+                workers: workerCount,
+                workerDirectory: dirCount,
+                lastBackup: lastBackup
+            }), {
+                status: 200,
+                headers: { "Content-Type": "application/json", "Cache-Control": "no-store" }
+            });
+        }
+
         if (url.pathname === "/api/export" && method === "GET") {
             const data: any = {};
-            for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions"]) {
+            for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system"]) {
                 data[collection] = [];
                 const entries = kv.list({ prefix: [collection] });
                 for await (const entry of entries) {
@@ -469,13 +547,18 @@ async function handler(req: Request): Promise<Response> {
 
         if (url.pathname === "/api/import" && method === "POST") {
             const data = await req.json();
-            for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions"]) {
+            for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system"]) {
                 if (data[collection]) {
                     for (const item of data[collection]) {
                         await kv.set(item.key, item.value);
                     }
                 }
             }
+            invalidateCache("users");
+            invalidateCache("records");
+            invalidateCache("workers");
+            invalidateCache("worker_directory");
+            await initPendingIndex(kv);
             return new Response("Imported successfully", { status: 200 });
         }
 

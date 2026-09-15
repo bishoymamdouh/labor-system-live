@@ -1680,16 +1680,121 @@ select {
                     </div>
                 </details>
 
-                <details class="card mt-20" style="padding: 10px; cursor: pointer;">
-                    <summary style="font-weight: bold; margin-bottom: 10px;"><i class="fas fa-database"></i> استعادة بيانات النظام</summary>
-                    <div style="padding: 10px;">
-                        <p style="margin-bottom: 15px; color: #555;">يتم أخذ نسخة احتياطية من النظام تلقائياً عند تصدير تقرير الإكسيل. يمكنك استعادة النظام بالكامل من هنا عن طريق اختيار ملف النسخة الاحتياطية (.json).</p>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <input type="file" id="import-file-input" accept=".json" style="display: none;">
-                            <button type="button" class="btn btn-secondary" onclick="document.getElementById('import-file-input').click()"><i class="fas fa-file-import"></i> استعادة النظام (.json)</button>
+                <!-- مركز النسخ الاحتياطي والاستعادة الشامل -->
+                <div class="card mt-20" style="padding: 18px 20px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #10b981, #059669); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-main);">مركز النسخ الاحتياطي والاستعادة (Backup & Restore Hub)</h3>
+                                <small style="color: var(--text-muted); font-size: 0.82rem;">إدارة شاملة لنسخ قاعدة البيانات تلقائياً ويدوياً وتصديرها واسترجاعها بنقرة واحدة</small>
+                            </div>
+                        </div>
+                        <div id="backup-status-badge" style="padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-shield-check"></i> <span>حالة الحماية: مؤمن ونشط ✓</span>
                         </div>
                     </div>
-                </details>
+
+                    <!-- إحصائيات قاعدة البيانات المشمولة بالنسخ -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 18px;">
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; text-align: center;">
+                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;"><i class="fas fa-file-invoice text-primary"></i> إجمالي السراكي</div>
+                            <div id="backup-records-count" style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);">--</div>
+                        </div>
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; text-align: center;">
+                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;"><i class="fas fa-users text-success"></i> تفاصيل العمالة</div>
+                            <div id="backup-workers-count" style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);">--</div>
+                        </div>
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; text-align: center;">
+                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;"><i class="fas fa-address-book text-warning"></i> دليل العمال</div>
+                            <div id="backup-dir-count" style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);">--</div>
+                        </div>
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; text-align: center;">
+                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;"><i class="fas fa-user-shield text-info"></i> المستخدمين</div>
+                            <div id="backup-users-count" style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);">--</div>
+                        </div>
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; text-align: center; grid-column: span 2;">
+                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;"><i class="fas fa-clock" style="color: #6366f1;"></i> توقيت آخر نسخة احتياطية</div>
+                            <div id="backup-last-time" style="font-size: 0.92rem; font-weight: 700; color: #6366f1;">جاري التحقق...</div>
+                        </div>
+                    </div>
+
+                    <!-- إعدادات النسخ التلقائي Auto-Backup -->
+                    <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 10px; padding: 14px 16px; margin-bottom: 18px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                            <label class="notif-toggle-switch" style="margin: 0; cursor: pointer;">
+                                <input type="checkbox" id="backup-auto-enabled" checked onchange="app.saveBackupConfig()">
+                                <span class="notif-slider"></span>
+                                <span style="font-weight: 800; font-size: 0.95rem; color: var(--text-main); margin-right: 4px;">تفعيل النسخ الاحتياطي التلقائي (Auto-Backup)</span>
+                            </label>
+                            <span id="backup-auto-badge" class="badge badge-approved" style="font-size: 0.8rem;">النسخ التلقائي مفعل</span>
+                        </div>
+                        <p style="font-size: 0.83rem; color: var(--text-muted); margin: 0 0 12px 0;">حدد محفزات وشروط أخذ النسخ الاحتياطية التلقائية لحماية البيانات باستمرار:</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.88rem; background: var(--bg-card); padding: 9px 12px; border-radius: 6px; border: 1px solid var(--border-color);">
+                                <input type="checkbox" id="backup-trigger-excel" checked onchange="app.saveBackupConfig()">
+                                <span><i class="fas fa-file-excel" style="color:#16a34a;"></i> نسخة تلقائية عند تصدير شيت الإكسيل</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.88rem; background: var(--bg-card); padding: 9px 12px; border-radius: 6px; border: 1px solid var(--border-color);">
+                                <input type="checkbox" id="backup-trigger-approve" checked onchange="app.saveBackupConfig()">
+                                <span><i class="fas fa-check-double" style="color:#0284c7;"></i> نسخة تلقائية عند اعتماد أو تعديل السراكي</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.88rem; background: var(--bg-card); padding: 9px 12px; border-radius: 6px; border: 1px solid var(--border-color);">
+                                <input type="checkbox" id="backup-trigger-daily" checked onchange="app.saveBackupConfig()">
+                                <span><i class="fas fa-calendar-check" style="color:#f59e0b;"></i> نسخة يومية منتظمة مجدولة</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- أزرار الإجراءات الفورية: تحميل شيت إكسيل ونسخة كاملة JSON -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 14px;">
+                        <!-- بطاقة تنزيل JSON -->
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                    <i class="fas fa-file-code" style="color: #6366f1; font-size: 1.2rem;"></i>
+                                    <strong style="font-size: 0.95rem; color: var(--text-main);">نسخة النظام الشاملة (.json)</strong>
+                                    <span style="font-size: 0.72rem; background: rgba(99, 102, 241, 0.1); color: #6366f1; padding: 2px 6px; border-radius: 4px; font-weight: bold;">كاملة وقابلة للاسترداد</span>
+                                </div>
+                                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 12px 0; line-height: 1.4;">تحفظ نسخة رقمية مطابقة لكامل قاعدة البيانات (سراكي، عمال، مستخدمين، إعدادات وإشعارات) ويمكن استعادتها بضغطة زر في أي وقت.</p>
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="app.downloadSystemBackupJson()" style="width: 100%; justify-content: center; gap: 8px; font-size: 0.9rem;">
+                                <i class="fas fa-download"></i> تحميل نسخة النظام الآن (.json)
+                            </button>
+                        </div>
+
+                        <!-- بطاقة تنزيل Excel -->
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                    <i class="fas fa-file-excel" style="color: #16a34a; font-size: 1.2rem;"></i>
+                                    <strong style="font-size: 0.95rem; color: var(--text-main);">قاعدة البيانات كاملة شيت إكسيل (.xlsx)</strong>
+                                    <span style="font-size: 0.72rem; background: rgba(22, 163, 74, 0.1); color: #16a34a; padding: 2px 6px; border-radius: 4px; font-weight: bold;">4 صفحات متكاملة</span>
+                                </div>
+                                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 12px 0; line-height: 1.4;">تصدير شامل ومنظم لكامل قاعدة البيانات في ملف إكسيل واحد يضم صفحات منفصلة (السراكي، تفاصيل العمال، دليل العمال، المستخدمين).</p>
+                            </div>
+                            <button type="button" class="btn" onclick="app.downloadSystemBackupExcel()" style="width: 100%; justify-content: center; gap: 8px; font-size: 0.9rem; background: linear-gradient(135deg, #15803d, #16a34a) !important; color: #ffffff !important; border: none;">
+                                <i class="fas fa-file-export"></i> تصدير قاعدة البيانات إكسيل (.xlsx)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- قسم الاسترجاع الآمن -->
+                    <div style="border-top: 1px dashed var(--border-color); padding-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <span style="font-weight: bold; font-size: 0.9rem; color: var(--danger);"><i class="fas fa-history"></i> استرجاع بيانات النظام من ملف:</span>
+                            <small style="display: block; color: var(--text-muted); font-size: 0.78rem;">قم باختيار ملف (.json) سابق لاسترجاع كامل البيانات مع معاينة دقيقة ومطابقة قبل التطبيق.</small>
+                        </div>
+                        <input type="file" id="backup-restore-input" accept=".json" style="display: none;" onchange="app.handleBackupRestore(event)">
+                        <input type="file" id="import-file-input" accept=".json" style="display: none;">
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('backup-restore-input').click()" style="border-color: var(--danger); color: var(--danger); font-size: 0.88rem; gap: 6px;">
+                            <i class="fas fa-upload"></i> استعادة النظام من ملف (.json)...
+                        </button>
+                    </div>
+                </div>
         </section>
 
         <!-- Reports View -->
@@ -4501,7 +4606,7 @@ document.addEventListener('keydown', (e) => {
             this.directoryWorkers = dirWorkers;
             dirSelect.innerHTML = app.getWorkerTypeOptionsHtml(null, false);
         }
-
+        await this.loadBackupHub();
     }
 
     async deleteUser(id) {
@@ -4661,6 +4766,370 @@ document.addEventListener('keydown', (e) => {
 
             this.loadAdminData();
         }
+    }
+
+    // --- Backup & Restore Hub Functions ---
+    async loadBackupHub() {
+        try {
+            // 1. Fetch live stats
+            const statsRes = await fetch('/api/backupStats');
+            if (statsRes.ok) {
+                const stats = await statsRes.json();
+                const recEl = document.getElementById('backup-records-count');
+                const workEl = document.getElementById('backup-workers-count');
+                const dirEl = document.getElementById('backup-dir-count');
+                const userEl = document.getElementById('backup-users-count');
+                const timeEl = document.getElementById('backup-last-time');
+
+                if (recEl) recEl.innerText = Number(stats.records || 0).toLocaleString();
+                if (workEl) workEl.innerText = Number(stats.workers || 0).toLocaleString();
+                if (dirEl) dirEl.innerText = Number(stats.workerDirectory || 0).toLocaleString();
+                if (userEl) userEl.innerText = Number(stats.users || 0).toLocaleString();
+
+                if (timeEl) {
+                    if (stats.lastBackup) {
+                        try {
+                            const d = new Date(stats.lastBackup);
+                            timeEl.innerText = d.toLocaleString('ar-EG', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true
+                            });
+                        } catch {
+                            timeEl.innerText = stats.lastBackup.replace('T', ' ').substring(0, 19);
+                        }
+                    } else {
+                        timeEl.innerText = 'لم يتم حفظ نسخة بعد';
+                    }
+                }
+            }
+
+            // 2. Fetch config
+            const configRes = await fetch('/api/backupConfig');
+            if (configRes.ok) {
+                const config = await configRes.json();
+                const autoEl = document.getElementById('backup-auto-enabled');
+                const excelEl = document.getElementById('backup-trigger-excel');
+                const approveEl = document.getElementById('backup-trigger-approve');
+                const dailyEl = document.getElementById('backup-trigger-daily');
+                const badgeEl = document.getElementById('backup-auto-badge');
+
+                if (autoEl) autoEl.checked = config.autoBackupActive !== false;
+                if (excelEl) excelEl.checked = config.onExcelExport !== false;
+                if (approveEl) approveEl.checked = config.onRecordApprove !== false;
+                if (dailyEl) dailyEl.checked = config.dailyAuto !== false;
+
+                if (badgeEl) {
+                    if (config.autoBackupActive !== false) {
+                        badgeEl.className = 'badge badge-approved';
+                        badgeEl.innerText = 'النسخ التلقائي مفعل';
+                    } else {
+                        badgeEl.className = 'badge badge-rejected';
+                        badgeEl.innerText = 'النسخ التلقائي معطل';
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Error loading backup hub:", e);
+        }
+    }
+
+    async saveBackupConfig() {
+        try {
+            const autoEl = document.getElementById('backup-auto-enabled');
+            const excelEl = document.getElementById('backup-trigger-excel');
+            const approveEl = document.getElementById('backup-trigger-approve');
+            const dailyEl = document.getElementById('backup-trigger-daily');
+            const badgeEl = document.getElementById('backup-auto-badge');
+
+            const isAuto = autoEl ? autoEl.checked : true;
+            if (badgeEl) {
+                if (isAuto) {
+                    badgeEl.className = 'badge badge-approved';
+                    badgeEl.innerText = 'النسخ التلقائي مفعل';
+                } else {
+                    badgeEl.className = 'badge badge-rejected';
+                    badgeEl.innerText = 'النسخ التلقائي معطل';
+                }
+            }
+
+            const payload = {
+                autoBackupActive: isAuto,
+                onExcelExport: excelEl ? excelEl.checked : true,
+                onRecordApprove: approveEl ? approveEl.checked : true,
+                dailyAuto: dailyEl ? dailyEl.checked : true
+            };
+
+            await fetch('/api/backupConfig', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        } catch (e) {
+            console.error("Error saving backup config:", e);
+        }
+    }
+
+    async downloadSystemBackupJson() {
+        try {
+            const res = await fetch('/api/backup?download=true');
+            if (!res.ok) throw new Error("فشل في تجهيز ملف النسخة الاحتياطية من السيرفر");
+            const blob = await res.blob();
+            const dateStr = new Date().toISOString().split('T')[0];
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `labor_backup_${dateStr}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            await this.loadBackupHub();
+        } catch (err) {
+            console.error("Download JSON backup error:", err);
+            alert("حدث خطأ أثناء تحميل النسخة الاحتياطية: " + (err.message || err));
+        }
+    }
+
+    async downloadSystemBackupExcel() {
+        try {
+            // Trigger server backup timestamp
+            fetch('/api/backup', { method: 'POST' }).catch(() => {});
+
+            const wb = new ExcelJS.Workbook();
+            wb.creator = 'نظام إدارة العمالة';
+            wb.lastModifiedBy = auth.currentUser?.username || 'مدير النظام';
+            wb.created = new Date();
+            wb.modified = new Date();
+
+            const headerFill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FF1E293B' }
+            };
+            const headerFont = {
+                name: 'Segoe UI',
+                size: 11,
+                bold: true,
+                color: { argb: 'FFFFFFFF' }
+            };
+            const headerAlignment = {
+                vertical: 'middle',
+                horizontal: 'center',
+                wrapText: true
+            };
+            const cellAlignment = {
+                vertical: 'middle',
+                horizontal: 'center',
+                wrapText: true
+            };
+            const borderStyle = {
+                top: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+                left: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+                bottom: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+                right: { style: 'thin', color: { argb: 'FFE2E8F0' } }
+            };
+
+            // Sheet 1: Records
+            const records = (await db.getAll('records')) || [];
+            const wsRecords = wb.addWorksheet('سجلات السراكي', { views: [{ rightToLeft: true }] });
+            wsRecords.columns = [
+                { header: 'رقم السركي', key: 'id', width: 14 },
+                { header: 'التاريخ', key: 'date', width: 14 },
+                { header: 'اليوم', key: 'day', width: 14 },
+                { header: 'المشرف', key: 'supervisor', width: 22 },
+                { header: 'المهندس', key: 'engineer', width: 22 },
+                { header: 'الحالة', key: 'status', width: 16 },
+                { header: 'إجمالي السركي (ج.م)', key: 'total', width: 18 },
+                { header: 'ملاحظات السركي', key: 'notes', width: 30 }
+            ];
+
+            records.forEach(r => {
+                const statusMap = { 'approved': 'معتمد', 'rejected': 'مرفوض', 'pending': 'بانتظار الاعتماد' };
+                wsRecords.addRow({
+                    id: r.id,
+                    date: r.date || '',
+                    day: r.day || '',
+                    supervisor: r.supervisorName || '',
+                    engineer: r.engineerName || '',
+                    status: statusMap[r.status] || r.status || '',
+                    total: Number(r.totalAmount || 0),
+                    notes: r.notes || ''
+                });
+            });
+
+            // Sheet 2: Workers
+            const workers = (await db.getAll('workers')) || [];
+            const wsWorkers = wb.addWorksheet('تفاصيل العمالة', { views: [{ rightToLeft: true }] });
+            wsWorkers.columns = [
+                { header: 'رقم السركي', key: 'recordId', width: 14 },
+                { header: 'اسم العامل', key: 'name', width: 25 },
+                { header: 'نوع الحرفة', key: 'type', width: 16 },
+                { header: 'اليومية (ج.م)', key: 'amount', width: 16 },
+                { header: 'إضافي (ج.م)', key: 'extra', width: 14 },
+                { header: 'خصم (ج.م)', key: 'deduction', width: 14 },
+                { header: 'الصافي (ج.م)', key: 'net', width: 16 },
+                { header: 'مكان العمل', key: 'location', width: 22 },
+                { header: 'بند العمل بالتفصيل', key: 'task', width: 35 },
+                { header: 'المقاول', key: 'contractor', width: 20 },
+                { header: 'ملاحظات', key: 'notes', width: 25 }
+            ];
+
+            workers.forEach(w => {
+                const amount = Number(w.amount || 0);
+                const extra = Number(w.extra || 0);
+                const deduction = Number(w.deduction || 0);
+                const net = amount + extra - deduction;
+                wsWorkers.addRow({
+                    recordId: w.recordId || '',
+                    name: w.name || '',
+                    type: w.type || '',
+                    amount: amount,
+                    extra: extra,
+                    deduction: deduction,
+                    net: net,
+                    location: w.location || '',
+                    task: w.task || '',
+                    contractor: w.contractor || '',
+                    notes: w.notes || ''
+                });
+            });
+
+            // Sheet 3: Worker Directory
+            const directory = (await db.getAll('worker_directory')) || [];
+            const wsDir = wb.addWorksheet('دليل العمال', { views: [{ rightToLeft: true }] });
+            wsDir.columns = [
+                { header: 'كود العامل', key: 'id', width: 14 },
+                { header: 'اسم العامل', key: 'name', width: 25 },
+                { header: 'نوع الحرفة', key: 'type', width: 18 },
+                { header: 'اليومية الافتراضية (ج.م)', key: 'wage', width: 22 }
+            ];
+
+            directory.forEach(d => {
+                wsDir.addRow({
+                    id: d.id,
+                    name: d.name || '',
+                    type: d.type || '',
+                    wage: Number(d.wage || d.amount || 0)
+                });
+            });
+
+            // Sheet 4: Users
+            const users = (await db.getAll('users')) || [];
+            const wsUsers = wb.addWorksheet('المستخدمين والصلاحيات', { views: [{ rightToLeft: true }] });
+            wsUsers.columns = [
+                { header: 'اسم المستخدم', key: 'username', width: 25 },
+                { header: 'الصلاحية', key: 'role', width: 20 }
+            ];
+
+            const roleMap = {
+                'admin': 'مدير النظام',
+                'engineer': 'مهندس موقع',
+                'supervisor': 'مشرف موقع',
+                'surveyor': 'مساح',
+                'warehouse_manager': 'مدير مخزن',
+                'operator_supervisor': 'مشرف مشغل'
+            };
+
+            users.forEach(u => {
+                wsUsers.addRow({
+                    username: u.username === 'admin' ? 'Bishoy Mamdouh' : u.username,
+                    role: roleMap[u.role] || u.role || ''
+                });
+            });
+
+            // Format all worksheets
+            [wsRecords, wsWorkers, wsDir, wsUsers].forEach(sheet => {
+                const header = sheet.getRow(1);
+                header.height = 28;
+                header.eachCell(cell => {
+                    cell.fill = headerFill;
+                    cell.font = headerFont;
+                    cell.alignment = headerAlignment;
+                });
+
+                sheet.eachRow((row, rIdx) => {
+                    if (rIdx > 1) {
+                        row.height = 22;
+                        row.eachCell(cell => {
+                            cell.alignment = cellAlignment;
+                            cell.border = borderStyle;
+                        });
+                    }
+                });
+            });
+
+            const buffer = await wb.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const dateStr = new Date().toISOString().split('T')[0];
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `labor_database_backup_${dateStr}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            await this.loadBackupHub();
+        } catch (err) {
+            console.error("Download Excel backup error:", err);
+            alert("حدث خطأ أثناء تصدير إكسيل النسخة الاحتياطية: " + (err.message || err));
+        }
+    }
+
+    async handleBackupRestore(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+
+            const recCount = Array.isArray(data.records) ? data.records.length : 0;
+            const workCount = Array.isArray(data.workers) ? data.workers.length : 0;
+            const dirCount = Array.isArray(data.worker_directory) ? data.worker_directory.length : 0;
+            const userCount = Array.isArray(data.users) ? data.users.length : 0;
+
+            if (recCount === 0 && workCount === 0 && userCount === 0) {
+                alert("الملف المختار لا يحتوي على بيانات نظام صالحة للاسترجاع.");
+                e.target.value = '';
+                return;
+            }
+
+            const confirmMsg = `تأكيد استعادة بيانات النظام بالكامل:\n\n` +
+                `الملف المختار: ${file.name}\n` +
+                `---------------------------------\n` +
+                `• السراكي: ${recCount} سجل\n` +
+                `• تفاصيل العمال: ${workCount} عامل\n` +
+                `• دليل العمال: ${dirCount} اسم\n` +
+                `• المستخدمين: ${userCount} مستخدم\n` +
+                `---------------------------------\n\n` +
+                `تحذير: سيتم الكتابة فوق جميع البيانات الحالية واستبدالها بهذه النسخة.\n\nهل أنت متأكد تماماً من المتابعة وتنفيذ الاسترجاع؟`;
+
+            if (confirm(confirmMsg)) {
+                const res = await fetch('/api/import', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    alert("تمت استعادة النظام بنجاح تام! سيتم تحديث الصفحة الآن.");
+                    window.location.reload();
+                } else {
+                    const errTxt = await res.text();
+                    alert("فشل في استعادة النظام: " + errTxt);
+                }
+            }
+        } catch (err) {
+            console.error("Backup restore error:", err);
+            alert("حدث خطأ أثناء قراءة أو فحص ملف النسخة الاحتياطية: " + (err.message || err));
+        }
+        e.target.value = '';
     }
 
     // --- Supervisor Functions ---
