@@ -1681,102 +1681,219 @@ select {
                 </details>
 
                 <!-- مركز النسخ الاحتياطي والاستعادة الشامل -->
-                <div class="card mt-20" style="padding: 18px 20px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                <div class="card mt-20" style="padding: 20px 22px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 14px; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #10b981, #059669); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);">
+                            <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #10b981, #059669); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.3rem; box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35);">
                                 <i class="fas fa-database"></i>
                             </div>
                             <div>
-                                <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-main);">مركز النسخ الاحتياطي والاستعادة (Backup & Restore Hub)</h3>
-                                <small style="color: var(--text-muted); font-size: 0.82rem;">إدارة شاملة لنسخ قاعدة البيانات تلقائياً ويدوياً وتصديرها واسترجاعها بنقرة واحدة</small>
+                                <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-main);">مركز النسخ الاحتياطي والاستعادة الشامل (Backup & Restore Hub)</h3>
+                                <small style="color: var(--text-muted); font-size: 0.84rem;">تحكم كامل في مسار حفظ النسخ، وتوقيتها وتكرارها، وبياناتها، واستخراج الإكسيل المطابق للبرنامج</small>
                             </div>
                         </div>
-                        <div id="backup-status-badge" style="padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); display: inline-flex; align-items: center; gap: 6px;">
+                        <div id="backup-status-badge" style="padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); display: inline-flex; align-items: center; gap: 6px;">
                             <i class="fas fa-shield-check"></i> <span>حالة الحماية: مؤمن ونشط ✓</span>
                         </div>
                     </div>
 
                     <!-- إحصائيات قاعدة البيانات المشمولة بالنسخ -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 18px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px;">
                         <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; text-align: center;">
                             <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;"><i class="fas fa-file-invoice text-primary"></i> إجمالي السراكي</div>
-                            <div id="backup-records-count" style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);">--</div>
+                            <div id="backup-records-count" style="font-size: 1.25rem; font-weight: 800; color: var(--text-main);">--</div>
                         </div>
                         <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; text-align: center;">
                             <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;"><i class="fas fa-users text-success"></i> تفاصيل العمالة</div>
-                            <div id="backup-workers-count" style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);">--</div>
+                            <div id="backup-workers-count" style="font-size: 1.25rem; font-weight: 800; color: var(--text-main);">--</div>
                         </div>
                         <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; text-align: center;">
                             <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;"><i class="fas fa-address-book text-warning"></i> دليل العمال</div>
-                            <div id="backup-dir-count" style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);">--</div>
+                            <div id="backup-dir-count" style="font-size: 1.25rem; font-weight: 800; color: var(--text-main);">--</div>
                         </div>
                         <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; text-align: center;">
                             <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;"><i class="fas fa-user-shield text-info"></i> المستخدمين</div>
-                            <div id="backup-users-count" style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);">--</div>
+                            <div id="backup-users-count" style="font-size: 1.25rem; font-weight: 800; color: var(--text-main);">--</div>
                         </div>
                         <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; text-align: center; grid-column: span 2;">
-                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;"><i class="fas fa-clock" style="color: #6366f1;"></i> توقيت آخر نسخة احتياطية</div>
-                            <div id="backup-last-time" style="font-size: 0.92rem; font-weight: 700; color: #6366f1;">جاري التحقق...</div>
+                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;"><i class="fas fa-clock" style="color: #6366f1;"></i> توقيت آخر نسخة احتياطية تم أخذها</div>
+                            <div id="backup-last-time" style="font-size: 0.95rem; font-weight: 700; color: #6366f1;">جاري التحقق...</div>
                         </div>
                     </div>
 
-                    <!-- إعدادات النسخ التلقائي Auto-Backup -->
-                    <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 10px; padding: 14px 16px; margin-bottom: 18px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                    <!-- إعدادات النسخ التلقائي الشاملة (Auto-Backup Hub) -->
+                    <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.22); border-radius: 12px; padding: 16px 18px; margin-bottom: 20px;">
+                        <!-- المفتاح الرئيسي للنسخ التلقائي -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid rgba(99, 102, 241, 0.15); padding-bottom: 12px;">
                             <label class="notif-toggle-switch" style="margin: 0; cursor: pointer;">
                                 <input type="checkbox" id="backup-auto-enabled" checked onchange="app.saveBackupConfig()">
                                 <span class="notif-slider"></span>
-                                <span style="font-weight: 800; font-size: 0.95rem; color: var(--text-main); margin-right: 4px;">تفعيل النسخ الاحتياطي التلقائي (Auto-Backup)</span>
+                                <span style="font-weight: 800; font-size: 1.05rem; color: var(--text-main); margin-right: 6px;">تشغيل نظام النسخ الاحتياطي التلقائي (Auto-Backup)</span>
                             </label>
-                            <span id="backup-auto-badge" class="badge badge-approved" style="font-size: 0.8rem;">النسخ التلقائي مفعل</span>
+                            <span id="backup-auto-badge" class="badge badge-approved" style="font-size: 0.85rem; padding: 5px 12px;">النسخ التلقائي مفعل</span>
                         </div>
-                        <p style="font-size: 0.83rem; color: var(--text-muted); margin: 0 0 12px 0;">حدد محفزات وشروط أخذ النسخ الاحتياطية التلقائية لحماية البيانات باستمرار:</p>
-                        
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px;">
-                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.88rem; background: var(--bg-card); padding: 9px 12px; border-radius: 6px; border: 1px solid var(--border-color);">
-                                <input type="checkbox" id="backup-trigger-excel" checked onchange="app.saveBackupConfig()">
-                                <span><i class="fas fa-file-excel" style="color:#16a34a;"></i> نسخة تلقائية عند تصدير شيت الإكسيل</span>
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.88rem; background: var(--bg-card); padding: 9px 12px; border-radius: 6px; border: 1px solid var(--border-color);">
-                                <input type="checkbox" id="backup-trigger-approve" checked onchange="app.saveBackupConfig()">
-                                <span><i class="fas fa-check-double" style="color:#0284c7;"></i> نسخة تلقائية عند اعتماد أو تعديل السراكي</span>
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.88rem; background: var(--bg-card); padding: 9px 12px; border-radius: 6px; border: 1px solid var(--border-color);">
-                                <input type="checkbox" id="backup-trigger-daily" checked onchange="app.saveBackupConfig()">
-                                <span><i class="fas fa-calendar-check" style="color:#f59e0b;"></i> نسخة يومية منتظمة مجدولة</span>
-                            </label>
+
+                        <!-- شبكة عناصر التحكم: الوجهة، التوقيت، البيانات، الصيغ -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 16px;">
+                            
+                            <!-- 1. تحديد مكان ووجهة النسخ الاحتياطي -->
+                            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
+                                <h4 style="margin: 0 0 10px 0; font-size: 0.95rem; font-weight: 800; color: #4338ca; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-map-marker-alt"></i> ١. وجهة ومكان حفظ النسخ الاحتياطية:
+                                </h4>
+                                <div style="display: flex; flex-direction: column; gap: 9px;">
+                                    <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 0.86rem;">
+                                        <input type="checkbox" id="backup-dest-download" checked onchange="app.saveBackupConfig()" style="margin-top: 3px;">
+                                        <div>
+                                            <strong style="color: var(--text-main);"><i class="fas fa-download text-primary"></i> تنزيل تلقائي على هذا الجهاز (Downloads)</strong>
+                                            <small style="display: block; color: var(--text-muted); font-size: 0.77rem;">يتم تنزيل ملف النسخة تلقائياً لمجلد التنزيلات على الكمبيوتر.</small>
+                                        </div>
+                                    </label>
+                                    
+                                    <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 0.86rem;">
+                                        <input type="checkbox" id="backup-dest-folder" checked onchange="app.saveBackupConfig()" style="margin-top: 3px;">
+                                        <div style="width: 100%;">
+                                            <strong style="color: var(--text-main);"><i class="fas fa-folder text-warning"></i> حفظ في مجلد على السيرفر / الكمبيوتر:</strong>
+                                            <div style="margin-top: 5px;">
+                                                <input type="text" id="backup-folder-path" value="./backups" onchange="app.saveBackupConfig()" placeholder="اكتب مسار المجلد مثل: ./backups" style="width: 100%; box-sizing: border-box; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); font-size: 0.82rem; font-family: monospace;">
+                                            </div>
+                                            <small style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-top: 3px;">المسار التلقائي: مجلد ./backups المؤرخ يومياً.</small>
+                                        </div>
+                                    </label>
+
+                                    <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 0.86rem;">
+                                        <input type="checkbox" id="backup-dest-cloud" checked onchange="app.saveBackupConfig()" style="margin-top: 3px;">
+                                        <div>
+                                            <strong style="color: var(--text-main);"><i class="fas fa-cloud text-info"></i> حفظ سحابي آمن (Cloud Safe Vault)</strong>
+                                            <small style="display: block; color: var(--text-muted); font-size: 0.77rem;">أرشفة النسخة في قاعدة البيانات السحابية المركزية المعتمدة.</small>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- 2. تحديد التوقيت والجدولة والمحفزات -->
+                            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
+                                <h4 style="margin: 0 0 10px 0; font-size: 0.95rem; font-weight: 800; color: #4338ca; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-clock"></i> ٢. توقيت ومواعيد النسخ التلقائي:
+                                </h4>
+                                <div style="display: flex; flex-direction: column; gap: 10px;">
+                                    <div>
+                                        <label style="display: block; font-size: 0.84rem; font-weight: bold; margin-bottom: 4px; color: var(--text-main);">توقيت النسخ اليومي المنتظم:</label>
+                                        <input type="time" id="backup-schedule-time" value="23:00" onchange="app.saveBackupConfig()" style="width: 100%; box-sizing: border-box; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); font-size: 0.9rem; font-weight: bold;">
+                                    </div>
+                                    <div>
+                                        <label style="display: block; font-size: 0.84rem; font-weight: bold; margin-bottom: 4px; color: var(--text-main);">تكرار النسخ التلقائي:</label>
+                                        <select id="backup-frequency" onchange="app.saveBackupConfig()" style="width: 100%; box-sizing: border-box; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); font-size: 0.86rem;">
+                                            <option value="daily">يومياً في التوقيت المحدد أعلاه</option>
+                                            <option value="12h">كل 12 ساعة (مرتين يومياً)</option>
+                                            <option value="6h">كل 6 ساعات (أربع مرات يومياً)</option>
+                                            <option value="weekly">أسبوعياً (كل يوم خميس نهاية الأسبوع)</option>
+                                        </select>
+                                    </div>
+                                    <div style="border-top: 1px dashed var(--border-color); padding-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+                                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.83rem;">
+                                            <input type="checkbox" id="backup-trigger-excel" checked onchange="app.saveBackupConfig()">
+                                            <span><i class="fas fa-file-excel" style="color:#16a34a;"></i> نسخة فورية عند تصدير شيت الإكسيل</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.83rem;">
+                                            <input type="checkbox" id="backup-trigger-approve" checked onchange="app.saveBackupConfig()">
+                                            <span><i class="fas fa-check-double" style="color:#0284c7;"></i> نسخة فورية عند اعتماد وتعديل السراكي</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. تحديد ما يتم نسخه بالتحديد -->
+                            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
+                                <h4 style="margin: 0 0 10px 0; font-size: 0.95rem; font-weight: 800; color: #4338ca; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-layer-group"></i> ٣. البيانات والعناصر المشمولة بالنسخ:
+                                </h4>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.85rem;">
+                                        <input type="checkbox" id="backup-inc-records" checked onchange="app.saveBackupConfig()">
+                                        <span><i class="fas fa-file-invoice text-primary"></i> سجلات السراكي بالكامل والاعتمادات</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.85rem;">
+                                        <input type="checkbox" id="backup-inc-workers" checked onchange="app.saveBackupConfig()">
+                                        <span><i class="fas fa-users text-success"></i> تفاصيل العمالة اليومية والبنود والمواقع</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.85rem;">
+                                        <input type="checkbox" id="backup-inc-dir" checked onchange="app.saveBackupConfig()">
+                                        <span><i class="fas fa-address-book text-warning"></i> دليل العمال المعتمد (الأساسي)</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.85rem;">
+                                        <input type="checkbox" id="backup-inc-users" checked onchange="app.saveBackupConfig()">
+                                        <span><i class="fas fa-user-shield text-info"></i> حسابات المستخدمين والصلاحيات</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.85rem;">
+                                        <input type="checkbox" id="backup-inc-system" checked onchange="app.saveBackupConfig()">
+                                        <span><i class="fas fa-cog text-secondary"></i> إعدادات وتنبيهات النظام والإشعارات</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- 4. صيغ الملفات المطلوب إنشاؤها -->
+                            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
+                                <h4 style="margin: 0 0 10px 0; font-size: 0.95rem; font-weight: 800; color: #4338ca; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-file-export"></i> ٤. صيغ النسخ الاحتياطي:
+                                </h4>
+                                <div style="display: flex; flex-direction: column; gap: 10px;">
+                                    <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 0.85rem;">
+                                        <input type="checkbox" id="backup-fmt-json" checked onchange="app.saveBackupConfig()" style="margin-top: 2px;">
+                                        <div>
+                                            <strong style="color: var(--text-main);"><i class="fas fa-file-code" style="color:#6366f1;"></i> ملف قاعدة بيانات كامل (.json)</strong>
+                                            <small style="display: block; color: var(--text-muted); font-size: 0.76rem;">الملف الرسمي لاسترداد قاعدة البيانات واسترجاعها بنقرة واحدة.</small>
+                                        </div>
+                                    </label>
+                                    <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 0.85rem;">
+                                        <input type="checkbox" id="backup-fmt-excel" checked onchange="app.saveBackupConfig()" style="margin-top: 2px;">
+                                        <div>
+                                            <strong style="color: var(--text-main);"><i class="fas fa-file-excel" style="color:#16a34a;"></i> شيت إكسيل شامل ٤ صفحات (.xlsx)</strong>
+                                            <small style="display: block; color: var(--text-muted); font-size: 0.76rem;">ملف إكسيل احترافي يضم السراكي والعمال ودليل العمال والمستخدمين بتطابق تام.</small>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- زر الحفظ والتطبيق الفوري -->
+                        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; border-top: 1px solid rgba(99, 102, 241, 0.15); padding-top: 12px;">
+                            <span id="backup-config-save-msg" style="font-size: 0.82rem; color: #10b981; font-weight: bold; display: none;"><i class="fas fa-check-circle"></i> تم حفظ إعدادات النسخ الاحتياطي وتطبيقها بنجاح</span>
+                            <button type="button" class="btn btn-primary" onclick="app.saveBackupConfig(true)" style="padding: 8px 18px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-save"></i> حفظ وتطبيق الإعدادات الآن
+                            </button>
                         </div>
                     </div>
 
                     <!-- أزرار الإجراءات الفورية: تحميل شيت إكسيل ونسخة كاملة JSON -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 14px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 16px;">
                         <!-- بطاقة تنزيل JSON -->
-                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;">
                             <div>
                                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                                    <i class="fas fa-file-code" style="color: #6366f1; font-size: 1.2rem;"></i>
-                                    <strong style="font-size: 0.95rem; color: var(--text-main);">نسخة النظام الشاملة (.json)</strong>
-                                    <span style="font-size: 0.72rem; background: rgba(99, 102, 241, 0.1); color: #6366f1; padding: 2px 6px; border-radius: 4px; font-weight: bold;">كاملة وقابلة للاسترداد</span>
+                                    <i class="fas fa-file-code" style="color: #6366f1; font-size: 1.3rem;"></i>
+                                    <strong style="font-size: 0.98rem; color: var(--text-main);">نسخة النظام الشاملة للاسترداد (.json)</strong>
+                                    <span style="font-size: 0.72rem; background: rgba(99, 102, 241, 0.12); color: #6366f1; padding: 2px 6px; border-radius: 4px; font-weight: bold;">كاملة ومطابقة 100%</span>
                                 </div>
-                                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 12px 0; line-height: 1.4;">تحفظ نسخة رقمية مطابقة لكامل قاعدة البيانات (سراكي، عمال، مستخدمين، إعدادات وإشعارات) ويمكن استعادتها بضغطة زر في أي وقت.</p>
+                                <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0 0 14px 0; line-height: 1.5;">تحميل ملف رقمي شامل يضم قاعدة البيانات بالكامل (السراكي، العمال، دليل العمال، المستخدمين، التنبيهات والإعدادات) وهو الملف الذي يمكن استخدامه لاستعادة النظام في أي وقت بنقرة واحدة.</p>
                             </div>
-                            <button type="button" class="btn btn-primary" onclick="app.downloadSystemBackupJson()" style="width: 100%; justify-content: center; gap: 8px; font-size: 0.9rem;">
-                                <i class="fas fa-download"></i> تحميل نسخة النظام الآن (.json)
+                            <button type="button" class="btn btn-primary" onclick="app.downloadSystemBackupJson()" style="width: 100%; justify-content: center; gap: 8px; font-size: 0.92rem; padding: 10px;">
+                                <i class="fas fa-download"></i> تحميل نسخة النظام الشاملة (.json)
                             </button>
                         </div>
 
                         <!-- بطاقة تنزيل Excel -->
-                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;">
                             <div>
                                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                                    <i class="fas fa-file-excel" style="color: #16a34a; font-size: 1.2rem;"></i>
-                                    <strong style="font-size: 0.95rem; color: var(--text-main);">قاعدة البيانات كاملة شيت إكسيل (.xlsx)</strong>
-                                    <span style="font-size: 0.72rem; background: rgba(22, 163, 74, 0.1); color: #16a34a; padding: 2px 6px; border-radius: 4px; font-weight: bold;">4 صفحات متكاملة</span>
+                                    <i class="fas fa-file-excel" style="color: #16a34a; font-size: 1.3rem;"></i>
+                                    <strong style="font-size: 0.98rem; color: var(--text-main);">تصدير قاعدة البيانات إكسيل (.xlsx)</strong>
+                                    <span style="font-size: 0.72rem; background: rgba(22, 163, 74, 0.12); color: #16a34a; padding: 2px 6px; border-radius: 4px; font-weight: bold;">مطابق للبرنامج بالكامل</span>
                                 </div>
-                                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 12px 0; line-height: 1.4;">تصدير شامل ومنظم لكامل قاعدة البيانات في ملف إكسيل واحد يضم صفحات منفصلة (السراكي، تفاصيل العمال، دليل العمال، المستخدمين).</p>
+                                <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0 0 14px 0; line-height: 1.5;">تصدير ملف إكسيل احترافي يضم ٤ أوراق عمل متكاملة: تقرير تفاصيل العمالة بجميع بنودها، جدول السراكي المجمعة مع التاريخ واليوم والمشرف والمهندس، دليل العمال، وقائمة المستخدمين مع إجماليات عامة وتنسيق RTL.</p>
                             </div>
-                            <button type="button" class="btn" onclick="app.downloadSystemBackupExcel()" style="width: 100%; justify-content: center; gap: 8px; font-size: 0.9rem; background: linear-gradient(135deg, #15803d, #16a34a) !important; color: #ffffff !important; border: none;">
+                            <button type="button" class="btn" onclick="app.downloadSystemBackupExcel()" style="width: 100%; justify-content: center; gap: 8px; font-size: 0.92rem; padding: 10px; background: linear-gradient(135deg, #15803d, #16a34a) !important; color: #ffffff !important; border: none;">
                                 <i class="fas fa-file-export"></i> تصدير قاعدة البيانات إكسيل (.xlsx)
                             </button>
                         </div>
@@ -1785,12 +1902,12 @@ select {
                     <!-- قسم الاسترجاع الآمن -->
                     <div style="border-top: 1px dashed var(--border-color); padding-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                         <div>
-                            <span style="font-weight: bold; font-size: 0.9rem; color: var(--danger);"><i class="fas fa-history"></i> استرجاع بيانات النظام من ملف:</span>
-                            <small style="display: block; color: var(--text-muted); font-size: 0.78rem;">قم باختيار ملف (.json) سابق لاسترجاع كامل البيانات مع معاينة دقيقة ومطابقة قبل التطبيق.</small>
+                            <span style="font-weight: bold; font-size: 0.92rem; color: var(--danger);"><i class="fas fa-history"></i> استرجاع بيانات النظام من ملف نسخة احتياطية:</span>
+                            <small style="display: block; color: var(--text-muted); font-size: 0.8rem; margin-top: 2px;">اختر أي ملف (.json) سابق ليقوم النظام بفحصه أولاً وعرض محتوياته بدقة قبل التأكيد والاسترجاع.</small>
                         </div>
                         <input type="file" id="backup-restore-input" accept=".json" style="display: none;" onchange="app.handleBackupRestore(event)">
                         <input type="file" id="import-file-input" accept=".json" style="display: none;">
-                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('backup-restore-input').click()" style="border-color: var(--danger); color: var(--danger); font-size: 0.88rem; gap: 6px;">
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('backup-restore-input').click()" style="border-color: var(--danger); color: var(--danger); font-size: 0.88rem; gap: 6px; padding: 8px 16px;">
                             <i class="fas fa-upload"></i> استعادة النظام من ملف (.json)...
                         </button>
                     </div>
@@ -4769,6 +4886,17 @@ document.addEventListener('keydown', (e) => {
     }
 
     // --- Backup & Restore Hub Functions ---
+    getArabicDayName(dateStr) {
+        if (!dateStr) return '';
+        try {
+            const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            const d = new Date(dateStr + 'T12:00:00Z');
+            return days[d.getUTCDay()] || '';
+        } catch {
+            return '';
+        }
+    }
+
     async loadBackupHub() {
         try {
             // 1. Fetch live stats
@@ -4811,17 +4939,11 @@ document.addEventListener('keydown', (e) => {
             const configRes = await fetch('/api/backupConfig');
             if (configRes.ok) {
                 const config = await configRes.json();
+                
+                // Master switch & badge
                 const autoEl = document.getElementById('backup-auto-enabled');
-                const excelEl = document.getElementById('backup-trigger-excel');
-                const approveEl = document.getElementById('backup-trigger-approve');
-                const dailyEl = document.getElementById('backup-trigger-daily');
                 const badgeEl = document.getElementById('backup-auto-badge');
-
                 if (autoEl) autoEl.checked = config.autoBackupActive !== false;
-                if (excelEl) excelEl.checked = config.onExcelExport !== false;
-                if (approveEl) approveEl.checked = config.onRecordApprove !== false;
-                if (dailyEl) dailyEl.checked = config.dailyAuto !== false;
-
                 if (badgeEl) {
                     if (config.autoBackupActive !== false) {
                         badgeEl.className = 'badge badge-approved';
@@ -4831,18 +4953,57 @@ document.addEventListener('keydown', (e) => {
                         badgeEl.innerText = 'النسخ التلقائي معطل';
                     }
                 }
+
+                // 1. Destinations
+                const destDownload = document.getElementById('backup-dest-download');
+                const destFolder = document.getElementById('backup-dest-folder');
+                const folderPath = document.getElementById('backup-folder-path');
+                const destCloud = document.getElementById('backup-dest-cloud');
+
+                if (destDownload) destDownload.checked = config.destinations?.download !== false;
+                if (destFolder) destFolder.checked = config.destinations?.folder !== false;
+                if (folderPath) folderPath.value = config.destinations?.folderPath || './backups';
+                if (destCloud) destCloud.checked = config.destinations?.cloud !== false;
+
+                // 2. Schedule & Triggers
+                const schedTime = document.getElementById('backup-schedule-time');
+                const frequency = document.getElementById('backup-frequency');
+                const trigExcel = document.getElementById('backup-trigger-excel');
+                const trigApprove = document.getElementById('backup-trigger-approve');
+
+                if (schedTime) schedTime.value = config.dailyTime || '23:00';
+                if (frequency) frequency.value = config.frequency || 'daily';
+                if (trigExcel) trigExcel.checked = config.onExcelExport !== false;
+                if (trigApprove) trigApprove.checked = config.onRecordApprove !== false;
+
+                // 3. Included Data
+                const incRec = document.getElementById('backup-inc-records');
+                const incWork = document.getElementById('backup-inc-workers');
+                const incDir = document.getElementById('backup-inc-dir');
+                const incUsers = document.getElementById('backup-inc-users');
+                const incSys = document.getElementById('backup-inc-system');
+
+                if (incRec) incRec.checked = config.includedData?.records !== false;
+                if (incWork) incWork.checked = config.includedData?.workers !== false;
+                if (incDir) incDir.checked = config.includedData?.directory !== false;
+                if (incUsers) incUsers.checked = config.includedData?.users !== false;
+                if (incSys) incSys.checked = config.includedData?.system !== false;
+
+                // 4. Formats
+                const fmtJson = document.getElementById('backup-fmt-json');
+                const fmtExcel = document.getElementById('backup-fmt-excel');
+
+                if (fmtJson) fmtJson.checked = config.formats?.json !== false;
+                if (fmtExcel) fmtExcel.checked = config.formats?.excel !== false;
             }
         } catch (e) {
             console.error("Error loading backup hub:", e);
         }
     }
 
-    async saveBackupConfig() {
+    async saveBackupConfig(showNotice = false) {
         try {
             const autoEl = document.getElementById('backup-auto-enabled');
-            const excelEl = document.getElementById('backup-trigger-excel');
-            const approveEl = document.getElementById('backup-trigger-approve');
-            const dailyEl = document.getElementById('backup-trigger-daily');
             const badgeEl = document.getElementById('backup-auto-badge');
 
             const isAuto = autoEl ? autoEl.checked : true;
@@ -4858,9 +5019,27 @@ document.addEventListener('keydown', (e) => {
 
             const payload = {
                 autoBackupActive: isAuto,
-                onExcelExport: excelEl ? excelEl.checked : true,
-                onRecordApprove: approveEl ? approveEl.checked : true,
-                dailyAuto: dailyEl ? dailyEl.checked : true
+                destinations: {
+                    download: document.getElementById('backup-dest-download')?.checked !== false,
+                    folder: document.getElementById('backup-dest-folder')?.checked !== false,
+                    folderPath: document.getElementById('backup-folder-path')?.value?.trim() || './backups',
+                    cloud: document.getElementById('backup-dest-cloud')?.checked !== false
+                },
+                dailyTime: document.getElementById('backup-schedule-time')?.value || '23:00',
+                frequency: document.getElementById('backup-frequency')?.value || 'daily',
+                onExcelExport: document.getElementById('backup-trigger-excel')?.checked !== false,
+                onRecordApprove: document.getElementById('backup-trigger-approve')?.checked !== false,
+                includedData: {
+                    records: document.getElementById('backup-inc-records')?.checked !== false,
+                    workers: document.getElementById('backup-inc-workers')?.checked !== false,
+                    directory: document.getElementById('backup-inc-dir')?.checked !== false,
+                    users: document.getElementById('backup-inc-users')?.checked !== false,
+                    system: document.getElementById('backup-inc-system')?.checked !== false
+                },
+                formats: {
+                    json: document.getElementById('backup-fmt-json')?.checked !== false,
+                    excel: document.getElementById('backup-fmt-excel')?.checked !== false
+                }
             };
 
             await fetch('/api/backupConfig', {
@@ -4868,6 +5047,14 @@ document.addEventListener('keydown', (e) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
+
+            if (showNotice) {
+                const msgEl = document.getElementById('backup-config-save-msg');
+                if (msgEl) {
+                    msgEl.style.display = 'inline-block';
+                    setTimeout(() => { msgEl.style.display = 'none'; }, 3500);
+                }
+            }
         } catch (e) {
             console.error("Error saving backup config:", e);
         }
@@ -4896,134 +5083,36 @@ document.addEventListener('keydown', (e) => {
 
     async downloadSystemBackupExcel() {
         try {
-            // Trigger server backup timestamp
+            // 1. Trigger server backup timestamp
             fetch('/api/backup', { method: 'POST' }).catch(() => {});
 
-            const wb = new ExcelJS.Workbook();
-            wb.creator = 'نظام إدارة العمالة';
-            wb.lastModifiedBy = auth.currentUser?.username || 'مدير النظام';
-            wb.created = new Date();
-            wb.modified = new Date();
+            const dateStr = new Date().toISOString().split('T')[0];
 
-            const headerFill = {
-                type: 'pattern',
-                pattern: 'solid',
-                fgColor: { argb: 'FF1E293B' }
-            };
-            const headerFont = {
-                name: 'Segoe UI',
-                size: 11,
-                bold: true,
-                color: { argb: 'FFFFFFFF' }
-            };
-            const headerAlignment = {
-                vertical: 'middle',
-                horizontal: 'center',
-                wrapText: true
-            };
-            const cellAlignment = {
-                vertical: 'middle',
-                horizontal: 'center',
-                wrapText: true
-            };
-            const borderStyle = {
-                top: { style: 'thin', color: { argb: 'FFE2E8F0' } },
-                left: { style: 'thin', color: { argb: 'FFE2E8F0' } },
-                bottom: { style: 'thin', color: { argb: 'FFE2E8F0' } },
-                right: { style: 'thin', color: { argb: 'FFE2E8F0' } }
-            };
+            // 2. Fetch all collections from database
+            const [rawRecords, rawWorkers, rawUsers, rawDirectory] = await Promise.all([
+                db.getAll('records').then(res => res || []),
+                db.getAll('workers').then(res => res || []),
+                db.getAll('users').then(res => res || []),
+                db.getAll('worker_directory').then(res => res || [])
+            ]);
 
-            // Sheet 1: Records
-            const records = (await db.getAll('records')) || [];
-            const wsRecords = wb.addWorksheet('سجلات السراكي', { views: [{ rightToLeft: true }] });
-            wsRecords.columns = [
-                { header: 'رقم السركي', key: 'id', width: 14 },
-                { header: 'التاريخ', key: 'date', width: 14 },
-                { header: 'اليوم', key: 'day', width: 14 },
-                { header: 'المشرف', key: 'supervisor', width: 22 },
-                { header: 'المهندس', key: 'engineer', width: 22 },
-                { header: 'الحالة', key: 'status', width: 16 },
-                { header: 'إجمالي السركي (ج.م)', key: 'total', width: 18 },
-                { header: 'ملاحظات السركي', key: 'notes', width: 30 }
-            ];
-
-            records.forEach(r => {
-                const statusMap = { 'approved': 'معتمد', 'rejected': 'مرفوض', 'pending': 'بانتظار الاعتماد' };
-                wsRecords.addRow({
-                    id: r.id,
-                    date: r.date || '',
-                    day: r.day || '',
-                    supervisor: r.supervisorName || '',
-                    engineer: r.engineerName || '',
-                    status: statusMap[r.status] || r.status || '',
-                    total: Number(r.totalAmount || 0),
-                    notes: r.notes || ''
-                });
+            // Build Users Map
+            const usersMap = {};
+            rawUsers.forEach(u => {
+                usersMap[u.id] = (u.username === 'admin' ? 'Bishoy Mamdouh' : u.username);
             });
 
-            // Sheet 2: Workers
-            const workers = (await db.getAll('workers')) || [];
-            const wsWorkers = wb.addWorksheet('تفاصيل العمالة', { views: [{ rightToLeft: true }] });
-            wsWorkers.columns = [
-                { header: 'رقم السركي', key: 'recordId', width: 14 },
-                { header: 'اسم العامل', key: 'name', width: 25 },
-                { header: 'نوع الحرفة', key: 'type', width: 16 },
-                { header: 'اليومية (ج.م)', key: 'amount', width: 16 },
-                { header: 'إضافي (ج.م)', key: 'extra', width: 14 },
-                { header: 'خصم (ج.م)', key: 'deduction', width: 14 },
-                { header: 'الصافي (ج.م)', key: 'net', width: 16 },
-                { header: 'مكان العمل', key: 'location', width: 22 },
-                { header: 'بند العمل بالتفصيل', key: 'task', width: 35 },
-                { header: 'المقاول', key: 'contractor', width: 20 },
-                { header: 'ملاحظات', key: 'notes', width: 25 }
-            ];
-
-            workers.forEach(w => {
-                const amount = Number(w.amount || 0);
-                const extra = Number(w.extra || 0);
-                const deduction = Number(w.deduction || 0);
-                const net = amount + extra - deduction;
-                wsWorkers.addRow({
-                    recordId: w.recordId || '',
-                    name: w.name || '',
-                    type: w.type || '',
-                    amount: amount,
-                    extra: extra,
-                    deduction: deduction,
-                    net: net,
-                    location: w.location || '',
-                    task: w.task || '',
-                    contractor: w.contractor || '',
-                    notes: w.notes || ''
-                });
+            // Build Records Map
+            const recordsMap = {};
+            rawRecords.forEach(r => {
+                recordsMap[r.id] = r;
             });
 
-            // Sheet 3: Worker Directory
-            const directory = (await db.getAll('worker_directory')) || [];
-            const wsDir = wb.addWorksheet('دليل العمال', { views: [{ rightToLeft: true }] });
-            wsDir.columns = [
-                { header: 'كود العامل', key: 'id', width: 14 },
-                { header: 'اسم العامل', key: 'name', width: 25 },
-                { header: 'نوع الحرفة', key: 'type', width: 18 },
-                { header: 'اليومية الافتراضية (ج.م)', key: 'wage', width: 22 }
-            ];
-
-            directory.forEach(d => {
-                wsDir.addRow({
-                    id: d.id,
-                    name: d.name || '',
-                    type: d.type || '',
-                    wage: Number(d.wage || d.amount || 0)
-                });
-            });
-
-            // Sheet 4: Users
-            const users = (await db.getAll('users')) || [];
-            const wsUsers = wb.addWorksheet('المستخدمين والصلاحيات', { views: [{ rightToLeft: true }] });
-            wsUsers.columns = [
-                { header: 'اسم المستخدم', key: 'username', width: 25 },
-                { header: 'الصلاحية', key: 'role', width: 20 }
-            ];
+            const statusMap = {
+                'approved': 'معتمد',
+                'pending': 'بانتظار الاعتماد',
+                'rejected': 'مرفوض'
+            };
 
             const roleMap = {
                 'admin': 'مدير النظام',
@@ -5034,37 +5123,475 @@ document.addEventListener('keydown', (e) => {
                 'operator_supervisor': 'مشرف مشغل'
             };
 
-            users.forEach(u => {
-                wsUsers.addRow({
-                    username: u.username === 'admin' ? 'Bishoy Mamdouh' : u.username,
-                    role: roleMap[u.role] || u.role || ''
-                });
+            // 3. Create ExcelJS Workbook
+            const wb = new ExcelJS.Workbook();
+            wb.creator = 'نظام إدارة العمالة';
+            wb.lastModifiedBy = (auth.currentUser?.username === 'admin' ? 'Bishoy Mamdouh' : auth.currentUser?.username) || 'مدير النظام';
+            wb.created = new Date();
+            wb.modified = new Date();
+
+            const thinBorder = {
+                top: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+                left: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+                bottom: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+                right: { style: 'thin', color: { argb: 'FFE2E8F0' } }
+            };
+
+            const cellAlign = { vertical: 'middle', horizontal: 'center', wrapText: true };
+
+            // ==========================================
+            // Sheet 1: تقرير تفاصيل العمالة اليومية الشامل
+            // ==========================================
+            const wsWorkers = wb.addWorksheet('تفاصيل العمالة اليومية', { views: [{ rightToLeft: true }] });
+
+            // Filter active workers that have a corresponding record
+            const activeWorkers = rawWorkers.filter(w => !w.isDeleted && recordsMap[w.recordId]);
+
+            // Sort workers: Supervisor (ascending), then Date (descending), then worker name (ascending)
+            activeWorkers.sort((a, b) => {
+                const rA = recordsMap[a.recordId] || {};
+                const rB = recordsMap[b.recordId] || {};
+
+                const supA = (usersMap[rA.supervisorId] || rA.supervisorName || '').toLowerCase();
+                const supB = (usersMap[rB.supervisorId] || rB.supervisorName || '').toLowerCase();
+                if (supA < supB) return -1;
+                if (supA > supB) return 1;
+
+                const dateA = rA.date || '';
+                const dateB = rB.date || '';
+                if (dateA > dateB) return -1;
+                if (dateA < dateB) return 1;
+
+                return (a.name || '').localeCompare(b.name || '', 'ar');
             });
 
-            // Format all worksheets
-            [wsRecords, wsWorkers, wsDir, wsUsers].forEach(sheet => {
-                const header = sheet.getRow(1);
-                header.height = 28;
-                header.eachCell(cell => {
-                    cell.fill = headerFill;
-                    cell.font = headerFont;
-                    cell.alignment = headerAlignment;
-                });
+            // Title Banner
+            wsWorkers.mergeCells('A1:O1');
+            const wTitle = wsWorkers.getCell('A1');
+            wTitle.value = 'نظام إدارة ومتابعة العمالة - تقرير تفاصيل العمالة الشامل';
+            wTitle.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF15803D' } }; // Green
+            wTitle.font = { name: 'Segoe UI', size: 13, bold: true, color: { argb: 'FFFFFFFF' } };
+            wTitle.alignment = cellAlign;
+            wsWorkers.getRow(1).height = 34;
 
-                sheet.eachRow((row, rIdx) => {
-                    if (rIdx > 1) {
-                        row.height = 22;
-                        row.eachCell(cell => {
-                            cell.alignment = cellAlignment;
-                            cell.border = borderStyle;
-                        });
+            // Subtitle
+            wsWorkers.mergeCells('A2:O2');
+            const wSub = wsWorkers.getCell('A2');
+            wSub.value = `تاريخ استخراج التقرير: ${dateStr} | إجمالي عمالة السراكي: ${activeWorkers.length} عامل`;
+            wSub.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0FDF4' } };
+            wSub.font = { name: 'Segoe UI', size: 9.5, bold: true, color: { argb: 'FF166534' } };
+            wSub.alignment = cellAlign;
+            wsWorkers.getRow(2).height = 20;
+
+            // Header Row (Row 4)
+            wsWorkers.getRow(3).height = 8; // Spacer
+
+            const workerHeaders = [
+                'م', 'التاريخ', 'اليوم', 'اسم العامل', 'نوع الحرفة / المهنة',
+                'المشرف', 'المهندس', 'اليومية (ج.م)', 'خصم (ج.م)', 'الصافي (ج.م)',
+                'مكان العمل', 'بند العمل (بالتفصيل)', 'المقاول', 'حالة السركي', 'الملاحظات'
+            ];
+
+            const wHeaderRow = wsWorkers.addRow(workerHeaders);
+            wHeaderRow.height = 28;
+            wHeaderRow.eachCell(cell => {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
+                cell.font = { name: 'Segoe UI', size: 10.5, bold: true, color: { argb: 'FFFFFFFF' } };
+                cell.alignment = cellAlign;
+                cell.border = thinBorder;
+            });
+
+            wsWorkers.columns = [
+                { key: 'index', width: 6 },
+                { key: 'date', width: 14 },
+                { key: 'day', width: 12 },
+                { key: 'name', width: 26 },
+                { key: 'type', width: 18 },
+                { key: 'supervisor', width: 22 },
+                { key: 'engineer', width: 22 },
+                { key: 'amount', width: 15 },
+                { key: 'deduction', width: 14 },
+                { key: 'net', width: 15 },
+                { key: 'location', width: 26 },
+                { key: 'task', width: 36 },
+                { key: 'contractor', width: 18 },
+                { key: 'status', width: 16 },
+                { key: 'notes', width: 28 }
+            ];
+
+            let sumWAmount = 0;
+            let sumWDeduction = 0;
+            let sumWNet = 0;
+
+            activeWorkers.forEach((w, idx) => {
+                const rec = recordsMap[w.recordId] || {};
+                const amount = Number(w.amount) || 0;
+                const deduction = Number(w.deduction) || 0;
+                const net = amount - deduction;
+
+                sumWAmount += amount;
+                sumWDeduction += deduction;
+                sumWNet += net;
+
+                const rowData = [
+                    idx + 1,
+                    rec.date || '',
+                    app.getArabicDayName(rec.date),
+                    w.name || '',
+                    w.type || '',
+                    usersMap[rec.supervisorId] || rec.supervisorName || 'غير معروف',
+                    usersMap[rec.engineerId] || rec.engineerName || 'غير معروف',
+                    amount,
+                    deduction,
+                    net,
+                    w.location || '',
+                    w.task || '',
+                    w.contractor || '',
+                    statusMap[rec.status] || rec.status || '',
+                    w.notes || ''
+                ];
+
+                const row = wsWorkers.addRow(rowData);
+                row.height = 22;
+                const isEven = idx % 2 === 1;
+
+                row.eachCell((cell, colNum) => {
+                    cell.alignment = cellAlign;
+                    cell.border = thinBorder;
+                    cell.font = { name: 'Segoe UI', size: 10 };
+
+                    if (isEven) {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+                    }
+
+                    // Format money columns
+                    if ([8, 9, 10].includes(colNum)) {
+                        cell.numFmt = '#,##0';
+                        if (colNum === 10) cell.font = { name: 'Segoe UI', size: 10, bold: true };
+                    }
+
+                    // Style status badge
+                    if (colNum === 14) {
+                        if (rec.status === 'approved') {
+                            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } };
+                            cell.font = { name: 'Segoe UI', size: 9.5, bold: true, color: { argb: 'FF15803D' } };
+                        } else if (rec.status === 'pending') {
+                            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
+                            cell.font = { name: 'Segoe UI', size: 9.5, bold: true, color: { argb: 'FFB45309' } };
+                        } else if (rec.status === 'rejected') {
+                            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } };
+                            cell.font = { name: 'Segoe UI', size: 9.5, bold: true, color: { argb: 'FFB91C1C' } };
+                        }
                     }
                 });
             });
 
+            // Summary Total Row for Sheet 1
+            const wSummaryRow = wsWorkers.addRow([
+                'الإجمالي العام', '', '', '', '', '', '',
+                sumWAmount, sumWDeduction, sumWNet,
+                '', '', '', '', ''
+            ]);
+            wSummaryRow.height = 26;
+            wsWorkers.mergeCells(`A${wSummaryRow.number}:G${wSummaryRow.number}`);
+            wSummaryRow.eachCell(cell => {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFECFDF5' } };
+                cell.font = { name: 'Segoe UI', size: 10.5, bold: true, color: { argb: 'FF065F46' } };
+                cell.alignment = cellAlign;
+                cell.border = {
+                    top: { style: 'thin', color: { argb: 'FF059669' } },
+                    bottom: { style: 'double', color: { argb: 'FF059669' } },
+                    left: thinBorder.left,
+                    right: thinBorder.right
+                };
+                if (typeof cell.value === 'number') {
+                    cell.numFmt = '#,##0';
+                }
+            });
+
+
+            // ==========================================
+            // Sheet 2: سجلات السراكي المجمعة
+            // ==========================================
+            const wsRecords = wb.addWorksheet('سجلات السراكي المجمعة', { views: [{ rightToLeft: true }] });
+
+            // Sort records by Date descending
+            const sortedRecords = [...rawRecords].sort((a, b) => {
+                const dateA = a.date || '';
+                const dateB = b.date || '';
+                if (dateA > dateB) return -1;
+                if (dateA < dateB) return 1;
+                return 0;
+            });
+
+            // Title Banner
+            wsRecords.mergeCells('A1:M1');
+            const rTitle = wsRecords.getCell('A1');
+            rTitle.value = 'سجلات السراكي المجمعة المعتمدة والتاريخية';
+            rTitle.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E3A8A' } }; // Navy Blue
+            rTitle.font = { name: 'Segoe UI', size: 13, bold: true, color: { argb: 'FFFFFFFF' } };
+            rTitle.alignment = cellAlign;
+            wsRecords.getRow(1).height = 34;
+
+            // Subtitle
+            wsRecords.mergeCells('A2:M2');
+            const rSub = wsRecords.getCell('A2');
+            rSub.value = `تاريخ استخراج التقرير: ${dateStr} | إجمالي عدد السراكي: ${sortedRecords.length} سركي`;
+            rSub.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEFF6FF' } };
+            rSub.font = { name: 'Segoe UI', size: 9.5, bold: true, color: { argb: 'FF1E40AF' } };
+            rSub.alignment = cellAlign;
+            wsRecords.getRow(2).height = 20;
+
+            wsRecords.getRow(3).height = 8; // Spacer
+
+            const recordHeaders = [
+                'م', 'تاريخ السركي', 'اليوم', 'المشرف مقدم السركي', 'المهندس المعتمد',
+                'عدد العمال', 'إجمالي اليوميات (ج.م)', 'إجمالي الخصومات (ج.م)', 'صافي السركي (ج.م)',
+                'حالة الاعتماد', 'تاريخ الإنشاء بالتوقيت', 'ملاحظات السركي', 'رقم السركي (ID)'
+            ];
+
+            const rHeaderRow = wsRecords.addRow(recordHeaders);
+            rHeaderRow.height = 28;
+            rHeaderRow.eachCell(cell => {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
+                cell.font = { name: 'Segoe UI', size: 10.5, bold: true, color: { argb: 'FFFFFFFF' } };
+                cell.alignment = cellAlign;
+                cell.border = thinBorder;
+            });
+
+            wsRecords.columns = [
+                { key: 'index', width: 6 },
+                { key: 'date', width: 15 },
+                { key: 'day', width: 13 },
+                { key: 'supervisor', width: 24 },
+                { key: 'engineer', width: 24 },
+                { key: 'workersCount', width: 14 },
+                { key: 'totalGross', width: 18 },
+                { key: 'totalDed', width: 18 },
+                { key: 'totalNet', width: 18 },
+                { key: 'status', width: 18 },
+                { key: 'createdAt', width: 22 },
+                { key: 'notes', width: 32 },
+                { key: 'id', width: 36 }
+            ];
+
+            let sumRWorkers = 0;
+            let sumRGross = 0;
+            let sumRDed = 0;
+            let sumRNet = 0;
+
+            sortedRecords.forEach((r, idx) => {
+                const recWorkers = rawWorkers.filter(w => w.recordId === r.id && !w.isDeleted);
+                const workerCount = recWorkers.length || Number(r.totalWorkers) || 0;
+                const gross = recWorkers.reduce((s, w) => s + (Number(w.amount) || 0), 0) || Number(r.totalAmount) || 0;
+                const ded = recWorkers.reduce((s, w) => s + (Number(w.deduction) || 0), 0);
+                const net = gross - ded;
+
+                sumRWorkers += workerCount;
+                sumRGross += gross;
+                sumRDed += ded;
+                sumRNet += net;
+
+                let createdStr = '';
+                if (r.createdAt) {
+                    try {
+                        createdStr = new Date(r.createdAt).toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' });
+                    } catch {
+                        createdStr = String(r.createdAt).replace('T', ' ').substring(0, 16);
+                    }
+                }
+
+                const rowData = [
+                    idx + 1,
+                    r.date || '',
+                    app.getArabicDayName(r.date),
+                    usersMap[r.supervisorId] || r.supervisorName || 'غير معروف',
+                    usersMap[r.engineerId] || r.engineerName || 'غير معروف',
+                    workerCount,
+                    gross,
+                    ded,
+                    net,
+                    statusMap[r.status] || r.status || '',
+                    createdStr,
+                    r.notes || '',
+                    r.id
+                ];
+
+                const row = wsRecords.addRow(rowData);
+                row.height = 22;
+                const isEven = idx % 2 === 1;
+
+                row.eachCell((cell, colNum) => {
+                    cell.alignment = cellAlign;
+                    cell.border = thinBorder;
+                    cell.font = { name: 'Segoe UI', size: 10 };
+
+                    if (isEven) {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+                    }
+
+                    if ([6, 7, 8, 9].includes(colNum)) {
+                        cell.numFmt = '#,##0';
+                        if (colNum === 9) cell.font = { name: 'Segoe UI', size: 10, bold: true };
+                    }
+
+                    if (colNum === 10) {
+                        if (r.status === 'approved') {
+                            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } };
+                            cell.font = { name: 'Segoe UI', size: 9.5, bold: true, color: { argb: 'FF15803D' } };
+                        } else if (r.status === 'pending') {
+                            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
+                            cell.font = { name: 'Segoe UI', size: 9.5, bold: true, color: { argb: 'FFB45309' } };
+                        } else if (r.status === 'rejected') {
+                            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } };
+                            cell.font = { name: 'Segoe UI', size: 9.5, bold: true, color: { argb: 'FFB91C1C' } };
+                        }
+                    }
+                });
+            });
+
+            // Summary Total Row for Sheet 2
+            const rSummaryRow = wsRecords.addRow([
+                'الإجمالي العام', '', '', '', '',
+                sumRWorkers, sumRGross, sumRDed, sumRNet,
+                '', '', '', ''
+            ]);
+            rSummaryRow.height = 26;
+            wsRecords.mergeCells(`A${rSummaryRow.number}:E${rSummaryRow.number}`);
+            rSummaryRow.eachCell(cell => {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEFF6FF' } };
+                cell.font = { name: 'Segoe UI', size: 10.5, bold: true, color: { argb: 'FF1E40AF' } };
+                cell.alignment = cellAlign;
+                cell.border = {
+                    top: { style: 'thin', color: { argb: 'FF2563EB' } },
+                    bottom: { style: 'double', color: { argb: 'FF2563EB' } },
+                    left: thinBorder.left,
+                    right: thinBorder.right
+                };
+                if (typeof cell.value === 'number') {
+                    cell.numFmt = '#,##0';
+                }
+            });
+
+
+            // ==========================================
+            // Sheet 3: دليل العمال المعتمد (الأساسي)
+            // ==========================================
+            const wsDir = wb.addWorksheet('دليل العمال المعتمد', { views: [{ rightToLeft: true }] });
+
+            const sortedDir = [...rawDirectory].sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ar'));
+
+            wsDir.mergeCells('A1:E1');
+            const dTitle = wsDir.getCell('A1');
+            dTitle.value = 'دليل العمال المعتمد (قاعدة بيانات العمال الأساسية)';
+            dTitle.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF92400E' } }; // Amber
+            dTitle.font = { name: 'Segoe UI', size: 13, bold: true, color: { argb: 'FFFFFFFF' } };
+            dTitle.alignment = cellAlign;
+            wsDir.getRow(1).height = 34;
+
+            wsDir.mergeCells('A2:E2');
+            const dSub = wsDir.getCell('A2');
+            dSub.value = `إجمالي عدد العمال المسجلين بالدليل: ${sortedDir.length} عامل`;
+            dSub.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
+            dSub.font = { name: 'Segoe UI', size: 9.5, bold: true, color: { argb: 'FF92400E' } };
+            dSub.alignment = cellAlign;
+            wsDir.getRow(2).height = 20;
+
+            wsDir.getRow(3).height = 8;
+
+            const dirHeaders = ['م', 'اسم العامل', 'نوع الحرفة / الصنعة', 'اليومية الافتراضية (ج.م)', 'كود العامل في الدليل'];
+            const dHeaderRow = wsDir.addRow(dirHeaders);
+            dHeaderRow.height = 28;
+            dHeaderRow.eachCell(cell => {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
+                cell.font = { name: 'Segoe UI', size: 10.5, bold: true, color: { argb: 'FFFFFFFF' } };
+                cell.alignment = cellAlign;
+                cell.border = thinBorder;
+            });
+
+            wsDir.columns = [
+                { key: 'index', width: 6 },
+                { key: 'name', width: 28 },
+                { key: 'type', width: 22 },
+                { key: 'wage', width: 22 },
+                { key: 'id', width: 36 }
+            ];
+
+            sortedDir.forEach((d, idx) => {
+                const wage = Number(d.wage || d.amount || 0);
+                const row = wsDir.addRow([idx + 1, d.name || '', d.type || '', wage, d.id || '']);
+                row.height = 22;
+                const isEven = idx % 2 === 1;
+                row.eachCell((cell, colNum) => {
+                    cell.alignment = cellAlign;
+                    cell.border = thinBorder;
+                    cell.font = { name: 'Segoe UI', size: 10 };
+                    if (isEven) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+                    if (colNum === 4) cell.numFmt = '#,##0';
+                });
+            });
+
+
+            // ==========================================
+            // Sheet 4: المستخدمين وصلاحيات النظام
+            // ==========================================
+            const wsUsers = wb.addWorksheet('المستخدمين والصلاحيات', { views: [{ rightToLeft: true }] });
+
+            const sortedUsers = [...rawUsers].sort((a, b) => customSort(a, b, true));
+
+            wsUsers.mergeCells('A1:D1');
+            const uTitle = wsUsers.getCell('A1');
+            uTitle.value = 'حسابات المستخدمين وصلاحيات الوصول للنظام';
+            uTitle.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF581C87' } }; // Purple
+            uTitle.font = { name: 'Segoe UI', size: 13, bold: true, color: { argb: 'FFFFFFFF' } };
+            uTitle.alignment = cellAlign;
+            wsUsers.getRow(1).height = 34;
+
+            wsUsers.mergeCells('A2:D2');
+            const uSub = wsUsers.getCell('A2');
+            uSub.value = `إجمالي عدد المستخدمين النشطين: ${sortedUsers.length} مستخدم`;
+            uSub.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF3E8FF' } };
+            uSub.font = { name: 'Segoe UI', size: 9.5, bold: true, color: { argb: 'FF581C87' } };
+            uSub.alignment = cellAlign;
+            wsUsers.getRow(2).height = 20;
+
+            wsUsers.getRow(3).height = 8;
+
+            const userHeaders = ['م', 'اسم المستخدم', 'الصلاحية / المسمى الوظيفي', 'كود المستخدم في النظام (ID)'];
+            const uHeaderRow = wsUsers.addRow(userHeaders);
+            uHeaderRow.height = 28;
+            uHeaderRow.eachCell(cell => {
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
+                cell.font = { name: 'Segoe UI', size: 10.5, bold: true, color: { argb: 'FFFFFFFF' } };
+                cell.alignment = cellAlign;
+                cell.border = thinBorder;
+            });
+
+            wsUsers.columns = [
+                { key: 'index', width: 6 },
+                { key: 'username', width: 26 },
+                { key: 'role', width: 24 },
+                { key: 'id', width: 36 }
+            ];
+
+            sortedUsers.forEach((u, idx) => {
+                const uName = u.username === 'admin' ? 'Bishoy Mamdouh' : u.username;
+                const rRole = roleMap[u.role] || u.role || 'غير محدد';
+                const row = wsUsers.addRow([idx + 1, uName, rRole, u.id || '']);
+                row.height = 22;
+                const isEven = idx % 2 === 1;
+                row.eachCell(cell => {
+                    cell.alignment = cellAlign;
+                    cell.border = thinBorder;
+                    cell.font = { name: 'Segoe UI', size: 10 };
+                    if (isEven) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+                });
+            });
+
+
+            // Generate & Download Excel
             const buffer = await wb.xlsx.writeBuffer();
             const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            const dateStr = new Date().toISOString().split('T')[0];
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;

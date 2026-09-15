@@ -449,7 +449,25 @@ async function handler(req: Request): Promise<Response> {
                 onExcelExport: true,
                 onRecordApprove: true,
                 dailyAuto: true,
-                dailyTime: "11:00 PM"
+                dailyTime: "23:00",
+                frequency: "daily",
+                destinations: {
+                    download: true,
+                    folder: true,
+                    folderPath: "./backups",
+                    cloud: true
+                },
+                includedData: {
+                    records: true,
+                    workers: true,
+                    directory: true,
+                    users: true,
+                    system: true
+                },
+                formats: {
+                    json: true,
+                    excel: true
+                }
             };
             return new Response(JSON.stringify(config), {
                 status: 200,
@@ -813,16 +831,19 @@ async function performDailyBackup() {
     }
     if (!kv) return;
     try {
+        const configEntry = await kv.get(["system", "backupConfig"]);
+        const config: any = configEntry?.value || {};
+        const folderPath = config.destinations?.folderPath || "./backups";
         const dateStr = new Date().toISOString().split("T")[0];
-        const exportData = {};
+        const exportData: any = {};
         for await (const entry of kv.list({ prefix: [] })) {
             const collection = entry.key[0];
             if (!exportData[collection]) exportData[collection] = [];
             exportData[collection].push({ key: entry.key, value: entry.value });
         }
-        await Deno.mkdir("./backups", { recursive: true });
-        await Deno.writeTextFile(`./backups/system_backup_${dateStr}.json`, JSON.stringify(exportData, null, 2));
-        console.log(`Daily backup saved: system_backup_${dateStr}.json`);
+        await Deno.mkdir(folderPath, { recursive: true });
+        await Deno.writeTextFile(`${folderPath}/system_backup_${dateStr}.json`, JSON.stringify(exportData, null, 2));
+        console.log(`Daily backup saved: ${folderPath}/system_backup_${dateStr}.json`);
     } catch (e) {
         console.error("Backup failed:", e);
     }
