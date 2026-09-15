@@ -198,14 +198,26 @@ async function dispatchInstantAlerts(kvInstance: any, triggerEvent: string, cont
             const targetIds = new Set<string>();
             const role = alert.targetRole || (alert.trigger === "new_record" || alert.trigger === "record_resubmit" ? "engineer" : "supervisor");
 
-            if (role === "engineer" && context.engineerId) {
-                targetIds.add(String(context.engineerId));
-            } else if (role === "supervisor" && context.supervisorId) {
-                targetIds.add(String(context.supervisorId));
-            } else if (role === "admin" || role === "all") {
+            if (role === "record_engineer" || (role === "engineer" && context.engineerId)) {
+                if (context.engineerId) {
+                    targetIds.add(String(context.engineerId));
+                } else {
+                    const users = await fetchUsers();
+                    users.filter(u => u.role === "engineer").forEach(u => targetIds.add(u.id));
+                }
+            } else if (role === "record_supervisor" || (role === "supervisor" && context.supervisorId)) {
+                if (context.supervisorId) {
+                    targetIds.add(String(context.supervisorId));
+                } else {
+                    const users = await fetchUsers();
+                    users.filter(u => u.role === "supervisor").forEach(u => targetIds.add(u.id));
+                }
+            } else {
                 const users = await fetchUsers();
                 users.forEach(u => {
-                    if (role === "all" || u.role === "admin") {
+                    if (role === "all") {
+                        targetIds.add(u.id);
+                    } else if (u.role === role) {
                         targetIds.add(u.id);
                     }
                 });

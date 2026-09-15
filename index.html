@@ -1749,6 +1749,99 @@ select {
             </div>
         </div>
 
+        <!-- Add/Edit Instant Alert Modal -->
+        <div id="modal-instant-alert" class="modal" style="display: none; z-index: 10000;">
+            <div class="card" style="width: 100%; max-width: 650px; max-height: 92vh; overflow-y: auto; position: relative;">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
+                    <h3 id="modal-instant-alert-title" style="margin: 0; font-size: 1.25rem;"><i class="fas fa-bolt text-primary"></i> تعديل إعدادات التنبيه الفوري</h3>
+                    <button class="btn-icon" onclick="app.closeInstantAlertModal()" style="font-size: 1.5rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+                </div>
+                
+                <input type="hidden" id="instant-alert-id">
+                <input type="hidden" id="instant-alert-is-builtin">
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.95rem;">اسم التنبيه <span style="color:var(--danger);">*</span></label>
+                    <input type="text" id="instant-alert-name" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-main); font-size: 0.95rem;" placeholder="مثال: طلب اعتماد سركي جديد...">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.95rem;"><i class="fas fa-bolt" style="color: #6366f1;"></i> الحدث المحفز (متى يتم إرسال التنبيه تلقائياً):</label>
+                    <select id="instant-alert-trigger" onchange="app.onInstantAlertTriggerChange()" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-main); font-size: 0.92rem;">
+                        <option value="new_record">سركي جديد بانتظار الاعتماد (عند تسجيل أي مشرف لسركي)</option>
+                        <option value="record_approved">اعتماد السركي من المهندس</option>
+                        <option value="record_rejected">رفض السركي من المهندس</option>
+                        <option value="record_review">مراجعة السركي (اعتماد أو رفض)</option>
+                        <option value="record_resubmit">تعديل وإعادة تقديم سركي</option>
+                        <option value="new_worker">إضافة عامل جديد في الدليل</option>
+                        <option value="custom">حدث مخصص (كتابة اسم الحدث يدوياً)...</option>
+                    </select>
+                </div>
+
+                <div id="instant-alert-custom-trigger-box" class="form-group" style="display: none; margin-bottom: 16px; background: rgba(99, 102, 241, 0.06); border: 1px dashed #6366f1; border-radius: 8px; padding: 12px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.9rem; color: #4338ca;"><i class="fas fa-pen"></i> اكتب اسم أو كود الحدث المخصص:</label>
+                    <input type="text" id="instant-alert-custom-trigger" style="width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-main); font-size: 0.92rem;" placeholder="مثال: inventory_update أو تعديل تسعيرة أو أي حدث...">
+                    <small style="color: var(--text-muted); display: block; margin-top: 4px; font-size: 0.78rem;">يمكنك كتابة أي مسمى حدث مخصص يتم إطلاقه من النظام أو السيرفر.</small>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.95rem;"><i class="fas fa-users" style="color: #10b981;"></i> إرسال إلى مين (المستهدفون بالإشعار):</label>
+                    <select id="instant-alert-target-role" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-main); font-size: 0.92rem;">
+                        <optgroup label="المعنيون بالسركي أو الإجراء مباشرة:">
+                            <option value="record_engineer">المهندس المختص بالسركي المعني (المهندس الموجه إليه السركي)</option>
+                            <option value="record_supervisor">المشرف صاحب ومقدم السركي (المشرف الذي سجل السركي)</option>
+                        </optgroup>
+                        <optgroup label="صلاحيات وفئات المستخدمين في النظام:">
+                            <option value="admin">مدير النظام (جميع المستخدمين بصلاحية مدير)</option>
+                            <option value="engineer">مهندس موقع (جميع المستخدمين بصلاحية مهندس)</option>
+                            <option value="supervisor">مشرف موقع (جميع المستخدمين بصلاحية مشرف)</option>
+                            <option value="surveyor">مساح (جميع المستخدمين بصلاحية مساح)</option>
+                            <option value="warehouse_manager">مدير مخزن / أمين مخزن (جميع المستخدمين بصلاحية مدير مخزن)</option>
+                            <option value="operator_supervisor">مشرف مشغل / حركة (جميع المستخدمين بصلاحية مشرف مشغل)</option>
+                        </optgroup>
+                        <optgroup label="بث عام لكافة الحسابات:">
+                            <option value="all">جميع المستخدمين في النظام بلا استثناء (الكل)</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.95rem;">عنوان الإشعار <span style="color:var(--danger);">*</span></label>
+                    <input type="text" id="instant-alert-title" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-main); font-size: 0.95rem;" placeholder="مثال: سركي جديد بانتظار الاعتماد">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+                        <label style="font-weight: bold; margin: 0; font-size: 0.95rem;">قالب نص الرسالة <span style="color:var(--danger);">*</span></label>
+                        <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">إدراج متغير:</span>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="app.insertInstantAlertVar('{supervisor}')" style="font-size: 0.73rem; padding: 2px 7px; border: 1px solid var(--border-color); background: var(--bg-card); cursor: pointer; border-radius: 4px;">المشرف</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="app.insertInstantAlertVar('{count}')" style="font-size: 0.73rem; padding: 2px 7px; border: 1px solid var(--border-color); background: var(--bg-card); cursor: pointer; border-radius: 4px;">العدد</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="app.insertInstantAlertVar('{status}')" style="font-size: 0.73rem; padding: 2px 7px; border: 1px solid var(--border-color); background: var(--bg-card); cursor: pointer; border-radius: 4px;">الحالة</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="app.insertInstantAlertVar('{date}')" style="font-size: 0.73rem; padding: 2px 7px; border: 1px solid var(--border-color); background: var(--bg-card); cursor: pointer; border-radius: 4px;">التاريخ</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="app.insertInstantAlertVar('{worker}')" style="font-size: 0.73rem; padding: 2px 7px; border: 1px solid var(--border-color); background: var(--bg-card); cursor: pointer; border-radius: 4px;">العامل</button>
+                        </div>
+                    </div>
+                    <textarea id="instant-alert-text" required style="width: 100%; box-sizing: border-box; min-height: 85px; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-main); font-family: inherit; font-size: 0.92rem; line-height: 1.5;" placeholder="اكتب نص الرسالة هنا..."></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 14px; display: flex; justify-content: space-between; align-items: center;">
+                    <label class="notif-toggle-switch" style="cursor: pointer; margin: 0; display: flex; align-items: center;">
+                        <input type="checkbox" id="instant-alert-active" checked>
+                        <span class="notif-slider"></span>
+                        <span style="font-weight: bold; font-size: 0.95rem; margin-right: 10px;">تفعيل هذا التنبيه الفوري</span>
+                    </label>
+                </div>
+
+                <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 14px;">
+                    <button type="button" class="btn btn-secondary" onclick="app.closeInstantAlertModal()">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="btn-save-instant-alert-modal" onclick="app.saveInstantAlertModal()">
+                        <i class="fas fa-save"></i> حفظ التنبيه
+                    </button>
+                </div>
+            </div>
+        </div>
+
             
             <section id="view-supervisor" class="view hidden">
                 <header class="view-header">
@@ -4092,7 +4185,7 @@ document.addEventListener('keydown', (e) => {
         const btnAddInstantAlert = document.getElementById('btn-add-instant-alert');
         if (btnAddInstantAlert) {
             btnAddInstantAlert.addEventListener('click', () => {
-                this.addInstantAlert();
+                this.openInstantAlertModal(null);
             });
         }
 
@@ -5925,114 +6018,357 @@ document.addEventListener('keydown', (e) => {
             'new_worker': { icon: 'fa-user-plus', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.15)' }
         };
 
+        this.renderInstantAlertCards(alerts);
+    }
+
+    getInstantTriggerLabel(trigger, customTrigger) {
+        const labels = {
+            'new_record': 'سركي جديد بانتظار الاعتماد',
+            'record_approved': 'اعتماد السركي من المهندس',
+            'record_rejected': 'رفض السركي من المهندس',
+            'record_review': 'مراجعة السركي (اعتماد أو رفض)',
+            'record_resubmit': 'تعديل وإعادة تقديم سركي',
+            'new_worker': 'إضافة عامل جديد في الدليل'
+        };
+        if (trigger === 'custom' || !labels[trigger]) {
+            return customTrigger || trigger || 'حدث مخصص';
+        }
+        return labels[trigger];
+    }
+
+    getInstantTargetLabel(role) {
+        const labels = {
+            'record_engineer': 'المهندس المختص بالسركي المعني',
+            'engineer': 'مهندس موقع (جميع المهندسين)',
+            'record_supervisor': 'المشرف صاحب ومقدم السركي',
+            'supervisor': 'مشرف موقع (جميع المشرفين)',
+            'admin': 'مدير النظام (جميع المديرين)',
+            'surveyor': 'مساح (جميع المساحين)',
+            'warehouse_manager': 'مدير مخزن / أمين مخزن',
+            'operator_supervisor': 'مشرف مشغل / حركة',
+            'all': 'جميع المستخدمين في النظام (الكل)'
+        };
+        return labels[role] || (auth ? auth.getRoleNameAr(role) : role) || role;
+    }
+
+    renderInstantAlertCards(alerts) {
+        const container = document.getElementById('instant-alerts-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (!alerts || alerts.length === 0) {
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 30px; background: var(--bg-main); border: 1px dashed var(--border-color); border-radius: 10px; color: var(--text-muted);">
+                    <i class="fas fa-bell-slash" style="font-size: 2.2rem; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                    <p style="margin: 0; font-weight: bold;">لا توجد تنبيهات فورية حالياً</p>
+                    <p style="margin: 5px 0 0; font-size: 0.85rem;">اضغط على زر "إضافة تنبيه فوري جديد" لإنشاء تنبيه تلقائي لأي حدث.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const triggerIcons = {
+            'new_record': { icon: 'fa-paper-plane', color: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.15)' },
+            'record_approved': { icon: 'fa-check-circle', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)' },
+            'record_rejected': { icon: 'fa-times-circle', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)' },
+            'record_review': { icon: 'fa-clipboard-check', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)' },
+            'record_resubmit': { icon: 'fa-sync-alt', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)' },
+            'new_worker': { icon: 'fa-user-plus', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.15)' }
+        };
+
         alerts.forEach((alert, index) => {
             const card = document.createElement('div');
             card.className = 'card instant-alert-card';
             card.dataset.id = alert.id || ('alert_' + index);
             card.dataset.isBuiltin = alert.isBuiltIn ? 'true' : 'false';
-            card.style.cssText = 'padding: 14px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 8px; display: flex; flex-direction: column; gap: 10px; position: relative; box-sizing: border-box; width: 100%;';
+            card.style.cssText = 'padding: 16px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 10px; display: flex; flex-direction: column; gap: 12px; position: relative; box-sizing: border-box; width: 100%; box-shadow: 0 1px 3px rgba(0,0,0,0.04);';
 
-            const meta = triggerIcons[alert.trigger] || { icon: 'fa-bell', color: '#6366f1', bg: 'rgba(99, 102, 241, 0.15)' };
+            const meta = triggerIcons[alert.trigger] || { icon: 'fa-bolt', color: '#6366f1', bg: 'rgba(99, 102, 241, 0.15)' };
+            const triggerLabel = this.getInstantTriggerLabel(alert.trigger, alert.customTrigger);
+            const targetLabel = this.getInstantTargetLabel(alert.targetRole);
 
             card.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
-                        <div style="width: 32px; height: 32px; border-radius: 6px; background: ${meta.bg}; color: ${meta.color}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+                        <div style="width: 36px; height: 36px; border-radius: 8px; background: ${meta.bg}; color: ${meta.color}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.1rem;">
                             <i class="fas ${meta.icon}"></i>
                         </div>
-                        <div style="flex: 1;">
-                            <input type="text" class="alert-name-input" value="${this.escapeHtml(alert.name || 'تنبيه فوري')}" 
-                                style="width: 100%; font-size: 0.92rem; font-weight: bold; border: 1px dashed var(--border-color); background: var(--bg-main); padding: 5px 8px; border-radius: 5px; color: var(--text-main);"
-                                title="اضغط لتعديل اسم هذا التنبيه" placeholder="اسم التنبيه...">
+                        <div style="flex: 1; min-width: 0;">
+                            <h4 style="margin: 0; font-size: 1.02rem; font-weight: bold; color: var(--text-main); white-space: normal; word-break: break-word;">
+                                ${this.escapeHtml(alert.name || 'تنبيه فوري')}
+                            </h4>
                         </div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
                         <label class="notif-toggle-switch" title="تفعيل / إيقاف هذا التنبيه" style="margin: 0; cursor: pointer;">
-                            <input type="checkbox" class="alert-active-input" ${alert.isActive !== false ? 'checked' : ''}>
+                            <input type="checkbox" ${alert.isActive !== false ? 'checked' : ''} onchange="app.toggleInstantAlertActive('${alert.id}', this.checked)">
                             <span class="notif-slider"></span>
                         </label>
                         ${!alert.isBuiltIn ? `
-                            <button type="button" class="btn-icon text-danger" title="حذف هذا التنبيه المخصص" onclick="app.deleteInstantAlert('${alert.id}')" style="font-size: 0.95rem; padding: 4px;">
+                            <button type="button" class="btn-icon text-danger" title="حذف هذا التنبيه المخصص" onclick="app.deleteInstantAlert('${alert.id}')" style="font-size: 1rem; padding: 4px;">
                                 <i class="fas fa-trash"></i>
                             </button>
                         ` : ''}
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                    <div class="form-group" style="margin: 0;">
-                        <label style="display: block; font-size: 0.76rem; font-weight: bold; margin-bottom: 3px; color: var(--text-muted);">
-                            <i class="fas fa-bolt"></i> عند حدث:
-                        </label>
-                        <select class="alert-trigger-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--bg-main); color: var(--text-main);">
-                            <option value="new_record" ${alert.trigger === 'new_record' ? 'selected' : ''}>سركي جديد بانتظار الاعتماد</option>
-                            <option value="record_approved" ${alert.trigger === 'record_approved' ? 'selected' : ''}>اعتماد السركي من المهندس</option>
-                            <option value="record_rejected" ${alert.trigger === 'record_rejected' ? 'selected' : ''}>رفض السركي من المهندس</option>
-                            <option value="record_review" ${alert.trigger === 'record_review' ? 'selected' : ''}>مراجعة السركي (اعتماد أو رفض)</option>
-                            <option value="record_resubmit" ${alert.trigger === 'record_resubmit' ? 'selected' : ''}>تعديل وإعادة تقديم سركي</option>
-                            <option value="new_worker" ${alert.trigger === 'new_worker' ? 'selected' : ''}>إضافة عامل جديد في الدليل</option>
-                        </select>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <div style="display: flex; align-items: center; gap: 8px; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 6px; padding: 6px 10px; font-size: 0.83rem; color: var(--text-main);">
+                        <i class="fas fa-bolt" style="color: #6366f1; flex-shrink: 0;"></i>
+                        <strong style="flex-shrink: 0; color: #4f46e5;">الحدث:</strong>
+                        <span style="font-weight: 500; word-break: break-word;">${this.escapeHtml(triggerLabel)}</span>
                     </div>
-
-                    <div class="form-group" style="margin: 0;">
-                        <label style="display: block; font-size: 0.76rem; font-weight: bold; margin-bottom: 3px; color: var(--text-muted);">
-                            <i class="fas fa-users"></i> إرسال إلى:
-                        </label>
-                        <select class="alert-target-input" style="width: 100%; padding: 5px 8px; font-size: 0.8rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--bg-main); color: var(--text-main);">
-                            <option value="engineer" ${alert.targetRole === 'engineer' ? 'selected' : ''}>المهندس المختص بالسركي</option>
-                            <option value="supervisor" ${alert.targetRole === 'supervisor' ? 'selected' : ''}>المشرف صاحب السركي</option>
-                            <option value="admin" ${alert.targetRole === 'admin' ? 'selected' : ''}>المديرين فقط</option>
-                            <option value="all" ${alert.targetRole === 'all' ? 'selected' : ''}>جميع المستخدمين</option>
-                        </select>
+                    <div style="display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 6px; padding: 6px 10px; font-size: 0.83rem; color: var(--text-main);">
+                        <i class="fas fa-users" style="color: #10b981; flex-shrink: 0;"></i>
+                        <strong style="flex-shrink: 0; color: #059669;">إرسال إلى:</strong>
+                        <span style="font-weight: 500; word-break: break-word;">${this.escapeHtml(targetLabel)}</span>
                     </div>
                 </div>
 
-                <div class="form-group" style="margin: 0;">
-                    <label style="display: block; font-size: 0.78rem; font-weight: bold; margin-bottom: 3px;">عنوان الإشعار:</label>
-                    <input type="text" class="alert-title-input" value="${this.escapeHtml(alert.title || '')}" style="width: 100%; padding: 5px 8px; font-size: 0.83rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--bg-main); color: var(--text-main);">
+                <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 10px;">
+                    <div style="font-size: 0.85rem; font-weight: bold; color: var(--text-main); margin-bottom: 4px;">
+                        <i class="fas fa-heading" style="opacity: 0.6; font-size: 0.75rem;"></i> ${this.escapeHtml(alert.title || alert.name)}
+                    </div>
+                    <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; white-space: pre-line;">
+                        ${this.escapeHtml(alert.text || 'لا يوجد نص محدد لهذا التنبيه')}
+                    </div>
                 </div>
 
-                <div class="form-group" style="margin: 0;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
-                        <label style="font-size: 0.78rem; font-weight: bold; margin: 0;">قالب نص الرسالة:</label>
-                        <span style="font-size: 0.7rem; color: var(--text-muted); direction: ltr;">{supervisor}, {count}, {status}, {date}, {worker}</span>
-                    </div>
-                    <textarea class="alert-text-input" style="width: 100%; min-height: 52px; padding: 6px 8px; font-size: 0.83rem; border: 1px solid var(--border-color); border-radius: 5px; background: var(--bg-main); color: var(--text-main); font-family: inherit;">${this.escapeHtml(alert.text || '')}</textarea>
+                <div style="display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: auto; padding-top: 6px; border-top: 1px dashed var(--border-color);">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="app.openInstantAlertModal('${alert.id}')" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 6px 14px; background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid #6366f1; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                        <i class="fas fa-edit"></i> تعديل التنبيه
+                    </button>
                 </div>
             `;
             container.appendChild(card);
         });
     }
 
-    addInstantAlert() {
-        if (!this.currentInstantAlerts) this.currentInstantAlerts = [];
-        this.currentInstantAlerts.push({
-            id: 'alert_' + Date.now(),
-            name: 'تنبيه فوري جديد',
-            trigger: 'new_record',
-            targetRole: 'engineer',
-            title: 'عنوان التنبيه',
-            text: 'نص التنبيه هنا...',
-            isActive: true,
-            isBuiltIn: false
-        });
-        this.renderInstantAlerts(this.currentInstantAlerts);
-        const container = document.getElementById('instant-alerts-container');
-        if (container && container.lastElementChild) {
-            container.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            const nameInput = container.lastElementChild.querySelector('.alert-name-input');
-            if (nameInput) {
-                nameInput.focus();
-                nameInput.select();
+    openInstantAlertModal(alertId = null) {
+        const modal = document.getElementById('modal-instant-alert');
+        if (!modal) return;
+
+        const titleEl = document.getElementById('modal-instant-alert-title');
+        const idInput = document.getElementById('instant-alert-id');
+        const isBuiltinInput = document.getElementById('instant-alert-is-builtin');
+        const nameInput = document.getElementById('instant-alert-name');
+        const triggerSelect = document.getElementById('instant-alert-trigger');
+        const customTriggerInput = document.getElementById('instant-alert-custom-trigger');
+        const targetRoleSelect = document.getElementById('instant-alert-target-role');
+        const titleInput = document.getElementById('instant-alert-title');
+        const textInput = document.getElementById('instant-alert-text');
+        const activeCb = document.getElementById('instant-alert-active');
+
+        if (alertId) {
+            const alertObj = (this.currentInstantAlerts || []).find(a => a.id === alertId);
+            if (!alertObj) return;
+
+            idInput.value = alertObj.id;
+            isBuiltinInput.value = alertObj.isBuiltIn ? 'true' : 'false';
+            nameInput.value = alertObj.name || '';
+
+            const standardTriggers = ['new_record', 'record_approved', 'record_rejected', 'record_review', 'record_resubmit', 'new_worker'];
+            if (standardTriggers.includes(alertObj.trigger)) {
+                triggerSelect.value = alertObj.trigger;
+                customTriggerInput.value = '';
+            } else {
+                triggerSelect.value = 'custom';
+                customTriggerInput.value = alertObj.customTrigger || alertObj.trigger || '';
             }
+
+            targetRoleSelect.value = alertObj.targetRole || 'record_engineer';
+            titleInput.value = alertObj.title || '';
+            textInput.value = alertObj.text || '';
+            activeCb.checked = alertObj.isActive !== false;
+
+            if (titleEl) {
+                titleEl.innerHTML = '<i class="fas fa-edit text-primary"></i> تعديل إعدادات التنبيه الفوري';
+            }
+        } else {
+            idInput.value = '';
+            isBuiltinInput.value = 'false';
+            nameInput.value = '';
+            triggerSelect.value = 'new_record';
+            customTriggerInput.value = '';
+            targetRoleSelect.value = 'record_engineer';
+            titleInput.value = '';
+            textInput.value = '';
+            activeCb.checked = true;
+
+            if (titleEl) {
+                titleEl.innerHTML = '<i class="fas fa-plus-circle text-primary"></i> إضافة تنبيه فوري جديد';
+            }
+        }
+
+        this.onInstantAlertTriggerChange();
+        modal.style.display = 'flex';
+    }
+
+    closeInstantAlertModal() {
+        const modal = document.getElementById('modal-instant-alert');
+        if (modal) modal.style.display = 'none';
+    }
+
+    onInstantAlertTriggerChange() {
+        const trigger = document.getElementById('instant-alert-trigger')?.value;
+        const customBox = document.getElementById('instant-alert-custom-trigger-box');
+        if (customBox) {
+            customBox.style.display = (trigger === 'custom') ? 'block' : 'none';
         }
     }
 
-    deleteInstantAlert(alertId) {
-        if (!confirm('هل أنت متأكد من حذف هذا التنبيه؟')) return;
+    insertInstantAlertVar(varStr) {
+        const textarea = document.getElementById('instant-alert-text');
+        if (!textarea) return;
+        const start = textarea.selectionStart || textarea.value.length;
+        const end = textarea.selectionEnd || textarea.value.length;
+        const val = textarea.value;
+        textarea.value = val.substring(0, start) + varStr + val.substring(end);
+        textarea.selectionStart = textarea.selectionEnd = start + varStr.length;
+        textarea.focus();
+    }
+
+    async saveInstantAlertModal() {
+        const idInput = document.getElementById('instant-alert-id');
+        const isBuiltinInput = document.getElementById('instant-alert-is-builtin');
+        const nameInput = document.getElementById('instant-alert-name');
+        const triggerSelect = document.getElementById('instant-alert-trigger');
+        const customTriggerInput = document.getElementById('instant-alert-custom-trigger');
+        const targetRoleSelect = document.getElementById('instant-alert-target-role');
+        const titleInput = document.getElementById('instant-alert-title');
+        const textInput = document.getElementById('instant-alert-text');
+        const activeCb = document.getElementById('instant-alert-active');
+
+        const name = nameInput.value.trim();
+        if (!name) {
+            alert('يرجى إدخال اسم التنبيه.');
+            nameInput.focus();
+            return;
+        }
+
+        let trigger = triggerSelect.value;
+        let customTrigger = '';
+        if (trigger === 'custom') {
+            customTrigger = customTriggerInput.value.trim();
+            if (!customTrigger) {
+                alert('يرجى كتابة اسم أو كود الحدث المخصص.');
+                customTriggerInput.focus();
+                return;
+            }
+        }
+
+        const targetRole = targetRoleSelect.value || 'record_engineer';
+        const title = titleInput.value.trim() || name;
+        const text = textInput.value.trim();
+        if (!text) {
+            alert('يرجى إدخال نص الرسالة أو قالب التنبيه.');
+            textInput.focus();
+            return;
+        }
+
+        const isActive = activeCb.checked;
+        const id = idInput.value || ('alert_' + Date.now());
+        const isBuiltIn = isBuiltinInput.value === 'true';
+
+        const alertItem = {
+            id,
+            isBuiltIn,
+            name,
+            trigger,
+            customTrigger,
+            targetRole,
+            title,
+            text,
+            isActive
+        };
+
+        if (!this.currentInstantAlerts) this.currentInstantAlerts = [];
+        const existingIdx = this.currentInstantAlerts.findIndex(a => a.id === id);
+        if (existingIdx >= 0) {
+            this.currentInstantAlerts[existingIdx] = alertItem;
+        } else {
+            this.currentInstantAlerts.push(alertItem);
+        }
+
+        this.renderInstantAlerts(this.currentInstantAlerts);
+        this.closeInstantAlertModal();
+
+        // Automatically sync with server
+        try {
+            const config = window.notifConfig || { scheduled: [], systemReminders: {} };
+            config.instantAlerts = this.currentInstantAlerts;
+
+            // Maintain builtInAlerts sync for backward compatibility
+            const nr = this.currentInstantAlerts.find(a => a.trigger === 'new_record');
+            const rr = this.currentInstantAlerts.find(a => a.trigger === 'record_review' || a.trigger === 'record_approved');
+            const rs = this.currentInstantAlerts.find(a => a.trigger === 'record_resubmit');
+            config.builtInAlerts = {
+                newRecord: {
+                    isActive: nr ? nr.isActive : true,
+                    title: nr?.title || 'طلب اعتماد سركي جديد',
+                    text: nr?.text || 'قام المشرف {supervisor} بتقديم سركي جديد بانتظار اعتمادك (إجمالي المعلق: {count})'
+                },
+                recordReview: {
+                    isActive: rr ? rr.isActive : true,
+                    title: rr?.title || 'نتيجة مراجعة السركي',
+                    text: rr?.text || 'تم {status} السركي الخاص بيوم {date}'
+                },
+                recordResubmit: {
+                    isActive: rs ? rs.isActive : true,
+                    title: rs?.title || 'إعادة تقديم سركي',
+                    text: rs?.text || 'قام المشرف {supervisor} بتعديل وإعادة تقديم السركي الخاص بيوم {date}'
+                }
+            };
+
+            await fetch('/api/notificationsConfig', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+            });
+            window.notifConfig = config;
+        } catch (e) {
+            console.error('Failed to sync instant alert to server:', e);
+        }
+    }
+
+    async toggleInstantAlertActive(alertId, isActive) {
+        if (!this.currentInstantAlerts) return;
+        const alertObj = this.currentInstantAlerts.find(a => a.id === alertId);
+        if (!alertObj) return;
+
+        alertObj.isActive = isActive;
+        this.renderInstantAlerts(this.currentInstantAlerts);
+
+        try {
+            const config = window.notifConfig || { scheduled: [], systemReminders: {} };
+            config.instantAlerts = this.currentInstantAlerts;
+            await fetch('/api/notificationsConfig', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+            });
+        } catch (e) {
+            console.error('Failed to toggle instant alert status:', e);
+        }
+    }
+
+    async deleteInstantAlert(alertId) {
+        if (!confirm('هل أنت متأكد من حذف هذا التنبيه نهائياً؟')) return;
         if (!this.currentInstantAlerts) return;
         this.currentInstantAlerts = this.currentInstantAlerts.filter(a => a.id !== alertId);
         this.renderInstantAlerts(this.currentInstantAlerts);
+
+        try {
+            const config = window.notifConfig || { scheduled: [], systemReminders: {} };
+            config.instantAlerts = this.currentInstantAlerts;
+            await fetch('/api/notificationsConfig', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+            });
+        } catch (e) {
+            console.error('Failed to delete instant alert:', e);
+        }
     }
 
     async saveBuiltinAlertsConfig() {
@@ -6044,32 +6380,7 @@ document.addEventListener('keydown', (e) => {
         }
 
         try {
-            const cards = document.querySelectorAll('#instant-alerts-container .instant-alert-card');
-            const instantAlerts = [];
-
-            cards.forEach(card => {
-                const id = card.dataset.id;
-                const isBuiltIn = card.dataset.isBuiltin === 'true';
-                const name = card.querySelector('.alert-name-input')?.value.trim() || 'تنبيه فوري';
-                const isActive = card.querySelector('.alert-active-input')?.checked ?? true;
-                const trigger = card.querySelector('.alert-trigger-input')?.value || 'new_record';
-                const targetRole = card.querySelector('.alert-target-input')?.value || 'engineer';
-                const title = card.querySelector('.alert-title-input')?.value.trim() || name;
-                const text = card.querySelector('.alert-text-input')?.value.trim() || '';
-
-                instantAlerts.push({
-                    id,
-                    isBuiltIn,
-                    name,
-                    isActive,
-                    trigger,
-                    targetRole,
-                    title,
-                    text
-                });
-            });
-
-            this.currentInstantAlerts = instantAlerts;
+            const instantAlerts = this.currentInstantAlerts || [];
 
             const config = window.notifConfig || { scheduled: [], systemReminders: {} };
             config.instantAlerts = instantAlerts;
@@ -6104,7 +6415,7 @@ document.addEventListener('keydown', (e) => {
 
             if (res.ok) {
                 window.notifConfig = config;
-                alert('تم حفظ إعدادات وتعديلات التنبيهات الفورية بنجاح! ✅');
+                alert('تم حفظ وتحديث إعدادات التنبيهات الفورية بنجاح! ✅');
             } else {
                 alert('فشل في حفظ إعدادات التنبيهات على السيرفر.');
             }
