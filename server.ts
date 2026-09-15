@@ -311,9 +311,35 @@ async function handler(req: Request): Promise<Response> {
             return new Response("Logged", { status: 200 });
         }
         
-        if (url.pathname === "/api/backup" && method === "POST") {
+        if (url.pathname === "/api/backup") {
+            const nowIso = new Date().toISOString();
+            await kv.set(["system", "lastBackup"], nowIso);
             await performDailyBackup();
-            return new Response(JSON.stringify({ success: true }), { status: 200, headers: { "Content-Type": "application/json" } });
+
+            if (method === "GET" || url.searchParams.get("download") === "true") {
+                const data: any = {};
+                for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system"]) {
+                    data[collection] = [];
+                    const entries = kv.list({ prefix: [collection] });
+                    for await (const entry of entries) {
+                        data[collection].push({ key: entry.key, value: entry.value });
+                    }
+                }
+                const dateStr = nowIso.split("T")[0];
+                return new Response(JSON.stringify(data, null, 2), {
+                    status: 200,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Content-Disposition": `attachment; filename="labor_backup_${dateStr}.json"`,
+                        "Cache-Control": "no-store"
+                    }
+                });
+            }
+
+            return new Response(JSON.stringify({ success: true, lastBackup: nowIso }), {
+                status: 200,
+                headers: { "Content-Type": "application/json", "Cache-Control": "no-store" }
+            });
         }
         
         
@@ -415,35 +441,6 @@ async function handler(req: Request): Promise<Response> {
         }
         // -------------------------------
 
-        if (url.pathname === "/api/backup") {
-            const nowIso = new Date().toISOString();
-            await kv.set(["system", "lastBackup"], nowIso);
-
-            if (method === "GET" || url.searchParams.get("download") === "true") {
-                const data: any = {};
-                for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system"]) {
-                    data[collection] = [];
-                    const entries = kv.list({ prefix: [collection] });
-                    for await (const entry of entries) {
-                        data[collection].push({ key: entry.key, value: entry.value });
-                    }
-                }
-                const dateStr = nowIso.split("T")[0];
-                return new Response(JSON.stringify(data, null, 2), {
-                    status: 200,
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Content-Disposition": `attachment; filename="labor_backup_${dateStr}.json"`,
-                        "Cache-Control": "no-store"
-                    }
-                });
-            }
-
-            return new Response(JSON.stringify({ success: true, lastBackup: nowIso }), {
-                status: 200,
-                headers: { "Content-Type": "application/json", "Cache-Control": "no-store" }
-            });
-        }
 
         if (url.pathname === "/api/backupConfig" && method === "GET") {
             const entry = await kv.get(["system", "backupConfig"]);
