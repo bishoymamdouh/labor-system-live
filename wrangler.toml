@@ -1,0 +1,8 @@
+name = "labor-management-app"
+compatibility_date = "2024-09-01"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "labor_db"
+database_id = "labor_db"
