@@ -3,6 +3,8 @@
 *.log
 *.sqlite*
 database.sqlite*
+*.sql
+seed_d1.sql
 node_modules/
 .system_generated/
 scratch/
