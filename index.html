@@ -2425,24 +2425,56 @@ select {
                 <header class="view-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px;">
                     <h2 style="margin: 0;"><i class="fas fa-chart-bar"></i> التقارير المجمعة</h2>
 
-                    <!-- Cloud Server Quota & Renewal Monitor Widget (Screen Only) -->
-                    <div class="screen-only" style="display: inline-flex; align-items: center; flex-wrap: wrap; gap: 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 14px; font-size: 0.85rem; box-shadow: var(--shadow-sm);">
-                        <div style="display: flex; align-items: center; gap: 6px; color: var(--primary);">
-                            <i class="fas fa-cloud"></i>
-                            <span style="font-weight: 700;">سيرفر Deno Cloud:</span>
-                            <span style="background: #10b981; color: #fff; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 600;" title="تم إيقاف الاستنزاف بنجاح واستهلاك السيرفر الآن شبه معدوم بفضل الكاش">مستقر ومحمي ✅</span>
+                    <!-- Server Monitoring Widgets Container (Screen Only) -->
+                    <div class="screen-only" id="server-monitors-container" style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <!-- 1. Cloudflare Monitor Widget -->
+                        <div id="monitor-widget-cf" style="display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--bg-card); border: 1px solid rgba(249, 115, 22, 0.35); border-radius: 8px; padding: 6px 12px; font-size: 0.83rem; box-shadow: var(--shadow-sm);">
+                            <div style="display: flex; align-items: center; gap: 6px; color: #ea580c;">
+                                <i class="fab fa-cloudflare" style="color: #f97316; font-size: 1rem;"></i>
+                                <span style="font-weight: 700;">سيرفر Cloudflare الأساسي:</span>
+                                <span style="background: #10b981; color: #fff; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 600;" title="خادم سحابي عالمي نشط 24/7 بسعة 3 مليون طلب شهرياً">شغال 24/7 ✅</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 8px;">
+                                <a href="https://dash.cloudflare.com/8fcd811bce36d07fe78c7c7a7137f62e/workers/services/view/labor-system-live/production" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; color: #ea580c; text-decoration: none; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: rgba(234, 88, 12, 0.08); border: 1px dashed #f97316; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(234, 88, 12, 0.18)'" onmouseout="this.style.background='rgba(234, 88, 12, 0.08)'" title="اضغط لعرض استهلاك الطلبات وقاعدة البيانات المباشرة على Cloudflare">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span style="text-decoration: underline;">متابعة الاستهلاك والطلبات اليومية</span>
+                                    <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i>
+                                </a>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 8px;">
+                                <span style="color: var(--text-muted); font-size: 0.8rem;">الباقة: 100,000 طلب/يوم</span>
+                            </div>
+                            <button type="button" onclick="toggleServerMonitor('cf', false)" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 2px 5px; border-radius: 4px; transition: color 0.2s;" title="إخفاء شريط Cloudflare" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text-muted)'">
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 10px;">
-                            <a href="https://console.deno.com/bishoymamdouh/~/metrics" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; color: #d97706; text-decoration: none; font-weight: 700; padding: 3px 10px; border-radius: 6px; background: rgba(217, 119, 6, 0.08); border: 1px dashed #d97706; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(217, 119, 6, 0.18)'" onmouseout="this.style.background='rgba(217, 119, 6, 0.08)'" title="اضغط هنا لفتح صفحة قراءات الداتابيز والتفاصيل الحية مباشرة على سيرفر Deno">
-                                <i class="fas fa-book-reader"></i>
-                                <span style="text-decoration: underline;">قراءات الداتابيز (KV Reads): اضغط لعرض التفاصيل المباشرة</span>
-                                <i class="fas fa-external-link-alt" style="font-size: 0.75rem;"></i>
-                            </a>
+
+                        <!-- 2. Deno Monitor Widget -->
+                        <div id="monitor-widget-deno" style="display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 12px; font-size: 0.83rem; box-shadow: var(--shadow-sm);">
+                            <div style="display: flex; align-items: center; gap: 6px; color: var(--primary);">
+                                <i class="fas fa-cloud"></i>
+                                <span style="font-weight: 700;">سيرفر Deno Cloud:</span>
+                                <span style="background: #64748b; color: #fff; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 600;">سابق / احتياطي</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 8px;">
+                                <a href="https://console.deno.com/bishoymamdouh/~/metrics" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; color: #d97706; text-decoration: none; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: rgba(217, 119, 6, 0.08); border: 1px dashed #d97706; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(217, 119, 6, 0.18)'" onmouseout="this.style.background='rgba(217, 119, 6, 0.08)'" title="اضغط لعرض استهلاك Deno القديم">
+                                    <i class="fas fa-book-reader"></i>
+                                    <span style="text-decoration: underline;">قراءات Deno (KV)</span>
+                                    <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i>
+                                </a>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 8px;">
+                                <span style="color: var(--text-muted); font-size: 0.8rem;" id="cloud-renewal-date-display">تجديد: 1 أكتوبر</span>
+                            </div>
+                            <button type="button" onclick="toggleServerMonitor('deno', false)" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 2px 5px; border-radius: 4px; transition: color 0.2s;" title="إخفاء شريط Deno" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text-muted)'">
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 10px;">
-                            <span style="color: var(--text-muted, #64748b);">تاريخ التجديد وتصفير العداد:</span>
-                            <span style="font-weight: 700; color: #059669;" id="cloud-renewal-date-display">1 أكتوبر 2026 (متبقي 18 يوماً)</span>
-                        </div>
+
+                        <!-- Restore Hidden Monitors Button -->
+                        <button id="btn-restore-monitors" type="button" onclick="restoreServerMonitors()" style="display: none; align-items: center; gap: 5px; background: var(--bg-card); border: 1px dashed var(--border-color); color: var(--text-muted); padding: 5px 10px; border-radius: 6px; font-size: 0.78rem; cursor: pointer;" title="استعادة إظهار أشرطة المراقبة التي تم إخفاؤها">
+                            <i class="fas fa-eye"></i> إظهار الأشرطة المخفية
+                        </button>
                     </div>
                 </header>
                 <div class="card filter-card" style="padding: 18px 20px;">
@@ -2855,15 +2887,39 @@ class UI {
 
     static updateCloudQuotaDisplay() {
         const el = document.getElementById('cloud-renewal-date-display');
-        if (!el) return;
-        const now = new Date();
-        const nextMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0));
-        const msDiff = nextMonth.getTime() - now.getTime();
-        const daysLeft = Math.max(1, Math.ceil(msDiff / (1000 * 60 * 60 * 24)));
-        const monthsAr = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-        const targetMonth = monthsAr[nextMonth.getUTCMonth()];
-        const targetYear = nextMonth.getUTCFullYear();
-        el.innerText = `1 ${targetMonth} ${targetYear} (متبقي ${daysLeft} يوماً)`;
+        if (el) {
+            const now = new Date();
+            const nextMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0));
+            const msDiff = nextMonth.getTime() - now.getTime();
+            const daysLeft = Math.max(1, Math.ceil(msDiff / (1000 * 60 * 60 * 24)));
+            const monthsAr = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+            const targetMonth = monthsAr[nextMonth.getUTCMonth()];
+            const targetYear = nextMonth.getUTCFullYear();
+            el.innerText = `تجديد: 1 ${targetMonth} (متبقي ${daysLeft} يوماً)`;
+        }
+        UI.applyServerMonitorVisibility();
+    }
+
+    static applyServerMonitorVisibility() {
+        const hideCf = localStorage.getItem('monitor_hide_cf') === 'true';
+        const hideDeno = localStorage.getItem('monitor_hide_deno') === 'true';
+        const elCf = document.getElementById('monitor-widget-cf');
+        const elDeno = document.getElementById('monitor-widget-deno');
+        const btnRestore = document.getElementById('btn-restore-monitors');
+        if (elCf) elCf.style.display = hideCf ? 'none' : 'inline-flex';
+        if (elDeno) elDeno.style.display = hideDeno ? 'none' : 'inline-flex';
+        if (btnRestore) btnRestore.style.display = (hideCf || hideDeno) ? 'inline-flex' : 'none';
+    }
+
+    static toggleServerMonitor(key, show) {
+        localStorage.setItem('monitor_hide_' + key, show ? 'false' : 'true');
+        UI.applyServerMonitorVisibility();
+    }
+
+    static restoreServerMonitors() {
+        localStorage.removeItem('monitor_hide_cf');
+        localStorage.removeItem('monitor_hide_deno');
+        UI.applyServerMonitorVisibility();
     }
 
     static updateNavigation(role) {
@@ -7945,6 +8001,9 @@ document.addEventListener('keydown', (e) => {
 
 // Initialize App
 window.app = new App();
+window.toggleServerMonitor = (key, show) => UI.toggleServerMonitor(key, show);
+window.restoreServerMonitors = () => UI.restoreServerMonitors();
+UI.applyServerMonitorVisibility();
 
         // --- Theme Toggle Logic ---
         const themeCheckbox = document.getElementById('theme-checkbox');
