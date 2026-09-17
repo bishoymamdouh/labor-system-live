@@ -1,0 +1,6 @@
+*.exe
+*.sqlite*
+database.sqlite*
+node_modules/
+.system_generated/
+scratch/
