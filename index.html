@@ -6687,12 +6687,22 @@ document.addEventListener('keydown', (e) => {
             document.addEventListener('visibilitychange', () => {
                 if (document.hidden) {
                     this.hiddenStartTime = Date.now();
+                    // Power & Battery Saving: stop all timer wakeups when phone is locked / tab hidden
+                    if (this.notifInterval) {
+                        clearInterval(this.notifInterval);
+                        this.notifInterval = null;
+                    }
                 } else {
                     if (this.hiddenStartTime && (Date.now() - this.hiddenStartTime >= 15 * 60 * 1000)) {
                         showSleepOverlay();
                     } else {
                         this.hiddenStartTime = 0;
-                        if (!this.isAppSleeping) check();
+                        if (!this.isAppSleeping) {
+                            check();
+                            // Resume interval only while screen is active
+                            if (this.notifInterval) clearInterval(this.notifInterval);
+                            this.notifInterval = setInterval(check, 300000);
+                        }
                     }
                 }
             });
