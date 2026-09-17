@@ -1,14 +1,17 @@
 // @ts-nocheck
-// Cloudflare Pages Function: /api/[[path]]
-// Optimized Cloudflare D1 integration with in-memory caching and battery/energy efficiency
+// Cloudflare Pages / Workers API Router: /api/[[path]]
+// Real-time synchronization with Cloudflare D1 (Serverless SQLite)
 
 const VAPID_PUBLIC = "BMnqakLZm3Nd93xNUMPOEcOKzmONIusdFaOhuk59jc46aR4b_D2frW_0nryIGSUZbwhMG_2WwLppzRqE0pVDKAc";
 
 const corsHeaders: Record<string, string> = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
-    "Content-Type": "application/json; charset=UTF-8"
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, Bypass-Tunnel-Reminder",
+    "Content-Type": "application/json; charset=UTF-8",
+    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+    "Pragma": "no-cache",
+    "Expires": "0"
 };
 
 function jsonResponse(data: any, status = 200, extraHeaders: Record<string, string> = {}) {
@@ -20,36 +23,6 @@ function jsonResponse(data: any, status = 200, extraHeaders: Record<string, stri
 
 function errorResponse(message: string, status = 500) {
     return jsonResponse({ error: message }, status);
-}
-
-// In-Memory Edge Cache for ultra-fast reads and minimal D1 query consumption
-let cacheAllRecordsDetails: any = null;
-let cacheAllRecordsDetailsTime = 0;
-
-let cacheUsers: any = null;
-let cacheUsersTime = 0;
-
-let cacheWorkerDirectory: any = null;
-let cacheWorkerDirectoryTime = 0;
-
-let cachePendingCount: Record<string, { count: number; time: number }> = {};
-
-function invalidateMemoryCache(col?: string) {
-    if (!col || col === "records" || col === "workers") {
-        cacheAllRecordsDetails = null;
-        cacheAllRecordsDetailsTime = 0;
-        cachePendingCount = {};
-    }
-    if (!col || col === "users") {
-        cacheUsers = null;
-        cacheUsersTime = 0;
-        cacheAllRecordsDetails = null;
-        cacheAllRecordsDetailsTime = 0;
-    }
-    if (!col || col === "worker_directory") {
-        cacheWorkerDirectory = null;
-        cacheWorkerDirectoryTime = 0;
-    }
 }
 
 class D1Store {
@@ -71,12 +44,10 @@ class D1Store {
         await this.db.prepare(
             "INSERT INTO kv (collection, key, value) VALUES (?, ?, ?) ON CONFLICT(collection, key) DO UPDATE SET value = ?"
         ).bind(col, key, valStr, valStr).run();
-        invalidateMemoryCache(col);
     }
 
     async delete(col: string, key: string) {
         await this.db.prepare("DELETE FROM kv WHERE collection = ? AND key = ?").bind(col, key).run();
-        invalidateMemoryCache(col);
     }
 
     async list(col: string) {
@@ -112,7 +83,7 @@ export async function onRequest(context: any): Promise<Response> {
     try {
         const pathParts = url.pathname.replace(/^\/api\/?/, "").split("/").filter(Boolean);
         const resource = pathParts[0];
-        const resourceId = pathParts[1];
+        const resourceId = pathParts[1] || url.searchParams.get("id");
 
         // 1. Logs
         if (resource === "logs" && method === "POST") {
@@ -153,24 +124,18 @@ export async function onRequest(context: any): Promise<Response> {
             }
         }
 
-        // 4. Pending Count & Status (Cached for 15s per engineer)
+        // 4. Pending Count & Status (Instant Real-time from D1)
         if (resource === "pendingCount" && method === "GET") {
-            const engineerId = url.searchParams.get("engineerId") || "all";
-            const now = Date.now();
-            if (cachePendingCount[engineerId] && (now - cachePendingCount[engineerId].time < 15000)) {
-                return jsonResponse({ count: cachePendingCount[engineerId].count });
-            }
-
+            const engineerId = url.searchParams.get("engineerId");
             const records = await store.list("records");
             let count = 0;
             for (const r of records) {
                 if (r.value && r.value.status === "pending") {
-                    if (engineerId === "all" || String(r.value.engineerId) === String(engineerId)) {
+                    if (!engineerId || engineerId === "all" || String(r.value.engineerId) === String(engineerId)) {
                         count++;
                     }
                 }
             }
-            cachePendingCount[engineerId] = { count, time: now };
             return jsonResponse({ count });
         }
 
@@ -215,34 +180,33 @@ export async function onRequest(context: any): Promise<Response> {
             }
             if (statements.length > 0) {
                 await env.DB.batch(statements);
-                invalidateMemoryCache("workers");
             }
             return jsonResponse({ success: true, count: updatedCount });
         }
 
-        // 6. Record Details (single record with its workers)
+        // 6. Record Details (single record with exact contract: { record, users, workers })
         if (resource === "recordDetails" && method === "GET") {
-            const recId = url.searchParams.get("id") || resourceId;
+            const recId = url.searchParams.get("id") || pathParts[1];
             if (!recId) return errorResponse("Missing record ID", 400);
 
             const record = await store.get("records", recId);
             if (!record) return errorResponse("Record not found", 404);
 
-            const allWorkers = await store.list("workers");
-            const recWorkers = allWorkers
-                .map((w: any) => ({ ...w.value, id: w.id }))
-                .filter((w: any) => w.recordId === recId && !w.isDeleted);
+            const [allWorkers, allUsers] = await Promise.all([
+                store.list("workers"),
+                store.list("users")
+            ]);
 
-            return jsonResponse({ ...record, id: recId, workers: recWorkers });
+            const users = allUsers.map((u: any) => ({ ...u.value, id: u.id }));
+            const workers = allWorkers
+                .filter((w: any) => w.value && w.value.recordId === recId && !w.value.isDeleted)
+                .map((w: any) => ({ ...w.value, id: w.id }));
+
+            return jsonResponse({ record: { ...record, id: recId }, users, workers });
         }
 
-        // 7. All Records Details (Edge In-Memory Cached for 30s)
+        // 7. All Records Details (Instant Real-time direct query from D1)
         if (resource === "allRecordsDetails" && method === "GET") {
-            const now = Date.now();
-            if (cacheAllRecordsDetails && (now - cacheAllRecordsDetailsTime < 30000)) {
-                return jsonResponse(cacheAllRecordsDetails, 200, { "X-Cache": "HIT" });
-            }
-
             const [recordsList, workersList, usersList] = await Promise.all([
                 store.list("records"),
                 store.list("workers"),
@@ -268,15 +232,13 @@ export async function onRequest(context: any): Promise<Response> {
                 return {
                     ...rec,
                     id: r.id,
-                    supervisorName: usersMap[rec.supervisorId] || rec.supervisorName || "",
-                    engineerName: usersMap[rec.engineerId] || rec.engineerName || "",
+                    supervisorName: usersMap[rec.supervisorId] || rec.supervisorName || "غير معروف",
+                    engineerName: usersMap[rec.engineerId] || rec.engineerName || "غير معروف",
                     workers: recWorkers
                 };
             });
 
-            cacheAllRecordsDetails = details;
-            cacheAllRecordsDetailsTime = now;
-            return jsonResponse(details, 200, { "X-Cache": "MISS" });
+            return jsonResponse(details);
         }
 
         // 8. Backup & Restore Endpoints
@@ -347,7 +309,7 @@ export async function onRequest(context: any): Promise<Response> {
             return jsonResponse(data);
         }
 
-        // Fast Batched Import
+        // Batched Import
         if (resource === "import" && method === "POST") {
             const data = await request.json();
             const statements: any[] = [];
@@ -367,61 +329,54 @@ export async function onRequest(context: any): Promise<Response> {
                     }
                 }
             }
-            // Execute in batches of 50
             const batchSize = 50;
             for (let i = 0; i < statements.length; i += batchSize) {
                 const chunk = statements.slice(i, i + batchSize);
                 await env.DB.batch(chunk);
             }
-            invalidateMemoryCache();
             return jsonResponse({ success: true, count: statements.length, message: "Imported successfully into Cloudflare D1" });
         }
 
-        // 9. Users Cached Read
-        if (resource === "users" && method === "GET" && !resourceId) {
-            const now = Date.now();
-            if (cacheUsers && (now - cacheUsersTime < 60000)) {
-                return jsonResponse(cacheUsers);
-            }
-            const items = await store.list("users");
-            const list = items.map((item: any) => ({ ...item.value, id: item.id }));
-            cacheUsers = list;
-            cacheUsersTime = now;
-            return jsonResponse(list);
+        // 9. Broadcast & Push Stubs
+        if (resource === "broadcast" && method === "POST") {
+            return jsonResponse({ success: true, sent: 0, message: "Broadcast handled" });
+        }
+        if ((resource === "subscribe" || resource === "unsubscribe" || resource === "triggerNotificationTasks") && method === "POST") {
+            return jsonResponse({ success: true });
         }
 
-        // 10. Worker Directory Cached Read
-        if (resource === "worker_directory" && method === "GET" && !resourceId) {
-            const now = Date.now();
-            if (cacheWorkerDirectory && (now - cacheWorkerDirectoryTime < 60000)) {
-                return jsonResponse(cacheWorkerDirectory);
-            }
-            const items = await store.list("worker_directory");
-            const list = items.map((item: any) => ({ ...item.value, id: item.id }));
-            cacheWorkerDirectory = list;
-            cacheWorkerDirectoryTime = now;
-            return jsonResponse(list);
-        }
-
-        // 11. CRUD Collections: users, records, workers, worker_directory, push_subscriptions
+        // 10. CRUD Collections: users, records, workers, worker_directory, push_subscriptions
         const validCollections = ["users", "records", "workers", "worker_directory", "push_subscriptions"];
         if (validCollections.includes(resource)) {
+            // GET single item (by /api/:col/:id OR /api/:col?id=...)
+            if (method === "GET" && resourceId) {
+                const item = await store.get(resource, resourceId);
+                return jsonResponse(item ? { ...item, id: resourceId } : null);
+            }
+
+            // GET list (with generic searchParams filtering matching server.ts)
             if (method === "GET" && !resourceId) {
                 const items = await store.list(resource);
                 let list = items.map((item: any) => ({ ...item.value, id: item.id }));
-                if (resource === "workers") {
-                    const recId = url.searchParams.get("recordId");
-                    if (recId) list = list.filter((w: any) => w.recordId === recId);
+
+                const filters: Record<string, string> = {};
+                for (const [key, value] of url.searchParams.entries()) {
+                    if (key !== "id") filters[key] = value;
                 }
+
+                if (Object.keys(filters).length > 0) {
+                    list = list.filter((item: any) => {
+                        for (const key in filters) {
+                            if (String(item[key]) !== String(filters[key])) return false;
+                        }
+                        return true;
+                    });
+                }
+
                 return jsonResponse(list);
             }
 
-            if (method === "GET" && resourceId) {
-                const item = await store.get(resource, resourceId);
-                if (!item) return errorResponse("Item not found", 404);
-                return jsonResponse({ ...item, id: resourceId });
-            }
-
+            // POST create item
             if (method === "POST") {
                 const body = await request.json();
                 const id = body.id || crypto.randomUUID();
@@ -430,13 +385,16 @@ export async function onRequest(context: any): Promise<Response> {
                 return jsonResponse(recordData, 201);
             }
 
+            // PUT update item (by /api/:col/:id OR /api/:col?id=...)
             if (method === "PUT" && resourceId) {
                 const body = await request.json();
-                const updated = { ...body, id: resourceId };
+                const current = await store.get(resource, resourceId) || {};
+                const updated = { ...current, ...body, id: resourceId };
                 await store.set(resource, resourceId, updated);
-                return jsonResponse(updated);
+                return jsonResponse({ success: true, ...updated });
             }
 
+            // DELETE item (by /api/:col/:id OR /api/:col?id=...)
             if (method === "DELETE" && resourceId) {
                 await store.delete(resource, resourceId);
                 if (resource === "records") {
@@ -449,7 +407,6 @@ export async function onRequest(context: any): Promise<Response> {
                         await env.DB.batch(delStmts);
                     }
                 }
-                invalidateMemoryCache(resource);
                 return jsonResponse({ success: true, id: resourceId });
             }
         }
