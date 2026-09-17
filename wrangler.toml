@@ -5,4 +5,4 @@ pages_build_output_dir = "."
 [[d1_databases]]
 binding = "DB"
 database_name = "labor_db"
-database_id = "labor_db"
+database_id = "88147d67-362d-4570-a2c5-3f7f9a72b327"
