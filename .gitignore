@@ -1,4 +1,6 @@
 *.exe
+*.zip
+*.log
 *.sqlite*
 database.sqlite*
 node_modules/

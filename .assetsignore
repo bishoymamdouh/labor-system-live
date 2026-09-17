@@ -1,4 +1,6 @@
 *.exe
+*.zip
+*.log
 *.sqlite*
 database.sqlite*
 *.bak
@@ -8,7 +10,6 @@ database.sqlite*
 *.ts
 *.py
 *.sql
-*.log
 *.txt
 *.xlsx
 backups/
