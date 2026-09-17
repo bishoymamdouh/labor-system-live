@@ -8,7 +8,19 @@ export default {
             return await onRequest({ request, env });
         }
         if (env.ASSETS) {
-            return await env.ASSETS.fetch(request);
+            const response = await env.ASSETS.fetch(request);
+            if (url.pathname === "/" || url.pathname.endsWith(".html") || url.pathname.endsWith("sw.js")) {
+                const headers = new Headers(response.headers);
+                headers.set("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
+                headers.set("Pragma", "no-cache");
+                headers.set("Expires", "0");
+                return new Response(response.body, {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers
+                });
+            }
+            return response;
         }
         return new Response("Not found", { status: 404 });
     }

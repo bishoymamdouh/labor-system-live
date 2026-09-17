@@ -2817,8 +2817,12 @@ class Auth {
     }
 
     async login(username, password) {
-        // Query users collection for matching username and password
-        const users = await db.getByField('users', 'username', username);
+        const cleanUser = (username || '').trim();
+        let users = await db.getByField('users', 'username', cleanUser);
+        if (users.length === 0 && (cleanUser.toLowerCase() === 'admin' || cleanUser === 'admin_default_id')) {
+            const adminDoc = await db.getById('users', 'admin_default_id');
+            if (adminDoc) users = [adminDoc];
+        }
         const user = users.find(u => u.password === password);
         
         if (user) {
@@ -4125,6 +4129,7 @@ document.addEventListener('keydown', (e) => {
 
 
     constructor() {
+        window.app = this;
         this.currentWorkers = [];
         this.directoryWorkers = [];
         this.init();
@@ -6501,56 +6506,71 @@ document.addEventListener('keydown', (e) => {
             document.getElementById('print-date-range').innerText = `جميع السجلات من بداية العمل`;
         }
         
-        // 1. Get all approved records
-        let records = await db.getAll('records');
-        records = records.filter(r => r.status === 'approved');
-        
-        // If Engineer, only show their records
-        if (auth.getRole() === 'engineer') {
-            records = records.filter(r => String(r.engineerId) === String(auth.currentUser.id));
+        const daysEl = document.getElementById('report-total-days');
+        const amountEl = document.getElementById('report-total-amount');
+        if (daysEl && (daysEl.innerText === '0' || daysEl.innerText === '')) {
+            daysEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 0.8em;"></i>';
         }
-        
-        // Filter by date if provided
-        if (startDate && endDate) {
-            records = records.filter(r => r.date >= startDate && r.date <= endDate);
+        if (amountEl && (amountEl.innerText === '0.00' || amountEl.innerText === '0' || amountEl.innerText === '')) {
+            amountEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 0.8em;"></i>';
         }
-        
-        const validRecordIds = records.map(r => r.id);
-        const recordsMap = records.reduce((acc, r) => { acc[r.id] = r; return acc; }, {});
-        
-        // 2. Get users map
-        const users = await db.getAll('users');
-        const usersMap = users.reduce((acc, u) => { acc[u.id] = u; return acc; }, {});
-        
-        // 3. Get all workers and filter
-        let allWorkers = await db.getAll('workers');
-        
-        let filteredWorkers = allWorkers.filter(w => validRecordIds.includes(w.recordId) && !w.isDeleted);
-        
-        if (workerName) {
-            filteredWorkers = filteredWorkers.filter(w => w.name.toLowerCase().includes(workerName));
+
+        try {
+            // 1. Get all approved records
+            let records = await db.getAll('records');
+            records = records.filter(r => r.status === 'approved');
+            
+            // If Engineer, only show their records
+            if (auth.getRole() === 'engineer') {
+                records = records.filter(r => String(r.engineerId) === String(auth.currentUser.id));
+            }
+            
+            // Filter by date if provided
+            if (startDate && endDate) {
+                records = records.filter(r => r.date >= startDate && r.date <= endDate);
+            }
+            
+            const validRecordIds = records.map(r => r.id);
+            const recordsMap = records.reduce((acc, r) => { acc[r.id] = r; return acc; }, {});
+            
+            // 2. Get users map
+            const users = await db.getAll('users');
+            const usersMap = users.reduce((acc, u) => { acc[u.id] = u; return acc; }, {});
+            
+            // 3. Get all workers and filter
+            let allWorkers = await db.getAll('workers');
+            
+            let filteredWorkers = allWorkers.filter(w => validRecordIds.includes(w.recordId) && !w.isDeleted);
+            
+            if (workerName) {
+                filteredWorkers = filteredWorkers.filter(w => w.name && w.name.toLowerCase().includes(workerName));
+            }
+            
+            // Sort workers: Supervisor name (ascending), then Date (descending)
+            filteredWorkers.sort((a, b) => {
+                const recordA = recordsMap[a.recordId];
+                const recordB = recordsMap[b.recordId];
+                
+                const dateA = recordA ? (recordA.date || '') : '';
+                const dateB = recordB ? (recordB.date || '') : '';
+                if (dateA > dateB) return -1;
+                if (dateA < dateB) return 1;
+                
+                const supervisorA = (recordA && usersMap[recordA.supervisorId] ? usersMap[recordA.supervisorId].username : '').toLowerCase();
+                const supervisorB = (recordB && usersMap[recordB.supervisorId] ? usersMap[recordB.supervisorId].username : '').toLowerCase();
+                
+                if (supervisorA < supervisorB) return -1;
+                if (supervisorA > supervisorB) return 1;
+                
+                return 0;
+            });
+            
+            UI.renderReportResults(filteredWorkers, recordsMap, usersMap);
+        } catch (err) {
+            console.error("Error generating report:", err);
+            if (daysEl) daysEl.innerText = '0';
+            if (amountEl) amountEl.innerText = '0.00';
         }
-        
-        // Sort workers: Supervisor name (ascending), then Date (descending)
-        filteredWorkers.sort((a, b) => {
-            const recordA = recordsMap[a.recordId];
-            const recordB = recordsMap[b.recordId];
-            
-            const dateA = recordA.date || '';
-            const dateB = recordB.date || '';
-            if (dateA > dateB) return -1;
-            if (dateA < dateB) return 1;
-            
-            const supervisorA = (usersMap[recordA.supervisorId] ? usersMap[recordA.supervisorId].username : '').toLowerCase();
-            const supervisorB = (usersMap[recordB.supervisorId] ? usersMap[recordB.supervisorId].username : '').toLowerCase();
-            
-            if (supervisorA < supervisorB) return -1;
-            if (supervisorA > supervisorB) return 1;
-            
-            return 0;
-        });
-        
-        UI.renderReportResults(filteredWorkers, recordsMap, usersMap);
     }
     
     
@@ -7991,7 +8011,7 @@ UI.applyServerMonitorVisibility();
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(registration => {
+        navigator.serviceWorker.register('/sw.js?v=5').then(registration => {
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
         }, err => {
             console.log('ServiceWorker registration failed: ', err);

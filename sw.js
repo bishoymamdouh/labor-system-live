@@ -1,3 +1,4 @@
+// Service Worker v5.0 - Automatic cache eviction & live updates
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
