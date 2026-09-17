@@ -2879,6 +2879,16 @@ class UI {
         if (view) {
             view.classList.remove('hidden');
         }
+        if (viewId === 'view-engineer') {
+            if (window.app && typeof window.app.loadEngineerData === 'function') {
+                window.app.loadEngineerData();
+            }
+        }
+        if (viewId === 'view-supervisor') {
+            if (window.app && typeof window.app.loadSupervisorData === 'function') {
+                window.app.loadSupervisorData();
+            }
+        }
         if (viewId === 'view-reports') {
             UI.updateCloudQuotaDisplay();
             if (window.app && typeof window.app.generateReport === 'function') {
@@ -3232,31 +3242,33 @@ class UI {
     static renderSupervisorRecords(records) {
         const container = document.getElementById('supervisor-records-container');
         if (!container) return;
-        container.innerHTML = '';
         
-        if (records.length === 0) {
+        if (!records || records.length === 0) {
             container.innerHTML = '<div class="text-center p-20">لا توجد سراكي سابقة</div>';
             return;
         }
 
+        let html = '';
         records.forEach(r => {
-            container.innerHTML += this.generateRecordCardHTML(r, 'supervisor', 'supervisor');
+            html += this.generateRecordCardHTML(r, 'supervisor', 'supervisor');
         });
+        container.innerHTML = html;
     }
 
     static renderEngineerRecords(records, role = 'engineer') {
         const container = document.getElementById('engineer-records-container');
         if (!container) return;
-        container.innerHTML = '';
         
-        if (records.length === 0) {
+        if (!records || records.length === 0) {
             container.innerHTML = '<div class="text-center p-20">لا توجد طلبات للعرض</div>';
             return;
         }
 
+        let html = '';
         records.forEach(r => {
-            container.innerHTML += this.generateRecordCardHTML(r, role, 'engineer');
+            html += this.generateRecordCardHTML(r, role, 'engineer');
         });
+        container.innerHTML = html;
     }
 
     static renderAdminRecords(records) {
@@ -4726,26 +4738,33 @@ document.addEventListener('keydown', (e) => {
         }
         
         UI.updateNavigation(role);
-        this.startNotificationPoller();
-        this.updateDeviceNotificationStatus();
+        try {
+            this.startNotificationPoller();
+        } catch(e) {
+            console.error("Poller error:", e);
+        }
+        try {
+            this.updateDeviceNotificationStatus();
+        } catch(e) {
+            console.error("Device status error:", e);
+        }
         
         if (role === 'admin') {
+            await this.loadEngineerData();
+            this.loadSupervisorData();
             this.loadAdminData();
-            this.loadEngineerData();
             this.generateReport();
             
             await UI.renderEngineerOptions();
             let dirWorkers = await db.getAll('worker_directory');
             dirWorkers.sort((a, b) => customSort(a, b, false));
             this.directoryWorkers = dirWorkers;
-            this.loadSupervisorData();
             this.currentWorkers = [];
             document.getElementById('workers-list').innerHTML = '';
             this.addWorkerRow();
             this.updateTotals();
             document.getElementById('record-date').removeAttribute('readonly');
             document.getElementById('record-date').style = 'background-color: white; color: black; font-weight: normal;';
-            // Removed emptying date
         } else if (role === 'engineer') {
             this.loadEngineerData();
             this.generateReport();
@@ -6117,10 +6136,14 @@ document.addEventListener('keydown', (e) => {
         const role = auth.getRole();
         const engineerId = role === 'admin' ? null : auth.currentUser.id;
         
-        let filterStatus = null;
+        let filterStatus = 'pending';
         const filterSelect = document.getElementById('engineer-status-filter');
-        if (filterSelect && filterSelect.value !== 'all') {
-            filterStatus = filterSelect.value;
+        if (filterSelect) {
+            if (filterSelect.value === 'all') {
+                filterStatus = null;
+            } else if (filterSelect.value) {
+                filterStatus = filterSelect.value;
+            }
         }
 
         let filterDate = null;
@@ -6129,7 +6152,10 @@ document.addEventListener('keydown', (e) => {
             filterDate = { start: dateInput.value, end: dateInput.value };
         }
 
-        const records = await db.getRecordsWithDetails(filterStatus, null, engineerId, filterDate);
+        let records = await db.getRecordsWithDetails(filterStatus, null, engineerId, filterDate);
+        if (!filterStatus && records.length > 50) {
+            records = records.slice(0, 50);
+        }
         UI.renderEngineerRecords(records, role);
         this.highlightRecordFromURL();
     }
@@ -6650,26 +6676,30 @@ document.addEventListener('keydown', (e) => {
 
 
     startNotificationPoller() {
-        const isDevicePushDisabled = localStorage.getItem('push_disabled_on_device') === 'true';
-        if (!isDevicePushDisabled) {
-            if (Notification.permission === "granted") {
-                this.subscribeUserToPush();
-            } else if (Notification.permission !== "denied") {
-                Notification.requestPermission().then(p => {
-                    if (p === "granted") this.subscribeUserToPush();
-                    this.updateDeviceNotificationStatus();
-                });
+        if ('Notification' in window) {
+            const isDevicePushDisabled = localStorage.getItem('push_disabled_on_device') === 'true';
+            if (!isDevicePushDisabled) {
+                if (Notification.permission === "granted") {
+                    this.subscribeUserToPush();
+                } else if (Notification.permission !== "denied") {
+                    Notification.requestPermission().then(p => {
+                        if (p === "granted") this.subscribeUserToPush();
+                        this.updateDeviceNotificationStatus();
+                    }).catch(e => console.log('Notification permission error:', e));
+                }
             }
         }
-        this.updateDeviceNotificationStatus();
+        try {
+            this.updateDeviceNotificationStatus();
+        } catch(e) {
+            console.warn(e);
+        }
         
         const role = auth.getRole();
         if (role !== 'admin' && role !== 'engineer') {
             if (this.notifInterval) clearInterval(this.notifInterval);
             return;
         }
-        
-
         
         this.lastPendingCount = -1;
 
@@ -6700,7 +6730,8 @@ document.addEventListener('keydown', (e) => {
                 }
                 
                 if (currentCount !== this.lastPendingCount && this.lastPendingCount !== -1) {
-                    if (document.getElementById('view-engineer')?.classList.contains('active')) {
+                    const engView = document.getElementById('view-engineer');
+                    if (engView && !engView.classList.contains('hidden')) {
                         this.loadEngineerData().catch(e => console.error('Error reloading engineer data:', e));
                     }
                 }
@@ -6725,7 +6756,8 @@ document.addEventListener('keydown', (e) => {
                 if (!document.hidden) {
                     check();
                     if (role === 'engineer' || role === 'admin') {
-                        if (document.getElementById('view-engineer')?.classList.contains('active')) {
+                        const engView = document.getElementById('view-engineer');
+                        if (engView && !engView.classList.contains('hidden')) {
                             this.loadEngineerData().catch(console.error);
                         }
                     }
@@ -7587,6 +7619,7 @@ document.addEventListener('keydown', (e) => {
     }
 
     async toggleDeviceNotificationPermission() {
+        if (!('Notification' in window)) return;
         const isUserDisabled = localStorage.getItem('push_disabled_on_device') === 'true';
         const isGranted = Notification.permission === 'granted';
         await this.handleDevicePushSwitch(isUserDisabled || !isGranted);
@@ -8102,6 +8135,10 @@ document.addEventListener('click', (e) => {
             startX = clientX - btn.offsetLeft;
             startY = clientY - btn.offsetTop;
             btn.style.transition = 'none';
+            document.addEventListener('mousemove', drag, {passive: false});
+            document.addEventListener('mouseup', stopDrag);
+            document.addEventListener('touchmove', drag, {passive: false});
+            document.addEventListener('touchend', stopDrag);
         };
 
         const drag = (e) => {
@@ -8130,6 +8167,10 @@ document.addEventListener('click', (e) => {
         const stopDrag = (e) => {
             if (!isDragging) return;
             isDragging = false;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('touchend', stopDrag);
             btn.style.transition = 'top 0.3s, left 0.3s';
             ensureInBounds();
             localStorage.setItem('refreshBtnPos', JSON.stringify({
@@ -8139,12 +8180,7 @@ document.addEventListener('click', (e) => {
         };
 
         btn.addEventListener('mousedown', startDrag);
-        document.addEventListener('mousemove', drag, {passive: false});
-        document.addEventListener('mouseup', stopDrag);
-        
         btn.addEventListener('touchstart', startDrag, {passive: true});
-        document.addEventListener('touchmove', drag, {passive: false});
-        document.addEventListener('touchend', stopDrag);
         
         btn.onclick = (e) => {
             if (hasMoved) {
