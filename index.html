@@ -2104,6 +2104,69 @@ select {
                     </div>
                 </div>
 
+                
+                <!-- Auto-Alert 70% Status Badge -->
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 0.82rem;">
+                    <div style="display: flex; align-items: center; gap: 8px; color: #10b981; font-weight: 700;">
+                        <i class="fas fa-bell"></i>
+                        <span>نظام التنبيه التلقائي (70%): مفعل لحسابك 🟢</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 0.74rem; color: var(--text-muted);">(تنبيه فوري عند وصول أي بند إلى 70%)</span>
+                        <button type="button" onclick="testQuotaAlertNotification()" class="btn btn-secondary" style="font-size: 0.72rem; padding: 3px 8px; border-radius: 4px;">
+                            <i class="fas fa-bell"></i> تجربة إشعار التنبيه
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 70% Alert Banner (Hidden by default, shown if threshold reached) -->
+                <div id="sm-alert-70-banner" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; color: #ef4444; font-weight: 700; align-items: center; gap: 8px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
+                    <span id="sm-alert-70-text">تحذير: استهلاك السيرفر تجاوز 70% من الحصة المسموحة!</span>
+                </div>
+
+                <!-- 4. Data Archiving & Purge Tool (Admin Only with Current Password) -->
+                <div style="background: var(--bg-main); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 0.88rem; font-weight: 700; color: #ef4444; display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-trash-alt"></i> أرشفة وتفريغ السراكي القديمة (لتخفيض المساحة)
+                        </span>
+                        <span style="font-size: 0.75rem; background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 2px 8px; border-radius: 4px; font-weight: 700;">محمية بكلمة المرور 🔒</span>
+                    </div>
+
+                    <div style="background: rgba(249, 115, 22, 0.08); border: 1px dashed rgba(249, 115, 22, 0.3); border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 0.77rem; color: var(--text-muted); line-height: 1.5;">
+                        <i class="fas fa-info-circle" style="color: #f97316;"></i>
+                        <strong>ملاحظة هامة:</strong> المساحة الحالية مستهلك منها <strong>0.004% فقط</strong> (تكفي لأكثر من 50 سنة قادمة). استخدم هذه الأداة فقط إذا كنت ترغب بتفريغ فترة معينة من السجلات القديمة. سيتم تنزيل نسخة احتياطية على جهازك تلقائياً قبل الحذف.
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div>
+                            <label style="font-size: 0.76rem; color: var(--text-muted); display: block; margin-bottom: 4px;">من تاريخ:</label>
+                            <input type="date" id="purge-start-date" class="modal-input" style="width: 100%; margin-bottom: 0; padding: 6px 10px; font-size: 0.85rem;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.76rem; color: var(--text-muted); display: block; margin-bottom: 4px;">إلى تاريخ:</label>
+                            <input type="date" id="purge-end-date" class="modal-input" style="width: 100%; margin-bottom: 0; padding: 6px 10px; font-size: 0.85rem;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 10px;">
+                        <label style="font-size: 0.76rem; color: var(--text-muted); display: block; margin-bottom: 4px;">كلمة مرور حسابك الحالية للتأكيد:</label>
+                        <input type="password" id="purge-admin-password" class="modal-input" placeholder="أدخل كلمة مرور حسابك لتأكيد الحذف" style="width: 100%; margin-bottom: 0; padding: 6px 10px; font-size: 0.85rem;">
+                    </div>
+
+                    <div id="purge-preview-result" style="display: none; padding: 8px 12px; border-radius: 6px; background: var(--bg-card); font-size: 0.8rem; margin-bottom: 10px;"></div>
+
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                        <button type="button" onclick="previewPurgeRecords()" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;">
+                            <i class="fas fa-search"></i> معاينة البيانات المستهدفة
+                        </button>
+                        <button type="button" onclick="confirmAndExecutePurge()" class="btn btn-danger" style="font-size: 0.8rem; padding: 6px 14px; font-weight: 700;">
+                            <i class="fas fa-trash-alt"></i> تأكيد الحذف وتنزيل النسخة الاحتياطية
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Modal Footer -->
                 <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-top: 12px; border-top: 1px solid var(--border-color);">
                     <div style="display: flex; gap: 8px; align-items: center;">
@@ -2111,7 +2174,7 @@ select {
                             <i class="fas fa-sync-alt" id="icon-refresh-metrics"></i>
                             <span>تحديث لحظي الآن 🔄</span>
                         </button>
-                        <a href="https://dash.cloudflare.com/8fcd811bce36d07fe78cfc7a7137f62e/workers-and-pages/services/view/labor-system-live" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; text-decoration: none; font-size: 0.82rem;">
+                        <a href="https://dash.cloudflare.com/8fcd811bce36d07fe78cfc7a7137f62e/workers/services/view/labor-system-live" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; text-decoration: none; font-size: 0.82rem;">
                             <i class="fas fa-external-link-alt"></i>
                             <span>لوحة Cloudflare الكاملة</span>
                         </a>
@@ -2592,7 +2655,7 @@ select {
                                 </button>
                             </div>
                             <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 8px;">
-                                <a href="https://dash.cloudflare.com/8fcd811bce36d07fe78cfc7a7137f62e/workers-and-pages/services/view/labor-system-live" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; color: #ea580c; text-decoration: none; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: rgba(234, 88, 12, 0.08); border: 1px dashed #f97316; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(234, 88, 12, 0.18)'" onmouseout="this.style.background='rgba(234, 88, 12, 0.08)'" title="اضغط لعرض استهلاك الطلبات وقاعدة البيانات المباشرة على Cloudflare">
+                                <a href="https://dash.cloudflare.com/8fcd811bce36d07fe78cfc7a7137f62e/workers/services/view/labor-system-live" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; color: #ea580c; text-decoration: none; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: rgba(234, 88, 12, 0.08); border: 1px dashed #f97316; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(234, 88, 12, 0.18)'" onmouseout="this.style.background='rgba(234, 88, 12, 0.08)'" title="اضغط لعرض استهلاك الطلبات وقاعدة البيانات المباشرة على Cloudflare">
                                     <i class="fas fa-chart-line"></i>
                                     <span style="text-decoration: underline;">متابعة الاستهلاك والطلبات اليومية</span>
                                     <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i>
@@ -8211,6 +8274,33 @@ window.refreshServerMetrics = async function() {
         const lastEl = document.getElementById("sm-last-checked");
         if (lastEl) lastEl.innerText = "تم الفحص " + timeStr;
         
+        // Check 70% Alert
+        if (data.quotaAlert && data.quotaAlert.alert70) {
+            const banner = document.getElementById('sm-alert-70-banner');
+            if (banner) {
+                banner.style.display = 'flex';
+                const txt = document.getElementById('sm-alert-70-text');
+                if (txt) {
+                    if (data.quotaAlert.isRequestsAlert70) {
+                        txt.innerText = '⚠️ تحذير: استهلاك الطلبات اليومية تجاوز 70% (' + (data.requests?.today || 0).toLocaleString() + ' / 100,000)!';
+                    } else if (data.quotaAlert.isStorageAlert70) {
+                        txt.innerText = '⚠️ تحذير: استهلاك مساحة قاعدة البيانات تجاوز 70% من الـ 5 جيجابايت!';
+                    }
+                }
+            }
+            
+            // Check if alert notification needs to be sent to user device
+            const todayStr = new Date().toISOString().slice(0, 10);
+            if (localStorage.getItem('last_70_alert_date') !== todayStr) {
+                localStorage.setItem('last_70_alert_date', todayStr);
+                if (Notification.permission === 'granted') {
+                    new Notification('⚠️ تحذير: استهلاك السيرفر تجاوز 70%', {
+                        body: 'وصل استهلاك السيرفر إلى ' + (data.requests?.percentage || '70') + '%. يرجى مراجعة النظام.',
+                        icon: '/logo.png'
+                    });
+                }
+            }
+        }
         // Requests
         const req = data.requests || {};
         const today = req.today || 0;

@@ -265,10 +265,109 @@ export async function onRequest(context: any): Promise<Response> {
                         nextResetUtc: nextResetUtc.toISOString(),
                         hoursRemaining: hoursUntilReset,
                         minutesRemaining: minutesUntilReset
+                    },
+                    quotaAlert: {
+                        alert70: (requestsToday >= 70000) || (parseFloat(storageUsedMB) >= 3584),
+                        isRequestsAlert70: requestsToday >= 70000,
+                        isStorageAlert70: parseFloat(storageUsedMB) >= 3584,
+                        thresholdPercentage: 70
                     }
                 });
             } catch (err: any) {
                 return errorResponse("Failed to calculate server metrics: " + err.message, 500);
+            }
+        }
+
+        // 2.8 Secure Date-Range Records Purge (Admin Only with Password Verification)
+        if (resource === "purge-records-range" && method === "POST") {
+            try {
+                const body = await request.json();
+                const { startDate, endDate, password, username, previewOnly } = body || {};
+
+                if (!startDate || !endDate) {
+                    return errorResponse("يرجى تحديد تاريخ البداية وتاريخ النهاية", 400);
+                }
+
+                // 1. If not preview, verify admin password against D1 users collection
+                if (!previewOnly) {
+                    if (!password) {
+                        return errorResponse("يرجى إدخال كلمة المرور لتأكيد عملية الحذف", 400);
+                    }
+
+                    const users = await store.list("users");
+                    const adminUser = users.find((u: any) => {
+                        const val = u.value;
+                        if (!val) return false;
+                        return val.role === "admin" || val.username === "Bishoy Mamdouh" || (username && val.username === username);
+                    });
+
+                    if (!adminUser || !adminUser.value) {
+                        return errorResponse("لم يتم العثور على حساب المسؤول للتحقق من الصلاحيات", 403);
+                    }
+
+                    if (String(adminUser.value.password).trim() !== String(password).trim()) {
+                        return errorResponse("كلمة المرور غير صحيحة! عملية مسح البيانات تتطلب كلمة المرور الحالية لحسابك الشخصي.", 403);
+                    }
+                }
+
+                // 2. Find matching records in range [startDate, endDate]
+                const records = await store.list("records");
+                const matchedRecords = records.filter((r: any) => {
+                    const rDate = r.value?.date;
+                    if (!rDate) return false;
+                    return rDate >= startDate && rDate <= endDate;
+                });
+
+                const recordIds = new Set(matchedRecords.map((r: any) => r.id));
+
+                // 3. Find associated workers
+                const workers = await store.list("workers");
+                const matchedWorkers = workers.filter((w: any) => {
+                    return w.value && recordIds.has(w.value.recordId);
+                });
+
+                if (previewOnly) {
+                    return jsonResponse({
+                        success: true,
+                        preview: true,
+                        recordsCount: matchedRecords.length,
+                        workersCount: matchedWorkers.length,
+                        startDate,
+                        endDate
+                    });
+                }
+
+                if (matchedRecords.length === 0) {
+                    return jsonResponse({
+                        success: true,
+                        deletedRecords: 0,
+                        deletedWorkers: 0,
+                        message: "لا توجد أي سراكي مسجلة في هذه الفترة المحددة."
+                    });
+                }
+
+                // 4. Batch delete matched records and workers from D1
+                const deleteStmts: any[] = [];
+                for (const recId of recordIds) {
+                    deleteStmts.push(env.DB.prepare("DELETE FROM kv WHERE collection = 'records' AND key = ?").bind(recId));
+                }
+                for (const wrk of matchedWorkers) {
+                    deleteStmts.push(env.DB.prepare("DELETE FROM kv WHERE collection = 'workers' AND key = ?").bind(wrk.id));
+                }
+
+                const batchSize = 50;
+                for (let i = 0; i < deleteStmts.length; i += batchSize) {
+                    await env.DB.batch(deleteStmts.slice(i, i + batchSize));
+                }
+
+                return jsonResponse({
+                    success: true,
+                    deletedRecords: matchedRecords.length,
+                    deletedWorkers: matchedWorkers.length,
+                    message: `تم بنجاح حذف ${matchedRecords.length} سركية و ${matchedWorkers.length} يومية عامل في الفترة من ${startDate} إلى ${endDate}`
+                });
+            } catch (err: any) {
+                return errorResponse("فشل تنفيذ عملية الحذف: " + err.message, 500);
             }
         }
 
