@@ -3127,9 +3127,122 @@ class Auth {
 
 const auth = new Auth();
 
+// --- Global In-App & System Notification Engine ---
+window.showAppNotification = function({
+    title = 'إشعار من النظام',
+    message = '',
+    type = 'info', // 'success', 'warning', 'danger', 'info'
+    duration = 5500,
+    sound = true,
+    action = null,
+    silent = false
+} = {}) {
+    // 1. Play Audio Chime if enabled
+    if (sound && !silent) {
+        try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) {
+                const ctx = new AudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sine';
+                if (type === 'warning' || type === 'danger') {
+                    osc.frequency.setValueAtTime(440, ctx.currentTime);
+                    osc.frequency.setValueAtTime(660, ctx.currentTime + 0.12);
+                } else {
+                    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.12);
+                }
+                gain.gain.setValueAtTime(0.25, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.38);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.38);
+            }
+        } catch(e) {}
+    }
+
+    // 2. Ensure Toast Container exists
+    let container = document.getElementById('app-toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'app-toast-container';
+        container.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999999; display: flex; flex-direction: column; gap: 10px; align-items: center; pointer-events: none; width: 100%; max-width: 480px; padding: 0 16px; direction: rtl;';
+        document.body.appendChild(container);
+    }
+
+    // 3. Configure themes (colors, icons)
+    const themes = {
+        success: { color: '#10b981', bgIcon: 'rgba(16, 185, 129, 0.18)', icon: 'fa-check-circle', border: '#10b981' },
+        warning: { color: '#f59e0b', bgIcon: 'rgba(245, 158, 11, 0.18)', icon: 'fa-exclamation-triangle', border: '#f59e0b' },
+        danger:  { color: '#ef4444', bgIcon: 'rgba(239, 68, 68, 0.18)', icon: 'fa-times-circle', border: '#ef4444' },
+        info:    { color: '#3b82f6', bgIcon: 'rgba(59, 130, 246, 0.18)', icon: 'fa-bell', border: '#3b82f6' }
+    };
+    const t = themes[type] || themes.info;
+
+    // 4. Create Toast Banner Element
+    const toast = document.createElement('div');
+    toast.style.cssText = `pointer-events: auto; width: 100%; background: #1e293b; color: #fff; border: 2px solid ${t.border}; border-radius: 12px; padding: 12px 18px; box-shadow: 0 12px 35px rgba(0,0,0,0.5), 0 0 15px ${t.bgIcon}; display: flex; align-items: center; gap: 14px; font-weight: bold; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0; transform: translateY(-20px); ${action ? 'cursor: pointer;' : ''}`;
+    
+    toast.innerHTML = `
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: ${t.bgIcon}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i class="fas ${t.icon}" style="color: ${t.color}; font-size: 1.25rem;"></i>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 0.92rem; color: ${t.color}; margin-bottom: 2px; font-weight: 800;">${title}</div>
+            <div style="font-size: 0.8rem; color: #cbd5e1; font-weight: normal; line-height: 1.4; word-break: break-word;">${message}</div>
+        </div>
+        <button type="button" class="btn-close-toast" style="background: none; border: none; color: #94a3b8; font-size: 1.3rem; cursor: pointer; padding: 2px 6px; line-height: 1;">&times;</button>
+    `;
+
+    const dismiss = () => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-20px)';
+        setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300);
+    };
+
+    if (action && typeof action === 'function') {
+        toast.addEventListener('click', (e) => {
+            if (e.target.closest('.btn-close-toast')) return;
+            action();
+            dismiss();
+        });
+    }
+
+    toast.querySelector('.btn-close-toast').addEventListener('click', (e) => {
+        e.stopPropagation();
+        dismiss();
+    });
+
+    container.appendChild(toast);
+    requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+    });
+
+    if (duration > 0) {
+        setTimeout(dismiss, duration);
+    }
+
+    // 5. Also dispatch Web/OS Notification if permitted
+    if ('Notification' in window && Notification.permission === 'granted' && !silent) {
+        try {
+            new Notification(title, {
+                body: message,
+                icon: '/logo.png',
+                tag: 'app-notif-' + Date.now()
+            });
+        } catch(e) {}
+    }
+};
+
 // UI Helpers and Components
 
 class UI {
+    static notify(opts) {
+        return window.showAppNotification(opts);
+    }
     static showView(viewId) {
         localStorage.setItem('labor_app_current_view', viewId);
         document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
@@ -4535,6 +4648,13 @@ document.addEventListener('keydown', (e) => {
 
             btn.innerHTML = originalText;
             btn.disabled = false;
+            if (window.showAppNotification) {
+                window.showAppNotification({
+                    title: '📊 تم تصدير ملف الإكسيل والنسخة الاحتياطية',
+                    message: 'تم تجهيز وتنزيل ملف Excel ونسخة الأمان الاحتياطية بنجاح على جهازك.',
+                    type: 'success'
+                });
+            }
         } catch (e) {
             console.error(e);
             alert('حدث خطأ أثناء تصدير الإكسيل.');
@@ -6256,8 +6376,22 @@ document.addEventListener('keydown', (e) => {
             
             
             if (role === 'engineer') {
+                if (window.showAppNotification) {
+                    window.showAppNotification({
+                        title: '✅ تم التسجيل والاعتماد',
+                        message: 'تم تسجيل السركي واعتماده بنجاح وحفظه في السيرفر.',
+                        type: 'success'
+                    });
+                }
                 alert('تم تسجيل السركي واعتماده بنجاح');
             } else {
+                if (window.showAppNotification) {
+                    window.showAppNotification({
+                        title: '📤 تم إرسال السركي',
+                        message: 'تم إرسال السركي للاعتماد بنجاح وبانتظار اعتماد المهندس.',
+                        type: 'info'
+                    });
+                }
                 alert('تم إرسال السركي للاعتماد بنجاح');
             }
 
@@ -6739,7 +6873,16 @@ document.addEventListener('keydown', (e) => {
                     await this.loadSupervisorData();
                 }
                 
-                alert(`تم ${status === 'approved' ? 'اعتماد' : status === 'pending' ? 'إعادة التقديم للمراجعة' : 'رفض'} السركي بنجاح`);
+                const statusTitle = status === 'approved' ? '✅ تم الاعتماد بنجاح' : (status === 'pending' ? '🔄 تم التقديم للمراجعة' : '❌ تم رفض السركي');
+                const statusMsg = `تم ${status === 'approved' ? 'اعتماد' : status === 'pending' ? 'إعادة التقديم للمراجعة' : 'رفض'} السركي بنجاح`;
+                if (window.showAppNotification) {
+                    window.showAppNotification({
+                        title: statusTitle,
+                        message: statusMsg,
+                        type: status === 'approved' ? 'success' : (status === 'pending' ? 'info' : 'warning')
+                    });
+                }
+                alert(statusMsg);
                 if (status === 'pending') {
                     window.location.reload();
                 }
@@ -6996,6 +7139,14 @@ document.addEventListener('keydown', (e) => {
                 }
                 
                 if (currentCount !== this.lastPendingCount && this.lastPendingCount !== -1) {
+                    if (currentCount > this.lastPendingCount && window.showAppNotification) {
+                        window.showAppNotification({
+                            title: '📋 سركية جديدة بانتظار الاعتماد',
+                            message: `يوجد الآن ${currentCount} سركية بانتظار مراجعتك واعتمادك. اضغط هنا للمراجعة.`,
+                            type: 'info',
+                            action: () => UI.showView('view-engineer')
+                        });
+                    }
                     const engView = document.getElementById('view-engineer');
                     if (engView && !engView.classList.contains('hidden')) {
                         this.loadEngineerData().catch(e => console.error('Error reloading engineer data:', e));
@@ -8315,89 +8466,16 @@ window.closeServerMetricsModal = function() {
 
 // --- 70% Alert & Purge Records Logic ---
 window.testQuotaAlertNotification = async function() {
-    // 1. Play Audio Chime
-    try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtx) {
-            const ctx = new AudioCtx();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-            osc.frequency.setValueAtTime(880, ctx.currentTime + 0.12); // A5
-            gain.gain.setValueAtTime(0.3, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-            osc.start();
-            osc.stop(ctx.currentTime + 0.4);
-        }
-    } catch(e) {}
-
-    // 2. Show In-App Visual Toast Banner
-    const oldToast = document.getElementById('test-quota-toast');
-    if (oldToast) oldToast.remove();
-    const toast = document.createElement('div');
-    toast.id = 'test-quota-toast';
-    toast.style.cssText = 'position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; border: 2px solid #10b981; border-radius: 12px; padding: 14px 24px; box-shadow: 0 12px 35px rgba(0,0,0,0.6); z-index: 999999; display: flex; align-items: center; gap: 14px; font-weight: bold; max-width: 90vw; width: 450px; direction: rtl; transition: all 0.3s ease;';
-    toast.innerHTML = `
-        <div style="width: 42px; height: 42px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <i class="fas fa-bell" style="color: #10b981; font-size: 1.3rem;"></i>
-        </div>
-        <div style="flex: 1;">
-            <div style="font-size: 0.95rem; color: #10b981; margin-bottom: 2px;">🔔 تجربة تنبيه: استهلاك السيرفر تجاوز 70%</div>
-            <div style="font-size: 0.8rem; color: #cbd5e1; font-weight: normal; line-height: 1.4;">تم إطلاق إشعار التنبيه بنجاح داخل هذا الجهاز!</div>
-        </div>
-        <button onclick="this.parentElement.remove()" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer; padding: 4px;">&times;</button>
-    `;
-    document.body.appendChild(toast);
-    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 6000);
-
-    // 3. System Notification (Windows / Android / iOS)
-    if (!('Notification' in window)) return;
+    window.showAppNotification({
+        title: '🔔 تجربة تنبيه: استهلاك السيرفر تجاوز 70%',
+        message: 'هذا إشعار تجريبي لاختبار ظهور الإشعارات الفورية بالصوت والصورة داخل البرنامج وعلى جهازك بنجاح!',
+        type: 'success',
+        duration: 6000
+    });
     
-    let perm = Notification.permission;
-    if (perm !== 'granted') {
-        try {
-            perm = await Notification.requestPermission();
-        } catch (e) {
-            console.warn('requestPermission error:', e);
-        }
-    }
-    
-    if (perm === 'granted') {
-        const notifTitle = '⚠️ تجربة تنبيه: استهلاك السيرفر تجاوز 70%';
-        const notifOptions = {
-            body: 'هذا إشعار تجريبي لاختبار وصول التنبيهات الفورية لجهازك بنجاح عند وصول استهلاك السيرفر إلى 70%.',
-            icon: '/logo.png',
-            badge: '/logo.png',
-            requireInteraction: true,
-            tag: 'test-quota-70-alert'
-        };
-        
-        let sent = false;
-        if ('serviceWorker' in navigator) {
-            try {
-                const reg = await navigator.serviceWorker.ready;
-                if (reg && reg.showNotification) {
-                    await reg.showNotification(notifTitle, notifOptions);
-                    sent = true;
-                }
-            } catch (swErr) {
-                console.warn('SW notification fallback to window.Notification:', swErr);
-            }
-        }
-        
-        if (!sent) {
-            try {
-                new Notification(notifTitle, notifOptions);
-                sent = true;
-            } catch (notifErr) {
-                console.error('Notification error:', notifErr);
-            }
-        }
-    } else if (perm === 'denied') {
-        alert('⚠️ تنبيه: صلاحية الإشعارات محظورة (Blocked) في متصفحك لهذا الموقع.\n\nلتفعيل ظهور الإشعارات خارج المتصفح: اضغط على أيقونة الإعدادات أو القفل 🔒 بجوار رابط الموقع في شريط العنوان، وقم باختيار "سماح / Allow" للإشعارات.');
+    // Request permission if not determined
+    if ('Notification' in window && Notification.permission === 'default') {
+        try { await Notification.requestPermission(); } catch(e) {}
     }
 };
 
@@ -8559,10 +8637,16 @@ window.refreshServerMetrics = async function() {
             const todayStr = new Date().toISOString().slice(0, 10);
             if (localStorage.getItem('last_70_alert_date') !== todayStr) {
                 localStorage.setItem('last_70_alert_date', todayStr);
-                if (Notification.permission === 'granted') {
-                    new Notification('⚠️ تحذير: استهلاك السيرفر تجاوز 70%', {
-                        body: 'وصل استهلاك السيرفر إلى ' + (data.requests?.percentage || '70') + '%. يرجى مراجعة النظام.',
-                        icon: '/logo.png'
+                const alertMsg = data.quotaAlert.isRequestsAlert70
+                    ? '⚠️ تحذير: استهلاك الطلبات اليومية تجاوز 70% (' + (data.requests?.today || 0).toLocaleString() + ' / 100,000)!'
+                    : '⚠️ تحذير: استهلاك مساحة قاعدة البيانات تجاوز 70% من الـ 5 جيجابايت!';
+                if (window.showAppNotification) {
+                    window.showAppNotification({
+                        title: '⚠️ تحذير: استهلاك السيرفر تجاوز 70%',
+                        message: alertMsg,
+                        type: 'warning',
+                        duration: 8000,
+                        action: () => window.openServerMetricsModal('alert')
                     });
                 }
             }
