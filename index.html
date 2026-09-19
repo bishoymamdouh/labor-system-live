@@ -2185,7 +2185,7 @@ select {
 
                         <div style="margin-bottom: 12px;">
                             <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px; font-weight: 700;">كلمة مرور حسابك الشخصي الحالية للتأكيد:</label>
-                            <input type="password" id="purge-admin-password" class="modal-input" placeholder="أدخل كلمة مرور حسابك لتأكيد الحذف" style="width: 100%; margin-bottom: 0; padding: 8px 10px; font-size: 0.88rem;">
+                            <input type="text" id="purge-admin-password" class="modal-input" placeholder="أدخل كلمة مرور حسابك بنفسك لتأكيد الحذف" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');" style="width: 100%; margin-bottom: 0; padding: 8px 10px; font-size: 0.88rem; -webkit-text-security: disc; text-security: disc;" value="">
                         </div>
 
                         <div id="purge-preview-result" style="display: none; padding: 10px 14px; border-radius: 6px; background: var(--bg-card); font-size: 0.82rem; margin-bottom: 12px;"></div>
@@ -8283,6 +8283,11 @@ window.openServerMetricsModal = function(initialTab = 'metrics') {
 };
 
 window.switchMetricsTab = function(tab) {
+    const pwdEl = document.getElementById("purge-admin-password");
+    if (pwdEl) {
+        pwdEl.value = "";
+        pwdEl.setAttribute("readonly", "readonly");
+    }
     const panes = ['metrics', 'alert', 'purge'];
     panes.forEach(p => {
         const paneEl = document.getElementById('tab-pane-' + p);
