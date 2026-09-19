@@ -1971,6 +1971,156 @@ select {
             </div>
         </div>
 
+        
+        <!-- Live Server Metrics Modal -->
+        <div id="modal-server-metrics" class="modal" style="display: none; z-index: 10000;">
+            <div class="card modal-content" style="width: 100%; max-width: 680px; max-height: 92vh; overflow-y: auto; position: relative; border: 1px solid rgba(249, 115, 22, 0.4); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(249, 115, 22, 0.15); margin: auto;">
+                <!-- Modal Header -->
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.25rem; display: flex; align-items: center; gap: 8px; color: #ea580c;">
+                            <i class="fab fa-cloudflare" style="font-size: 1.4rem;"></i>
+                            <span>معدل استهلاك سيرفر Cloudflare اللحظي</span>
+                        </h3>
+                        <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 6px;">
+                            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981;"></span>
+                            <span>إحصائيات رسمية ومباشرة من رادار Cloudflare المركزي</span>
+                        </div>
+                    </div>
+                    <button class="btn-icon" onclick="closeServerMetricsModal()" style="font-size: 1.5rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 4px;">&times;</button>
+                </div>
+
+                <!-- Top Status Bar -->
+                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; background: rgba(249, 115, 22, 0.08); border: 1px solid rgba(249, 115, 22, 0.2); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
+                        <i class="fas fa-server" style="color: #ea580c;"></i>
+                        <span style="font-weight: 700;">حالة الخادم:</span>
+                        <span id="sm-server-status" style="background: #10b981; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">متصل ويعمل 24/7 ✅</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--text-muted);">
+                        <span>سرعة الاستجابة:</span>
+                        <strong id="sm-ping" style="color: #10b981; font-family: monospace; font-size: 0.95rem;">-- ms</strong>
+                    </div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">
+                        <span>آخر فحص:</span>
+                        <span id="sm-last-checked" style="font-weight: 600;">جاري الفحص...</span>
+                    </div>
+                </div>
+
+                <!-- Metrics Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 16px;">
+                    <!-- 1. Daily Requests Card -->
+                    <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-size: 0.88rem; font-weight: 700; color: #ea580c; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-chart-pie"></i> الحصة اليومية للطلبات (Workers)
+                            </span>
+                            <span id="sm-req-pct-badge" style="background: rgba(249, 115, 22, 0.15); color: #ea580c; font-weight: 800; font-size: 0.82rem; padding: 2px 7px; border-radius: 4px;">0.00%</span>
+                        </div>
+                        <div style="font-size: 1.6rem; font-weight: 800; margin-bottom: 6px; font-family: monospace; display: flex; align-items: baseline; gap: 4px;">
+                            <span id="sm-req-today">0</span>
+                            <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: normal;">/ 100,000 طلب</span>
+                        </div>
+                        <!-- Progress Bar -->
+                        <div style="width: 100%; height: 10px; background: rgba(255,255,255,0.08); border-radius: 5px; overflow: hidden; margin-bottom: 8px;">
+                            <div id="sm-req-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #10b981 0%, #f97316 80%, #ef4444 100%); transition: width 0.6s ease; border-radius: 5px;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted);">
+                            <span>متبقي لليوم: <strong id="sm-req-remaining" style="color: #10b981;">100,000</strong> طلب</span>
+                            <span>الحد الأقصى: 100,000</span>
+                        </div>
+                        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-color); font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px;">
+                            <i class="fas fa-history" style="color: #f97316;"></i>
+                            <span>تجديد العداد اليومي بعد: <strong id="sm-reset-timer" style="color: #ea580c;">--</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- 2. Performance & Health Card -->
+                    <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
+                        <div style="font-size: 0.88rem; font-weight: 700; color: #3b82f6; display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
+                            <i class="fas fa-tachometer-alt"></i> الأداء وسرعة المعالجة (CPU & Errors)
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div style="background: rgba(59, 130, 246, 0.08); border-radius: 8px; padding: 8px 10px;">
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">متوسط زمن المعالجة:</div>
+                                <div style="font-size: 1.25rem; font-weight: 800; color: #3b82f6; font-family: monospace; margin-top: 2px;">
+                                    <span id="sm-cpu-avg">0</span> <span style="font-size: 0.75rem;">ms</span>
+                                </div>
+                                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">المسموح حتى 10 ms ⚡</div>
+                            </div>
+                            <div style="background: rgba(16, 185, 129, 0.08); border-radius: 8px; padding: 8px 10px;">
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">نسبة الأخطاء:</div>
+                                <div style="font-size: 1.25rem; font-weight: 800; color: #10b981; font-family: monospace; margin-top: 2px;">
+                                    <span id="sm-errors">0</span>
+                                </div>
+                                <div style="font-size: 0.7rem; color: #10b981; margin-top: 2px;">استقرار بنسبة 100% 🛡️</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 0.76rem; color: var(--text-muted); display: flex; justify-content: space-between;">
+                            <span>أقصى زمن ذروة: <strong id="sm-cpu-max">0</strong> ms</span>
+                            <span>الطلبات الفرعية: <strong id="sm-subrequests">0</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. D1 Database Card -->
+                <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 0.88rem; font-weight: 700; color: #8b5cf6; display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-database"></i> قاعدة بيانات Cloudflare D1 الموزعة عالمياً
+                        </span>
+                        <span id="sm-db-pct-badge" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6; font-weight: 800; font-size: 0.82rem; padding: 2px 7px; border-radius: 4px;">0.01%</span>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+                        <div style="font-size: 1.3rem; font-weight: 800; font-family: monospace;">
+                            <span id="sm-db-used-mb">0.00</span> <span style="font-size: 0.85rem; color: var(--text-muted);">MB مستهلكة / 5,000 MB (5 GB)</span>
+                        </div>
+                        <div style="font-size: 0.78rem; color: var(--text-muted);">
+                            المساحة المتبقية: <strong>4,999+ MB</strong>
+                        </div>
+                    </div>
+                    <!-- Database Progress Bar -->
+                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; margin-bottom: 10px;">
+                        <div id="sm-db-bar" style="width: 0.1%; height: 100%; background: #8b5cf6; border-radius: 4px;"></div>
+                    </div>
+                    <!-- Entity Stats Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; background: var(--bg-card); border-radius: 8px; padding: 10px 6px;">
+                        <div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted);">إجمالي السراكي</div>
+                            <strong id="sm-cnt-records" style="font-size: 1.1rem; color: #f97316;">0</strong>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted);">إجمالي العمال</div>
+                            <strong id="sm-cnt-workers" style="font-size: 1.1rem; color: #3b82f6;">0</strong>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted);">المستخدمين</div>
+                            <strong id="sm-cnt-users" style="font-size: 1.1rem; color: #10b981;">0</strong>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted);">إجمالي السجلات</div>
+                            <strong id="sm-cnt-total" style="font-size: 1.1rem; color: #a855f7;">0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button type="button" id="btn-refresh-server-metrics" onclick="refreshServerMetrics()" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; font-weight: 700;">
+                            <i class="fas fa-sync-alt" id="icon-refresh-metrics"></i>
+                            <span>تحديث لحظي الآن 🔄</span>
+                        </button>
+                        <a href="https://dash.cloudflare.com/8fcd811bce36d07fe78cfc7a7137f62e/workers-and-pages/services/view/labor-system-live" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; text-decoration: none; font-size: 0.82rem;">
+                            <i class="fas fa-external-link-alt"></i>
+                            <span>لوحة Cloudflare الكاملة</span>
+                        </a>
+                    </div>
+                    <button type="button" onclick="closeServerMetricsModal()" class="btn btn-danger" style="padding: 7px 18px;">إغلاق</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Add/Edit Instant Alert Modal -->
         <div id="modal-instant-alert" class="modal" style="display: none; z-index: 10000;">
             <div class="card" style="width: 100%; max-width: 650px; max-height: 92vh; overflow-y: auto; position: relative;">
