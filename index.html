@@ -1973,14 +1973,16 @@ select {
 
         
         <!-- Live Server Metrics Modal -->
+        <!-- Live Server Metrics Modal with Tabs -->
         <div id="modal-server-metrics" class="modal" style="display: none; z-index: 10000;">
             <div class="card modal-content" style="width: 100%; max-width: 680px; max-height: 92vh; overflow-y: auto; position: relative; border: 1px solid rgba(249, 115, 22, 0.4); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(249, 115, 22, 0.15); margin: auto;">
+                
                 <!-- Modal Header -->
-                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
                     <div>
                         <h3 style="margin: 0; font-size: 1.25rem; display: flex; align-items: center; gap: 8px; color: #ea580c;">
                             <i class="fab fa-cloudflare" style="font-size: 1.4rem;"></i>
-                            <span>معدل استهلاك سيرفر Cloudflare اللحظي</span>
+                            <span>لوحة مراقبة وإدارة سيرفر Cloudflare</span>
                         </h3>
                         <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 6px;">
                             <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981;"></span>
@@ -1990,180 +1992,212 @@ select {
                     <button class="btn-icon" onclick="closeServerMetricsModal()" style="font-size: 1.5rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 4px;">&times;</button>
                 </div>
 
-                <!-- Top Status Bar -->
-                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; background: rgba(249, 115, 22, 0.08); border: 1px solid rgba(249, 115, 22, 0.2); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;">
-                    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
-                        <i class="fas fa-server" style="color: #ea580c;"></i>
-                        <span style="font-weight: 700;">حالة الخادم:</span>
-                        <span id="sm-server-status" style="background: #10b981; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">متصل ويعمل 24/7 ✅</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--text-muted);">
-                        <span>سرعة الاستجابة:</span>
-                        <strong id="sm-ping" style="color: #10b981; font-family: monospace; font-size: 0.95rem;">-- ms</strong>
-                    </div>
-                    <div style="font-size: 0.78rem; color: var(--text-muted);">
-                        <span>آخر فحص:</span>
-                        <span id="sm-last-checked" style="font-weight: 600;">جاري الفحص...</span>
-                    </div>
+                <!-- 3 Clear Tabs for Instant Navigation -->
+                <div style="display: flex; gap: 6px; border-bottom: 2px solid var(--border-color); margin-bottom: 16px; padding-bottom: 6px;">
+                    <button type="button" id="tab-btn-metrics" onclick="switchMetricsTab('metrics')" style="flex: 1; padding: 9px 8px; font-size: 0.84rem; font-weight: 700; border: none; border-radius: 6px; background: rgba(249, 115, 22, 0.15); color: #ea580c; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <i class="fas fa-chart-pie"></i> <span>1. استهلاك السيرفر</span>
+                    </button>
+                    <button type="button" id="tab-btn-alert" onclick="switchMetricsTab('alert')" style="flex: 1; padding: 9px 8px; font-size: 0.84rem; font-weight: 700; border: none; border-radius: 6px; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <i class="fas fa-bell"></i> <span>2. تنبيه الـ 70% 🔔</span>
+                    </button>
+                    <button type="button" id="tab-btn-purge" onclick="switchMetricsTab('purge')" style="flex: 1; padding: 9px 8px; font-size: 0.84rem; font-weight: 700; border: none; border-radius: 6px; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <i class="fas fa-trash-alt"></i> <span>3. تفريغ السراكي 🗑️</span>
+                    </button>
                 </div>
 
-                <!-- Metrics Grid -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 16px;">
-                    <!-- 1. Daily Requests Card -->
-                    <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; position: relative;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <span style="font-size: 0.88rem; font-weight: 700; color: #ea580c; display: flex; align-items: center; gap: 6px;">
-                                <i class="fas fa-chart-pie"></i> الحصة اليومية للطلبات (Workers)
-                            </span>
-                            <span id="sm-req-pct-badge" style="background: rgba(249, 115, 22, 0.15); color: #ea580c; font-weight: 800; font-size: 0.82rem; padding: 2px 7px; border-radius: 4px;">0.00%</span>
+                <!-- ==================== TAB 1: METRICS ==================== -->
+                <div id="tab-pane-metrics" style="display: block;">
+                    <!-- Top Status Bar -->
+                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; background: rgba(249, 115, 22, 0.08); border: 1px solid rgba(249, 115, 22, 0.2); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
+                            <i class="fas fa-server" style="color: #ea580c;"></i>
+                            <span style="font-weight: 700;">حالة الخادم:</span>
+                            <span id="sm-server-status" style="background: #10b981; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">متصل ويعمل 24/7 ✅</span>
                         </div>
-                        <div style="font-size: 1.6rem; font-weight: 800; margin-bottom: 6px; font-family: monospace; display: flex; align-items: baseline; gap: 4px;">
-                            <span id="sm-req-today">0</span>
-                            <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: normal;">/ 100,000 طلب</span>
-                        </div>
-                        <!-- Progress Bar -->
-                        <div style="width: 100%; height: 10px; background: rgba(255,255,255,0.08); border-radius: 5px; overflow: hidden; margin-bottom: 8px;">
-                            <div id="sm-req-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #10b981 0%, #f97316 80%, #ef4444 100%); transition: width 0.6s ease; border-radius: 5px;"></div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted);">
-                            <span>متبقي لليوم: <strong id="sm-req-remaining" style="color: #10b981;">100,000</strong> طلب</span>
-                            <span>الحد الأقصى: 100,000</span>
-                        </div>
-                        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-color); font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px;">
-                            <i class="fas fa-history" style="color: #f97316;"></i>
-                            <span>تجديد العداد اليومي بعد: <strong id="sm-reset-timer" style="color: #ea580c;">--</strong></span>
-                        </div>
-                    </div>
-
-                    <!-- 2. Performance & Health Card -->
-                    <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
-                        <div style="font-size: 0.88rem; font-weight: 700; color: #3b82f6; display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
-                            <i class="fas fa-tachometer-alt"></i> الأداء وسرعة المعالجة (CPU & Errors)
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <div style="background: rgba(59, 130, 246, 0.08); border-radius: 8px; padding: 8px 10px;">
-                                <div style="font-size: 0.75rem; color: var(--text-muted);">متوسط زمن المعالجة:</div>
-                                <div style="font-size: 1.25rem; font-weight: 800; color: #3b82f6; font-family: monospace; margin-top: 2px;">
-                                    <span id="sm-cpu-avg">0</span> <span style="font-size: 0.75rem;">ms</span>
-                                </div>
-                                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">المسموح حتى 10 ms ⚡</div>
-                            </div>
-                            <div style="background: rgba(16, 185, 129, 0.08); border-radius: 8px; padding: 8px 10px;">
-                                <div style="font-size: 0.75rem; color: var(--text-muted);">نسبة الأخطاء:</div>
-                                <div style="font-size: 1.25rem; font-weight: 800; color: #10b981; font-family: monospace; margin-top: 2px;">
-                                    <span id="sm-errors">0</span>
-                                </div>
-                                <div style="font-size: 0.7rem; color: #10b981; margin-top: 2px;">استقرار بنسبة 100% 🛡️</div>
-                            </div>
-                        </div>
-                        <div style="margin-top: 10px; font-size: 0.76rem; color: var(--text-muted); display: flex; justify-content: space-between;">
-                            <span>أقصى زمن ذروة: <strong id="sm-cpu-max">0</strong> ms</span>
-                            <span>الطلبات الفرعية: <strong id="sm-subrequests">0</strong></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. D1 Database Card -->
-                <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span style="font-size: 0.88rem; font-weight: 700; color: #8b5cf6; display: flex; align-items: center; gap: 6px;">
-                            <i class="fas fa-database"></i> قاعدة بيانات Cloudflare D1 الموزعة عالمياً
-                        </span>
-                        <span id="sm-db-pct-badge" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6; font-weight: 800; font-size: 0.82rem; padding: 2px 7px; border-radius: 4px;">0.01%</span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
-                        <div style="font-size: 1.3rem; font-weight: 800; font-family: monospace;">
-                            <span id="sm-db-used-mb">0.00</span> <span style="font-size: 0.85rem; color: var(--text-muted);">MB مستهلكة / 5,000 MB (5 GB)</span>
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--text-muted);">
+                            <span>سرعة الاستجابة:</span>
+                            <strong id="sm-ping" style="color: #10b981; font-family: monospace; font-size: 0.95rem;">-- ms</strong>
                         </div>
                         <div style="font-size: 0.78rem; color: var(--text-muted);">
-                            المساحة المتبقية: <strong>4,999+ MB</strong>
+                            <span>آخر فحص:</span>
+                            <span id="sm-last-checked" style="font-weight: 600;">جاري الفحص...</span>
                         </div>
                     </div>
-                    <!-- Database Progress Bar -->
-                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; margin-bottom: 10px;">
-                        <div id="sm-db-bar" style="width: 0.1%; height: 100%; background: #8b5cf6; border-radius: 4px;"></div>
+
+                    <!-- Metrics Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 16px;">
+                        <!-- 1. Daily Requests Card -->
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span style="font-size: 0.88rem; font-weight: 700; color: #ea580c; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-chart-pie"></i> الحصة اليومية للطلبات (Workers)
+                                </span>
+                                <span id="sm-req-pct-badge" style="background: rgba(249, 115, 22, 0.15); color: #ea580c; font-weight: 800; font-size: 0.82rem; padding: 2px 7px; border-radius: 4px;">0.00%</span>
+                            </div>
+                            <div style="font-size: 1.6rem; font-weight: 800; margin-bottom: 6px; font-family: monospace; display: flex; align-items: baseline; gap: 4px;">
+                                <span id="sm-req-today">0</span>
+                                <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: normal;">/ 100,000 طلب</span>
+                            </div>
+                            <div style="width: 100%; height: 10px; background: rgba(255,255,255,0.08); border-radius: 5px; overflow: hidden; margin-bottom: 8px;">
+                                <div id="sm-req-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #10b981 0%, #f97316 80%, #ef4444 100%); transition: width 0.6s ease; border-radius: 5px;"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted);">
+                                <span>متبقي لليوم: <strong id="sm-req-remaining" style="color: #10b981;">100,000</strong> طلب</span>
+                                <span>الحد الأقصى: 100,000</span>
+                            </div>
+                            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-color); font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-history" style="color: #f97316;"></i>
+                                <span>تجديد العداد اليومي بعد: <strong id="sm-reset-timer" style="color: #ea580c;">--</strong></span>
+                            </div>
+                        </div>
+
+                        <!-- 2. Performance & Health Card -->
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px;">
+                            <div style="font-size: 0.88rem; font-weight: 700; color: #3b82f6; display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
+                                <i class="fas fa-tachometer-alt"></i> الأداء وسرعة المعالجة (CPU & Errors)
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div style="background: rgba(59, 130, 246, 0.08); border-radius: 8px; padding: 8px 10px;">
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">متوسط زمن المعالجة:</div>
+                                    <div style="font-size: 1.25rem; font-weight: 800; color: #3b82f6; font-family: monospace; margin-top: 2px;">
+                                        <span id="sm-cpu-avg">0</span> <span style="font-size: 0.75rem;">ms</span>
+                                    </div>
+                                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">المسموح حتى 10 ms ⚡</div>
+                                </div>
+                                <div style="background: rgba(16, 185, 129, 0.08); border-radius: 8px; padding: 8px 10px;">
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">نسبة الأخطاء:</div>
+                                    <div style="font-size: 1.25rem; font-weight: 800; color: #10b981; font-family: monospace; margin-top: 2px;">
+                                        <span id="sm-errors">0</span>
+                                    </div>
+                                    <div style="font-size: 0.7rem; color: #10b981; margin-top: 2px;">استقرار بنسبة 100% 🛡️</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px; font-size: 0.76rem; color: var(--text-muted); display: flex; justify-content: space-between;">
+                                <span>أقصى زمن ذروة: <strong id="sm-cpu-max">0</strong> ms</span>
+                                <span>الطلبات الفرعية: <strong id="sm-subrequests">0</strong></span>
+                            </div>
+                        </div>
                     </div>
-                    <!-- Entity Stats Grid -->
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; background: var(--bg-card); border-radius: 8px; padding: 10px 6px;">
-                        <div>
-                            <div style="font-size: 0.72rem; color: var(--text-muted);">إجمالي السراكي</div>
-                            <strong id="sm-cnt-records" style="font-size: 1.1rem; color: #f97316;">0</strong>
+
+                    <!-- 3. D1 Database Card -->
+                    <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-size: 0.88rem; font-weight: 700; color: #8b5cf6; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-database"></i> قاعدة بيانات Cloudflare D1 الموزعة عالمياً
+                            </span>
+                            <span id="sm-db-pct-badge" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6; font-weight: 800; font-size: 0.82rem; padding: 2px 7px; border-radius: 4px;">0.01%</span>
                         </div>
-                        <div>
-                            <div style="font-size: 0.72rem; color: var(--text-muted);">إجمالي العمال</div>
-                            <strong id="sm-cnt-workers" style="font-size: 1.1rem; color: #3b82f6;">0</strong>
+                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+                            <div style="font-size: 1.3rem; font-weight: 800; font-family: monospace;">
+                                <span id="sm-db-used-mb">0.00</span> <span style="font-size: 0.85rem; color: var(--text-muted);">MB مستهلكة / 5,000 MB (5 GB)</span>
+                            </div>
+                            <div style="font-size: 0.78rem; color: var(--text-muted);">
+                                المساحة المتبقية: <strong>4,999+ MB</strong>
+                            </div>
                         </div>
-                        <div>
-                            <div style="font-size: 0.72rem; color: var(--text-muted);">المستخدمين</div>
-                            <strong id="sm-cnt-users" style="font-size: 1.1rem; color: #10b981;">0</strong>
+                        <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; margin-bottom: 10px;">
+                            <div id="sm-db-bar" style="width: 0.1%; height: 100%; background: #8b5cf6; border-radius: 4px;"></div>
                         </div>
-                        <div>
-                            <div style="font-size: 0.72rem; color: var(--text-muted);">إجمالي السجلات</div>
-                            <strong id="sm-cnt-total" style="font-size: 1.1rem; color: #a855f7;">0</strong>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; background: var(--bg-card); border-radius: 8px; padding: 10px 6px;">
+                            <div>
+                                <div style="font-size: 0.72rem; color: var(--text-muted);">إجمالي السراكي</div>
+                                <strong id="sm-cnt-records" style="font-size: 1.1rem; color: #f97316;">0</strong>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.72rem; color: var(--text-muted);">إجمالي العمال</div>
+                                <strong id="sm-cnt-workers" style="font-size: 1.1rem; color: #3b82f6;">0</strong>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.72rem; color: var(--text-muted);">المستخدمين</div>
+                                <strong id="sm-cnt-users" style="font-size: 1.1rem; color: #10b981;">0</strong>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.72rem; color: var(--text-muted);">إجمالي السجلات</div>
+                                <strong id="sm-cnt-total" style="font-size: 1.1rem; color: #a855f7;">0</strong>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                
-                <!-- Auto-Alert 70% Status Badge -->
-                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 0.82rem;">
-                    <div style="display: flex; align-items: center; gap: 8px; color: #10b981; font-weight: 700;">
-                        <i class="fas fa-bell"></i>
-                        <span>نظام التنبيه التلقائي (70%): مفعل لحسابك 🟢</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 0.74rem; color: var(--text-muted);">(تنبيه فوري عند وصول أي بند إلى 70%)</span>
-                        <button type="button" onclick="testQuotaAlertNotification()" class="btn btn-secondary" style="font-size: 0.72rem; padding: 3px 8px; border-radius: 4px;">
-                            <i class="fas fa-bell"></i> تجربة إشعار التنبيه
-                        </button>
+                <!-- ==================== TAB 2: 70% ALERT SYSTEM ==================== -->
+                <div id="tab-pane-alert" style="display: none;">
+                    <div style="background: var(--bg-main); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                            <div style="display: flex; align-items: center; gap: 8px; color: #10b981; font-weight: 800; font-size: 1.05rem;">
+                                <i class="fas fa-bell"></i>
+                                <span>نظام التنبيه التلقائي المباشر (70%)</span>
+                            </div>
+                            <span style="background: #10b981; color: #fff; padding: 3px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 700;">مفعل لحسابك 🟢</span>
+                        </div>
+
+                        <p style="font-size: 0.85rem; color: var(--text-main); line-height: 1.7; margin-bottom: 14px;">
+                            تم ضبط النظام ليقوم بمراقبة استهلاك السيرفر لحظياً، وسيرسل لك <strong>إشعاراً فورياً (WebPush Notification)</strong> على هاتفك أو جهازك في الحالات التالية:
+                        </p>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+                            <div style="background: rgba(249, 115, 22, 0.08); border: 1px solid rgba(249, 115, 22, 0.25); border-radius: 8px; padding: 12px;">
+                                <div style="font-weight: 700; color: #f97316; font-size: 0.85rem; margin-bottom: 4px;">1. الطلبات اليومية:</div>
+                                <div style="font-size: 0.78rem; color: var(--text-muted);">عند وصول الطلبات لـ <strong>70,000 طلب</strong> (70% من الـ 100,000).</div>
+                            </div>
+                            <div style="background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 8px; padding: 12px;">
+                                <div style="font-weight: 700; color: #8b5cf6; font-size: 0.85rem; margin-bottom: 4px;">2. مساحة قاعدة البيانات:</div>
+                                <div style="font-size: 0.78rem; color: var(--text-muted);">عند وصول مساحة البيانات لـ <strong>3,500 ميجابايت</strong> (70% من 5 جيجا).</div>
+                            </div>
+                        </div>
+
+                        <!-- Test Alert Button Card -->
+                        <div style="background: var(--bg-card); border-radius: 8px; padding: 14px; text-align: center; border: 1px dashed #10b981;">
+                            <div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 6px;">اختبار وصول التنبيه إلى هاتفك الآن:</div>
+                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">اضغط على الزر أدناه لإرسال إشعار تجريبي فوري لجهازك والتأكد من تفعيل الإشعارات:</div>
+                            <button type="button" onclick="testQuotaAlertNotification()" class="btn btn-success" style="padding: 10px 24px; font-size: 0.92rem; font-weight: 800; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                                <i class="fas fa-bell"></i>
+                                <span>تجربة إشعار التنبيه الآن 🔔</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 70% Alert Banner (Hidden by default, shown if threshold reached) -->
-                <div id="sm-alert-70-banner" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; color: #ef4444; font-weight: 700; align-items: center; gap: 8px;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
-                    <span id="sm-alert-70-text">تحذير: استهلاك السيرفر تجاوز 70% من الحصة المسموحة!</span>
-                </div>
-
-                <!-- 4. Data Archiving & Purge Tool (Admin Only with Current Password) -->
-                <div style="background: var(--bg-main); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span style="font-size: 0.88rem; font-weight: 700; color: #ef4444; display: flex; align-items: center; gap: 6px;">
-                            <i class="fas fa-trash-alt"></i> أرشفة وتفريغ السراكي القديمة (لتخفيض المساحة)
-                        </span>
-                        <span style="font-size: 0.75rem; background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 2px 8px; border-radius: 4px; font-weight: 700;">محمية بكلمة المرور 🔒</span>
-                    </div>
-
-                    <div style="background: rgba(249, 115, 22, 0.08); border: 1px dashed rgba(249, 115, 22, 0.3); border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 0.77rem; color: var(--text-muted); line-height: 1.5;">
-                        <i class="fas fa-info-circle" style="color: #f97316;"></i>
-                        <strong>ملاحظة هامة:</strong> المساحة الحالية مستهلك منها <strong>0.004% فقط</strong> (تكفي لأكثر من 50 سنة قادمة). استخدم هذه الأداة فقط إذا كنت ترغب بتفريغ فترة معينة من السجلات القديمة. سيتم تنزيل نسخة احتياطية على جهازك تلقائياً قبل الحذف.
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                        <div>
-                            <label style="font-size: 0.76rem; color: var(--text-muted); display: block; margin-bottom: 4px;">من تاريخ:</label>
-                            <input type="date" id="purge-start-date" class="modal-input" style="width: 100%; margin-bottom: 0; padding: 6px 10px; font-size: 0.85rem;">
+                <!-- ==================== TAB 3: DATA PURGE ==================== -->
+                <div id="tab-pane-purge" style="display: none;">
+                    <div style="background: var(--bg-main); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                            <span style="font-size: 1.05rem; font-weight: 800; color: #ef4444; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-trash-alt"></i> أرشفة وتفريغ السراكي القديمة (لتخفيض المساحة)
+                            </span>
+                            <span style="font-size: 0.75rem; background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 3px 10px; border-radius: 4px; font-weight: 700;">محمية بكلمة المرور 🔒</span>
                         </div>
-                        <div>
-                            <label style="font-size: 0.76rem; color: var(--text-muted); display: block; margin-bottom: 4px;">إلى تاريخ:</label>
-                            <input type="date" id="purge-end-date" class="modal-input" style="width: 100%; margin-bottom: 0; padding: 6px 10px; font-size: 0.85rem;">
+
+                        <div style="background: rgba(249, 115, 22, 0.08); border: 1px dashed rgba(249, 115, 22, 0.3); border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.8rem; color: var(--text-muted); line-height: 1.6;">
+                            <i class="fas fa-info-circle" style="color: #f97316;"></i>
+                            <strong>ملاحظة للمدير:</strong> المساحة الحالية مستهلك منها <strong>0.004% فقط</strong> (تكفي لأكثر من 50 سنة قادمة). استخدم هذه الأداة فقط إذا كنت ترغب بتفريغ فترة معينة من السجلات القديمة. سيتم تنزيل نسخة احتياطية على جهازك تلقائياً قبل الحذف.
                         </div>
-                    </div>
 
-                    <div style="margin-bottom: 10px;">
-                        <label style="font-size: 0.76rem; color: var(--text-muted); display: block; margin-bottom: 4px;">كلمة مرور حسابك الحالية للتأكيد:</label>
-                        <input type="password" id="purge-admin-password" class="modal-input" placeholder="أدخل كلمة مرور حسابك لتأكيد الحذف" style="width: 100%; margin-bottom: 0; padding: 6px 10px; font-size: 0.85rem;">
-                    </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                            <div>
+                                <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px; font-weight: 700;">من تاريخ:</label>
+                                <input type="date" id="purge-start-date" class="modal-input" style="width: 100%; margin-bottom: 0; padding: 8px 10px; font-size: 0.88rem;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px; font-weight: 700;">إلى تاريخ:</label>
+                                <input type="date" id="purge-end-date" class="modal-input" style="width: 100%; margin-bottom: 0; padding: 8px 10px; font-size: 0.88rem;">
+                            </div>
+                        </div>
 
-                    <div id="purge-preview-result" style="display: none; padding: 8px 12px; border-radius: 6px; background: var(--bg-card); font-size: 0.8rem; margin-bottom: 10px;"></div>
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px; font-weight: 700;">كلمة مرور حسابك الشخصي الحالية للتأكيد:</label>
+                            <input type="password" id="purge-admin-password" class="modal-input" placeholder="أدخل كلمة مرور حسابك لتأكيد الحذف" style="width: 100%; margin-bottom: 0; padding: 8px 10px; font-size: 0.88rem;">
+                        </div>
 
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-                        <button type="button" onclick="previewPurgeRecords()" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;">
-                            <i class="fas fa-search"></i> معاينة البيانات المستهدفة
-                        </button>
-                        <button type="button" onclick="confirmAndExecutePurge()" class="btn btn-danger" style="font-size: 0.8rem; padding: 6px 14px; font-weight: 700;">
-                            <i class="fas fa-trash-alt"></i> تأكيد الحذف وتنزيل النسخة الاحتياطية
-                        </button>
+                        <div id="purge-preview-result" style="display: none; padding: 10px 14px; border-radius: 6px; background: var(--bg-card); font-size: 0.82rem; margin-bottom: 12px;"></div>
+
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                            <button type="button" onclick="previewPurgeRecords()" class="btn btn-secondary" style="font-size: 0.85rem; padding: 8px 14px; font-weight: 700;">
+                                <i class="fas fa-search"></i> معاينة البيانات المستهدفة
+                            </button>
+                            <button type="button" onclick="confirmAndExecutePurge()" class="btn btn-danger" style="font-size: 0.85rem; padding: 8px 16px; font-weight: 800;">
+                                <i class="fas fa-trash-alt"></i> تأكيد الحذف وتنزيل النسخة الاحتياطية
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -2183,7 +2217,7 @@ select {
                 </div>
             </div>
         </div>
-
+        
         <!-- Add/Edit Instant Alert Modal -->
         <div id="modal-instant-alert" class="modal" style="display: none; z-index: 10000;">
             <div class="card" style="width: 100%; max-width: 650px; max-height: 92vh; overflow-y: auto; position: relative;">
@@ -2649,9 +2683,13 @@ select {
                             </div>
                             
                             <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 8px;">
-                                <button type="button" onclick="openServerMetricsModal()" style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #fff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer; box-shadow: 0 2px 4px rgba(234, 88, 12, 0.25); transition: all 0.2s ease;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'" title="فحص استهلاك وحصة السيرفر اللحظية الصادرة من Cloudflare">
+                                <button type="button" onclick="openServerMetricsModal('metrics')" style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #fff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer; box-shadow: 0 2px 4px rgba(234, 88, 12, 0.25); transition: all 0.2s ease;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'" title="فحص استهلاك وحصة السيرفر اللحظية الصادرة من Cloudflare">
                                     <i class="fas fa-bolt"></i>
                                     <span>معدل الاستهلاك اللحظي ⚡</span>
+                                </button>
+                                <button type="button" onclick="openServerMetricsModal('purge')" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(239, 68, 68, 0.12); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.22)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.12)'" title="أرشفة ومسح السراكي القديمة لتخفيض المساحة">
+                                    <i class="fas fa-trash-alt"></i>
+                                    <span>تفريغ وأرشفة السراكي 🗑️</span>
                                 </button>
                             </div>
                             <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 8px;">
@@ -8234,13 +8272,32 @@ document.addEventListener('keydown', (e) => {
 
 
 // --- Live Server Metrics Modal Functions ---
-window.openServerMetricsModal = function() {
+window.openServerMetricsModal = function(initialTab = 'metrics') {
     const modal = document.getElementById("modal-server-metrics");
     if (modal) {
         modal.style.display = "flex";
         modal.classList.remove("hidden");
+        window.switchMetricsTab(initialTab);
         window.refreshServerMetrics();
     }
+};
+
+window.switchMetricsTab = function(tab) {
+    const panes = ['metrics', 'alert', 'purge'];
+    panes.forEach(p => {
+        const paneEl = document.getElementById('tab-pane-' + p);
+        const btnEl = document.getElementById('tab-btn-' + p);
+        if (paneEl) paneEl.style.display = (p === tab) ? 'block' : 'none';
+        if (btnEl) {
+            if (p === tab) {
+                btnEl.style.background = (p === 'purge') ? 'rgba(239, 68, 68, 0.15)' : (p === 'alert' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(249, 115, 22, 0.15)');
+                btnEl.style.color = (p === 'purge') ? '#ef4444' : (p === 'alert' ? '#10b981' : '#ea580c');
+            } else {
+                btnEl.style.background = 'transparent';
+                btnEl.style.color = 'var(--text-muted)';
+            }
+        }
+    });
 };
 
 window.closeServerMetricsModal = function() {
