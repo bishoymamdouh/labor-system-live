@@ -1,4 +1,4 @@
-// Service Worker v5.0 - Automatic cache eviction & live updates
+// Service Worker v5.1 - Push only, native network routing
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
@@ -13,10 +13,6 @@ self.addEventListener('activate', e => {
       );
     }).then(() => self.clients.claim())
   );
-});
-
-self.addEventListener('fetch', e => {
-    // By-pass cache completely
 });
 
 self.addEventListener('push', e => {

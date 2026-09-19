@@ -3199,6 +3199,10 @@ class Auth {
         return this.currentUser !== null;
     }
 
+    getUser() {
+        return this.currentUser;
+    }
+
     getRole() {
         return this.currentUser ? this.currentUser.role : null;
     }
@@ -3413,7 +3417,7 @@ class UI {
         sidebar.classList.remove('hidden');
         navLinks.innerHTML = '';
 
-        const currentUser = userOverride || auth.getUser();
+        const currentUser = userOverride || (auth && auth.currentUser) || (auth && typeof auth.getUser === 'function' ? auth.getUser() : null);
         const perms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(currentUser) : {
             admin_dashboard: role === 'admin',
             manage_notifications: role === 'admin',
@@ -4950,7 +4954,7 @@ document.addEventListener('keydown', (e) => {
             
             try {
                 if (await auth.login(user, pass)) {
-                    this.setupWorkspace();
+                    await this.setupWorkspace();
                 } else {
                     alert('اسم المستخدم أو كلمة المرور غير صحيحة');
                 }
@@ -5249,46 +5253,50 @@ document.addEventListener('keydown', (e) => {
             console.error("Device status error:", e);
         }
         
-        if (role === 'admin') {
-            await this.loadEngineerData();
-            this.loadSupervisorData();
-            this.loadAdminData();
-            this.generateReport();
-            
-            await UI.renderEngineerOptions();
-            let dirWorkers = await db.getAll('worker_directory');
-            dirWorkers.sort((a, b) => customSort(a, b, false));
-            this.directoryWorkers = dirWorkers;
-            this.currentWorkers = [];
-            document.getElementById('workers-list').innerHTML = '';
-            this.addWorkerRow();
-            this.updateTotals();
-            document.getElementById('record-date').removeAttribute('readonly');
-            document.getElementById('record-date').style = 'background-color: white; color: black; font-weight: normal;';
-        } else if (role === 'engineer') {
-            this.loadEngineerData();
-            this.generateReport();
-            
-            await UI.renderEngineerOptions();
-            let dirWorkers = await db.getAll('worker_directory');
-            dirWorkers.sort((a, b) => customSort(a, b, false));
-            this.directoryWorkers = dirWorkers;
-            this.loadSupervisorData();
-            this.currentWorkers = [];
-            document.getElementById('workers-list').innerHTML = '';
-            this.addWorkerRow();
-            this.updateTotals();
-        } else if (role === 'supervisor' || role === 'surveyor' || role === 'warehouse_manager' || role === 'operator_supervisor') {
-            await UI.renderEngineerOptions();
-            let dirWorkers = await db.getAll('worker_directory');
-            dirWorkers.sort((a, b) => customSort(a, b, false));
-            this.directoryWorkers = dirWorkers;
-            this.loadSupervisorData();
-            // Add first empty worker row
-            this.currentWorkers = [];
-            document.getElementById('workers-list').innerHTML = '';
-            this.addWorkerRow();
-            this.updateTotals();
+        try {
+            if (role === 'admin') {
+                await this.loadEngineerData();
+                this.loadSupervisorData();
+                this.loadAdminData();
+                this.generateReport();
+                
+                await UI.renderEngineerOptions();
+                let dirWorkers = await db.getAll('worker_directory');
+                dirWorkers.sort((a, b) => customSort(a, b, false));
+                this.directoryWorkers = dirWorkers;
+                this.currentWorkers = [];
+                document.getElementById('workers-list').innerHTML = '';
+                this.addWorkerRow();
+                this.updateTotals();
+                document.getElementById('record-date').removeAttribute('readonly');
+                document.getElementById('record-date').style = 'background-color: white; color: black; font-weight: normal;';
+            } else if (role === 'engineer') {
+                this.loadEngineerData();
+                this.generateReport();
+                
+                await UI.renderEngineerOptions();
+                let dirWorkers = await db.getAll('worker_directory');
+                dirWorkers.sort((a, b) => customSort(a, b, false));
+                this.directoryWorkers = dirWorkers;
+                this.loadSupervisorData();
+                this.currentWorkers = [];
+                document.getElementById('workers-list').innerHTML = '';
+                this.addWorkerRow();
+                this.updateTotals();
+            } else if (role === 'supervisor' || role === 'surveyor' || role === 'warehouse_manager' || role === 'operator_supervisor') {
+                await UI.renderEngineerOptions();
+                let dirWorkers = await db.getAll('worker_directory');
+                dirWorkers.sort((a, b) => customSort(a, b, false));
+                this.directoryWorkers = dirWorkers;
+                this.loadSupervisorData();
+                // Add first empty worker row
+                this.currentWorkers = [];
+                document.getElementById('workers-list').innerHTML = '';
+                this.addWorkerRow();
+                this.updateTotals();
+            }
+        } catch (dataErr) {
+            console.error("Workspace initial data load error:", dataErr);
         }
     }
 
@@ -8735,7 +8743,7 @@ window.openServerMetricsModal = function(initialTab = 'metrics') {
     const modal = document.getElementById("modal-server-metrics");
     if (modal) {
         const tabBtnPurge = document.getElementById('tab-btn-purge');
-        const userPerms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(auth.getUser()) : { purge_records: true };
+        const userPerms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(auth && (auth.currentUser || (typeof auth.getUser === 'function' ? auth.getUser() : null))) : { purge_records: true };
         if (tabBtnPurge) {
             tabBtnPurge.style.display = userPerms.purge_records ? 'flex' : 'none';
         }
@@ -8752,7 +8760,7 @@ window.openServerMetricsModal = function(initialTab = 'metrics') {
 
 window.switchMetricsTab = function(tab) {
     if (tab === 'purge') {
-        const userPerms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(auth.getUser()) : { purge_records: true };
+        const userPerms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(auth && (auth.currentUser || (typeof auth.getUser === 'function' ? auth.getUser() : null))) : { purge_records: true };
         if (!userPerms.purge_records) {
             if (window.showAppNotification) {
                 window.showAppNotification('عفواً، لا تملك صلاحية تفريغ وأرشفة السراكي.', 'warning');
