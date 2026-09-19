@@ -3371,7 +3371,32 @@ window.showAppNotification = function(firstArg, secondArg, thirdArg, fourthArg) 
     const duration = (typeof opts.duration === 'number' && opts.duration > 0) ? opts.duration : 0;
     const sound = opts.sound !== undefined ? opts.sound : true;
     const silent = opts.silent !== undefined ? opts.silent : false;
-    const action = typeof opts.action === 'function' ? opts.action : null;
+    
+    // Interactive Navigation (Explicit action, target view, or smart contextual auto-routing)
+    let action = typeof opts.action === 'function' ? opts.action : null;
+    let targetView = opts.view || opts.target || null;
+    if (!action && targetView) {
+        action = () => UI.showView(targetView);
+    }
+    if (!action && opts.autoNavigate !== false) {
+        const fullText = (title + ' ' + message).toLowerCase();
+        if (fullText.includes('سركي') || fullText.includes('سراكي') || fullText.includes('معلق') || fullText.includes('اعتماد')) {
+            const role = (window.auth && typeof auth.getRole === 'function') ? auth.getRole() : '';
+            if (role === 'supervisor') {
+                action = () => UI.showView('view-supervisor');
+            } else {
+                action = () => UI.showView('view-engineer');
+            }
+        } else if (fullText.includes('تقرير') || fullText.includes('excel') || fullText.includes('تصدير')) {
+            action = () => UI.showView('view-reports');
+        } else if (fullText.includes('سيرفر') || fullText.includes('70%') || fullText.includes('تفريغ') || fullText.includes('مساحة')) {
+            action = () => {
+                UI.showView('view-admin');
+                const tab = document.querySelector('[onclick*="server-metrics"]');
+                if (tab) tab.click();
+            };
+        }
+    }
 
     // 4. Play Audio Chime if enabled
     if (sound && !silent) {
@@ -3496,7 +3521,7 @@ window.showAppNotification = function(firstArg, secondArg, thirdArg, fourthArg) 
         gap: 8px;
         position: relative;
         overflow: hidden;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, opacity 0.3s ease;
         opacity: 0;
         transform: translateY(-20px) scale(0.97);
         ${action ? 'cursor: pointer;' : ''}
@@ -3524,6 +3549,11 @@ window.showAppNotification = function(firstArg, secondArg, thirdArg, fourthArg) 
         <div style="padding-right: 44px; padding-left: 8px; font-size: 0.88rem; color: #f1f5f9; font-weight: 500; line-height: 1.55; word-break: break-word; text-align: right;">
             ${message}
         </div>
+        ${action ? `
+        <div class="toast-nav-hint" style="padding-right: 44px; display: flex; align-items: center; gap: 5px; font-size: 0.74rem; color: ${t.color}; font-weight: 700; opacity: 0.95; padding-top: 1px;">
+            <i class="fas fa-arrow-left" style="font-size: 0.68rem;"></i> انقر هنا للانتقال المباشر
+        </div>
+        ` : ''}
     `;
 
     // 9. Dismiss Handler (Smooth transition and DOM removal)
@@ -3563,9 +3593,17 @@ window.showAppNotification = function(firstArg, secondArg, thirdArg, fourthArg) 
     }
 
     if (action) {
+        toast.addEventListener('mouseenter', () => {
+            toast.style.transform = 'translateY(-2px) scale(1.008)';
+            toast.style.boxShadow = `0 14px 35px rgba(0,0,0,0.65), 0 0 20px ${t.glow}`;
+        });
+        toast.addEventListener('mouseleave', () => {
+            toast.style.transform = 'translateY(0) scale(1)';
+            toast.style.boxShadow = `0 10px 28px rgba(0,0,0,0.55), 0 0 15px ${t.glow}`;
+        });
         toast.addEventListener('click', (e) => {
             if (e.target.closest('.btn-close-toast')) return;
-            action();
+            try { action(); } catch(err) { console.error('Toast action error', err); }
             dismiss();
         });
     }
