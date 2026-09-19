@@ -8313,6 +8313,177 @@ window.closeServerMetricsModal = function() {
     }
 };
 
+// --- 70% Alert & Purge Records Logic ---
+window.testQuotaAlertNotification = async function() {
+    if (!('Notification' in window)) {
+        alert('⚠️ متصفحك أو جهازك الحالي لا يدعم خاصية إشعارات الويب (Web Notifications).');
+        return;
+    }
+    
+    let perm = Notification.permission;
+    if (perm !== 'granted') {
+        try {
+            perm = await Notification.requestPermission();
+        } catch (e) {
+            console.warn('requestPermission error:', e);
+        }
+    }
+    
+    if (perm === 'granted') {
+        const notifTitle = '⚠️ تجربة تنبيه: استهلاك السيرفر تجاوز 70%';
+        const notifOptions = {
+            body: 'هذا إشعار تجريبي لاختبار وصول التنبيهات الفورية لجهازك بنجاح عند وصول استهلاك السيرفر إلى 70%.',
+            icon: '/logo.png',
+            badge: '/logo.png',
+            tag: 'test-quota-70-alert'
+        };
+        
+        let sent = false;
+        if ('serviceWorker' in navigator) {
+            try {
+                const reg = await navigator.serviceWorker.ready;
+                if (reg && reg.showNotification) {
+                    await reg.showNotification(notifTitle, notifOptions);
+                    sent = true;
+                }
+            } catch (swErr) {
+                console.warn('SW notification fallback to window.Notification:', swErr);
+            }
+        }
+        
+        if (!sent) {
+            try {
+                new Notification(notifTitle, notifOptions);
+                sent = true;
+            } catch (notifErr) {
+                console.error('Notification error:', notifErr);
+            }
+        }
+        
+        alert('🔔 تم إرسال إشعار التنبيه التجريبي لجهازك بنجاح!\n\nإذا لم يظهر على شاشتك فوراً، يرجى التأكد من تفعيل الإشعارات في إعدادات النظام (Windows Notifications أو إشعارات المتصفح).');
+    } else if (perm === 'denied') {
+        alert('⚠️ صلاحية الإشعارات محظورة (Blocked) في متصفحك لهذا الموقع.\n\nلتفعيلها: اضغط على أيقونة الإعدادات أو القفل 🔒 بجوار رابط الموقع في شريط العنوان، وقم بالسماح بالإشعارات (Allow Notifications).');
+    } else {
+        alert('لم يتم منح الإذن بإرسال الإشعارات. يرجى الموافقة على طلب المتصفح لتفعيل التنبيه.');
+    }
+};
+
+window.previewPurgeRecords = async function() {
+    const sDate = document.getElementById('purge-start-date')?.value;
+    const eDate = document.getElementById('purge-end-date')?.value;
+    const resEl = document.getElementById('purge-preview-result');
+    
+    if (!sDate || !eDate) {
+        alert('يرجى تحديد تاريخ البداية وتاريخ النهاية أولاً');
+        return;
+    }
+    if (sDate > eDate) {
+        alert('تاريخ البداية يجب أن يكون قبل أو يساوي تاريخ النهاية');
+        return;
+    }
+    
+    if (resEl) {
+        resEl.style.display = 'block';
+        resEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري فحص السجلات المستهدفة...';
+    }
+    
+    try {
+        const res = await fetch('/api/purge-records-range', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ startDate: sDate, endDate: eDate, previewOnly: true })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'فشل الفحص');
+        
+        if (resEl) {
+            resEl.innerHTML = `
+                <div style="color: #10b981; font-weight: 700; margin-bottom: 4px;">
+                    <i class="fas fa-check-circle"></i> نتيجة الفحص للفترة من ${sDate} إلى ${eDate}:
+                </div>
+                <div>عدد السراكي المستهدفة: <strong style="color: #f97316;">${data.recordsCount || 0}</strong> سركية</div>
+                <div>عدد يوميات العمال التابعة لها: <strong style="color: #3b82f6;">${data.workersCount || 0}</strong> يومية</div>
+            `;
+        }
+    } catch (e) {
+        if (resEl) resEl.innerHTML = `<span style="color: #ef4444;">خطأ: ${e.message}</span>`;
+    }
+};
+
+window.confirmAndExecutePurge = async function() {
+    const sDate = document.getElementById('purge-start-date')?.value;
+    const eDate = document.getElementById('purge-end-date')?.value;
+    const pwd = document.getElementById('purge-admin-password')?.value;
+    
+    if (!sDate || !eDate) {
+        alert('يرجى تحديد تاريخ البداية وتاريخ النهاية');
+        return;
+    }
+    if (!pwd) {
+        alert('يرجى إدخال كلمة مرور حسابك الحالية لتأكيد عملية الحذف');
+        return;
+    }
+    
+    const confirmMsg = `⚠️ تحذير أمني شديد:
+هل أنت متأكد تماماً من حذف جميع السراكي وعمالها في الفترة من ${sDate} إلى ${eDate}؟
+سيتم الآن تنزيل نسخة احتياطية على جهازك تلقائياً قبل بدء الحذف لضمان عدم ضياع أي بيانات.`;
+    
+    if (!confirm(confirmMsg)) return;
+    
+    // 1. Download Backup First
+    try {
+        if (window.app && window.app.exportStyledExcel) {
+            await window.app.exportStyledExcel();
+        }
+    } catch (e) {
+        console.warn('Backup export note:', e);
+    }
+    
+    // 2. Execute Purge on server
+    const purgeBtn = document.querySelector('button[onclick="confirmAndExecutePurge()"]');
+    const origText = purgeBtn ? purgeBtn.innerHTML : '';
+    if (purgeBtn) {
+        purgeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحقق والحذف...';
+        purgeBtn.disabled = true;
+    }
+    
+    try {
+        const res = await fetch('/api/purge-records-range', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                startDate: sDate,
+                endDate: eDate,
+                password: pwd,
+                username: (window.auth && window.auth.currentUser) ? window.auth.currentUser.username : 'Bishoy Mamdouh'
+            })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data.error || 'فشلت عملية الحذف');
+        }
+        
+        alert(`✅ تم بنجاح!\n${data.message}`);
+        
+        // Clear inputs
+        const pwdInput = document.getElementById('purge-admin-password');
+        if (pwdInput) pwdInput.value = '';
+        const resEl = document.getElementById('purge-preview-result');
+        if (resEl) resEl.style.display = 'none';
+        
+        // Refresh metrics and reload workspace
+        if (window.refreshServerMetrics) window.refreshServerMetrics();
+        if (window.app && window.app.loadData) await window.app.loadData();
+    } catch (err) {
+        alert('❌ خطأ: ' + err.message);
+    } finally {
+        if (purgeBtn) {
+            purgeBtn.innerHTML = origText;
+            purgeBtn.disabled = false;
+        }
+    }
+};
+
 window.refreshServerMetrics = async function() {
     const icon = document.getElementById("icon-refresh-metrics");
     const btn = document.getElementById("btn-refresh-server-metrics");
