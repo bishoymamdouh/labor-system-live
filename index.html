@@ -8315,10 +8315,46 @@ window.closeServerMetricsModal = function() {
 
 // --- 70% Alert & Purge Records Logic ---
 window.testQuotaAlertNotification = async function() {
-    if (!('Notification' in window)) {
-        alert('⚠️ متصفحك أو جهازك الحالي لا يدعم خاصية إشعارات الويب (Web Notifications).');
-        return;
-    }
+    // 1. Play Audio Chime
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+            const ctx = new AudioCtx();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+            osc.frequency.setValueAtTime(880, ctx.currentTime + 0.12); // A5
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.4);
+        }
+    } catch(e) {}
+
+    // 2. Show In-App Visual Toast Banner
+    const oldToast = document.getElementById('test-quota-toast');
+    if (oldToast) oldToast.remove();
+    const toast = document.createElement('div');
+    toast.id = 'test-quota-toast';
+    toast.style.cssText = 'position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; border: 2px solid #10b981; border-radius: 12px; padding: 14px 24px; box-shadow: 0 12px 35px rgba(0,0,0,0.6); z-index: 999999; display: flex; align-items: center; gap: 14px; font-weight: bold; max-width: 90vw; width: 450px; direction: rtl; transition: all 0.3s ease;';
+    toast.innerHTML = `
+        <div style="width: 42px; height: 42px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i class="fas fa-bell" style="color: #10b981; font-size: 1.3rem;"></i>
+        </div>
+        <div style="flex: 1;">
+            <div style="font-size: 0.95rem; color: #10b981; margin-bottom: 2px;">🔔 تجربة تنبيه: استهلاك السيرفر تجاوز 70%</div>
+            <div style="font-size: 0.8rem; color: #cbd5e1; font-weight: normal; line-height: 1.4;">تم إطلاق إشعار التنبيه بنجاح داخل هذا الجهاز!</div>
+        </div>
+        <button onclick="this.parentElement.remove()" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer; padding: 4px;">&times;</button>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 6000);
+
+    // 3. System Notification (Windows / Android / iOS)
+    if (!('Notification' in window)) return;
     
     let perm = Notification.permission;
     if (perm !== 'granted') {
@@ -8335,6 +8371,7 @@ window.testQuotaAlertNotification = async function() {
             body: 'هذا إشعار تجريبي لاختبار وصول التنبيهات الفورية لجهازك بنجاح عند وصول استهلاك السيرفر إلى 70%.',
             icon: '/logo.png',
             badge: '/logo.png',
+            requireInteraction: true,
             tag: 'test-quota-70-alert'
         };
         
@@ -8359,12 +8396,8 @@ window.testQuotaAlertNotification = async function() {
                 console.error('Notification error:', notifErr);
             }
         }
-        
-        alert('🔔 تم إرسال إشعار التنبيه التجريبي لجهازك بنجاح!\n\nإذا لم يظهر على شاشتك فوراً، يرجى التأكد من تفعيل الإشعارات في إعدادات النظام (Windows Notifications أو إشعارات المتصفح).');
     } else if (perm === 'denied') {
-        alert('⚠️ صلاحية الإشعارات محظورة (Blocked) في متصفحك لهذا الموقع.\n\nلتفعيلها: اضغط على أيقونة الإعدادات أو القفل 🔒 بجوار رابط الموقع في شريط العنوان، وقم بالسماح بالإشعارات (Allow Notifications).');
-    } else {
-        alert('لم يتم منح الإذن بإرسال الإشعارات. يرجى الموافقة على طلب المتصفح لتفعيل التنبيه.');
+        alert('⚠️ تنبيه: صلاحية الإشعارات محظورة (Blocked) في متصفحك لهذا الموقع.\n\nلتفعيل ظهور الإشعارات خارج المتصفح: اضغط على أيقونة الإعدادات أو القفل 🔒 بجوار رابط الموقع في شريط العنوان، وقم باختيار "سماح / Allow" للإشعارات.');
     }
 };
 
