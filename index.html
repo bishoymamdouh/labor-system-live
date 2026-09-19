@@ -3497,11 +3497,12 @@ class UI {
         if (workers.length === 0) {
             tbody.innerHTML = '<tr><td colspan="12" class="text-center">لا توجد بيانات مطابقة للبحث</td></tr>';
         } else {
+            let html = '';
             workers.forEach(w => {
                 const record = recordsMap[w.recordId];
                 if(record && record.status === 'approved') {
-                    const supervisorName = usersMap[record.supervisorId] ? usersMap[record.supervisorId].username : 'غير معروف';
-                    const engineerName = usersMap[record.engineerId] ? usersMap[record.engineerId].username : 'غير معروف';
+                    const supervisorName = (usersMap[record.supervisorId] && usersMap[record.supervisorId].username) ? usersMap[record.supervisorId].username : 'غير معروف';
+                    const engineerName = (usersMap[record.engineerId] && usersMap[record.engineerId].username) ? usersMap[record.engineerId].username : 'غير معروف';
                     const amount = Number(w.amount) || 0;
                     const deduction = Number(w.deduction) || 0;
                     const netAmount = amount - deduction;
@@ -3511,16 +3512,16 @@ class UI {
                     totalDeduction += deduction;
                     totalAmount += netAmount;
                     
-                    tbody.innerHTML += `
+                    html += `
                         <tr>
-                            <td><strong>${w.name}</strong></td>
-                            <td><span class="cell-type-text" title="${w.type}">${w.type}</span></td>
+                            <td><strong>${w.name || ''}</strong></td>
+                            <td><span class="cell-type-text" title="${w.type || ''}">${w.type || ''}</span></td>
                             <td>${supervisorName}</td>
-                            <td style="white-space: nowrap;">${record.date}</td>
+                            <td style="white-space: nowrap;">${record.date || ''}</td>
                             <td>${amount}</td>
                             <td>${deduction}</td>
                             <td><strong>${netAmount}</strong></td>
-                            <td ><span class="badge-glow badge-glow-supervisor" style="font-size: 0.7em; padding: 2px 4px; font-weight: normal;"><i class="fas fa-hard-hat"></i> ${engineerName}</span></td>
+                            <td><span class="badge-glow badge-glow-supervisor" style="font-size: 0.7em; padding: 2px 4px; font-weight: normal;"><i class="fas fa-hard-hat"></i> ${engineerName}</span></td>
                             <td>${w.location || ''}</td>
                             <td>${w.task || ''}</td>
                             <td>${w.contractor ? `<span class="badge badge-pending" style="font-weight:bold;">${w.contractor}</span>` : ''}</td>
@@ -3529,6 +3530,7 @@ class UI {
                     `;
                 }
             });
+            tbody.innerHTML = html;
         }
         
         document.getElementById('report-total-days').innerText = totalDays;
@@ -6542,13 +6544,18 @@ document.addEventListener('keydown', (e) => {
         }
 
         try {
-            // 1. Get all approved records
-            let records = await db.getAll('records');
-            records = records.filter(r => r.status === 'approved');
+            // Fetch records, users, and workers concurrently in parallel
+            const [rawRecords, rawUsers, allWorkers] = await Promise.all([
+                db.getAll('records'),
+                db.getAll('users'),
+                db.getAll('workers')
+            ]);
+
+            let records = (rawRecords || []).filter(r => r && r.status === 'approved');
             
             // If Engineer, only show their records
             if (auth.getRole() === 'engineer') {
-                records = records.filter(r => String(r.engineerId) === String(auth.currentUser.id));
+                records = records.filter(r => String(r.engineerId) === String(auth.currentUser?.id));
             }
             
             // Filter by date if provided
@@ -6556,17 +6563,13 @@ document.addEventListener('keydown', (e) => {
                 records = records.filter(r => r.date >= startDate && r.date <= endDate);
             }
             
-            const validRecordIds = records.map(r => r.id);
+            const validRecordIds = new Set(records.map(r => r.id));
             const recordsMap = records.reduce((acc, r) => { acc[r.id] = r; return acc; }, {});
             
-            // 2. Get users map
-            const users = await db.getAll('users');
+            const users = rawUsers || [];
             const usersMap = users.reduce((acc, u) => { acc[u.id] = u; return acc; }, {});
             
-            // 3. Get all workers and filter
-            let allWorkers = await db.getAll('workers');
-            
-            let filteredWorkers = allWorkers.filter(w => validRecordIds.includes(w.recordId) && !w.isDeleted);
+            let filteredWorkers = (allWorkers || []).filter(w => w && validRecordIds.has(w.recordId) && !w.isDeleted);
             
             if (workerName) {
                 filteredWorkers = filteredWorkers.filter(w => w.name && w.name.toLowerCase().includes(workerName));
@@ -6582,8 +6585,8 @@ document.addEventListener('keydown', (e) => {
                 if (dateA > dateB) return -1;
                 if (dateA < dateB) return 1;
                 
-                const supervisorA = (recordA && usersMap[recordA.supervisorId] ? usersMap[recordA.supervisorId].username : '').toLowerCase();
-                const supervisorB = (recordB && usersMap[recordB.supervisorId] ? usersMap[recordB.supervisorId].username : '').toLowerCase();
+                const supervisorA = String(recordA && usersMap[recordA.supervisorId]?.username || '').toLowerCase();
+                const supervisorB = String(recordB && usersMap[recordB.supervisorId]?.username || '').toLowerCase();
                 
                 if (supervisorA < supervisorB) return -1;
                 if (supervisorA > supervisorB) return 1;
@@ -6594,6 +6597,11 @@ document.addEventListener('keydown', (e) => {
             UI.renderReportResults(filteredWorkers, recordsMap, usersMap);
         } catch (err) {
             console.error("Error generating report:", err);
+            fetch('/api/logs', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ context: 'generateReport', error: String(err), stack: err.stack }) 
+            }).catch(() => {});
             if (daysEl) daysEl.innerText = '0';
             if (amountEl) amountEl.innerText = '0.00';
         }

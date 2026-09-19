@@ -86,8 +86,19 @@ export async function onRequest(context: any): Promise<Response> {
         const resourceId = pathParts[1] || url.searchParams.get("id");
 
         // 1. Logs
-        if (resource === "logs" && method === "POST") {
-            return new Response("Logged", { status: 200, headers: corsHeaders });
+        if (resource === "logs") {
+            if (method === "POST") {
+                try {
+                    const text = await request.text();
+                    const key = `${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+                    await store.set("client_logs", key, text);
+                } catch(e) {}
+                return new Response("Logged", { status: 200, headers: corsHeaders });
+            }
+            if (method === "GET") {
+                const items = await store.list("client_logs");
+                return jsonResponse(items);
+            }
         }
 
         // 2. Vapid Public Key
