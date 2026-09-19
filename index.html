@@ -133,7 +133,10 @@ h1, h2, h3, h4 {
 }
 
 .sidebar {
-    width: 250px;
+    flex: 0 0 260px;
+    width: 260px;
+    min-width: 260px;
+    max-width: 260px;
     background-color: var(--bg-card);
     border-left: 1px solid var(--border-color);
     display: flex;
@@ -143,38 +146,51 @@ h1, h2, h3, h4 {
     position: sticky;
     top: 0;
     height: 100vh;
+    max-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    box-sizing: border-box;
 }
 
 .sidebar-header {
-    padding: 20px;
+    padding: 14px 10px 10px;
     border-bottom: 1px solid var(--border-color);
     text-align: center;
+    flex-shrink: 0;
 }
 
 .sidebar-header h2 {
     color: var(--primary-color);
-    font-size: 1.5rem;
+    font-size: 1.15rem;
+    margin: 0;
 }
 
 .nav-links {
     list-style: none;
-    padding: 20px 0;
+    padding: 10px 0;
+    margin: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
 }
 
 .nav-links li {
-    padding: 0 15px;
-    margin-bottom: 5px;
+    padding: 0 12px;
+    margin-bottom: 4px;
 }
 
 .nav-links a {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 15px;
+    gap: 9px;
+    padding: 9px 12px;
     color: var(--text-muted);
     text-decoration: none;
     border-radius: var(--radius-md);
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 0.88rem;
     transition: var(--transition);
 }
 
@@ -184,21 +200,23 @@ h1, h2, h3, h4 {
 }
 
 .sidebar-footer {
-    padding: 20px;
+    padding: 10px 12px 12px;
     border-top: 1px solid var(--border-color);
+    flex-shrink: 0;
+    background: var(--bg-card);
 }
 
 .user-info {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 8px;
 }
 
 .user-info i {
-    font-size: 2rem;
+    font-size: 1.8rem;
     color: var(--primary-color);
-    margin-bottom: 5px;
+    margin-bottom: 3px;
 }
 
 .user-info small {
@@ -206,12 +224,13 @@ h1, h2, h3, h4 {
     background: var(--secondary-color);
     padding: 2px 8px;
     border-radius: 12px;
-    margin-top: 5px;
+    margin-top: 3px;
+    font-size: 0.72rem;
 }
 
 .btn-logout {
     width: 100%;
-    padding: 10px;
+    padding: 7px 10px;
     background: transparent;
     border: 1px solid var(--danger);
     color: var(--danger);
@@ -219,6 +238,7 @@ h1, h2, h3, h4 {
     cursor: pointer;
     font-family: inherit;
     font-weight: 700;
+    font-size: 0.84rem;
     transition: var(--transition);
 }
 
@@ -676,9 +696,14 @@ h1, h2, h3, h4 {
         flex-direction: column;
     }
     .sidebar {
+        flex: 0 0 100%;
         width: 100%;
+        min-width: 100%;
+        max-width: 100%;
         height: auto;
+        max-height: none;
         position: static;
+        overflow-y: visible;
     }
     .sidebar-header {
         padding: 10px;
@@ -1490,27 +1515,27 @@ select {
     <div class="app-container">
         <!-- Sidebar Navigation (Hidden on Login) -->
         <nav id="sidebar" class="sidebar hidden">
-            <div class="sidebar-header" style="text-align: center; padding: 20px 0;">
-                <img src="/logo.png?v=2" alt="Company Logo" style="max-width: 80%; height: auto; margin-bottom: 10px;">
-                <h2 style="font-size: 1.2rem; margin:0;"><i class="fas fa-hard-hat"></i> نظام السراكي</h2>
+            <div class="sidebar-header" style="text-align: center; padding: 12px 10px 8px; flex-shrink: 0;">
+                <img src="/logo.png?v=2" alt="Company Logo" style="max-height: 42px; width: auto; margin-bottom: 5px;">
+                <h2 style="font-size: 1.1rem; margin:0;"><i class="fas fa-hard-hat"></i> نظام السراكي</h2>
             </div>
             <ul class="nav-links" id="nav-links">
                 <!-- Dynamically populated based on role -->
             </ul>
             <div class="sidebar-footer">
                 <div class="user-info">
-                    <div id="profile-pic-container" style="position: relative; cursor: pointer; display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; margin-bottom: 5px;" title="تغيير الصورة الشخصية">
+                    <div id="profile-pic-container" style="position: relative; cursor: pointer; display: flex; justify-content: center; align-items: center; width: 46px; height: 46px; margin-bottom: 3px;" title="تغيير الصورة الشخصية">
                         <img id="current-profile-pic" src="" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: none; background: var(--secondary-color);">
-                        <i id="default-profile-icon" class="fas fa-user-circle" style="font-size: 60px; color: var(--primary-color); margin-bottom: 0;"></i>
+                        <i id="default-profile-icon" class="fas fa-user-circle" style="font-size: 46px; color: var(--primary-color); margin-bottom: 0;"></i>
                         <input type="file" id="profile-pic-input" accept="image/*" style="display: none;">
                     </div>
-                    <span id="current-username">اسم المستخدم</span>
-                    <small id="current-role">الدور</small>
+                    <span id="current-username" style="font-size: 0.9rem; font-weight: 700;">اسم المستخدم</span>
+                    <small id="current-role" style="font-size: 0.72rem;">الدور</small>
                 </div>
                 
                 <!-- Universal Device Notification Slider Toggle (Visible for all users) -->
-                <div class="sidebar-device-push-box" style="width: 100%; margin-bottom: 14px; padding: 7px 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border-color); background: var(--bg-main); transition: all 0.2s ease;" title="تفعيل أو إلغاء استقبال الإشعارات على هذا الجهاز">
-                    <div style="display: flex; align-items: center; gap: 7px; font-size: 0.8rem; font-weight: 600; color: var(--text-main);">
+                <div class="sidebar-device-push-box" style="width: 100%; margin-bottom: 8px; padding: 5px 8px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border-color); background: var(--bg-main); transition: all 0.2s ease;" title="تفعيل أو إلغاء استقبال الإشعارات على هذا الجهاز">
+                    <div style="display: flex; align-items: center; gap: 7px; font-size: 0.78rem; font-weight: 600; color: var(--text-main);">
                         <i class="fas fa-bell" style="color: var(--primary);"></i>
                         <span id="sidebar-device-push-label">إشعارات الجهاز</span>
                     </div>
@@ -1520,15 +1545,15 @@ select {
                     </label>
                 </div>
 
-                <div class="theme-toggle-container" style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px; gap: 10px;">
-                    <i class="fas fa-moon" style="color: #6366f1; font-size: 1.1rem;" title="الوضع الليلي"></i>
-                    <label class="theme-switch" style="position: relative; display: inline-block; width: 46px; height: 24px;" title="تغيير المظهر">
+                <div class="theme-toggle-container" style="display: flex; align-items: center; justify-content: center; margin-bottom: 8px; gap: 8px;">
+                    <i class="fas fa-moon" style="color: #6366f1; font-size: 0.95rem;" title="الوضع الليلي"></i>
+                    <label class="theme-switch" style="position: relative; display: inline-block; width: 42px; height: 22px;" title="تغيير المظهر">
                         <input type="checkbox" id="theme-checkbox" style="opacity: 0; width: 0; height: 0;">
-                        <span class="theme-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .4s; border-radius: 24px;">
-                            <span class="theme-slider-circle" style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                        <span class="theme-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .4s; border-radius: 22px;">
+                            <span class="theme-slider-circle" style="position: absolute; content: ''; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
                         </span>
                     </label>
-                    <i class="fas fa-sun" style="color: #f59e0b; font-size: 1.1rem;" title="الوضع النهاري"></i>
+                    <i class="fas fa-sun" style="color: #f59e0b; font-size: 0.95rem;" title="الوضع النهاري"></i>
                 </div>
                 <button id="logout-btn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</button>
             </div>
@@ -1638,6 +1663,38 @@ select {
                                 <!-- Users list populated dynamically -->
                             </tbody>
                         </table>
+                    </div>
+                </details>
+
+                <details class="card mt-20" style="padding: 12px; cursor: pointer;">
+                    <summary style="font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between;">
+                        <span><i class="fas fa-shield-alt" style="color: #6366f1;"></i> الصلاحيات الافتراضية لكل وظيفة (Role Defaults)</span>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;"><i class="fas fa-chevron-down"></i> تخصيص الصلاحيات العامة لكل رتبة</span>
+                    </summary>
+                    <div style="margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px; cursor: default;" onclick="event.stopPropagation();">
+                        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 14px; flex-wrap: wrap;">
+                            <label style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">الوظيفة المستهدفة:</label>
+                            <select id="role-default-selector" class="modal-input" style="width: auto; min-width: 180px; margin-bottom: 0; padding: 6px 12px; font-weight: 600;" onchange="app.onRoleDefaultChange(this.value)">
+                                <option value="supervisor">مشرف</option>
+                                <option value="surveyor">مساح</option>
+                                <option value="warehouse_manager">مدير مخزن</option>
+                                <option value="operator_supervisor">مشرف مشغل</option>
+                                <option value="engineer">مهندس</option>
+                                <option value="admin">مدير</option>
+                            </select>
+                            <span style="font-size: 0.78rem; color: var(--text-muted);">أي مستخدم جديد بهذه الوظيفة يحصل تلقائياً على هذه الصلاحيات:</span>
+                        </div>
+                        <div id="role-default-permissions-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-bottom: 16px;">
+                            <!-- Populated dynamically via app.renderRoleDefaultPermissions() -->
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 12px;">
+                            <button type="button" class="btn btn-secondary" onclick="app.resetRoleDefaultToFactory()" style="font-size: 0.85rem;">
+                                <i class="fas fa-undo"></i> استعادة الأصل للوظيفة
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="app.saveRoleDefaultPermissions()" style="font-size: 0.85rem;">
+                                <i class="fas fa-save"></i> حفظ افتراضيات الوظيفة
+                            </button>
+                        </div>
                     </div>
                 </details>
 
@@ -2311,6 +2368,44 @@ select {
             </div>
         </div>
 
+        <!-- Modal: User Permissions Editor -->
+        <div id="modal-user-permissions" class="modal" style="display: none; z-index: 10000;">
+            <div class="modal-content card" style="max-width: 620px; width: 95%; max-height: 90vh; overflow-y: auto;">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-user-shield" style="color: #6366f1; font-size: 1.4rem;"></i>
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-main);">تعديل صلاحيات المستخدم</h3>
+                            <div id="perm-modal-user-subtitle" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 3px;"></div>
+                        </div>
+                    </div>
+                    <button type="button" class="close-btn" onclick="app.closeUserPermissionsModal()" style="background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+                </div>
+                
+                <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
+                    <input type="hidden" id="perm-modal-user-id">
+                    
+                    <div style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 8px; padding: 10px 14px; font-size: 0.84rem; color: var(--text-main); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                        <span>تخصيص الصلاحيات يمنح هذا المستخدم هذه الخيارات حصرياً حتى لو اختلفت وظيفته.</span>
+                        <button type="button" class="btn btn-secondary" onclick="app.resetUserPermissionsToRoleDefault()" style="padding: 4px 10px; font-size: 0.78rem;">
+                            <i class="fas fa-undo"></i> استعادة الافتراضي للدور
+                        </button>
+                    </div>
+
+                    <div id="user-permissions-checkboxes" style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Populated dynamically via app.openUserPermissionsModal() -->
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 14px; margin-top: 14px;">
+                    <button type="button" class="btn btn-secondary" onclick="app.closeUserPermissionsModal()">إلغاء</button>
+                    <button type="button" class="btn btn-primary" onclick="app.saveUserPermissionsModal()">
+                        <i class="fas fa-save"></i> حفظ الصلاحيات
+                    </button>
+                </div>
+            </div>
+        </div>
+
             
             <section id="view-supervisor" class="view hidden">
                 <header class="view-header">
@@ -2686,10 +2781,6 @@ select {
                                 <button type="button" onclick="openServerMetricsModal('metrics')" style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #fff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer; box-shadow: 0 2px 4px rgba(234, 88, 12, 0.25); transition: all 0.2s ease;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'" title="فحص استهلاك وحصة السيرفر اللحظية الصادرة من Cloudflare">
                                     <i class="fas fa-bolt"></i>
                                     <span>معدل الاستهلاك اللحظي ⚡</span>
-                                </button>
-                                <button type="button" onclick="openServerMetricsModal('purge')" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(239, 68, 68, 0.12); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.22)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.12)'" title="أرشفة ومسح السراكي القديمة لتخفيض المساحة">
-                                    <i class="fas fa-trash-alt"></i>
-                                    <span>تفريغ وأرشفة السراكي 🗑️</span>
                                 </button>
                             </div>
                             <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 8px;">
@@ -3310,7 +3401,7 @@ class UI {
         UI.applyServerMonitorVisibility();
     }
 
-    static updateNavigation(role) {
+    static updateNavigation(role, userOverride = null) {
         const sidebar = document.getElementById('sidebar');
         const navLinks = document.getElementById('nav-links');
         
@@ -3322,25 +3413,32 @@ class UI {
         sidebar.classList.remove('hidden');
         navLinks.innerHTML = '';
 
-        if (role === 'admin') {
-            navLinks.innerHTML += `
-                <li><a href="#" data-view="view-admin"><i class="fas fa-users-cog"></i> لوحة الإدارة</a></li>
-                <li><a href="#" data-view="view-notifications" id="menu-notifications-link"><i class="fas fa-bell"></i> إدارة الإشعارات</a></li>
-                <li><a href="#" data-view="view-engineer"><i class="fas fa-check-double"></i> اعتماد السراكي <span id="nav-badge-engineer" class="badge-glow" style="background: red; border-radius: 5px; padding: 2px 6px; font-size: 0.8em; margin-right: 5px; display: none;">0</span></a></li>
-                <li><a href="#" data-view="view-supervisor"><i class="fas fa-file-signature"></i> تسجيل سركي</a></li>
-                <li><a href="#" data-view="view-reports"><i class="fas fa-chart-bar"></i> التقارير المجمعة</a></li>
-            `;
-        } else if (role === 'engineer') {
-            navLinks.innerHTML += `
-                <li><a href="#" data-view="view-engineer"><i class="fas fa-check-double"></i> اعتماد السراكي <span id="nav-badge-engineer" class="badge-glow" style="background: red; border-radius: 5px; padding: 2px 6px; font-size: 0.8em; margin-right: 5px; display: none;">0</span></a></li>
-                <li><a href="#" data-view="view-supervisor"><i class="fas fa-file-signature"></i> تسجيل سركي</a></li>
-                <li><a href="#" data-view="view-reports"><i class="fas fa-chart-bar"></i> التقارير المجمعة</a></li>
-            `;
-        } else if (role === 'supervisor' || role === 'surveyor' || role === 'warehouse_manager' || role === 'operator_supervisor') {
-            navLinks.innerHTML += `
-                <li><a href="#" data-view="view-supervisor"><i class="fas fa-file-signature"></i> تسجيل سركي</a></li>
-            `;
+        const currentUser = userOverride || auth.getUser();
+        const perms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(currentUser) : {
+            admin_dashboard: role === 'admin',
+            manage_notifications: role === 'admin',
+            approve_records: role === 'admin' || role === 'engineer',
+            record_entry: true,
+            view_reports: role === 'admin' || role === 'engineer'
+        };
+
+        let navHtml = '';
+        if (perms.admin_dashboard) {
+            navHtml += `<li><a href="#" data-view="view-admin"><i class="fas fa-users-cog"></i> لوحة الإدارة</a></li>`;
         }
+        if (perms.manage_notifications) {
+            navHtml += `<li><a href="#" data-view="view-notifications" id="menu-notifications-link"><i class="fas fa-bell"></i> إدارة الإشعارات</a></li>`;
+        }
+        if (perms.approve_records) {
+            navHtml += `<li><a href="#" data-view="view-engineer"><i class="fas fa-check-double"></i> اعتماد السراكي <span id="nav-badge-engineer" class="badge-glow" style="background: red; border-radius: 5px; padding: 2px 6px; font-size: 0.8em; margin-right: 5px; display: none;">0</span></a></li>`;
+        }
+        if (perms.record_entry) {
+            navHtml += `<li><a href="#" data-view="view-supervisor"><i class="fas fa-file-signature"></i> تسجيل سركي</a></li>`;
+        }
+        if (perms.view_reports) {
+            navHtml += `<li><a href="#" data-view="view-reports"><i class="fas fa-chart-bar"></i> التقارير المجمعة</a></li>`;
+        }
+        navLinks.innerHTML = navHtml;
         
         // Active link logic
         const links = navLinks.querySelectorAll('a');
@@ -3353,7 +3451,7 @@ class UI {
             });
         });
         
-                // Select saved tab or first tab by default
+        // Select saved tab or first tab by default
         const savedView = localStorage.getItem('labor_app_current_view');
         let selectedLink = null;
         if (savedView) {
@@ -3389,6 +3487,7 @@ class UI {
                 <td class="user-col-pass" data-pass="${user.password}">********</td>
                 <td class="user-col-role"><span class="badge badge-approved" data-role="${user.role}">${auth.getRoleNameAr(user.role)}</span></td>
                 <td class="user-col-actions">
+                    <button class="btn-icon text-warning" onclick="app.openUserPermissionsModal('${user.id}')" title="تعديل صلاحيات المستخدم 🛡️"><i class="fas fa-user-shield"></i></button>
                     <button class="btn-icon text-success" onclick="app.copyInviteLink('${user.id}')" title="نسخ رابط الدعوة المباشر"><i class="fas fa-link"></i></button>
                     <button class="btn-icon text-primary" onclick="app.editUser('${user.id}')" title="تعديل بيانات المستخدم"><i class="fas fa-edit"></i></button>
                     ${user.id !== currentUserId ? `
@@ -4480,6 +4579,27 @@ document.addEventListener('keydown', (e) => {
         }
     }
 
+    const SYSTEM_PERMISSIONS = [
+        { key: 'record_entry', label: 'تسجيل السراكي اليومية', desc: 'إمكانية إدخال وتسجيل سركي يومية جديدة للعمال والمعدات', icon: 'fa-file-signature' },
+        { key: 'approve_records', label: 'مراجعة واعتماد السراكي', desc: 'صلاحية المهندس لاعتماد أو رفض وتعديل يوميات وسراكي المشرفين', icon: 'fa-check-double' },
+        { key: 'view_reports', label: 'عرض التقارير وتصدير إكسيل', desc: 'الاطلاع على تقارير السراكي، الفلاتر، وتصدير شيتات Excel و PDF', icon: 'fa-chart-bar' },
+        { key: 'manage_workers', label: 'إدارة قاعدة العمال', desc: 'إضافة عمال جدد لدليل العمال وتعديل المسميات واليوميات الافتراضية', icon: 'fa-address-book' },
+        { key: 'manage_notifications', label: 'إدارة وجدولة الإشعارات', desc: 'الدخول لشاشة إدارة الإشعارات وجدولة رسائل التنبيه والبرودكاست', icon: 'fa-bell' },
+        { key: 'admin_dashboard', label: 'لوحة الإدارة والمستخدمين', desc: 'إدارة حسابات المستخدمين، النسخ الاحتياطي، وإعدادات النظام', icon: 'fa-users-cog' },
+        { key: 'purge_records', label: 'تفريغ وأرشفة السراكي القديمة', desc: 'صلاحية مسح وأرشفة بيانات السراكي القديمة لتخفيض مساحة التخزين', icon: 'fa-trash-alt' }
+    ];
+
+    const FACTORY_ROLE_PERMISSIONS = {
+        admin: { record_entry: true, approve_records: true, view_reports: true, manage_workers: true, manage_notifications: true, admin_dashboard: true, purge_records: true },
+        engineer: { record_entry: true, approve_records: true, view_reports: true, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        supervisor: { record_entry: true, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        surveyor: { record_entry: true, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        warehouse_manager: { record_entry: true, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        operator_supervisor: { record_entry: true, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false }
+    };
+    window.SYSTEM_PERMISSIONS = SYSTEM_PERMISSIONS;
+    window.FACTORY_ROLE_PERMISSIONS = FACTORY_ROLE_PERMISSIONS;
+
     class App {
 
     getWorkerTypeOptionsHtml(selectedValue = null, includePlaceholder = false) {
@@ -5187,6 +5307,194 @@ document.addEventListener('keydown', (e) => {
             dirSelect.innerHTML = app.getWorkerTypeOptionsHtml(null, false);
         }
         await this.loadBackupHub();
+        this.renderRoleDefaultPermissions();
+    }
+
+    getCustomRoleDefaults() {
+        try {
+            return JSON.parse(localStorage.getItem('labor_custom_role_permissions') || '{}');
+        } catch(e) {
+            return {};
+        }
+    }
+
+    getRoleDefaultPermissions(roleKey) {
+        const custom = this.getCustomRoleDefaults();
+        if (custom && custom[roleKey]) {
+            return { ...(FACTORY_ROLE_PERMISSIONS[roleKey] || FACTORY_ROLE_PERMISSIONS.supervisor), ...custom[roleKey] };
+        }
+        return { ...(FACTORY_ROLE_PERMISSIONS[roleKey] || FACTORY_ROLE_PERMISSIONS.supervisor) };
+    }
+
+    getUserPermissions(user) {
+        if (!user) return {};
+        // Bishoy / admin default fallback has all permissions
+        if (user.username === 'admin' || (user.role === 'admin' && !user.permissions)) {
+            return { ...FACTORY_ROLE_PERMISSIONS.admin, ...(user.permissions || {}) };
+        }
+        const roleDefaults = this.getRoleDefaultPermissions(user.role);
+        return { ...roleDefaults, ...(user.permissions || {}) };
+    }
+
+    // --- Role Defaults Management ---
+    onRoleDefaultChange(roleKey) {
+        this.renderRoleDefaultPermissions(roleKey);
+    }
+
+    renderRoleDefaultPermissions(selectedRole = null) {
+        const select = document.getElementById('role-default-selector');
+        const role = selectedRole || (select ? select.value : 'supervisor') || 'supervisor';
+        if (select && select.value !== role) select.value = role;
+
+        const container = document.getElementById('role-default-permissions-list');
+        if (!container) return;
+
+        const rolePerms = this.getRoleDefaultPermissions(role);
+        container.innerHTML = SYSTEM_PERMISSIONS.map(p => {
+            const isChecked = !!rolePerms[p.key];
+            return `
+                <label style="display: flex; align-items: flex-start; gap: 8px; background: var(--bg-main); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s ease;">
+                    <input type="checkbox" id="role-perm-${p.key}" ${isChecked ? 'checked' : ''} style="width: 17px; height: 17px; accent-color: var(--primary-color); margin-top: 2px; cursor: pointer;">
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-weight: 700; font-size: 0.86rem; color: var(--text-main);"><i class="fas ${p.icon}" style="margin-left: 5px; color: var(--primary-color);"></i> ${p.label}</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.3;">${p.desc}</span>
+                    </div>
+                </label>
+            `;
+        }).join('');
+    }
+
+    saveRoleDefaultPermissions() {
+        const select = document.getElementById('role-default-selector');
+        const role = select ? select.value : 'supervisor';
+        const custom = this.getCustomRoleDefaults();
+        custom[role] = {};
+        SYSTEM_PERMISSIONS.forEach(p => {
+            const cb = document.getElementById(`role-perm-${p.key}`);
+            custom[role][p.key] = cb ? cb.checked : false;
+        });
+        localStorage.setItem('labor_custom_role_permissions', JSON.stringify(custom));
+        if (window.showAppNotification) {
+            window.showAppNotification(`تم حفظ الصلاحيات الافتراضية لوظيفة (${auth.getRoleNameAr(role)}) بنجاح! 🛡️`, 'success');
+        } else {
+            alert('تم حفظ الصلاحيات الافتراضية بنجاح!');
+        }
+        UI.updateNavigation(auth.getRole());
+    }
+
+    resetRoleDefaultToFactory() {
+        const select = document.getElementById('role-default-selector');
+        const role = select ? select.value : 'supervisor';
+        if (confirm(`هل أنت متأكد من استعادة الصلاحيات الأصلية لوظيفة (${auth.getRoleNameAr(role)})؟`)) {
+            const custom = this.getCustomRoleDefaults();
+            delete custom[role];
+            localStorage.setItem('labor_custom_role_permissions', JSON.stringify(custom));
+            this.renderRoleDefaultPermissions(role);
+            UI.updateNavigation(auth.getRole());
+            if (window.showAppNotification) {
+                window.showAppNotification(`تمت استعادة الصلاحيات الأصلية لوظيفة (${auth.getRoleNameAr(role)})`, 'info');
+            }
+        }
+    }
+
+    // --- Per-User Permissions Modal ---
+    async openUserPermissionsModal(userId) {
+        const user = (window.allSystemUsers || []).find(u => u.id === userId) || await db.getById('users', userId);
+        if (!user) {
+            alert('المستخدم غير موجود!');
+            return;
+        }
+        window.currentEditingPermUser = user;
+        const modal = document.getElementById('modal-user-permissions');
+        if (!modal) return;
+
+        const subtitle = document.getElementById('perm-modal-user-subtitle');
+        const hiddenId = document.getElementById('perm-modal-user-id');
+        const checkboxesContainer = document.getElementById('user-permissions-checkboxes');
+        
+        hiddenId.value = user.id;
+        const displayName = user.username === 'admin' ? 'Bishoy Mamdouh' : user.username;
+        subtitle.innerHTML = `المستخدم: <strong>${displayName}</strong> | الوظيفة: <span class="badge badge-approved">${auth.getRoleNameAr(user.role)}</span>`;
+
+        const effectivePerms = this.getUserPermissions(user);
+        checkboxesContainer.innerHTML = SYSTEM_PERMISSIONS.map(p => {
+            const isChecked = !!effectivePerms[p.key];
+            const isCustom = user.permissions && user.permissions.hasOwnProperty(p.key);
+            return `
+                <label style="display: flex; align-items: flex-start; gap: 10px; background: var(--bg-card); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s ease;">
+                    <input type="checkbox" id="user-perm-${p.key}" ${isChecked ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: var(--primary-color); margin-top: 2px; cursor: pointer;">
+                    <div style="display: flex; flex-direction: column; flex: 1;">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);"><i class="fas ${p.icon}" style="margin-left: 6px; color: var(--primary-color);"></i> ${p.label}</span>
+                            ${isCustom ? '<span style="font-size: 0.7rem; background: rgba(99, 102, 241, 0.15); color: #6366f1; padding: 2px 6px; border-radius: 4px; font-weight: 700;">مخصصة</span>' : ''}
+                        </div>
+                        <span style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; margin-top: 2px;">${p.desc}</span>
+                    </div>
+                </label>
+            `;
+        }).join('');
+
+        modal.style.display = 'flex';
+    }
+
+    closeUserPermissionsModal() {
+        const modal = document.getElementById('modal-user-permissions');
+        if (modal) modal.style.display = 'none';
+        window.currentEditingPermUser = null;
+    }
+
+    resetUserPermissionsToRoleDefault() {
+        const user = window.currentEditingPermUser;
+        if (!user) return;
+        const roleDefaults = this.getRoleDefaultPermissions(user.role);
+        SYSTEM_PERMISSIONS.forEach(p => {
+            const cb = document.getElementById(`user-perm-${p.key}`);
+            if (cb) cb.checked = !!roleDefaults[p.key];
+        });
+        if (window.showAppNotification) {
+            window.showAppNotification(`تمت استعادة الافتراضي لوظيفة (${auth.getRoleNameAr(user.role)})`, 'info');
+        }
+    }
+
+    async saveUserPermissionsModal() {
+        const hiddenId = document.getElementById('perm-modal-user-id');
+        const userId = hiddenId ? hiddenId.value : null;
+        if (!userId) return;
+
+        const user = window.currentEditingPermUser || await db.getById('users', userId);
+        if (!user) return;
+
+        const newPermissions = {};
+        SYSTEM_PERMISSIONS.forEach(p => {
+            const cb = document.getElementById(`user-perm-${p.key}`);
+            if (cb) newPermissions[p.key] = cb.checked;
+        });
+
+        user.permissions = newPermissions;
+        await db.update('users', user.id, user);
+
+        // Update in-memory user list
+        if (window.allSystemUsers) {
+            const idx = window.allSystemUsers.findIndex(u => u.id === user.id);
+            if (idx !== -1) window.allSystemUsers[idx] = user;
+        }
+
+        // If this is currently logged in user, refresh local storage user and navigation
+        if (auth.currentUser && auth.currentUser.id === user.id) {
+            auth.currentUser = user;
+            localStorage.setItem('labor_app_user', JSON.stringify(user));
+            UI.updateNavigation(user.role, user);
+        }
+
+        this.closeUserPermissionsModal();
+        this.loadAdminData();
+
+        const displayName = user.username === 'admin' ? 'Bishoy Mamdouh' : user.username;
+        if (window.showAppNotification) {
+            window.showAppNotification(`تم حفظ صلاحيات المستخدم (${displayName}) بنجاح! 🛡️`, 'success');
+        } else {
+            alert(`تم حفظ صلاحيات (${displayName}) بنجاح!`);
+        }
     }
 
     async deleteUser(id) {
@@ -8426,6 +8734,15 @@ document.addEventListener('keydown', (e) => {
 window.openServerMetricsModal = function(initialTab = 'metrics') {
     const modal = document.getElementById("modal-server-metrics");
     if (modal) {
+        const tabBtnPurge = document.getElementById('tab-btn-purge');
+        const userPerms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(auth.getUser()) : { purge_records: true };
+        if (tabBtnPurge) {
+            tabBtnPurge.style.display = userPerms.purge_records ? 'flex' : 'none';
+        }
+        if (initialTab === 'purge' && !userPerms.purge_records) {
+            initialTab = 'metrics';
+        }
+
         modal.style.display = "flex";
         modal.classList.remove("hidden");
         window.switchMetricsTab(initialTab);
@@ -8434,6 +8751,17 @@ window.openServerMetricsModal = function(initialTab = 'metrics') {
 };
 
 window.switchMetricsTab = function(tab) {
+    if (tab === 'purge') {
+        const userPerms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(auth.getUser()) : { purge_records: true };
+        if (!userPerms.purge_records) {
+            if (window.showAppNotification) {
+                window.showAppNotification('عفواً، لا تملك صلاحية تفريغ وأرشفة السراكي.', 'warning');
+            } else {
+                alert('عفواً، لا تملك صلاحية تفريغ وأرشفة السراكي.');
+            }
+            return;
+        }
+    }
     const pwdEl = document.getElementById("purge-admin-password");
     if (pwdEl) {
         pwdEl.value = "";
