@@ -1672,17 +1672,27 @@ select {
                         <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;"><i class="fas fa-chevron-down"></i> تخصيص الصلاحيات العامة لكل رتبة</span>
                     </summary>
                     <div style="margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px; cursor: default;" onclick="event.stopPropagation();">
-                        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 14px; flex-wrap: wrap;">
-                            <label style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">الوظيفة المستهدفة:</label>
-                            <select id="role-default-selector" class="modal-input" style="width: auto; min-width: 180px; margin-bottom: 0; padding: 6px 12px; font-weight: 600;" onchange="app.onRoleDefaultChange(this.value)">
-                                <option value="supervisor">مشرف</option>
-                                <option value="surveyor">مساح</option>
-                                <option value="warehouse_manager">مدير مخزن</option>
-                                <option value="operator_supervisor">مشرف مشغل</option>
-                                <option value="engineer">مهندس</option>
-                                <option value="admin">مدير</option>
-                            </select>
-                            <span style="font-size: 0.78rem; color: var(--text-muted);">أي مستخدم جديد بهذه الوظيفة يحصل تلقائياً على هذه الصلاحيات:</span>
+                        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; justify-content: space-between;">
+                            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                <label style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">الوظيفة المستهدفة:</label>
+                                <select id="role-default-selector" class="modal-input" style="width: auto; min-width: 180px; margin-bottom: 0; padding: 6px 12px; font-weight: 600;" onchange="app.onRoleDefaultChange(this.value)">
+                                    <option value="supervisor">مشرف</option>
+                                    <option value="surveyor">مساح</option>
+                                    <option value="warehouse_manager">مدير مخزن</option>
+                                    <option value="operator_supervisor">مشرف مشغل</option>
+                                    <option value="engineer">مهندس</option>
+                                    <option value="admin">مدير</option>
+                                </select>
+                                <span style="font-size: 0.78rem; color: var(--text-muted);">أي مستخدم جديد بهذه الوظيفة يحصل تلقائياً على هذه الصلاحيات:</span>
+                            </div>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button type="button" class="btn btn-secondary btn-small" onclick="app.openRoleManagerModal()" style="font-size: 0.82rem;">
+                                    <i class="fas fa-briefcase" style="color: #0284c7;"></i> إدارة وتعديل الوظائف
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-small" onclick="app.openAddPermissionModal()" style="font-size: 0.82rem;">
+                                    <i class="fas fa-plus-circle" style="color: #6366f1;"></i> إضافة نص صلاحية جديد
+                                </button>
+                            </div>
                         </div>
                         <div id="role-default-permissions-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-bottom: 16px;">
                             <!-- Populated dynamically via app.renderRoleDefaultPermissions() -->
@@ -2401,6 +2411,92 @@ select {
                     <button type="button" class="btn btn-secondary" onclick="app.closeUserPermissionsModal()">إلغاء</button>
                     <button type="button" class="btn btn-primary" onclick="app.saveUserPermissionsModal()">
                         <i class="fas fa-save"></i> حفظ الصلاحيات
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role Manager Modal -->
+        <div id="modal-manage-roles" class="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+            <div class="modal-content" style="background: var(--bg-card); border-radius: 12px; width: 95%; max-width: 650px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.3); padding: 22px; border: 1px solid var(--border-color);">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                    <h3 style="margin: 0; display: flex; align-items: center; gap: 8px; font-size: 1.15rem; color: var(--text-main);">
+                        <i class="fas fa-briefcase" style="color: #0284c7;"></i> إدارة وتعديل مسميات الوظائف والرتب
+                    </h3>
+                    <button class="close-btn" onclick="app.closeRoleManagerModal()" style="background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;">
+                        يمكنك هنا تعديل المسمى العربي لأي وظيفة في النظام، أو إضافة وظائف جديدة لتظهر تلقائياً في قوائم المستخدمين والصلاحيات.
+                    </p>
+                    
+                    <div class="table-responsive" style="margin-bottom: 20px;">
+                        <table class="data-table" style="font-size: 0.88rem;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 25%;">معرف الوظيفة</th>
+                                    <th style="width: 45%;">المسمى في البرنامج (عربي)</th>
+                                    <th style="width: 30%;">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="roles-manager-table-body">
+                                <!-- Populated dynamically via app.renderRolesManagerTable() -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 15px;">
+                        <h4 style="margin: 0 0 10px 0; font-size: 0.92rem; color: var(--text-main);"><i class="fas fa-plus-circle text-primary"></i> إضافة وظيفة / رتبة جديدة</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: center;">
+                            <input type="text" id="new-custom-role-id" placeholder="المعرف (إنجليزي: e.g. accountant)" class="modal-input" style="margin: 0; font-size: 0.85rem;">
+                            <input type="text" id="new-custom-role-name" placeholder="المسمى العربي (e.g. محاسب موقع)" class="modal-input" style="margin: 0; font-size: 0.85rem;">
+                            <button type="button" class="btn btn-primary btn-small" onclick="app.addNewCustomRole()" style="white-space: nowrap; height: 38px;">
+                                <i class="fas fa-plus"></i> إضافة
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 14px;">
+                    <button type="button" class="btn btn-secondary" onclick="app.resetAllRolesToDefault()" style="font-size: 0.85rem;">
+                        <i class="fas fa-undo"></i> استعادة المسميات الأصلية
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="app.closeRoleManagerModal()" style="font-size: 0.85rem;">
+                        إغلاق
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Permission Definition Modal -->
+        <div id="modal-add-permission" class="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+            <div class="modal-content" style="background: var(--bg-card); border-radius: 12px; width: 95%; max-width: 520px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); padding: 22px; border: 1px solid var(--border-color);">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                    <h3 style="margin: 0; display: flex; align-items: center; gap: 8px; font-size: 1.15rem; color: var(--text-main);">
+                        <i class="fas fa-key" style="color: #6366f1;"></i> إضافة بند صلاحية جديد إلى النظام
+                    </h3>
+                    <button class="close-btn" onclick="app.closeAddPermissionModal()" style="background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;">
+                        أدخل نص الصلاحية الجديد ووصفها. ستظهر الصلاحية فوراً في بطاقة الصلاحيات الافتراضية لكل وظيفة وفي نافذة صلاحيات كل مستخدم لتخصيصها.
+                    </p>
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label style="display: block; font-weight: bold; font-size: 0.85rem; margin-bottom: 5px;">اسم / نص الصلاحية <span style="color: red;">*</span></label>
+                        <input type="text" id="custom-perm-label" class="modal-input" placeholder="مثال: تعديل أسعار العمالة أو مراجعة تقارير خاصة" required style="width: 100%; box-sizing: border-box;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label style="display: block; font-weight: bold; font-size: 0.85rem; margin-bottom: 5px;">وصف الصلاحية ومجالها</label>
+                        <input type="text" id="custom-perm-desc" class="modal-input" placeholder="شرح مبسط لما تتيحه هذه الصلاحية للمستخدم" style="width: 100%; box-sizing: border-box;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label style="display: block; font-weight: bold; font-size: 0.85rem; margin-bottom: 5px;">المعرف البرمجي (اختياري - يترك فارغاً للتوليد التلقائي)</label>
+                        <input type="text" id="custom-perm-key" class="modal-input" placeholder="e.g. edit_rates أو اتركه فارغاً" style="width: 100%; box-sizing: border-box;">
+                    </div>
+                </div>
+                <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 14px;">
+                    <button type="button" class="btn btn-secondary" onclick="app.closeAddPermissionModal()">إلغاء</button>
+                    <button type="button" class="btn btn-primary" onclick="app.saveCustomPermission()">
+                        <i class="fas fa-save"></i> حفظ الصلاحية الجديدة
                     </button>
                 </div>
             </div>
@@ -3208,6 +3304,9 @@ class Auth {
     }
     
     getRoleNameAr(role) {
+        if (window.app && typeof window.app.getRoleNameAr === 'function') {
+            return window.app.getRoleNameAr(role);
+        }
         const roles = {
             'admin': 'مدير النظام',
             'supervisor': 'مشرف',
@@ -3216,7 +3315,7 @@ class Auth {
             'operator_supervisor': 'مشرف مشغل',
             'engineer': 'مهندس'
         };
-        return roles[role] || 'غير محدد';
+        return roles[role] || role || 'غير محدد';
     }
 }
 
@@ -3351,6 +3450,9 @@ class UI {
             }
         }
         if (viewId === 'view-supervisor') {
+            if (window.app && typeof window.app.updateRecordDateAccess === 'function') {
+                window.app.updateRecordDateAccess();
+            }
             if (window.app && typeof window.app.loadSupervisorData === 'function') {
                 window.app.loadSupervisorData();
             }
@@ -3466,6 +3568,9 @@ class UI {
         if (selectedLink) {
             selectedLink.classList.add('active');
             UI.showView(selectedLink.getAttribute('data-view'));
+        }
+        if (window.app && typeof window.app.updateRecordDateAccess === 'function') {
+            window.app.updateRecordDateAccess();
         }
     }
 
@@ -4585,6 +4690,7 @@ document.addEventListener('keydown', (e) => {
 
     const SYSTEM_PERMISSIONS = [
         { key: 'record_entry', label: 'تسجيل السراكي اليومية', desc: 'إمكانية إدخال وتسجيل سركي يومية جديدة للعمال والمعدات', icon: 'fa-file-signature' },
+        { key: 'custom_record_date', label: 'تحديد تاريخ السركي بحرية', desc: 'السماح باختيار وتعديل تاريخ طلب اعتماد السركي لأي يوم ماضي أو مخصص بدلاً من إجباره على تاريخ اليوم فقط', icon: 'fa-calendar-alt' },
         { key: 'approve_records', label: 'مراجعة واعتماد السراكي', desc: 'صلاحية المهندس لاعتماد أو رفض وتعديل يوميات وسراكي المشرفين', icon: 'fa-check-double' },
         { key: 'view_reports', label: 'عرض التقارير وتصدير إكسيل', desc: 'الاطلاع على تقارير السراكي، الفلاتر، وتصدير شيتات Excel و PDF', icon: 'fa-chart-bar' },
         { key: 'manage_workers', label: 'إدارة قاعدة العمال', desc: 'إضافة عمال جدد لدليل العمال وتعديل المسميات واليوميات الافتراضية', icon: 'fa-address-book' },
@@ -4593,15 +4699,25 @@ document.addEventListener('keydown', (e) => {
         { key: 'purge_records', label: 'تفريغ وأرشفة السراكي القديمة', desc: 'صلاحية مسح وأرشفة بيانات السراكي القديمة لتخفيض مساحة التخزين', icon: 'fa-trash-alt' }
     ];
 
+    const DEFAULT_SYSTEM_ROLES = [
+        { id: 'admin', nameAr: 'مدير النظام', isSystem: true, icon: 'fa-user-shield' },
+        { id: 'engineer', nameAr: 'مهندس', isSystem: true, icon: 'fa-hard-hat' },
+        { id: 'supervisor', nameAr: 'مشرف', isSystem: true, icon: 'fa-user-tie' },
+        { id: 'surveyor', nameAr: 'مساح', isSystem: true, icon: 'fa-drafting-compass' },
+        { id: 'warehouse_manager', nameAr: 'مدير مخزن', isSystem: true, icon: 'fa-warehouse' },
+        { id: 'operator_supervisor', nameAr: 'مشرف مشغل', isSystem: true, icon: 'fa-truck-loading' }
+    ];
+
     const FACTORY_ROLE_PERMISSIONS = {
-        admin: { record_entry: true, approve_records: true, view_reports: true, manage_workers: true, manage_notifications: true, admin_dashboard: true, purge_records: true },
-        engineer: { record_entry: true, approve_records: true, view_reports: true, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        supervisor: { record_entry: true, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        surveyor: { record_entry: true, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        warehouse_manager: { record_entry: true, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        operator_supervisor: { record_entry: true, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false }
+        admin: { record_entry: true, custom_record_date: true, approve_records: true, view_reports: true, manage_workers: true, manage_notifications: true, admin_dashboard: true, purge_records: true },
+        engineer: { record_entry: true, custom_record_date: false, approve_records: true, view_reports: true, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        supervisor: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        surveyor: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        warehouse_manager: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        operator_supervisor: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false }
     };
     window.SYSTEM_PERMISSIONS = SYSTEM_PERMISSIONS;
+    window.DEFAULT_SYSTEM_ROLES = DEFAULT_SYSTEM_ROLES;
     window.FACTORY_ROLE_PERMISSIONS = FACTORY_ROLE_PERMISSIONS;
 
     class App {
@@ -5268,8 +5384,6 @@ document.addEventListener('keydown', (e) => {
                 document.getElementById('workers-list').innerHTML = '';
                 this.addWorkerRow();
                 this.updateTotals();
-                document.getElementById('record-date').removeAttribute('readonly');
-                document.getElementById('record-date').style = 'background-color: white; color: black; font-weight: normal;';
             } else if (role === 'engineer') {
                 this.loadEngineerData();
                 this.generateReport();
@@ -5283,7 +5397,7 @@ document.addEventListener('keydown', (e) => {
                 document.getElementById('workers-list').innerHTML = '';
                 this.addWorkerRow();
                 this.updateTotals();
-            } else if (role === 'supervisor' || role === 'surveyor' || role === 'warehouse_manager' || role === 'operator_supervisor') {
+            } else {
                 await UI.renderEngineerOptions();
                 let dirWorkers = await db.getAll('worker_directory');
                 dirWorkers.sort((a, b) => customSort(a, b, false));
@@ -5295,6 +5409,8 @@ document.addEventListener('keydown', (e) => {
                 this.addWorkerRow();
                 this.updateTotals();
             }
+            this.updateRecordDateAccess();
+            this.populateRoleSelectors();
         } catch (dataErr) {
             console.error("Workspace initial data load error:", dataErr);
         }
@@ -5315,7 +5431,324 @@ document.addEventListener('keydown', (e) => {
             dirSelect.innerHTML = app.getWorkerTypeOptionsHtml(null, false);
         }
         await this.loadBackupHub();
+        this.populateRoleSelectors();
         this.renderRoleDefaultPermissions();
+    }
+
+    // --- Role Management Registry ---
+    getCustomRoles() {
+        try {
+            return JSON.parse(localStorage.getItem('labor_custom_roles') || '{}');
+        } catch(e) {
+            return {};
+        }
+    }
+
+    getAllRoles() {
+        const custom = this.getCustomRoles();
+        const rolesMap = new Map();
+        (window.DEFAULT_SYSTEM_ROLES || []).forEach(r => {
+            rolesMap.set(r.id, { ...r });
+        });
+        Object.keys(custom).forEach(id => {
+            if (rolesMap.has(id)) {
+                rolesMap.set(id, { ...rolesMap.get(id), ...custom[id] });
+            } else {
+                rolesMap.set(id, { id, nameAr: custom[id].nameAr || id, isSystem: false, icon: custom[id].icon || 'fa-user' });
+            }
+        });
+        return Array.from(rolesMap.values());
+    }
+
+    getRoleNameAr(roleKey) {
+        if (!roleKey) return 'غير محدد';
+        const roles = this.getAllRoles();
+        const found = roles.find(r => r.id === roleKey);
+        return found ? found.nameAr : (roleKey === 'admin' ? 'مدير النظام' : roleKey);
+    }
+
+    populateRoleSelectors() {
+        const roles = this.getAllRoles();
+        
+        // 1. Update #new-role in Add User form
+        const newRoleSelect = document.getElementById('new-role');
+        if (newRoleSelect) {
+            const currentVal = newRoleSelect.value;
+            newRoleSelect.innerHTML = `<option value="" disabled ${!currentVal ? 'selected' : ''}>اختر الوظيفة / الصلاحية</option>` +
+                roles.map(r => `<option value="${r.id}" ${currentVal === r.id ? 'selected' : ''}>${r.nameAr}</option>`).join('');
+        }
+
+        // 2. Update #role-default-selector in Role Defaults card
+        const roleDefaultSelect = document.getElementById('role-default-selector');
+        if (roleDefaultSelect) {
+            const currentVal = roleDefaultSelect.value || 'supervisor';
+            roleDefaultSelect.innerHTML = roles.map(r => `<option value="${r.id}" ${currentVal === r.id ? 'selected' : ''}>${r.nameAr}</option>`).join('');
+        }
+    }
+
+    renderRolesManagerTable() {
+        const tbody = document.getElementById('roles-manager-table-body');
+        if (!tbody) return;
+        const roles = this.getAllRoles();
+        tbody.innerHTML = roles.map(r => {
+            return `
+                <tr>
+                    <td style="font-weight: 700; direction: ltr; text-align: left;"><span class="badge" style="background: rgba(99, 102, 241, 0.15); color: #6366f1;">${r.id}</span></td>
+                    <td>
+                        <input type="text" id="role-display-name-${r.id}" value="${r.nameAr}" class="modal-input" style="width: 100%; margin: 0; padding: 6px 10px; font-weight: 600; font-size: 0.88rem;">
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 6px; align-items: center;">
+                            <button type="button" class="btn btn-primary btn-small" onclick="app.saveRoleDisplayName('${r.id}')" title="حفظ المسمى المعدل" style="padding: 5px 10px; font-size: 0.8rem;">
+                                <i class="fas fa-check"></i> حفظ
+                            </button>
+                            ${!r.isSystem ? `
+                                <button type="button" class="btn btn-danger btn-small" onclick="app.deleteCustomRole('${r.id}')" title="حذف الوظيفة المخصصة" style="padding: 5px 10px; font-size: 0.8rem;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : '<span style="font-size: 0.72rem; color: var(--text-muted);">رتبة أساسية</span>'}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    saveRoleDisplayName(roleId) {
+        const input = document.getElementById(`role-display-name-${roleId}`);
+        if (!input) return;
+        const newName = input.value.trim();
+        if (!newName) {
+            alert('يرجى إدخال مسمى الوظيفة بالعربي');
+            return;
+        }
+        const custom = this.getCustomRoles();
+        if (!custom[roleId]) custom[roleId] = {};
+        custom[roleId].nameAr = newName;
+        localStorage.setItem('labor_custom_roles', JSON.stringify(custom));
+
+        this.populateRoleSelectors();
+        this.renderRoleDefaultPermissions();
+        if (this.loadAdminData) this.loadAdminData();
+        UI.updateNavigation(auth.getRole());
+
+        if (window.showAppNotification) {
+            window.showAppNotification(`تم تعديل مسمى الوظيفة إلى (${newName}) بنجاح! ✨`, 'success');
+        } else {
+            alert(`تم حفظ مسمى الوظيفة بنجاح!`);
+        }
+    }
+
+    addNewCustomRole() {
+        const idInput = document.getElementById('new-custom-role-id');
+        const nameInput = document.getElementById('new-custom-role-name');
+        if (!idInput || !nameInput) return;
+        const rawId = idInput.value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
+        const nameAr = nameInput.value.trim();
+
+        if (!rawId || !nameAr) {
+            alert('يرجى كتابة معرف الوظيفة والمسمى العربي');
+            return;
+        }
+
+        const roles = this.getAllRoles();
+        if (roles.some(r => r.id === rawId)) {
+            alert('هذا المعرف مستخدم بالفعل! اختر معرفاً آخر.');
+            return;
+        }
+
+        const custom = this.getCustomRoles();
+        custom[rawId] = {
+            id: rawId,
+            nameAr: nameAr,
+            isSystem: false,
+            icon: 'fa-user'
+        };
+        localStorage.setItem('labor_custom_roles', JSON.stringify(custom));
+
+        idInput.value = '';
+        nameInput.value = '';
+
+        this.renderRolesManagerTable();
+        this.populateRoleSelectors();
+        this.renderRoleDefaultPermissions();
+        if (this.loadAdminData) this.loadAdminData();
+
+        if (window.showAppNotification) {
+            window.showAppNotification(`تمت إضافة وظيفة (${nameAr}) بنجاح! يمكنك الآن تحديد صلاحياتها الافتراضية. 🛡️`, 'success');
+        } else {
+            alert(`تمت إضافة وظيفة (${nameAr}) بنجاح!`);
+        }
+    }
+
+    deleteCustomRole(roleId) {
+        if (!confirm(`هل أنت متأكد من حذف هذه الوظيفة؟`)) return;
+        const custom = this.getCustomRoles();
+        delete custom[roleId];
+        localStorage.setItem('labor_custom_roles', JSON.stringify(custom));
+
+        const customPerms = this.getCustomRoleDefaults();
+        if (customPerms[roleId]) {
+            delete customPerms[roleId];
+            localStorage.setItem('labor_custom_role_permissions', JSON.stringify(customPerms));
+        }
+
+        this.renderRolesManagerTable();
+        this.populateRoleSelectors();
+        this.renderRoleDefaultPermissions();
+        if (this.loadAdminData) this.loadAdminData();
+    }
+
+    resetAllRolesToDefault() {
+        if (!confirm('هل أنت متأكد من استعادة كافة مسميات الوظائف الأصلية؟')) return;
+        localStorage.removeItem('labor_custom_roles');
+        this.renderRolesManagerTable();
+        this.populateRoleSelectors();
+        this.renderRoleDefaultPermissions();
+        if (this.loadAdminData) this.loadAdminData();
+        UI.updateNavigation(auth.getRole());
+        if (window.showAppNotification) {
+            window.showAppNotification('تمت استعادة المسميات الأصلية للوظائف بنجاح.', 'info');
+        }
+    }
+
+    openRoleManagerModal() {
+        const modal = document.getElementById('modal-manage-roles');
+        if (modal) {
+            this.renderRolesManagerTable();
+            modal.style.display = 'flex';
+        }
+    }
+
+    closeRoleManagerModal() {
+        const modal = document.getElementById('modal-manage-roles');
+        if (modal) modal.style.display = 'none';
+    }
+
+    // --- Custom Permission Definitions ---
+    getCustomPermissionDefs() {
+        try {
+            return JSON.parse(localStorage.getItem('labor_custom_permission_defs') || '[]');
+        } catch(e) {
+            return [];
+        }
+    }
+
+    getAllPermissions() {
+        const customDefs = this.getCustomPermissionDefs();
+        return [...SYSTEM_PERMISSIONS, ...customDefs.map(c => ({ ...c, isCustom: true }))];
+    }
+
+    openAddPermissionModal() {
+        const modal = document.getElementById('modal-add-permission');
+        if (modal) {
+            document.getElementById('custom-perm-label').value = '';
+            document.getElementById('custom-perm-desc').value = '';
+            document.getElementById('custom-perm-key').value = '';
+            modal.style.display = 'flex';
+        }
+    }
+
+    closeAddPermissionModal() {
+        const modal = document.getElementById('modal-add-permission');
+        if (modal) modal.style.display = 'none';
+    }
+
+    saveCustomPermission() {
+        const labelInput = document.getElementById('custom-perm-label');
+        const descInput = document.getElementById('custom-perm-desc');
+        const keyInput = document.getElementById('custom-perm-key');
+
+        const label = labelInput ? labelInput.value.trim() : '';
+        const desc = descInput ? descInput.value.trim() : '';
+        let key = keyInput ? keyInput.value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_') : '';
+
+        if (!label) {
+            alert('يرجى إدخال اسم / نص الصلاحية');
+            return;
+        }
+
+        if (!key) {
+            key = 'perm_' + Date.now().toString(36);
+        }
+
+        const allPerms = this.getAllPermissions();
+        if (allPerms.some(p => p.key === key)) {
+            alert('هذا المعرف البرمجي للصلاحية مستخدم بالفعل! اختر معرفاً آخر.');
+            return;
+        }
+
+        const customDefs = this.getCustomPermissionDefs();
+        customDefs.push({
+            key,
+            label,
+            desc: desc || label,
+            icon: 'fa-shield-alt',
+            isCustom: true
+        });
+        localStorage.setItem('labor_custom_permission_defs', JSON.stringify(customDefs));
+
+        this.closeAddPermissionModal();
+        this.renderRoleDefaultPermissions();
+        if (window.showAppNotification) {
+            window.showAppNotification(`تمت إضافة بند الصلاحية الجديد (${label}) بنجاح! 🛡️`, 'success');
+        } else {
+            alert(`تمت إضافة بند الصلاحية بنجاح!`);
+        }
+    }
+
+    deleteCustomPermission(permKey) {
+        const allPerms = this.getAllPermissions();
+        const perm = allPerms.find(p => p.key === permKey);
+        const name = perm ? perm.label : permKey;
+
+        if (!confirm(`هل أنت متأكد من حذف بند الصلاحية (${name}) من النظام؟`)) return;
+
+        let customDefs = this.getCustomPermissionDefs();
+        customDefs = customDefs.filter(p => p.key !== permKey);
+        localStorage.setItem('labor_custom_permission_defs', JSON.stringify(customDefs));
+
+        // Clean up from custom role permissions
+        const customRolePerms = this.getCustomRoleDefaults();
+        Object.keys(customRolePerms).forEach(role => {
+            if (customRolePerms[role] && customRolePerms[role][permKey] !== undefined) {
+                delete customRolePerms[role][permKey];
+            }
+        });
+        localStorage.setItem('labor_custom_role_permissions', JSON.stringify(customRolePerms));
+
+        this.renderRoleDefaultPermissions();
+        if (window.showAppNotification) {
+            window.showAppNotification(`تم حذف بند الصلاحية (${name}) بنجاح.`, 'info');
+        }
+    }
+
+    // --- Record Date Access Control ---
+    updateRecordDateAccess() {
+        const currentUser = (auth && auth.currentUser) || null;
+        if (!currentUser) return;
+        const userPerms = this.getUserPermissions(currentUser);
+        const canPickDate = !!(userPerms.custom_record_date || currentUser.username === 'admin' || currentUser.role === 'admin');
+        const dateInput = document.getElementById('record-date');
+        if (dateInput) {
+            if (canPickDate) {
+                dateInput.removeAttribute('readonly');
+                dateInput.style.pointerEvents = 'auto';
+                dateInput.style.backgroundColor = 'var(--bg-main)';
+                dateInput.style.color = 'var(--text-main)';
+                dateInput.style.fontWeight = 'normal';
+                dateInput.style.cursor = 'pointer';
+                dateInput.title = 'يمكنك اختيار أي تاريخ لهذا السركي بحرية 📅';
+            } else {
+                dateInput.setAttribute('readonly', 'true');
+                dateInput.style.pointerEvents = 'none';
+                dateInput.style.backgroundColor = 'var(--bg-card)';
+                dateInput.style.color = 'var(--text-main)';
+                dateInput.style.fontWeight = 'bold';
+                dateInput.style.cursor = 'not-allowed';
+                dateInput.title = 'تاريخ اليوم إجباري وفقاً لصلاحياتك 🔒';
+            }
+        }
     }
 
     getCustomRoleDefaults() {
@@ -5338,7 +5771,9 @@ document.addEventListener('keydown', (e) => {
         if (!user) return {};
         // Bishoy / admin default fallback has all permissions
         if (user.username === 'admin' || (user.role === 'admin' && !user.permissions)) {
-            return { ...FACTORY_ROLE_PERMISSIONS.admin, ...(user.permissions || {}) };
+            const allPermsObj = {};
+            this.getAllPermissions().forEach(p => { allPermsObj[p.key] = true; });
+            return { ...allPermsObj, ...(user.permissions || {}) };
         }
         const roleDefaults = this.getRoleDefaultPermissions(user.role);
         return { ...roleDefaults, ...(user.permissions || {}) };
@@ -5358,16 +5793,22 @@ document.addEventListener('keydown', (e) => {
         if (!container) return;
 
         const rolePerms = this.getRoleDefaultPermissions(role);
-        container.innerHTML = SYSTEM_PERMISSIONS.map(p => {
+        const allPerms = this.getAllPermissions();
+        container.innerHTML = allPerms.map(p => {
             const isChecked = !!rolePerms[p.key];
             return `
-                <label style="display: flex; align-items: flex-start; gap: 8px; background: var(--bg-main); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s ease;">
-                    <input type="checkbox" id="role-perm-${p.key}" ${isChecked ? 'checked' : ''} style="width: 17px; height: 17px; accent-color: var(--primary-color); margin-top: 2px; cursor: pointer;">
-                    <div style="display: flex; flex-direction: column;">
-                        <span style="font-weight: 700; font-size: 0.86rem; color: var(--text-main);"><i class="fas ${p.icon}" style="margin-left: 5px; color: var(--primary-color);"></i> ${p.label}</span>
-                        <span style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.3;">${p.desc}</span>
-                    </div>
-                </label>
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; background: var(--bg-main); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); transition: all 0.2s ease;">
+                    <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; flex: 1; margin-bottom: 0;">
+                        <input type="checkbox" id="role-perm-${p.key}" ${isChecked ? 'checked' : ''} style="width: 17px; height: 17px; accent-color: var(--primary-color); margin-top: 2px; cursor: pointer;">
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-weight: 700; font-size: 0.86rem; color: var(--text-main);"><i class="fas ${p.icon || 'fa-shield-alt'}" style="margin-left: 5px; color: var(--primary-color);"></i> ${p.label}</span>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.3;">${p.desc || ''}</span>
+                        </div>
+                    </label>
+                    ${p.isCustom ? `
+                        <button type="button" class="btn-icon text-danger" onclick="app.deleteCustomPermission('${p.key}')" title="حذف هذا البند المخصص من النظام" style="padding: 2px 4px; font-size: 0.8rem;"><i class="fas fa-trash-alt"></i></button>
+                    ` : ''}
+                </div>
             `;
         }).join('');
     }
@@ -5377,7 +5818,8 @@ document.addEventListener('keydown', (e) => {
         const role = select ? select.value : 'supervisor';
         const custom = this.getCustomRoleDefaults();
         custom[role] = {};
-        SYSTEM_PERMISSIONS.forEach(p => {
+        const allPerms = this.getAllPermissions();
+        allPerms.forEach(p => {
             const cb = document.getElementById(`role-perm-${p.key}`);
             custom[role][p.key] = cb ? cb.checked : false;
         });
@@ -5425,20 +5867,23 @@ document.addEventListener('keydown', (e) => {
         subtitle.innerHTML = `المستخدم: <strong>${displayName}</strong> | الوظيفة: <span class="badge badge-approved">${auth.getRoleNameAr(user.role)}</span>`;
 
         const effectivePerms = this.getUserPermissions(user);
-        checkboxesContainer.innerHTML = SYSTEM_PERMISSIONS.map(p => {
+        const allPerms = this.getAllPermissions();
+        checkboxesContainer.innerHTML = allPerms.map(p => {
             const isChecked = !!effectivePerms[p.key];
             const isCustom = user.permissions && user.permissions.hasOwnProperty(p.key);
             return `
-                <label style="display: flex; align-items: flex-start; gap: 10px; background: var(--bg-card); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s ease;">
-                    <input type="checkbox" id="user-perm-${p.key}" ${isChecked ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: var(--primary-color); margin-top: 2px; cursor: pointer;">
-                    <div style="display: flex; flex-direction: column; flex: 1;">
-                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <span style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);"><i class="fas ${p.icon}" style="margin-left: 6px; color: var(--primary-color);"></i> ${p.label}</span>
-                            ${isCustom ? '<span style="font-size: 0.7rem; background: rgba(99, 102, 241, 0.15); color: #6366f1; padding: 2px 6px; border-radius: 4px; font-weight: 700;">مخصصة</span>' : ''}
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; background: var(--bg-card); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-color); transition: all 0.2s ease;">
+                    <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; flex: 1; margin-bottom: 0;">
+                        <input type="checkbox" id="user-perm-${p.key}" ${isChecked ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: var(--primary-color); margin-top: 2px; cursor: pointer;">
+                        <div style="display: flex; flex-direction: column; flex: 1;">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <span style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);"><i class="fas ${p.icon || 'fa-shield-alt'}" style="margin-left: 6px; color: var(--primary-color);"></i> ${p.label}</span>
+                                ${isCustom ? '<span style="font-size: 0.7rem; background: rgba(99, 102, 241, 0.15); color: #6366f1; padding: 2px 6px; border-radius: 4px; font-weight: 700;">مخصصة</span>' : ''}
+                            </div>
+                            <span style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; margin-top: 2px;">${p.desc || ''}</span>
                         </div>
-                        <span style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; margin-top: 2px;">${p.desc}</span>
-                    </div>
-                </label>
+                    </label>
+                </div>
             `;
         }).join('');
 
@@ -5455,7 +5900,7 @@ document.addEventListener('keydown', (e) => {
         const user = window.currentEditingPermUser;
         if (!user) return;
         const roleDefaults = this.getRoleDefaultPermissions(user.role);
-        SYSTEM_PERMISSIONS.forEach(p => {
+        this.getAllPermissions().forEach(p => {
             const cb = document.getElementById(`user-perm-${p.key}`);
             if (cb) cb.checked = !!roleDefaults[p.key];
         });
@@ -5473,7 +5918,7 @@ document.addEventListener('keydown', (e) => {
         if (!user) return;
 
         const newPermissions = {};
-        SYSTEM_PERMISSIONS.forEach(p => {
+        this.getAllPermissions().forEach(p => {
             const cb = document.getElementById(`user-perm-${p.key}`);
             if (cb) newPermissions[p.key] = cb.checked;
         });
@@ -5487,11 +5932,12 @@ document.addEventListener('keydown', (e) => {
             if (idx !== -1) window.allSystemUsers[idx] = user;
         }
 
-        // If this is currently logged in user, refresh local storage user and navigation
+        // If this is currently logged in user, refresh local storage user, navigation, and date access
         if (auth.currentUser && auth.currentUser.id === user.id) {
             auth.currentUser = user;
             localStorage.setItem('labor_app_user', JSON.stringify(user));
             UI.updateNavigation(user.role, user);
+            this.updateRecordDateAccess();
         }
 
         this.closeUserPermissionsModal();
@@ -5553,14 +5999,10 @@ document.addEventListener('keydown', (e) => {
         
         nameCell.innerHTML = `<input type="text" id="edit-user-name-${id}" value="${currentName}" style="min-width: max-content; width: 100%; padding: 5px;">`;
         passCell.innerHTML = `<input type="text" id="edit-user-pass-${id}" value="${currentPass}" placeholder="باسورد جديد" style="min-width: max-content; width: 100%; padding: 5px;">`;
+        const roles = this.getAllRoles();
         roleCell.innerHTML = `
             <select id="edit-user-role-${id}" style="min-width: max-content; width: 100%; padding: 5px;">
-                <option value="supervisor" ${currentRole==='supervisor'?'selected':''}>مشرف</option>
-                <option value="surveyor" ${currentRole==='surveyor'?'selected':''}>مساح</option>
-                <option value="warehouse_manager" ${currentRole==='warehouse_manager'?'selected':''}>مدير مخزن</option>
-                <option value="operator_supervisor" ${currentRole==='operator_supervisor'?'selected':''}>مشرف مشغل</option>
-                <option value="engineer" ${currentRole==='engineer'?'selected':''}>مهندس</option>
-                <option value="admin" ${currentRole==='admin'?'selected':''}>مدير</option>
+                ${roles.map(r => `<option value="${r.id}" ${currentRole === r.id ? 'selected' : ''}>${r.nameAr}</option>`).join('')}
             </select>
         `;
         
@@ -6569,7 +7011,14 @@ document.addEventListener('keydown', (e) => {
     }
     
     async submitRecord() {
-        const date = document.getElementById('record-date').value;
+        const today = new Date().toISOString().split('T')[0];
+        let date = document.getElementById('record-date').value;
+        const currentUser = (auth && auth.currentUser) || null;
+        const userPerms = this.getUserPermissions(currentUser);
+        const canPickDate = !!(userPerms.custom_record_date || (currentUser && (currentUser.username === 'admin' || currentUser.role === 'admin')));
+        if (!canPickDate || !date) {
+            date = today;
+        }
         let engineerId = document.getElementById('record-engineer').value;
         const role = auth.getRole();
         
@@ -6714,7 +7163,8 @@ document.addEventListener('keydown', (e) => {
             
             // Reset Form
             document.getElementById('record-form').reset();
-            document.getElementById('record-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('record-date').value = today;
+            this.updateRecordDateAccess();
             document.getElementById('workers-list').innerHTML = '';
             this.currentWorkers = [];
             this.addWorkerRow();
@@ -6745,7 +7195,8 @@ document.addEventListener('keydown', (e) => {
                 alert('لا يوجد اتصال! تم حفظ السركي مؤقتاً في الهاتف وسيتم رفعه تلقائياً عند عودة الإنترنت.');
                 
                 document.getElementById('record-form').reset();
-                document.getElementById('record-date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('record-date').value = today;
+                this.updateRecordDateAccess();
                 document.getElementById('workers-list').innerHTML = '';
                 this.currentWorkers = [];
                 this.addWorkerRow();
