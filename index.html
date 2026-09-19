@@ -3621,14 +3621,39 @@ window.showAppNotification = function(firstArg, secondArg, thirdArg, fourthArg) 
         setTimeout(dismiss, duration);
     }
 
-    // 10. Web/OS Push Notification if permitted
+    // 10. Web/OS Native System Notification (Displays on Windows Desktop even when minimized in taskbar)
     if ('Notification' in window && Notification.permission === 'granted' && !silent) {
         try {
-            new Notification(title, {
+            const notifOptions = {
                 body: message,
                 icon: '/icon-192x192.png',
-                tag: 'app-notif-' + Date.now()
-            });
+                badge: '/icon-192x192.png',
+                tag: 'app-notif-' + Date.now(),
+                requireInteraction: true,
+                silent: false
+            };
+
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.ready.then(reg => {
+                    reg.showNotification(title, notifOptions);
+                }).catch(() => {
+                    const n = new Notification(title, notifOptions);
+                    n.onclick = () => {
+                        window.focus();
+                        if (action) {
+                            try { action(); } catch(e) {}
+                        }
+                    };
+                });
+            } else {
+                const n = new Notification(title, notifOptions);
+                n.onclick = () => {
+                    window.focus();
+                    if (action) {
+                        try { action(); } catch(e) {}
+                    }
+                };
+            }
         } catch(e) {}
     }
 };
