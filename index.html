@@ -2434,8 +2434,15 @@ select {
                                 <span style="font-weight: 700;">سيرفر Cloudflare الأساسي:</span>
                                 <span style="background: #10b981; color: #fff; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 600;" title="خادم سحابي عالمي نشط 24/7 بسعة 3 مليون طلب شهرياً">شغال 24/7 ✅</span>
                             </div>
+                            
                             <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 8px;">
-                                <a href="https://dash.cloudflare.com/?to=/:account/workers/services/view/labor-system-live" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; color: #ea580c; text-decoration: none; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: rgba(234, 88, 12, 0.08); border: 1px dashed #f97316; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(234, 88, 12, 0.18)'" onmouseout="this.style.background='rgba(234, 88, 12, 0.08)'" title="اضغط لعرض استهلاك الطلبات وقاعدة البيانات المباشرة على Cloudflare">
+                                <button type="button" onclick="openServerMetricsModal()" style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #fff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer; box-shadow: 0 2px 4px rgba(234, 88, 12, 0.25); transition: all 0.2s ease;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'" title="فحص استهلاك وحصة السيرفر اللحظية الصادرة من Cloudflare">
+                                    <i class="fas fa-bolt"></i>
+                                    <span>معدل الاستهلاك اللحظي ⚡</span>
+                                </button>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; border-right: 1px solid var(--border-color); padding-right: 8px;">
+                                <a href="https://dash.cloudflare.com/8fcd811bce36d07fe78cfc7a7137f62e/workers-and-pages/services/view/labor-system-live" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; color: #ea580c; text-decoration: none; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: rgba(234, 88, 12, 0.08); border: 1px dashed #f97316; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(234, 88, 12, 0.18)'" onmouseout="this.style.background='rgba(234, 88, 12, 0.08)'" title="اضغط لعرض استهلاك الطلبات وقاعدة البيانات المباشرة على Cloudflare">
                                     <i class="fas fa-chart-line"></i>
                                     <span style="text-decoration: underline;">متابعة الاستهلاك والطلبات اليومية</span>
                                     <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i>
@@ -8011,6 +8018,120 @@ document.addEventListener('keydown', (e) => {
         }
     }
 }
+
+
+// --- Live Server Metrics Modal Functions ---
+window.openServerMetricsModal = function() {
+    const modal = document.getElementById("modal-server-metrics");
+    if (modal) {
+        modal.style.display = "flex";
+        modal.classList.remove("hidden");
+        window.refreshServerMetrics();
+    }
+};
+
+window.closeServerMetricsModal = function() {
+    const modal = document.getElementById("modal-server-metrics");
+    if (modal) {
+        modal.style.display = "none";
+        modal.classList.add("hidden");
+    }
+};
+
+window.refreshServerMetrics = async function() {
+    const icon = document.getElementById("icon-refresh-metrics");
+    const btn = document.getElementById("btn-refresh-server-metrics");
+    if (icon) icon.classList.add("fa-spin");
+    if (btn) btn.disabled = true;
+    
+    const startTime = performance.now();
+    try {
+        const res = await fetch("/api/server-metrics?t=" + Date.now());
+        const pingMs = Math.round(performance.now() - startTime);
+        
+        if (!res.ok) throw new Error("فشل جلب بيانات السيرفر");
+        const data = await res.json();
+        
+        // Update Ping & Time
+        const pingEl = document.getElementById("sm-ping");
+        if (pingEl) pingEl.innerText = pingMs + " ms";
+        
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        const lastEl = document.getElementById("sm-last-checked");
+        if (lastEl) lastEl.innerText = "تم الفحص " + timeStr;
+        
+        // Requests
+        const req = data.requests || {};
+        const today = req.today || 0;
+        const quota = req.quota || 100000;
+        const pct = parseFloat(req.percentage || 0);
+        const rem = req.remaining != null ? req.remaining : (quota - today);
+        
+        const reqTodayEl = document.getElementById("sm-req-today");
+        if (reqTodayEl) reqTodayEl.innerText = Number(today).toLocaleString();
+        
+        const reqPctEl = document.getElementById("sm-req-pct-badge");
+        if (reqPctEl) reqPctEl.innerText = pct.toFixed(2) + "%";
+        
+        const reqRemEl = document.getElementById("sm-req-remaining");
+        if (reqRemEl) reqRemEl.innerText = Number(rem).toLocaleString();
+        
+        const bar = document.getElementById("sm-req-bar");
+        if (bar) bar.style.width = Math.min(100, Math.max(0.5, pct)) + "%";
+        
+        // Timer
+        const sched = data.resetSchedule || {};
+        const hr = sched.hoursRemaining || 0;
+        const min = sched.minutesRemaining || 0;
+        const timerEl = document.getElementById("sm-reset-timer");
+        if (timerEl) timerEl.innerText = `${hr} ساعة و ${min} دقيقة`;
+        
+        // Performance
+        const perf = data.performance || {};
+        const cpuAvgEl = document.getElementById("sm-cpu-avg");
+        if (cpuAvgEl) cpuAvgEl.innerText = perf.cpuAvgMs || "0";
+        
+        const cpuMaxEl = document.getElementById("sm-cpu-max");
+        if (cpuMaxEl) cpuMaxEl.innerText = perf.cpuMaxMs || "0";
+        
+        const errEl = document.getElementById("sm-errors");
+        if (errEl) errEl.innerText = (perf.errorsToday || 0) + " أخطاء";
+        
+        const subreqEl = document.getElementById("sm-subrequests");
+        if (subreqEl) subreqEl.innerText = perf.subrequests || 0;
+        
+        // Database
+        const db = data.database || {};
+        const dbMbEl = document.getElementById("sm-db-used-mb");
+        if (dbMbEl) dbMbEl.innerText = db.storageUsedMB || "0.00";
+        
+        const dbPctEl = document.getElementById("sm-db-pct-badge");
+        if (dbPctEl) dbPctEl.innerText = db.storagePercentage || "0.01%";
+        
+        const recCntEl = document.getElementById("sm-cnt-records");
+        if (recCntEl) recCntEl.innerText = (db.recordsCount || 0).toLocaleString();
+        
+        const wrkCntEl = document.getElementById("sm-cnt-workers");
+        if (wrkCntEl) wrkCntEl.innerText = (db.workersCount || 0).toLocaleString();
+        
+        const usrCntEl = document.getElementById("sm-cnt-users");
+        if (usrCntEl) usrCntEl.innerText = (db.usersCount || 0).toLocaleString();
+        
+        const totCntEl = document.getElementById("sm-cnt-total");
+        if (totCntEl) totCntEl.innerText = (db.totalRows || 0).toLocaleString();
+        
+        const dbBar = document.getElementById("sm-db-bar");
+        if (dbBar) dbBar.style.width = Math.min(100, Math.max(0.5, parseFloat(db.storagePercentage || 0))) + "%";
+    } catch (err) {
+        console.error("Error fetching server metrics:", err);
+        const lastEl = document.getElementById("sm-last-checked");
+        if (lastEl) lastEl.innerText = "حدث خطأ في الاتصال";
+    } finally {
+        if (icon) icon.classList.remove("fa-spin");
+        if (btn) btn.disabled = false;
+    }
+};
 
 // Initialize App
 window.app = new App();
