@@ -2514,8 +2514,21 @@ select {
                     <form id="record-form">
                         <div class="form-row">
                             <div class="form-group half">
-                                <label for="record-date">التاريخ</label>
-                                <input type="date" id="record-date" class="modal-input" required readonly style="pointer-events: none; background-color: var(--bg-card); color: var(--text-main); font-weight: bold;">
+                                <label for="record-date" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                                    <span>التاريخ</span>
+                                    <span id="date-lock-badge" style="display: none; font-size: 0.72rem; color: #94a3b8; background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);">
+                                        <i class="fas fa-lock" style="color: #f59e0b;"></i> تاريخ اليوم إجباري
+                                    </span>
+                                    <span id="date-unlocked-badge" style="display: none; font-size: 0.72rem; color: #10b981; background: rgba(16, 185, 129, 0.12); padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.25); font-weight: bold;">
+                                        <i class="fas fa-calendar-check"></i> تحديد التاريخ متاح
+                                    </span>
+                                </label>
+                                <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                                    <input type="date" id="record-date" class="modal-input" required style="flex: 1; min-width: 0; cursor: pointer;">
+                                    <button type="button" id="btn-open-calendar" class="btn btn-secondary" style="padding: 10px 14px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; flex-shrink: 0; background: var(--bg-card); border: 1px solid var(--border-color);" title="فتح تقويم التاريخ">
+                                        <i class="fas fa-calendar-alt" style="color: var(--primary-color);"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="form-group half">
                                 <label for="record-engineer">المهندس المسؤول (للاعتماد)</label>
@@ -5955,17 +5968,38 @@ document.addEventListener('keydown', (e) => {
         const currentUser = (auth && auth.currentUser) || null;
         if (!currentUser) return;
         const userPerms = this.getUserPermissions(currentUser);
-        const canPickDate = !!(userPerms.custom_record_date || currentUser.username === 'admin' || currentUser.role === 'admin');
+        
+        // Custom per-user override has top priority; otherwise default to true for engineer & admin
+        const userCustomPerm = (currentUser.permissions && typeof currentUser.permissions.custom_record_date === 'boolean')
+            ? currentUser.permissions.custom_record_date
+            : null;
+        const canPickDate = userCustomPerm !== null
+            ? userCustomPerm
+            : !!(userPerms.custom_record_date || currentUser.role === 'engineer' || currentUser.role === 'admin' || currentUser.username === 'admin');
+
         const dateInput = document.getElementById('record-date');
+        const btnCal = document.getElementById('btn-open-calendar');
+        const lockBadge = document.getElementById('date-lock-badge');
+        const unlockedBadge = document.getElementById('date-unlocked-badge');
+
         if (dateInput) {
             if (canPickDate) {
                 dateInput.removeAttribute('readonly');
+                dateInput.disabled = false;
                 dateInput.style.pointerEvents = 'auto';
                 dateInput.style.backgroundColor = 'var(--bg-main)';
                 dateInput.style.color = 'var(--text-main)';
                 dateInput.style.fontWeight = 'normal';
                 dateInput.style.cursor = 'pointer';
-                dateInput.title = 'يمكنك اختيار أي تاريخ لهذا السركي بحرية 📅';
+                dateInput.title = 'انقر لاختيار أي تاريخ لهذا السركي بحرية 📅';
+
+                if (btnCal) {
+                    btnCal.style.display = 'flex';
+                    btnCal.style.pointerEvents = 'auto';
+                    btnCal.style.opacity = '1';
+                }
+                if (unlockedBadge) unlockedBadge.style.display = 'inline-flex';
+                if (lockBadge) lockBadge.style.display = 'none';
             } else {
                 dateInput.setAttribute('readonly', 'true');
                 dateInput.style.pointerEvents = 'none';
@@ -5974,6 +6008,43 @@ document.addEventListener('keydown', (e) => {
                 dateInput.style.fontWeight = 'bold';
                 dateInput.style.cursor = 'not-allowed';
                 dateInput.title = 'تاريخ اليوم إجباري وفقاً لصلاحياتك 🔒';
+
+                if (btnCal) {
+                    btnCal.style.display = 'none';
+                    btnCal.style.pointerEvents = 'none';
+                    btnCal.style.opacity = '0.4';
+                }
+                if (unlockedBadge) unlockedBadge.style.display = 'none';
+                if (lockBadge) lockBadge.style.display = 'inline-flex';
+            }
+
+            // Bind click to trigger native calendar picker
+            const triggerPicker = () => {
+                if (canPickDate && !dateInput.hasAttribute('readonly')) {
+                    try {
+                        if (typeof dateInput.showPicker === 'function') {
+                            dateInput.showPicker();
+                        } else {
+                            dateInput.focus();
+                        }
+                    } catch(err) {
+                        dateInput.focus();
+                    }
+                }
+            };
+
+            if (btnCal && !btnCal._pickerBound) {
+                btnCal._pickerBound = true;
+                btnCal.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    triggerPicker();
+                });
+            }
+            if (!dateInput._pickerBound) {
+                dateInput._pickerBound = true;
+                dateInput.addEventListener('click', () => {
+                    triggerPicker();
+                });
             }
         }
     }
@@ -7246,7 +7317,12 @@ document.addEventListener('keydown', (e) => {
         let date = document.getElementById('record-date').value;
         const currentUser = (auth && auth.currentUser) || null;
         const userPerms = this.getUserPermissions(currentUser);
-        const canPickDate = !!(userPerms.custom_record_date || (currentUser && (currentUser.username === 'admin' || currentUser.role === 'admin')));
+        const userCustomPerm = (currentUser && currentUser.permissions && typeof currentUser.permissions.custom_record_date === 'boolean')
+            ? currentUser.permissions.custom_record_date
+            : null;
+        const canPickDate = userCustomPerm !== null
+            ? userCustomPerm
+            : !!(userPerms.custom_record_date || (currentUser && (currentUser.role === 'engineer' || currentUser.role === 'admin' || currentUser.username === 'admin')));
         if (!canPickDate || !date) {
             date = today;
         }
