@@ -2581,7 +2581,7 @@ select {
                             </div>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary btn-block mt-20"><i class="fas fa-paper-plane"></i> إرسال السركي للاعتماد</button>
+                        <button type="submit" id="btn-submit-record" class="btn btn-primary btn-block mt-20"><i class="fas fa-paper-plane"></i> إرسال السركي للاعتماد</button>
                     </form>
                 </div>
                 
@@ -4962,6 +4962,7 @@ document.addEventListener('keydown', (e) => {
     const SYSTEM_PERMISSIONS = [
         { key: 'record_entry', label: 'تسجيل السراكي اليومية', desc: 'إمكانية إدخال وتسجيل سركي يومية جديدة للعمال والمعدات', icon: 'fa-file-signature' },
         { key: 'custom_record_date', label: 'تحديد تاريخ السركي بحرية', desc: 'السماح باختيار وتعديل تاريخ طلب اعتماد السركي لأي يوم ماضي أو مخصص بدلاً من إجباره على تاريخ اليوم فقط', icon: 'fa-calendar-alt' },
+        { key: 'auto_approve_record', label: 'الاعتماد التلقائي لطلب السركي', desc: 'عند إرسال سركي يتم اعتماده بشكل تلقائي وفوري دون تمريره على مرحلة قيد الانتظار', icon: 'fa-check-circle' },
         { key: 'approve_records', label: 'مراجعة واعتماد السراكي', desc: 'صلاحية المهندس لاعتماد أو رفض وتعديل يوميات وسراكي المشرفين', icon: 'fa-check-double' },
         { key: 'view_reports', label: 'عرض التقارير وتصدير إكسيل', desc: 'الاطلاع على تقارير السراكي، الفلاتر، وتصدير شيتات Excel و PDF', icon: 'fa-chart-bar' },
         { key: 'view_server_status', label: 'متابعة سيرفر Cloudflare والاستهلاك', desc: 'عرض شريط خادم Cloudflare وحصة الـ 100 ألف طلب يومياً ومعدل الاستهلاك اللحظي للسيرفر', icon: 'fa-server' },
@@ -4981,12 +4982,12 @@ document.addEventListener('keydown', (e) => {
     ];
 
     const FACTORY_ROLE_PERMISSIONS = {
-        admin: { record_entry: true, custom_record_date: true, approve_records: true, view_reports: true, view_server_status: true, manage_workers: true, manage_notifications: true, admin_dashboard: true, purge_records: true },
-        engineer: { record_entry: true, custom_record_date: true, approve_records: true, view_reports: true, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        supervisor: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        surveyor: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        warehouse_manager: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        operator_supervisor: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false }
+        admin: { record_entry: true, custom_record_date: true, auto_approve_record: true, approve_records: true, view_reports: true, view_server_status: true, manage_workers: true, manage_notifications: true, admin_dashboard: true, purge_records: true },
+        engineer: { record_entry: true, custom_record_date: true, auto_approve_record: true, approve_records: true, view_reports: true, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        supervisor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        surveyor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        warehouse_manager: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        operator_supervisor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false }
     };
     window.SYSTEM_PERMISSIONS = SYSTEM_PERMISSIONS;
     window.DEFAULT_SYSTEM_ROLES = DEFAULT_SYSTEM_ROLES;
@@ -5909,7 +5910,14 @@ document.addEventListener('keydown', (e) => {
 
     getAllPermissions() {
         const customDefs = this.getCustomPermissionDefs();
-        return [...SYSTEM_PERMISSIONS, ...customDefs.map(c => ({ ...c, isCustom: true }))];
+        const norm = (s) => (s || '').toString().replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').toLowerCase().trim();
+        const hasCustomAutoApprove = customDefs.some(c => norm(c.label).includes('اعتماد تلقاي') || c.key === 'auto_approve_record');
+        
+        let systemPerms = SYSTEM_PERMISSIONS;
+        if (hasCustomAutoApprove) {
+            systemPerms = SYSTEM_PERMISSIONS.filter(p => p.key !== 'auto_approve_record');
+        }
+        return [...systemPerms, ...customDefs.map(c => ({ ...c, isCustom: true }))];
     }
 
     openAddPermissionModal() {
@@ -6079,6 +6087,78 @@ document.addEventListener('keydown', (e) => {
                     triggerPicker();
                 });
             }
+        }
+        this.updateRecordSubmitButton();
+    }
+
+    canAutoApprove(user = null) {
+        const u = user || (auth && auth.currentUser) || null;
+        if (!u) return false;
+        // Bishoy / admin always auto-approves
+        if (u.username === 'admin' || (u.role === 'admin' && !u.permissions)) return true;
+
+        const norm = (s) => (s || '').toString().replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').toLowerCase().trim();
+
+        // 1. Direct user permissions override
+        if (u.permissions && typeof u.permissions.auto_approve_record === 'boolean') {
+            return u.permissions.auto_approve_record;
+        }
+
+        // 2. Identify all auto-approval keys (built-in + any custom ones created by user)
+        const customDefs = this.getCustomPermissionDefs();
+        const autoApproveKeys = new Set(['auto_approve_record']);
+        customDefs.forEach(def => {
+            const labelNorm = norm(def.label);
+            const descNorm = norm(def.desc);
+            if (labelNorm.includes('اعتماد تلقاي') || (descNorm.includes('اعتماد') && descNorm.includes('تلقاي'))) {
+                autoApproveKeys.add(def.key);
+            }
+        });
+
+        // 3. Check if user's custom permissions has any of these keys explicitly set
+        if (u.permissions) {
+            for (let k of autoApproveKeys) {
+                if (typeof u.permissions[k] === 'boolean') {
+                    return u.permissions[k];
+                }
+            }
+            for (let k in u.permissions) {
+                if (u.permissions[k] === true && (k.includes('auto_approve') || norm(k).includes('اعتماد_تلقاي'))) {
+                    return true;
+                }
+            }
+        }
+
+        // 4. Check role permissions (including custom role defaults from admin panel)
+        const rolePerms = this.getRoleDefaultPermissions(u.role);
+        for (let k of autoApproveKeys) {
+            if (typeof rolePerms[k] === 'boolean') {
+                return rolePerms[k];
+            }
+        }
+
+        // 5. Fallback: engineer and admin default to true
+        if (u.role === 'engineer' || u.role === 'admin') {
+            return true;
+        }
+
+        return false;
+    }
+
+    updateRecordSubmitButton() {
+        const btn = document.getElementById('btn-submit-record') || document.querySelector('#record-form button[type="submit"]');
+        if (!btn) return;
+        const isAuto = this.canAutoApprove(auth.currentUser);
+        if (isAuto) {
+            btn.innerHTML = '<i class="fas fa-check-circle" style="margin-left: 6px;"></i> حفظ واعتماد السركي مباشرة (معتمد فوراً)';
+            btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            btn.style.borderColor = '#10b981';
+            btn.title = 'سيتم اعتماد هذا السركي تلقائياً فور الحفظ ✅';
+        } else {
+            btn.innerHTML = '<i class="fas fa-paper-plane" style="margin-left: 6px;"></i> إرسال السركي للاعتماد';
+            btn.style.background = '';
+            btn.style.borderColor = '';
+            btn.title = 'سيتم إرسال السركي للمهندس المسؤول للاعتماد ⏳';
         }
     }
 
@@ -7454,12 +7534,16 @@ document.addEventListener('keydown', (e) => {
         // --------------------------------
         
         try {
+            // Check auto approve permission
+            const isAutoApprove = this.canAutoApprove(auth.currentUser);
+            const recordStatus = isAutoApprove ? 'approved' : 'pending';
+
             // Create Record
             const recordId = await db.add('records', {
                 date: date,
                 supervisorId: auth.currentUser.id,
                 engineerId: engineerId,
-                status: (role === 'admin') ? 'approved' : 'pending',
+                status: recordStatus,
                 totalWorkers: validWorkersCount,
                 totalAmount: totalAmount,
                 createdAt: new Date().toISOString()
@@ -7480,21 +7564,20 @@ document.addEventListener('keydown', (e) => {
                 });
             }
             
-            
-            if (role === 'engineer') {
+            if (recordStatus === 'approved') {
                 if (window.showAppNotification) {
                     window.showAppNotification({
-                        title: 'تم التسجيل والاعتماد',
-                        message: 'تم تسجيل السركي واعتماده بنجاح وحفظه في السيرفر.',
+                        title: 'تم التسجيل والاعتماد الفوري ✅',
+                        message: 'تم تسجيل السركي واعتماده تلقائياً بنجاح وظهر بحالة معتمد فوراً.',
                         type: 'success'
                     });
                 } else {
-                    alert('تم تسجيل السركي واعتماده بنجاح');
+                    alert('تم تسجيل السركي واعتماده تلقائياً بنجاح');
                 }
             } else {
                 if (window.showAppNotification) {
                     window.showAppNotification({
-                        title: 'تم إرسال السركي',
+                        title: 'تم إرسال السركي ⏳',
                         message: 'تم إرسال السركي للاعتماد بنجاح وبانتظار اعتماد المهندس.',
                         type: 'info'
                     });
@@ -7503,7 +7586,6 @@ document.addEventListener('keydown', (e) => {
                 }
             }
 
-            
             // Reset Form
             document.getElementById('record-form').reset();
             document.getElementById('record-date').value = today;
@@ -7519,13 +7601,15 @@ document.addEventListener('keydown', (e) => {
         } catch (error) {
             console.error(error);
             if (!navigator.onLine || error.message.includes('fetch') || error.message.includes('retries')) {
+                const isAutoApprove = this.canAutoApprove(auth.currentUser);
+                const recordStatus = isAutoApprove ? 'approved' : 'pending';
                 const offlinePayload = {
                     record: {
                         id: crypto.randomUUID(),
                         date: date,
                         supervisorId: auth.currentUser.id,
                         engineerId: engineerId,
-                        status: (role === 'admin') ? 'approved' : 'pending',
+                        status: recordStatus,
                         totalWorkers: validWorkersCount,
                         totalAmount: totalAmount,
                         createdAt: new Date().toISOString()
