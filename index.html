@@ -2877,7 +2877,7 @@ select {
                     <h2 style="margin: 0;"><i class="fas fa-chart-bar"></i> التقارير المجمعة</h2>
 
                     <!-- Server Monitoring Widgets Container (Screen Only) -->
-                    <div class="screen-only" id="server-monitors-container" style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div class="screen-only" id="server-monitors-container" style="display: none; align-items: center; flex-wrap: wrap; gap: 8px;">
                         <!-- 1. Cloudflare Monitor Widget -->
                         <div id="monitor-widget-cf" style="display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--bg-card); border: 1px solid rgba(249, 115, 22, 0.35); border-radius: 8px; padding: 6px 12px; font-size: 0.83rem; box-shadow: var(--shadow-sm);">
                             <div style="display: flex; align-items: center; gap: 6px; color: #ea580c;">
@@ -3710,7 +3710,28 @@ class UI {
         }
     }
 
+    static canViewServerStatus() {
+        const currentUser = (auth && auth.currentUser) || null;
+        if (!currentUser) return false;
+        if (currentUser.username === 'admin' || (currentUser.role === 'admin' && !currentUser.permissions)) return true;
+
+        if (currentUser.permissions && typeof currentUser.permissions.view_server_status === 'boolean') {
+            return currentUser.permissions.view_server_status;
+        }
+
+        if (window.app && typeof window.app.getUserPermissions === 'function') {
+            const perms = window.app.getUserPermissions(currentUser);
+            return !!perms.view_server_status;
+        }
+
+        return currentUser.role === 'admin';
+    }
+
     static updateCloudQuotaDisplay() {
+        if (!UI.canViewServerStatus()) {
+            UI.applyServerMonitorVisibility();
+            return;
+        }
         const el = document.getElementById('cloud-renewal-date-display');
         if (el) {
             const now = new Date();
@@ -3726,6 +3747,15 @@ class UI {
     }
 
     static applyServerMonitorVisibility() {
+        const container = document.getElementById('server-monitors-container');
+        if (!container) return;
+
+        if (!UI.canViewServerStatus()) {
+            container.style.display = 'none';
+            return;
+        }
+
+        container.style.display = 'flex';
         const hideCf = localStorage.getItem('monitor_hide_cf') === 'true';
         const hideDeno = localStorage.getItem('monitor_hide_deno') === 'true';
         const elCf = document.getElementById('monitor-widget-cf');
@@ -3812,6 +3842,7 @@ class UI {
         if (window.app && typeof window.app.updateRecordDateAccess === 'function') {
             window.app.updateRecordDateAccess();
         }
+        UI.applyServerMonitorVisibility();
     }
 
     static renderUsersTable(users, currentUserId) {
@@ -4933,6 +4964,7 @@ document.addEventListener('keydown', (e) => {
         { key: 'custom_record_date', label: 'تحديد تاريخ السركي بحرية', desc: 'السماح باختيار وتعديل تاريخ طلب اعتماد السركي لأي يوم ماضي أو مخصص بدلاً من إجباره على تاريخ اليوم فقط', icon: 'fa-calendar-alt' },
         { key: 'approve_records', label: 'مراجعة واعتماد السراكي', desc: 'صلاحية المهندس لاعتماد أو رفض وتعديل يوميات وسراكي المشرفين', icon: 'fa-check-double' },
         { key: 'view_reports', label: 'عرض التقارير وتصدير إكسيل', desc: 'الاطلاع على تقارير السراكي، الفلاتر، وتصدير شيتات Excel و PDF', icon: 'fa-chart-bar' },
+        { key: 'view_server_status', label: 'متابعة سيرفر Cloudflare والاستهلاك', desc: 'عرض شريط خادم Cloudflare وحصة الـ 100 ألف طلب يومياً ومعدل الاستهلاك اللحظي للسيرفر', icon: 'fa-server' },
         { key: 'manage_workers', label: 'إدارة قاعدة العمال', desc: 'إضافة عمال جدد لدليل العمال وتعديل المسميات واليوميات الافتراضية', icon: 'fa-address-book' },
         { key: 'manage_notifications', label: 'إدارة وجدولة الإشعارات', desc: 'الدخول لشاشة إدارة الإشعارات وجدولة رسائل التنبيه والبرودكاست', icon: 'fa-bell' },
         { key: 'admin_dashboard', label: 'لوحة الإدارة والمستخدمين', desc: 'إدارة حسابات المستخدمين، النسخ الاحتياطي، وإعدادات النظام', icon: 'fa-users-cog' },
@@ -4949,12 +4981,12 @@ document.addEventListener('keydown', (e) => {
     ];
 
     const FACTORY_ROLE_PERMISSIONS = {
-        admin: { record_entry: true, custom_record_date: true, approve_records: true, view_reports: true, manage_workers: true, manage_notifications: true, admin_dashboard: true, purge_records: true },
-        engineer: { record_entry: true, custom_record_date: true, approve_records: true, view_reports: true, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        supervisor: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        surveyor: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        warehouse_manager: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        operator_supervisor: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false }
+        admin: { record_entry: true, custom_record_date: true, approve_records: true, view_reports: true, view_server_status: true, manage_workers: true, manage_notifications: true, admin_dashboard: true, purge_records: true },
+        engineer: { record_entry: true, custom_record_date: true, approve_records: true, view_reports: true, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        supervisor: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        surveyor: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        warehouse_manager: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
+        operator_supervisor: { record_entry: true, custom_record_date: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false }
     };
     window.SYSTEM_PERMISSIONS = SYSTEM_PERMISSIONS;
     window.DEFAULT_SYSTEM_ROLES = DEFAULT_SYSTEM_ROLES;
@@ -5650,6 +5682,7 @@ document.addEventListener('keydown', (e) => {
                 this.updateTotals();
             }
             this.updateRecordDateAccess();
+            UI.applyServerMonitorVisibility();
             this.populateRoleSelectors();
         } catch (dataErr) {
             console.error("Workspace initial data load error:", dataErr);
@@ -6236,6 +6269,7 @@ document.addEventListener('keydown', (e) => {
             localStorage.setItem('labor_app_user', JSON.stringify(user));
             UI.updateNavigation(user.role, user);
             this.updateRecordDateAccess();
+            UI.applyServerMonitorVisibility();
         }
 
         this.closeUserPermissionsModal();
@@ -9500,25 +9534,53 @@ document.addEventListener('keydown', (e) => {
 
 // --- Live Server Metrics Modal Functions ---
 window.openServerMetricsModal = function(initialTab = 'metrics') {
+    const userPerms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(auth && (auth.currentUser || (typeof auth.getUser === 'function' ? auth.getUser() : null))) : { purge_records: true };
+    const canViewServer = (typeof UI !== 'undefined' && typeof UI.canViewServerStatus === 'function') ? UI.canViewServerStatus() : false;
+
+    if (!canViewServer && !userPerms.purge_records) {
+        if (window.showAppNotification) {
+            window.showAppNotification('عفواً، لا تملك صلاحية عرض ومتابعة سيرفر وخوادم النظام.', 'warning');
+        } else {
+            alert('عفواً، لا تملك صلاحية عرض ومتابعة سيرفر وخوادم النظام.');
+        }
+        return;
+    }
+
     const modal = document.getElementById("modal-server-metrics");
     if (modal) {
+        const tabBtnMetrics = document.getElementById('tab-btn-metrics');
+        const tabBtnAlert = document.getElementById('tab-btn-alert');
         const tabBtnPurge = document.getElementById('tab-btn-purge');
-        const userPerms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(auth && (auth.currentUser || (typeof auth.getUser === 'function' ? auth.getUser() : null))) : { purge_records: true };
-        if (tabBtnPurge) {
-            tabBtnPurge.style.display = userPerms.purge_records ? 'flex' : 'none';
-        }
-        if (initialTab === 'purge' && !userPerms.purge_records) {
+
+        if (tabBtnMetrics) tabBtnMetrics.style.display = canViewServer ? 'flex' : 'none';
+        if (tabBtnAlert) tabBtnAlert.style.display = canViewServer ? 'flex' : 'none';
+        if (tabBtnPurge) tabBtnPurge.style.display = userPerms.purge_records ? 'flex' : 'none';
+
+        if (!canViewServer && initialTab !== 'purge') {
+            initialTab = 'purge';
+        } else if (initialTab === 'purge' && !userPerms.purge_records) {
             initialTab = 'metrics';
         }
 
         modal.style.display = "flex";
         modal.classList.remove("hidden");
         window.switchMetricsTab(initialTab);
-        window.refreshServerMetrics();
+        if (canViewServer) {
+            window.refreshServerMetrics();
+        }
     }
 };
 
 window.switchMetricsTab = function(tab) {
+    if (tab === 'metrics' || tab === 'alert') {
+        const canViewServer = (typeof UI !== 'undefined' && typeof UI.canViewServerStatus === 'function') ? UI.canViewServerStatus() : false;
+        if (!canViewServer) {
+            if (window.showAppNotification) {
+                window.showAppNotification('عفواً، لا تملك صلاحية عرض ومتابعة سيرفر وخوادم النظام.', 'warning');
+            }
+            return;
+        }
+    }
     if (tab === 'purge') {
         const userPerms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(auth && (auth.currentUser || (typeof auth.getUser === 'function' ? auth.getUser() : null))) : { purge_records: true };
         if (!userPerms.purge_records) {
