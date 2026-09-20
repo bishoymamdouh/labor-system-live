@@ -60,6 +60,11 @@ h1, h2, h3, h4 {
 .mb-10 { margin-bottom: 10px; }
 .text-center { text-align: center; }
 
+@keyframes toastCountdown {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+}
+
 /* Buttons */
 .btn {
     display: inline-flex;
@@ -3380,8 +3385,13 @@ window.showAppNotification = function(firstArg, secondArg, thirdArg, fourthArg) 
         message = 'تم تنفيذ العملية بنجاح.';
     }
 
-    // 3. Timing & Auto-dismiss logic (Persistent by default until user clicks X)
-    const duration = (typeof opts.duration === 'number' && opts.duration > 0) ? opts.duration : 0;
+    // 3. Timing & Auto-dismiss logic (Default: 15 seconds unless explicitly set)
+    let duration = 15000;
+    if (typeof opts.duration === 'number') {
+        duration = opts.duration;
+    } else if (opts.persistent === true) {
+        duration = 0;
+    }
     const sound = opts.sound !== undefined ? opts.sound : true;
     const silent = opts.silent !== undefined ? opts.silent : false;
     
@@ -3567,13 +3577,22 @@ window.showAppNotification = function(firstArg, secondArg, thirdArg, fourthArg) 
             <i class="fas fa-arrow-left" style="font-size: 0.68rem;"></i> انقر هنا للانتقال المباشر
         </div>
         ` : ''}
+        ${duration > 0 ? `
+        <div class="toast-progress-bar" style="position: absolute; bottom: 0; right: 0; left: 0; height: 3px; background: ${t.color}; opacity: 0.7; transform-origin: right; animation: toastCountdown ${duration}ms linear forwards;"></div>
+        ` : ''}
     `;
 
     // 9. Dismiss Handler (Smooth transition and DOM removal)
     let isDismissed = false;
+    let autoDismissTimeout = null;
+
     const dismiss = () => {
         if (isDismissed) return;
         isDismissed = true;
+        if (autoDismissTimeout) {
+            clearTimeout(autoDismissTimeout);
+            autoDismissTimeout = null;
+        }
         toast.style.opacity = '0';
         toast.style.transform = 'translateY(-15px) scale(0.96)';
         toast.style.maxHeight = '0px';
@@ -3605,15 +3624,28 @@ window.showAppNotification = function(firstArg, secondArg, thirdArg, fourthArg) 
         });
     }
 
+    toast.addEventListener('mouseenter', () => {
+        if (autoDismissTimeout) {
+            clearTimeout(autoDismissTimeout);
+            autoDismissTimeout = null;
+        }
+        const progressBar = toast.querySelector('.toast-progress-bar');
+        if (progressBar) progressBar.style.animationPlayState = 'paused';
+        toast.style.transform = 'translateY(-2px) scale(1.008)';
+        toast.style.boxShadow = `0 14px 35px rgba(0,0,0,0.65), 0 0 20px ${t.glow}`;
+    });
+
+    toast.addEventListener('mouseleave', () => {
+        if (duration > 0 && !isDismissed) {
+            const progressBar = toast.querySelector('.toast-progress-bar');
+            if (progressBar) progressBar.style.animationPlayState = 'running';
+            autoDismissTimeout = setTimeout(dismiss, 3000); // 3 seconds grace period after mouse leaves
+        }
+        toast.style.transform = 'translateY(0) scale(1)';
+        toast.style.boxShadow = `0 10px 28px rgba(0,0,0,0.55), 0 0 15px ${t.glow}`;
+    });
+
     if (action) {
-        toast.addEventListener('mouseenter', () => {
-            toast.style.transform = 'translateY(-2px) scale(1.008)';
-            toast.style.boxShadow = `0 14px 35px rgba(0,0,0,0.65), 0 0 20px ${t.glow}`;
-        });
-        toast.addEventListener('mouseleave', () => {
-            toast.style.transform = 'translateY(0) scale(1)';
-            toast.style.boxShadow = `0 10px 28px rgba(0,0,0,0.55), 0 0 15px ${t.glow}`;
-        });
         toast.addEventListener('click', (e) => {
             if (e.target.closest('.btn-close-toast')) return;
             try { action(); } catch(err) { console.error('Toast action error', err); }
@@ -3629,9 +3661,9 @@ window.showAppNotification = function(firstArg, secondArg, thirdArg, fourthArg) 
         toast.style.transform = 'translateY(0) scale(1)';
     });
 
-    // Auto-dismiss ONLY if explicitly provided a positive duration
+    // Auto-dismiss after duration (default 15 seconds)
     if (duration > 0) {
-        setTimeout(dismiss, duration);
+        autoDismissTimeout = setTimeout(dismiss, duration);
     }
 
     // 10. Web/OS Native System Notification (Displays on Windows Desktop even when minimized in taskbar)
