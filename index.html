@@ -5910,8 +5910,12 @@ document.addEventListener('keydown', (e) => {
 
     getAllPermissions() {
         const customDefs = this.getCustomPermissionDefs();
-        const norm = (s) => (s || '').toString().replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').toLowerCase().trim();
-        const hasCustomAutoApprove = customDefs.some(c => norm(c.label).includes('اعتماد تلقاي') || c.key === 'auto_approve_record');
+        const norm = (s) => (s || '').toString().replace(/[أإآ]/g, 'ا').replace(/[ىئ]/g, 'ي').replace(/ة/g, 'ه').toLowerCase().trim();
+        const hasCustomAutoApprove = customDefs.some(c => {
+            const l = norm(c.label);
+            const d = norm(c.desc);
+            return (l.includes('اعتماد') && l.includes('تلقاي')) || (d.includes('اعتماد') && d.includes('تلقاي')) || c.key === 'auto_approve_record';
+        });
         
         let systemPerms = SYSTEM_PERMISSIONS;
         if (hasCustomAutoApprove) {
@@ -6097,7 +6101,7 @@ document.addEventListener('keydown', (e) => {
         // Bishoy / admin always auto-approves
         if (u.username === 'admin' || (u.role === 'admin' && !u.permissions)) return true;
 
-        const norm = (s) => (s || '').toString().replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').toLowerCase().trim();
+        const norm = (s) => (s || '').toString().replace(/[أإآ]/g, 'ا').replace(/[ىئ]/g, 'ي').replace(/ة/g, 'ه').toLowerCase().trim();
 
         // 1. Direct user permissions override
         if (u.permissions && typeof u.permissions.auto_approve_record === 'boolean') {
@@ -6110,7 +6114,7 @@ document.addEventListener('keydown', (e) => {
         customDefs.forEach(def => {
             const labelNorm = norm(def.label);
             const descNorm = norm(def.desc);
-            if (labelNorm.includes('اعتماد تلقاي') || (descNorm.includes('اعتماد') && descNorm.includes('تلقاي'))) {
+            if ((labelNorm.includes('اعتماد') && labelNorm.includes('تلقاي')) || (descNorm.includes('اعتماد') && descNorm.includes('تلقاي'))) {
                 autoApproveKeys.add(def.key);
             }
         });
