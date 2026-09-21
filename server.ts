@@ -718,6 +718,16 @@ async function handler(req: Request): Promise<Response> {
             const id = body.id || crypto.randomUUID();
             delete body.id;
             
+            // Ensure authoritative server timestamp for records:
+            // Prevents clock skew and wrong timezone on supervisors' mobile phones (e.g. appearing 2 hours ahead)
+            if (collection === "records") {
+                const now = Date.now();
+                const clientTime = body.createdAt ? Date.parse(body.createdAt) : NaN;
+                if (isNaN(clientTime) || clientTime > now + 3 * 60 * 1000 || Math.abs(now - clientTime) > 20 * 60 * 1000) {
+                    body.createdAt = new Date().toISOString();
+                }
+            }
+
             await kv.set([collection, id], body);
             invalidateCache(collection);
             if (collection === "records") {
