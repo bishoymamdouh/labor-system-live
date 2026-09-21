@@ -3743,6 +3743,38 @@ class UI {
         }
     }
 
+    static formatCairoTime(dateInput) {
+        if (!dateInput) return '-';
+        try {
+            const d = new Date(dateInput);
+            if (isNaN(d.getTime())) return '-';
+            return d.toLocaleTimeString('ar-EG-u-nu-latn', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+                timeZone: 'Africa/Cairo'
+            });
+        } catch {
+            return '-';
+        }
+    }
+
+    static formatCairoDateTime(dateInput) {
+        if (!dateInput) return '-';
+        try {
+            const d = new Date(dateInput);
+            if (isNaN(d.getTime())) return '-';
+            return d.toLocaleString('ar-EG-u-nu-latn', {
+                dateStyle: 'short',
+                timeStyle: 'short',
+                hour12: true,
+                timeZone: 'Africa/Cairo'
+            });
+        } catch {
+            return String(dateInput);
+        }
+    }
+
     static canViewServerStatus() {
         const currentUser = (auth && auth.currentUser) || null;
         if (!currentUser) return false;
@@ -3976,13 +4008,13 @@ class UI {
 
     static generateRecordCardHTML(r, role = 'admin', view = 'default') {
         const statusBadge = this.getStatusBadge(r.status);
-        const timeStr = r.createdAt ? new Date(r.createdAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Cairo' }) : '-';
+        const timeStr = UI.formatCairoTime(r.createdAt);
         
         let headerHtml = `
             <div id="record-card-${r.id}" class="card mb-30 record-scroll-target" style="margin-bottom: 30px;">
                 <div class="record-card-header flex-between mb-10" style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
                     <div>
-                        <strong>${r.date}</strong> <span dir="ltr" style="font-size:0.85em; color:var(--text-muted);">(${timeStr})</span>
+                        <strong>${r.date}</strong> ${r.createdAt ? `<span style="font-size:0.85em; color:var(--text-muted); margin-right: 6px;"><i class="far fa-clock"></i> (${timeStr})</span>` : ''}
                     </div>
                     <div>${statusBadge}</div>
                 </div>
@@ -4182,7 +4214,10 @@ class UI {
         
         let html = `
             <div class="form-row mb-10" style="align-items: center;">
-                <div class="half"><strong>التاريخ:</strong> ${record.date}</div>
+                <div class="half">
+                    <strong>التاريخ:</strong> ${record.date}
+                    ${record.createdAt ? `<span style="font-size:0.85em; color:var(--text-muted); margin-right: 6px;"><i class="far fa-clock"></i> (${UI.formatCairoTime(record.createdAt)})</span>` : ''}
+                </div>
                 <div class="half"><strong>المشرف:</strong> <span class="badge-glow badge-glow-supervisor"><i class="fas fa-user-tie"></i> ${record.supervisorName === 'admin' ? 'Bishoy Mamdouh' : record.supervisorName}</span></div>
             </div>
             <div style="overflow-x:auto;">
@@ -7068,11 +7103,7 @@ document.addEventListener('keydown', (e) => {
 
                 let createdStr = '';
                 if (r.createdAt) {
-                    try {
-                        createdStr = new Date(r.createdAt).toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Africa/Cairo' });
-                    } catch {
-                        createdStr = String(r.createdAt).replace('T', ' ').substring(0, 16);
-                    }
+                    createdStr = UI.formatCairoDateTime(r.createdAt);
                 }
 
                 const rowData = [

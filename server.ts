@@ -365,6 +365,19 @@ async function handler(req: Request): Promise<Response> {
         if (url.pathname === "/api/vapidPublicKey" && method === "GET") {
             return new Response(VAPID_PUBLIC, { status: 200 });
         }
+
+        if (url.pathname === "/api/serverTime" && method === "GET") {
+            const now = new Date();
+            return new Response(JSON.stringify({
+                utc: now.toISOString(),
+                cairo: now.toLocaleTimeString("ar-EG-u-nu-latn", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true, timeZone: "Africa/Cairo" }),
+                cairoDate: now.toLocaleDateString("ar-EG-u-nu-latn", { timeZone: "Africa/Cairo" }),
+                timestamp: now.getTime()
+            }), { 
+                status: 200, 
+                headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } 
+            });
+        }
         
         if (url.pathname === "/api/pendingCount" && method === "GET") {
             const engineerId = url.searchParams.get("engineerId");
@@ -717,15 +730,11 @@ async function handler(req: Request): Promise<Response> {
             // Handle specific ID (like admin)
             const id = body.id || crypto.randomUUID();
             delete body.id;
-            
+
             // Ensure authoritative server timestamp for records:
-            // Prevents clock skew and wrong timezone on supervisors' mobile phones (e.g. appearing 2 hours ahead)
+            // Completely bypasses supervisor's phone clock and records official time at transmission
             if (collection === "records") {
-                const now = Date.now();
-                const clientTime = body.createdAt ? Date.parse(body.createdAt) : NaN;
-                if (isNaN(clientTime) || clientTime > now + 3 * 60 * 1000 || Math.abs(now - clientTime) > 20 * 60 * 1000) {
-                    body.createdAt = new Date().toISOString();
-                }
+                body.createdAt = new Date().toISOString();
             }
 
             await kv.set([collection, id], body);
@@ -762,6 +771,11 @@ async function handler(req: Request): Promise<Response> {
 
             const current = await kv.get([collection, id]);
             if (!current.value) return new Response("Not found", { status: 404 });
+
+            // Defensive: preserve authoritative original creation timestamp
+            if (collection === "records" && current.value.createdAt) {
+                body.createdAt = current.value.createdAt;
+            }
 
             await kv.set([collection, id], { ...current.value, ...body });
             invalidateCache(collection);
