@@ -1827,9 +1827,9 @@ select {
                                         <div style="width: 100%;">
                                             <strong style="color: var(--text-main);"><i class="fas fa-folder text-warning"></i> حفظ في مجلد على السيرفر / الكمبيوتر:</strong>
                                             <div style="margin-top: 5px;">
-                                                <input type="text" id="backup-folder-path" value="./backups" onchange="app.saveBackupConfig()" placeholder="اكتب مسار المجلد مثل: ./backups" style="width: 100%; box-sizing: border-box; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); font-size: 0.82rem; font-family: monospace;">
+                                                <input type="text" id="backup-folder-path" value="D:\B I S H O Y\PROTECT\11- سراكى العمال\labor-management-app\backups" onchange="app.saveBackupConfig()" placeholder="D:\B I S H O Y\PROTECT\11- سراكى العمال\labor-management-app\backups" style="width: 100%; box-sizing: border-box; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); font-size: 0.82rem; font-family: monospace;">
                                             </div>
-                                            <small style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-top: 3px;">المسار التلقائي: مجلد ./backups المؤرخ يومياً.</small>
+                                            <small style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-top: 3px;">المسار التلقائي المعتمد: مجلد backups الخاص بالبرنامج مؤرخ يومياً.</small>
                                         </div>
                                     </label>
 
@@ -6671,7 +6671,11 @@ document.addEventListener('keydown', (e) => {
 
                 if (destDownload) destDownload.checked = config.destinations?.download !== false;
                 if (destFolder) destFolder.checked = config.destinations?.folder !== false;
-                if (folderPath) folderPath.value = config.destinations?.folderPath || './backups';
+                if (folderPath) {
+                    folderPath.value = (config.destinations?.folderPath && config.destinations.folderPath !== './backups')
+                        ? config.destinations.folderPath
+                        : 'D:\\B I S H O Y\\PROTECT\\11- سراكى العمال\\labor-management-app\\backups';
+                }
                 if (destCloud) destCloud.checked = config.destinations?.cloud !== false;
 
                 // 2. Schedule & Triggers
@@ -6731,7 +6735,7 @@ document.addEventListener('keydown', (e) => {
                 destinations: {
                     download: document.getElementById('backup-dest-download')?.checked !== false,
                     folder: document.getElementById('backup-dest-folder')?.checked !== false,
-                    folderPath: document.getElementById('backup-folder-path')?.value?.trim() || './backups',
+                    folderPath: document.getElementById('backup-folder-path')?.value?.trim() || 'D:\\B I S H O Y\\PROTECT\\11- سراكى العمال\\labor-management-app\\backups',
                     cloud: document.getElementById('backup-dest-cloud')?.checked !== false
                 },
                 dailyTime: document.getElementById('backup-schedule-time')?.value || '23:00',
