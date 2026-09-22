@@ -11160,62 +11160,215 @@ document.addEventListener('click', (e) => {
             <title>سركي العامل</title>
             <base href="\${window.location.origin}">
             <style>
-                @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
                 @media print {
-                    @page { margin: 0; size: landscape; }
-                    .receipt-page { page-break-after: always; }
-                    .receipt-page:last-child { page-break-after: auto; }
+                    @page { 
+                        size: A4 landscape; 
+                        margin: 0.35cm 0.5cm; 
+                    }
+                    html, body {
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    .receipt-page { 
+                        page-break-after: always; 
+                        break-after: page;
+                        page-break-inside: avoid !important;
+                        break-inside: avoid !important;
+                    }
+                    .receipt-page:last-child { 
+                        page-break-after: auto; 
+                        break-after: auto;
+                    }
                 }
-                body { font-family: 'Cairo', sans-serif, Arial; margin: 0; padding: 0; background: #fff; color: #000; }
+
+                * {
+                    box-sizing: border-box;
+                }
+
+                body { 
+                    font-family: 'Cairo', sans-serif, Arial; 
+                    margin: 0; 
+                    padding: 0; 
+                    background: #fff; 
+                    color: #000; 
+                    direction: rtl;
+                }
+
                 .receipt-page { 
                     width: 100%; 
-                    padding: 0.8cm; 
+                    height: 100%;
+                    max-height: 198mm;
+                    padding: 0.2cm 0.3cm; 
                     box-sizing: border-box; 
-                    display: flex;
-                    flex-direction: column;
-                    min-height: 100vh;
+                    display: flex; 
+                    flex-direction: column; 
+                    justify-content: space-between;
+                    overflow: hidden;
+                    page-break-inside: avoid !important;
+                    break-inside: avoid !important;
                 }
-                .header { position: relative; text-align: center; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 15px; }
-                .header h1 { margin: 8px 0; font-size: 24px; font-weight: bold; }
-                .header h2 { margin: 0; font-size: 16px; font-weight: bold; }
+
+                /* HEADER */
+                .header { 
+                    position: relative; 
+                    text-align: center; 
+                    margin-bottom: 6px; 
+                    border-bottom: 2px solid #000; 
+                    padding-bottom: 8px; 
+                    page-break-inside: avoid;
+                    break-inside: avoid;
+                    flex-shrink: 0;
+                }
+                .header h1 { 
+                    margin: 4px 0; 
+                    font-size: 20px; 
+                    font-weight: 800; 
+                    color: #000;
+                }
                 .project-title-box {
                     background-color: #eef5fb;
                     color: #003366;
-                    padding: 8px 20px;
+                    padding: 5px 18px;
                     border-radius: 6px;
                     display: inline-block;
-                    font-size: 16px;
+                    font-size: 14px;
                     font-weight: bold;
                     margin: 0;
                     border: 1px solid #b8d4f0;
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
                 }
-                .header p { margin: 0; font-size: 14px; }
-                .logo-img { position: absolute; right: 0; top: 0; max-height: 60px; }
-                
-                table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 15px; font-size: 11px; }
-                th, td { border: 1px solid #000; padding: 6px; text-align: center; vertical-align: middle; word-wrap: break-word; }
-                th { background-color: #eee; font-weight: bold; }
-                
-                .summary { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; font-weight: bold; border: 1px solid #000; padding: 6px; background: #fafafa;}
-                
+                .header p { 
+                    margin: 2px 0 0 0; 
+                    font-size: 13px; 
+                    font-weight: 600;
+                }
+                .logo-img { 
+                    position: absolute; 
+                    right: 0; 
+                    top: 0; 
+                    max-height: 50px; 
+                }
+
+                /* TABLE WRAPPER */
+                .table-container {
+                    width: 100%;
+                    flex: 1 1 auto;
+                    display: flex;
+                    align-items: flex-start;
+                    margin-bottom: 6px;
+                    page-break-inside: avoid;
+                    break-inside: avoid;
+                    overflow: hidden;
+                }
+
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin: 0;
+                    page-break-inside: avoid;
+                    break-inside: avoid;
+                }
+                th, td { 
+                    border: 1px solid #000; 
+                    text-align: center; 
+                    vertical-align: middle; 
+                    word-wrap: break-word; 
+                    line-height: 1.25;
+                }
+                th { 
+                    background-color: #f1f1f1 !important; 
+                    font-weight: 700; 
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
+                .rowspan-cell {
+                    vertical-align: middle;
+                    font-weight: bold;
+                }
+
+                /* DENSITY TIERS FOR FIT-TO-PAPER */
+                .density-normal table { font-size: 11px; }
+                .density-normal th { padding: 5px 4px; }
+                .density-normal td { padding: 4px 4px; }
+                .density-normal .name-cell { font-size: 13px; }
+
+                .density-snug table { font-size: 10px; }
+                .density-snug th { padding: 4px 3px; font-size: 10px; }
+                .density-snug td { padding: 3px 3px; }
+                .density-snug .name-cell { font-size: 11.5px; }
+
+                .density-medium table { font-size: 9px; }
+                .density-medium th { padding: 3px 2px; font-size: 9px; }
+                .density-medium td { padding: 2px 2px; }
+                .density-medium .name-cell { font-size: 10.5px; }
+                .density-medium .header h1 { font-size: 18px; margin: 2px 0; }
+                .density-medium .project-title-box { font-size: 12.5px; padding: 3px 12px; }
+                .density-medium .logo-img { max-height: 42px; }
+
+                .density-compact table { font-size: 8px; line-height: 1.15; }
+                .density-compact th { padding: 2px 2px; font-size: 8px; }
+                .density-compact td { padding: 1.5px 1.5px; }
+                .density-compact .name-cell { font-size: 9.5px; }
+                .density-compact .header { margin-bottom: 3px; padding-bottom: 4px; }
+                .density-compact .header h1 { font-size: 16px; margin: 1px 0; }
+                .density-compact .project-title-box { font-size: 11px; padding: 2px 10px; }
+                .density-compact .logo-img { max-height: 35px; }
+                .density-compact .header p { font-size: 11px; }
+
+                /* SUMMARY BAR */
+                .summary { 
+                    display: flex; 
+                    justify-content: space-between; 
+                    font-size: 12.5px; 
+                    margin-bottom: 6px; 
+                    font-weight: bold; 
+                    border: 1px solid #000; 
+                    padding: 5px 12px; 
+                    background: #fafafa !important;
+                    page-break-inside: avoid !important;
+                    break-inside: avoid !important;
+                    flex-shrink: 0;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
+                .density-compact .summary {
+                    font-size: 11px;
+                    padding: 3px 8px;
+                    margin-bottom: 4px;
+                }
+
+                /* SIGNATURES */
                 .signatures { 
                     display: flex; 
                     justify-content: space-between; 
-                    margin-top: auto; 
-                    padding-top: 10px; 
+                    margin-top: 0; 
+                    padding-top: 4px; 
+                    page-break-inside: avoid !important;
+                    break-inside: avoid !important;
+                    flex-shrink: 0;
                 }
                 .sig-box { 
                     text-align: center; 
                     width: 15%; 
-                    font-size: 12px; 
+                    font-size: 11.5px; 
                     font-weight: bold; 
+                    page-break-inside: avoid !important;
+                    break-inside: avoid !important;
                 }
                 .sig-line { 
                     border-bottom: 1px solid #000; 
-                    margin-top: 30px; 
+                    margin-top: 22px; 
                 }
+                .density-snug .sig-line { margin-top: 18px; }
+                .density-medium .sig-line { margin-top: 15px; }
+                .density-compact .sig-line { margin-top: 12px; }
+                .density-compact .sig-box { font-size: 10px; }
             </style>
         </head>
         <body>
@@ -11225,8 +11378,33 @@ document.addEventListener('click', (e) => {
         
         for (const [name, stats] of Object.entries(workerStats)) {
             stats.records.sort((a, b) => a.date.localeCompare(b.date));
+            const rowCount = stats.records.length;
             
-            let recordsHtml = '<table><thead><tr><th>م</th><th>الاسم</th><th>النوع</th><th>التاريخ</th><th>المشروع</th><th>مكان العمل</th><th>بند العمل (بالتفصيل)</th><th>خصم على مقاول<br><span style="font-size:0.85em; font-weight:normal;">(اسم المقاول)</span></th><th>الملاحظات</th><th>سعر الساعة</th><th>ساعات العمل</th><th>خصم</th><th>صافية اليومية</th></tr></thead><tbody>';
+            let densityClass = 'density-normal';
+            if (rowCount > 22) densityClass = 'density-compact';
+            else if (rowCount > 14) densityClass = 'density-medium';
+            else if (rowCount > 8) densityClass = 'density-snug';
+
+            let recordsHtml = `<table>
+                <thead>
+                    <tr>
+                        <th style="width: 3%;">م</th>
+                        <th style="width: 11%;">الاسم</th>
+                        <th style="width: 13%;">النوع</th>
+                        <th style="width: 9%;">التاريخ</th>
+                        <th style="width: 7%;">المشروع</th>
+                        <th style="width: 8%;">مكان العمل</th>
+                        <th style="width: 17%;">بند العمل (بالتفصيل)</th>
+                        <th style="width: 9%;">خصم على مقاول<br><span style="font-size:0.85em; font-weight:normal;">(اسم المقاول)</span></th>
+                        <th style="width: 7%;">الملاحظات</th>
+                        <th style="width: 5.5%;">سعر الساعة</th>
+                        <th style="width: 4.5%;">ساعات العمل</th>
+                        <th style="width: 4%;">خصم</th>
+                        <th style="width: 6%;">صافية اليومية</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
             stats.records.forEach((r, index) => {
                 recordsHtml += '<tr>';
                 // Serial
@@ -11234,20 +11412,20 @@ document.addEventListener('click', (e) => {
                 
                 // Name (rowspan)
                 if (index === 0) {
-                    recordsHtml += `<td rowspan="${stats.records.length}" style="vertical-align: middle; font-weight: bold; font-size: 13px;">${name}</td>`;
+                    recordsHtml += `<td rowspan="${stats.records.length}" class="rowspan-cell name-cell">${name}</td>`;
                 }
                 
                 // Type (rowspan)
                 if (index === 0) {
-                    recordsHtml += `<td rowspan="${stats.records.length}" style="vertical-align: middle; font-size: 12px;">${r.type}</td>`;
+                    recordsHtml += `<td rowspan="${stats.records.length}" class="rowspan-cell">${r.type}</td>`;
                 }
                 
                 // Date
-                recordsHtml += `<td>${r.date}</td>`;
+                recordsHtml += `<td style="white-space: nowrap;">${r.date}</td>`;
                 
                 // Project (rowspan)
                 if (index === 0) {
-                    recordsHtml += `<td rowspan="${stats.records.length}" style="vertical-align: middle; font-weight: bold; font-size: 13px;">The Curve</td>`;
+                    recordsHtml += `<td rowspan="${stats.records.length}" class="rowspan-cell">The Curve</td>`;
                 }
                 
                 // Location
@@ -11260,7 +11438,7 @@ document.addEventListener('click', (e) => {
                 recordsHtml += `<td>${r.contractor || '-'}</td>`;
                 
                 // Notes
-                recordsHtml += `<td>${r.notes}</td>`;
+                recordsHtml += `<td>${r.notes || ''}</td>`;
                 
                 // Hourly Rate (Gross / 8)
                 const hourlyRate = (r.gross / 8).toFixed(2);
@@ -11280,15 +11458,17 @@ document.addEventListener('click', (e) => {
             recordsHtml += '</tbody></table>';
             
             printHtml += `
-            <div class="receipt-page">
+            <div class="receipt-page ${densityClass}">
                 <div class="header">
-                    <img src="/logo.png?v=2" class="logo-img" alt="Logo">
+                    <img src="/logo.png?v=2" class="logo-img" alt="Logo" onerror="this.style.display='none'">
                     <div class="project-title-box">Cornerstone Development - Project: The Curve</div>
                     <h1>سركي العامل</h1>
                     <p>${dateRange}</p>
                 </div>
                 
-                ${recordsHtml}
+                <div class="table-container">
+                    ${recordsHtml}
+                </div>
                 
                 <div class="summary">
                     <div>إجمالي عدد اليوميات: ${stats.days} يوم</div>
@@ -11337,12 +11517,29 @@ document.addEventListener('click', (e) => {
         
         iframe.onload = function() {
             setTimeout(() => {
+                try {
+                    // Fail-safe auto-fit: check if any page exceeds printable height and scale down smoothly if needed
+                    const doc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (doc) {
+                        const pages = doc.querySelectorAll('.receipt-page');
+                        pages.forEach(p => {
+                            if (p.scrollHeight > p.clientHeight + 2) {
+                                const ratio = (p.clientHeight - 4) / p.scrollHeight;
+                                p.style.transformOrigin = 'top center';
+                                p.style.transform = `scale(${ratio})`;
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.warn("Print auto-fit check notice:", e);
+                }
+
                 iframe.contentWindow.focus();
                 iframe.contentWindow.print();
                 setTimeout(() => {
                     document.body.removeChild(iframe);
                 }, 5000); // Cleanup after a delay
-            }, 500); // Wait for images to render
+            }, 500); // Wait for fonts and images to render
         };
     };
 
