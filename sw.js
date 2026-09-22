@@ -1,4 +1,4 @@
-// Service Worker v5.2 - Push only, native network routing
+// Service Worker v5.3 - Push only, native network routing
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
