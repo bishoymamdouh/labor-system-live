@@ -4419,7 +4419,9 @@ class UI {
             workers.forEach(w => {
                 const record = recordsMap[w.recordId];
                 if(record && record.status === 'approved') {
-                    const supervisorName = (usersMap[record.supervisorId] && usersMap[record.supervisorId].username) ? usersMap[record.supervisorId].username : 'غير معروف';
+                    const supUser = usersMap[record.supervisorId];
+                    const supervisorName = (supUser && supUser.username) ? (supUser.username === 'admin' ? 'Bishoy Mamdouh' : supUser.username) : 'غير معروف';
+                    const supervisorRole = supUser ? (supUser.role || '') : '';
                     const engineerName = (usersMap[record.engineerId] && usersMap[record.engineerId].username) ? usersMap[record.engineerId].username : 'غير معروف';
                     const amount = Number(w.amount) || 0;
                     const deduction = Number(w.deduction) || 0;
@@ -4434,7 +4436,7 @@ class UI {
                         <tr>
                             <td><strong>${w.name || ''}</strong></td>
                             <td><span class="cell-type-text" title="${w.type || ''}">${w.type || ''}</span></td>
-                            <td>${supervisorName}</td>
+                            <td data-role="${supervisorRole}">${supervisorName}</td>
                             <td style="white-space: nowrap;">${record.date || ''}</td>
                             <td>${amount}</td>
                             <td>${deduction}</td>
@@ -11111,7 +11113,7 @@ document.addEventListener('click', (e) => {
         };
     };
 
-    window.printWorkerReceipts = function() {
+    window.printWorkerReceipts = async function() {
         const rows = Array.from(document.querySelectorAll('#report-results-list tr'));
         const visibleRows = rows.filter(r => r.style.display !== 'none');
         
@@ -11119,13 +11121,65 @@ document.addEventListener('click', (e) => {
             alert('لا توجد بيانات للطباعة');
             return;
         }
+
+        // Fetch users to accurately determine roles
+        let usersList = [];
+        try {
+            usersList = await db.getAll('users');
+        } catch(e) {
+            console.warn("Could not fetch users in printWorkerReceipts", e);
+        }
+
+        const roleByUsername = {};
+        if (Array.isArray(usersList)) {
+            usersList.forEach(u => {
+                const r = (u.role || '').trim().toLowerCase();
+                if (u.username) {
+                    roleByUsername[u.username.trim().toLowerCase()] = r;
+                }
+                if (u.username === 'admin') {
+                    roleByUsername['bishoy mamdouh'] = 'admin';
+                }
+            });
+        }
+
+        const ALLOWED_SUPERVISOR_ROLES = new Set([
+            'supervisor', 
+            'warehouse_manager', 
+            'surveyor', 
+            'operator_supervisor'
+        ]);
+
+        function isEligibleSupervisor(supName, cellRole) {
+            if (!supName || supName === '-' || supName === 'غير معروف') return false;
+            const norm = supName.trim().toLowerCase();
+            if (norm === 'admin' || norm === 'bishoy mamdouh') return false;
+            
+            // Check cell role first if attached
+            if (cellRole) {
+                const cr = cellRole.trim().toLowerCase();
+                if (cr === 'admin' || cr === 'engineer') return false;
+                if (ALLOWED_SUPERVISOR_ROLES.has(cr)) return true;
+            }
+            
+            // Check database role
+            const dbRole = roleByUsername[norm];
+            if (dbRole) {
+                if (dbRole === 'admin' || dbRole === 'engineer') return false;
+                if (ALLOWED_SUPERVISOR_ROLES.has(dbRole)) return true;
+            }
+
+            return false;
+        }
         
         const workerStats = {};
         
         visibleRows.forEach(row => {
             const name = row.cells[0].innerText.trim();
             const type = row.cells[1].innerText.trim();
-            const supervisor = row.cells[2] ? row.cells[2].innerText.trim() : '';
+            const supervisorCell = row.cells[2];
+            const supervisor = supervisorCell ? supervisorCell.innerText.trim() : '';
+            const cellRole = supervisorCell ? (supervisorCell.getAttribute('data-role') || '') : '';
             const date = row.cells[3].innerText.trim();
             const grossAmount = parseFloat(row.cells[4].innerText.replace(/,/g, '').trim()) || 0;
             const deduction = parseFloat(row.cells[5].innerText.replace(/,/g, '').trim()) || 0;
@@ -11136,13 +11190,20 @@ document.addEventListener('click', (e) => {
             const notes = row.cells[11] ? row.cells[11].innerText.trim() : '';
             
             if (!workerStats[name]) {
-                workerStats[name] = { days: 0, totalNet: 0, records: [], supervisors: new Set() };
+                workerStats[name] = { 
+                    days: 0, 
+                    totalNet: 0, 
+                    records: [], 
+                    supervisorCounts: {} 
+                };
             }
             workerStats[name].days += 1;
             workerStats[name].totalNet += netAmount;
-            if (supervisor && supervisor !== '-' && supervisor !== 'غير معروف') {
-                workerStats[name].supervisors.add(supervisor);
+            
+            if (isEligibleSupervisor(supervisor, cellRole)) {
+                workerStats[name].supervisorCounts[supervisor] = (workerStats[name].supervisorCounts[supervisor] || 0) + 1;
             }
+
             workerStats[name].records.push({
                 type: type,
                 date: date,
@@ -11466,8 +11527,15 @@ document.addEventListener('click', (e) => {
             });
             recordsHtml += '</tbody></table>';
             
-            const supList = stats.supervisors ? Array.from(stats.supervisors) : [];
-            const supervisorDisplay = supList.length > 0 ? supList.join(' / ') : '';
+            // Choose the single supervisor with the highest count (most days registered)
+            let chosenSupervisor = '';
+            let maxCount = -1;
+            for (const [sup, count] of Object.entries(stats.supervisorCounts || {})) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    chosenSupervisor = sup;
+                }
+            }
 
             printHtml += `
             <div class="receipt-page ${densityClass}">
@@ -11475,7 +11543,7 @@ document.addEventListener('click', (e) => {
                     <img src="/logo.png?v=2" class="logo-img" alt="Logo" onerror="this.style.display='none'">
                     <div class="project-title-box">Cornerstone Development - Project: The Curve</div>
                     <h1>سركي العامل</h1>
-                    <p>${dateRange}${supervisorDisplay ? ` &nbsp;&nbsp;|&nbsp;&nbsp; المشرف: <strong>${supervisorDisplay}</strong>` : ''}</p>
+                    <p>${dateRange}${chosenSupervisor ? ` &nbsp;&nbsp;|&nbsp;&nbsp; المشرف: <strong>${chosenSupervisor}</strong>` : ''}</p>
                 </div>
                 
                 <div class="table-container">
@@ -11483,7 +11551,7 @@ document.addEventListener('click', (e) => {
                 </div>
                 
                 <div class="summary">
-                    ${supervisorDisplay ? `<div>المشرف المسؤول: <span>${supervisorDisplay}</span></div>` : ''}
+                    ${chosenSupervisor ? `<div>المشرف المسؤول: <span>${chosenSupervisor}</span></div>` : ''}
                     <div>إجمالي عدد اليوميات: ${stats.days} يوم</div>
                     <div>إجمالي المبلغ المستحق: ${stats.totalNet.toLocaleString()} جنيه</div>
                 </div>
