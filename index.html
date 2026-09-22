@@ -11164,7 +11164,7 @@ document.addEventListener('click', (e) => {
                 @media print {
                     @page { 
                         size: A4 landscape; 
-                        margin: 0.4cm 1.1cm; 
+                        margin: 0.4cm 1.8cm; 
                     }
                     html, body {
                         margin: 0 !important;
@@ -11203,7 +11203,7 @@ document.addEventListener('click', (e) => {
                     width: 100%; 
                     height: 100%;
                     max-height: 196mm;
-                    padding: 0.2cm 0.4cm; 
+                    padding: 0.2cm 0.6cm; 
                     box-sizing: border-box; 
                     display: flex; 
                     flex-direction: column; 
@@ -11217,9 +11217,9 @@ document.addEventListener('click', (e) => {
                 .header { 
                     position: relative; 
                     text-align: center; 
-                    margin-bottom: 8px; 
+                    margin-bottom: 10px; 
                     border-bottom: 2px solid #000; 
-                    padding-bottom: 8px; 
+                    padding-bottom: 10px; 
                     page-break-inside: avoid;
                     break-inside: avoid;
                     flex-shrink: 0;
@@ -11261,7 +11261,7 @@ document.addEventListener('click', (e) => {
                     flex: 1 1 auto;
                     display: flex;
                     align-items: flex-start;
-                    margin-bottom: 8px;
+                    margin-bottom: 10px;
                     page-break-inside: avoid;
                     break-inside: avoid;
                     overflow: hidden;
@@ -11279,7 +11279,7 @@ document.addEventListener('click', (e) => {
                     text-align: center; 
                     vertical-align: middle; 
                     word-wrap: break-word; 
-                    line-height: 1.35;
+                    line-height: 1.4;
                 }
                 th { 
                     background-color: #f1f1f1 !important; 
@@ -11293,17 +11293,17 @@ document.addEventListener('click', (e) => {
                 }
 
                 /* DENSITY TIERS FOR FIT-TO-PAPER */
-                /* Normal (1-8 rows): Generous vertical cell height */
-                .density-normal table { font-size: 11px; }
-                .density-normal th { padding: 9px 4px; }
-                .density-normal td { padding: 8.5px 4px; }
-                .density-normal .name-cell { font-size: 13px; }
+                /* Normal (1-8 rows): Extra generous vertical cell height */
+                .density-normal table { font-size: 12px; }
+                .density-normal th { padding: 14px 6px; font-size: 12.5px; }
+                .density-normal td { padding: 13.5px 6px; }
+                .density-normal .name-cell { font-size: 14px; }
 
                 /* Snug (9-14 rows) */
-                .density-snug table { font-size: 10px; }
-                .density-snug th { padding: 6px 3px; font-size: 10px; }
-                .density-snug td { padding: 5.5px 3px; }
-                .density-snug .name-cell { font-size: 11.5px; }
+                .density-snug table { font-size: 10.5px; }
+                .density-snug th { padding: 7.5px 4px; font-size: 11px; }
+                .density-snug td { padding: 7px 4px; }
+                .density-snug .name-cell { font-size: 12.5px; }
 
                 /* Medium (15-22 rows) */
                 .density-medium table { font-size: 9px; }
@@ -11329,11 +11329,11 @@ document.addEventListener('click', (e) => {
                 .summary { 
                     display: flex; 
                     justify-content: space-between; 
-                    font-size: 12.5px; 
-                    margin-bottom: 8px; 
+                    font-size: 13px; 
+                    margin-bottom: 10px; 
                     font-weight: bold; 
                     border: 1px solid #000; 
-                    padding: 6px 14px; 
+                    padding: 8px 16px; 
                     background: #fafafa !important;
                     page-break-inside: avoid !important;
                     break-inside: avoid !important;
@@ -11367,9 +11367,9 @@ document.addEventListener('click', (e) => {
                 }
                 .sig-line { 
                     border-bottom: 1px solid #000; 
-                    margin-top: 24px; 
+                    margin-top: 28px; 
                 }
-                .density-snug .sig-line { margin-top: 18px; }
+                .density-snug .sig-line { margin-top: 20px; }
                 .density-medium .sig-line { margin-top: 15px; }
                 .density-compact .sig-line { margin-top: 12px; }
                 .density-compact .sig-box { font-size: 10px; }
