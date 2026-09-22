@@ -11125,6 +11125,7 @@ document.addEventListener('click', (e) => {
         visibleRows.forEach(row => {
             const name = row.cells[0].innerText.trim();
             const type = row.cells[1].innerText.trim();
+            const supervisor = row.cells[2] ? row.cells[2].innerText.trim() : '';
             const date = row.cells[3].innerText.trim();
             const grossAmount = parseFloat(row.cells[4].innerText.replace(/,/g, '').trim()) || 0;
             const deduction = parseFloat(row.cells[5].innerText.replace(/,/g, '').trim()) || 0;
@@ -11135,10 +11136,13 @@ document.addEventListener('click', (e) => {
             const notes = row.cells[11] ? row.cells[11].innerText.trim() : '';
             
             if (!workerStats[name]) {
-                workerStats[name] = { days: 0, totalNet: 0, records: [] };
+                workerStats[name] = { days: 0, totalNet: 0, records: [], supervisors: new Set() };
             }
             workerStats[name].days += 1;
             workerStats[name].totalNet += netAmount;
+            if (supervisor && supervisor !== '-' && supervisor !== 'غير معروف') {
+                workerStats[name].supervisors.add(supervisor);
+            }
             workerStats[name].records.push({
                 type: type,
                 date: date,
@@ -11329,6 +11333,7 @@ document.addEventListener('click', (e) => {
                 .summary { 
                     display: flex; 
                     justify-content: space-between; 
+                    align-items: center;
                     font-size: 13px; 
                     margin-bottom: 10px; 
                     font-weight: bold; 
@@ -11461,13 +11466,16 @@ document.addEventListener('click', (e) => {
             });
             recordsHtml += '</tbody></table>';
             
+            const supList = stats.supervisors ? Array.from(stats.supervisors) : [];
+            const supervisorDisplay = supList.length > 0 ? supList.join(' / ') : '';
+
             printHtml += `
             <div class="receipt-page ${densityClass}">
                 <div class="header">
                     <img src="/logo.png?v=2" class="logo-img" alt="Logo" onerror="this.style.display='none'">
                     <div class="project-title-box">Cornerstone Development - Project: The Curve</div>
                     <h1>سركي العامل</h1>
-                    <p>${dateRange}</p>
+                    <p>${dateRange}${supervisorDisplay ? ` &nbsp;&nbsp;|&nbsp;&nbsp; المشرف: <strong>${supervisorDisplay}</strong>` : ''}</p>
                 </div>
                 
                 <div class="table-container">
@@ -11475,6 +11483,7 @@ document.addEventListener('click', (e) => {
                 </div>
                 
                 <div class="summary">
+                    ${supervisorDisplay ? `<div>المشرف المسؤول: <span>${supervisorDisplay}</span></div>` : ''}
                     <div>إجمالي عدد اليوميات: ${stats.days} يوم</div>
                     <div>إجمالي المبلغ المستحق: ${stats.totalNet.toLocaleString()} جنيه</div>
                 </div>
