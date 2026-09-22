@@ -1,7 +1,24 @@
 import ExcelJS from "npm:exceljs";
 
 const BACKUP_DIR = "D:\\B I S H O Y\\PROTECT\\11- سراكى العمال\\labor-management-app\\backups";
-const dateStr = new Date().toISOString().split("T")[0];
+function getCairoDateStr(): string {
+    try {
+        const dtf = new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Africa/Cairo",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        });
+        const parts = dtf.formatToParts(new Date());
+        const map: any = {};
+        parts.forEach(p => map[p.type] = p.value);
+        return `${map.year}-${map.month}-${map.day}`;
+    } catch (_e) {
+        return new Date().toISOString().split("T")[0];
+    }
+}
+
+const dateStr = getCairoDateStr();
 
 console.log(`Starting backup for date: ${dateStr}...`);
 

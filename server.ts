@@ -462,7 +462,7 @@ async function handler(req: Request): Promise<Response> {
                 onExcelExport: true,
                 onRecordApprove: true,
                 dailyAuto: true,
-                dailyTime: "23:00",
+                dailyTime: "13:00",
                 frequency: "daily",
                 destinations: {
                     download: true,
@@ -1319,7 +1319,8 @@ async function performDailyBackup() {
         const folderPath = (config.destinations?.folderPath && config.destinations.folderPath !== "./backups")
             ? config.destinations.folderPath
             : defaultFolder;
-        const dateStr = new Date().toISOString().split("T")[0];
+        const cairo = getCairoTimeParts();
+        const dateStr = cairo.dateStr;
         const exportData: any = {};
         for await (const entry of kv.list({ prefix: [] })) {
             const collection = entry.key[0];
@@ -1577,21 +1578,30 @@ async function runNotificationTasks(forceRun = false) {
 }
 
 // Check notifications and daily backup every 60 seconds
-let lastCheckedBackupHour = -1;
 setInterval(async () => {
     runNotificationTasks().catch(e => console.error("Periodic notification runner error:", e));
 
     try {
         if (!isDeploy && kv) {
-            const now = new Date();
-            const currentHour = now.getHours();
-            const currentDateStr = now.toISOString().split("T")[0];
-            
-            // Check once per hour if today's backup has been performed
-            if (currentHour !== lastCheckedBackupHour) {
-                lastCheckedBackupHour = currentHour;
+            const cairo = getCairoTimeParts();
+            const currentCairoMinutes = cairo.hour * 60 + cairo.minute;
+
+            const configEntry = await kv.get(["system", "backupConfig"]);
+            const config: any = configEntry?.value || {};
+            const autoActive = config.autoBackupActive !== false;
+            const dailyAuto = config.dailyAuto !== false;
+
+            if (autoActive && dailyAuto) {
+                const targetTimeStr = config.dailyTime || "13:00";
+                const targetMins = parseTimeToMinutes(targetTimeStr);
+
                 const lastDateEntry = await kv.get(["system", "lastBackupDate"]);
-                if (lastDateEntry?.value !== currentDateStr) {
+                const lastBackupDate = lastDateEntry?.value;
+
+                // Trigger scheduled daily backup if today's backup has not yet run,
+                // and current Cairo time has reached or passed the scheduled time (13:00)
+                if (lastBackupDate !== cairo.dateStr && currentCairoMinutes >= targetMins) {
+                    console.log(`[Scheduled Backup] Cairo time (${cairo.hour}:${cairo.minute < 10 ? '0' + cairo.minute : cairo.minute}) reached target time (${targetTimeStr}). Executing daily backup...`);
                     await performDailyBackup();
                 }
             }
@@ -1612,7 +1622,6 @@ if (typeof (Deno as any).cron === "function") {
     }
 }
 
-performDailyBackup();
 console.log("Server running on http://localhost:8000");
 Deno.serve({ port: 8000 }, handler);
 

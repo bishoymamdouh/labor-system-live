@@ -1851,7 +1851,7 @@ select {
                                 <div style="display: flex; flex-direction: column; gap: 10px;">
                                     <div>
                                         <label style="display: block; font-size: 0.84rem; font-weight: bold; margin-bottom: 4px; color: var(--text-main);">توقيت النسخ اليومي المنتظم:</label>
-                                        <input type="time" id="backup-schedule-time" value="23:00" onchange="app.saveBackupConfig()" style="width: 100%; box-sizing: border-box; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); font-size: 0.9rem; font-weight: bold;">
+                                        <input type="time" id="backup-schedule-time" value="13:00" onchange="app.saveBackupConfig()" style="width: 100%; box-sizing: border-box; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-main); font-size: 0.9rem; font-weight: bold;">
                                     </div>
                                     <div>
                                         <label style="display: block; font-size: 0.84rem; font-weight: bold; margin-bottom: 4px; color: var(--text-main);">تكرار النسخ التلقائي:</label>
@@ -6684,7 +6684,7 @@ document.addEventListener('keydown', (e) => {
                 const trigExcel = document.getElementById('backup-trigger-excel');
                 const trigApprove = document.getElementById('backup-trigger-approve');
 
-                if (schedTime) schedTime.value = config.dailyTime || '23:00';
+                if (schedTime) schedTime.value = config.dailyTime || '13:00';
                 if (frequency) frequency.value = config.frequency || 'daily';
                 if (trigExcel) trigExcel.checked = config.onExcelExport !== false;
                 if (trigApprove) trigApprove.checked = config.onRecordApprove !== false;
@@ -6738,7 +6738,7 @@ document.addEventListener('keydown', (e) => {
                     folderPath: document.getElementById('backup-folder-path')?.value?.trim() || 'D:\\B I S H O Y\\PROTECT\\11- سراكى العمال\\labor-management-app\\backups',
                     cloud: document.getElementById('backup-dest-cloud')?.checked !== false
                 },
-                dailyTime: document.getElementById('backup-schedule-time')?.value || '23:00',
+                dailyTime: document.getElementById('backup-schedule-time')?.value || '13:00',
                 frequency: document.getElementById('backup-frequency')?.value || 'daily',
                 onExcelExport: document.getElementById('backup-trigger-excel')?.checked !== false,
                 onRecordApprove: document.getElementById('backup-trigger-approve')?.checked !== false,
