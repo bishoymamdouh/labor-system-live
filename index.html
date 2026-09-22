@@ -10252,11 +10252,64 @@ document.addEventListener('click', (e) => {
         }
 
         try {
+            // Fetch users to accurately determine roles
+            let usersList = [];
+            try {
+                usersList = await db.getAll('users');
+            } catch(e) {
+                console.warn("Could not fetch users in exportWorkerReceiptsExcel", e);
+            }
+
+            const roleByUsername = {};
+            if (Array.isArray(usersList)) {
+                usersList.forEach(u => {
+                    const r = (u.role || '').trim().toLowerCase();
+                    if (u.username) {
+                        roleByUsername[u.username.trim().toLowerCase()] = r;
+                    }
+                    if (u.username === 'admin') {
+                        roleByUsername['bishoy mamdouh'] = 'admin';
+                    }
+                });
+            }
+
+            const ALLOWED_SUPERVISOR_ROLES = new Set([
+                'supervisor', 
+                'warehouse_manager', 
+                'surveyor', 
+                'operator_supervisor'
+            ]);
+
+            function isEligibleSupervisor(supName, cellRole) {
+                if (!supName || supName === '-' || supName === 'غير معروف') return false;
+                const norm = supName.trim().toLowerCase();
+                if (norm === 'admin' || norm === 'bishoy mamdouh') return false;
+                
+                // Check cell role first if attached
+                if (cellRole) {
+                    const cr = cellRole.trim().toLowerCase();
+                    if (cr === 'admin' || cr === 'engineer') return false;
+                    if (ALLOWED_SUPERVISOR_ROLES.has(cr)) return true;
+                }
+                
+                // Check database role
+                const dbRole = roleByUsername[norm];
+                if (dbRole) {
+                    if (dbRole === 'admin' || dbRole === 'engineer') return false;
+                    if (ALLOWED_SUPERVISOR_ROLES.has(dbRole)) return true;
+                }
+
+                return false;
+            }
+
             const workerStats = {};
             
             visibleRows.forEach(row => {
                 const name = row.cells[0].innerText.trim();
                 const type = row.cells[1].innerText.trim();
+                const supervisorCell = row.cells[2];
+                const supervisor = supervisorCell ? supervisorCell.innerText.trim() : '';
+                const cellRole = supervisorCell ? (supervisorCell.getAttribute('data-role') || '') : '';
                 const date = row.cells[3].innerText.trim();
                 const grossAmount = parseFloat(row.cells[4].innerText.replace(/,/g, '').trim()) || 0;
                 const deduction = parseFloat(row.cells[5].innerText.replace(/,/g, '').trim()) || 0;
@@ -10267,10 +10320,19 @@ document.addEventListener('click', (e) => {
                 const notes = row.cells[11] ? row.cells[11].innerText.trim() : '';
                 
                 if (!workerStats[name]) {
-                    workerStats[name] = { type: type, days: 0, totalNet: 0, records: [] };
+                    workerStats[name] = { 
+                        type: type, 
+                        days: 0, 
+                        totalNet: 0, 
+                        records: [],
+                        supervisorCounts: {}
+                    };
                 }
                 workerStats[name].days += 1;
                 workerStats[name].totalNet += netAmount;
+                if (isEligibleSupervisor(supervisor, cellRole)) {
+                    workerStats[name].supervisorCounts[supervisor] = (workerStats[name].supervisorCounts[supervisor] || 0) + 1;
+                }
                 workerStats[name].records.push({
                     type: type,
                     date: date,
@@ -10301,6 +10363,16 @@ document.addEventListener('click', (e) => {
 
             for (const [name, stats] of Object.entries(workerStats)) {
                 stats.records.sort((a, b) => a.date.localeCompare(b.date));
+                
+                // Choose the single supervisor with the highest count (most days registered)
+                let chosenSupervisor = '';
+                let maxCount = -1;
+                for (const [sup, count] of Object.entries(stats.supervisorCounts || {})) {
+                    if (count > maxCount) {
+                        maxCount = count;
+                        chosenSupervisor = sup;
+                    }
+                }
                 
                 let safeName = name.replace(/[\*\?\:\[\]\\\/]/g, '').substring(0, 31);
                 let sheetName = safeName || "سركى";
@@ -10374,10 +10446,10 @@ document.addEventListener('click', (e) => {
                 titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
                 ws.getRow(2).height = 36;
 
-                // Row 3: Date range
+                // Row 3: Date range and supervisor
                 ws.mergeCells('A3:M3');
                 const dateCell = ws.getCell('A3');
-                dateCell.value = dateRange;
+                dateCell.value = dateRange + (chosenSupervisor ? '   |   المشرف: ' + chosenSupervisor : '');
                 dateCell.font = { name: 'Cairo', size: 12, bold: true, color: { argb: 'FF333333' } };
                 dateCell.alignment = { vertical: 'middle', horizontal: 'center' };
                 ws.getRow(3).height = 22;
@@ -10476,34 +10548,61 @@ document.addEventListener('click', (e) => {
                 const sumRow = sumGapRow + 1;
                 ws.getRow(sumRow).height = 30;
 
-                // Right side: Days (A to F in RTL)
-                ws.mergeCells(`A${sumRow}:F${sumRow}`);
-                const sumDays = ws.getCell(`A${sumRow}`);
-                sumDays.value = 'إجمالي عدد اليوميات: ' + stats.days + ' يوم';
-                sumDays.font = { name: 'Cairo', size: 12, bold: true };
-                sumDays.alignment = { vertical: 'middle', horizontal: 'right' };
+                // 1. المشرف المسؤول: A:B (label), C (value)
+                ws.mergeCells(`A${sumRow}:B${sumRow}`);
+                const supLabel = ws.getCell(`A${sumRow}`);
+                supLabel.value = 'المشرف المسؤول:';
+                supLabel.font = { name: 'Cairo', size: 11, bold: true, color: { argb: 'FF333333' } };
+                supLabel.alignment = { vertical: 'middle', horizontal: 'center' };
+                supLabel.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF5F7FA' } };
 
-                // Left side: Amount (G to M in RTL)
-                ws.mergeCells(`G${sumRow}:M${sumRow}`);
-                const sumNet = ws.getCell(`G${sumRow}`);
-                sumNet.value = 'إجمالي المبلغ المستحق: ' + stats.totalNet.toLocaleString() + ' جنيه';
-                sumNet.font = { name: 'Cairo', size: 12, bold: true };
-                sumNet.alignment = { vertical: 'middle', horizontal: 'left' };
+                const supVal = ws.getCell(`C${sumRow}`);
+                supVal.value = chosenSupervisor || 'غير محدد';
+                supVal.font = { name: 'Cairo', size: 12, bold: true, color: { argb: 'FF003366' } };
+                supVal.alignment = { vertical: 'middle', horizontal: 'center' };
+                supVal.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
 
-                // Outer border for summary box
+                // 2. إجمالي عدد اليوميات: D:F (label), G (value - PURE NUMBER)
+                ws.mergeCells(`D${sumRow}:F${sumRow}`);
+                const daysLabel = ws.getCell(`D${sumRow}`);
+                daysLabel.value = 'إجمالي عدد اليوميات:';
+                daysLabel.font = { name: 'Cairo', size: 11, bold: true, color: { argb: 'FF333333' } };
+                daysLabel.alignment = { vertical: 'middle', horizontal: 'center' };
+                daysLabel.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF5F7FA' } };
+
+                const daysVal = ws.getCell(`G${sumRow}`);
+                daysVal.value = stats.days;
+                daysVal.numFmt = '#,##0';
+                daysVal.font = { name: 'Cairo', size: 13, bold: true, color: { argb: 'FF000000' } };
+                daysVal.alignment = { vertical: 'middle', horizontal: 'center' };
+                daysVal.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
+
+                // 3. إجمالي المبلغ المستحق: H:L (label), M (value - PURE NUMBER in Net Amount column)
+                ws.mergeCells(`H${sumRow}:L${sumRow}`);
+                const amountLabel = ws.getCell(`H${sumRow}`);
+                amountLabel.value = 'إجمالي المبلغ المستحق (جنيه):';
+                amountLabel.font = { name: 'Cairo', size: 11, bold: true, color: { argb: 'FF333333' } };
+                amountLabel.alignment = { vertical: 'middle', horizontal: 'center' };
+                amountLabel.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF5F7FA' } };
+
+                const amountVal = ws.getCell(`M${sumRow}`);
+                amountVal.value = stats.totalNet;
+                amountVal.numFmt = '#,##0';
+                amountVal.font = { name: 'Cairo', size: 13, bold: true, color: { argb: 'FF000000' } };
+                amountVal.alignment = { vertical: 'middle', horizontal: 'center' };
+                amountVal.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
+
+                // Borders for summary box
                 for (let c = 1; c <= 13; c++) {
                     const cell = ws.getRow(sumRow).getCell(c);
-                    const b = {
+                    cell.border = {
                         top: { style: 'medium', color: { argb: 'FF000000' } },
-                        bottom: { style: 'medium', color: { argb: 'FF000000' } }
+                        bottom: { style: 'medium', color: { argb: 'FF000000' } },
+                        left: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+                        right: { style: 'thin', color: { argb: 'FFCCCCCC' } }
                     };
-                    if (c === 1) {
-                        b.left = { style: 'medium', color: { argb: 'FF000000' } };
-                    }
-                    if (c === 13) {
-                        b.right = { style: 'medium', color: { argb: 'FF000000' } };
-                    }
-                    cell.border = b;
+                    if (c === 1) cell.border.left = { style: 'medium', color: { argb: 'FF000000' } };
+                    if (c === 13) cell.border.right = { style: 'medium', color: { argb: 'FF000000' } };
                 }
 
                 // Signatures Area
