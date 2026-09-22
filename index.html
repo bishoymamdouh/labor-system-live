@@ -11164,7 +11164,7 @@ document.addEventListener('click', (e) => {
                 @media print {
                     @page { 
                         size: A4 landscape; 
-                        margin: 0.35cm 0.5cm; 
+                        margin: 0.4cm 0.85cm; 
                     }
                     html, body {
                         margin: 0 !important;
@@ -11202,8 +11202,8 @@ document.addEventListener('click', (e) => {
                 .receipt-page { 
                     width: 100%; 
                     height: 100%;
-                    max-height: 198mm;
-                    padding: 0.2cm 0.3cm; 
+                    max-height: 196mm;
+                    padding: 0.2cm 0.35cm; 
                     box-sizing: border-box; 
                     display: flex; 
                     flex-direction: column; 
@@ -11217,7 +11217,7 @@ document.addEventListener('click', (e) => {
                 .header { 
                     position: relative; 
                     text-align: center; 
-                    margin-bottom: 6px; 
+                    margin-bottom: 8px; 
                     border-bottom: 2px solid #000; 
                     padding-bottom: 8px; 
                     page-break-inside: avoid;
@@ -11226,7 +11226,7 @@ document.addEventListener('click', (e) => {
                 }
                 .header h1 { 
                     margin: 4px 0; 
-                    font-size: 20px; 
+                    font-size: 21px; 
                     font-weight: 800; 
                     color: #000;
                 }
@@ -11236,7 +11236,7 @@ document.addEventListener('click', (e) => {
                     padding: 5px 18px;
                     border-radius: 6px;
                     display: inline-block;
-                    font-size: 14px;
+                    font-size: 14.5px;
                     font-weight: bold;
                     margin: 0;
                     border: 1px solid #b8d4f0;
@@ -11261,7 +11261,7 @@ document.addEventListener('click', (e) => {
                     flex: 1 1 auto;
                     display: flex;
                     align-items: flex-start;
-                    margin-bottom: 6px;
+                    margin-bottom: 8px;
                     page-break-inside: avoid;
                     break-inside: avoid;
                     overflow: hidden;
@@ -11279,7 +11279,7 @@ document.addEventListener('click', (e) => {
                     text-align: center; 
                     vertical-align: middle; 
                     word-wrap: break-word; 
-                    line-height: 1.25;
+                    line-height: 1.3;
                 }
                 th { 
                     background-color: #f1f1f1 !important; 
@@ -11293,27 +11293,31 @@ document.addEventListener('click', (e) => {
                 }
 
                 /* DENSITY TIERS FOR FIT-TO-PAPER */
+                /* Normal (1-8 rows): Generous vertical cell height */
                 .density-normal table { font-size: 11px; }
-                .density-normal th { padding: 5px 4px; }
-                .density-normal td { padding: 4px 4px; }
+                .density-normal th { padding: 7.5px 4px; }
+                .density-normal td { padding: 7px 4px; }
                 .density-normal .name-cell { font-size: 13px; }
 
+                /* Snug (9-14 rows) */
                 .density-snug table { font-size: 10px; }
-                .density-snug th { padding: 4px 3px; font-size: 10px; }
-                .density-snug td { padding: 3px 3px; }
+                .density-snug th { padding: 5px 3px; font-size: 10px; }
+                .density-snug td { padding: 4.5px 3px; }
                 .density-snug .name-cell { font-size: 11.5px; }
 
+                /* Medium (15-22 rows) */
                 .density-medium table { font-size: 9px; }
-                .density-medium th { padding: 3px 2px; font-size: 9px; }
-                .density-medium td { padding: 2px 2px; }
+                .density-medium th { padding: 3.5px 2px; font-size: 9px; }
+                .density-medium td { padding: 3px 2px; }
                 .density-medium .name-cell { font-size: 10.5px; }
                 .density-medium .header h1 { font-size: 18px; margin: 2px 0; }
                 .density-medium .project-title-box { font-size: 12.5px; padding: 3px 12px; }
                 .density-medium .logo-img { max-height: 42px; }
 
+                /* Compact (23-31+ rows) */
                 .density-compact table { font-size: 8px; line-height: 1.15; }
-                .density-compact th { padding: 2px 2px; font-size: 8px; }
-                .density-compact td { padding: 1.5px 1.5px; }
+                .density-compact th { padding: 2.5px 2px; font-size: 8px; }
+                .density-compact td { padding: 2px 1.5px; }
                 .density-compact .name-cell { font-size: 9.5px; }
                 .density-compact .header { margin-bottom: 3px; padding-bottom: 4px; }
                 .density-compact .header h1 { font-size: 16px; margin: 1px 0; }
@@ -11326,10 +11330,10 @@ document.addEventListener('click', (e) => {
                     display: flex; 
                     justify-content: space-between; 
                     font-size: 12.5px; 
-                    margin-bottom: 6px; 
+                    margin-bottom: 8px; 
                     font-weight: bold; 
                     border: 1px solid #000; 
-                    padding: 5px 12px; 
+                    padding: 6px 14px; 
                     background: #fafafa !important;
                     page-break-inside: avoid !important;
                     break-inside: avoid !important;
@@ -11363,7 +11367,7 @@ document.addEventListener('click', (e) => {
                 }
                 .sig-line { 
                     border-bottom: 1px solid #000; 
-                    margin-top: 22px; 
+                    margin-top: 24px; 
                 }
                 .density-snug .sig-line { margin-top: 18px; }
                 .density-medium .sig-line { margin-top: 15px; }
