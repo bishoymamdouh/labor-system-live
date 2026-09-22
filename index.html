@@ -10079,7 +10079,7 @@ UI.applyServerMonitorVisibility();
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js?v=5').then(registration => {
+        navigator.serviceWorker.register('/sw.js?v=6').then(registration => {
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
         }, err => {
             console.log('ServiceWorker registration failed: ', err);
@@ -10236,26 +10236,40 @@ document.addEventListener('click', (e) => {
 
     
     window.exportWorkerReceiptsExcel = async function() {
-        const rows = Array.from(document.querySelectorAll('#report-results-list tr'));
-        const visibleRows = rows.filter(r => r.style.display !== 'none' && r.cells.length > 5);
-        
-        if (visibleRows.length === 0) {
-            alert('لا توجد بيانات متاحة للتصدير');
-            return;
-        }
-        
         const submitBtn = document.querySelector('button[onclick="window.exportWorkerReceiptsExcel()"]');
         const originalHtml = submitBtn ? submitBtn.innerHTML : '';
         if (submitBtn) {
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التصدير...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحضير والتصدير...';
             submitBtn.disabled = true;
         }
 
         try {
+            let rows = Array.from(document.querySelectorAll('#report-results-list tr'));
+            let visibleRows = rows.filter(r => r.style.display !== 'none' && r.cells.length > 5);
+            
+            // If report has not been generated yet, try to trigger report generation automatically
+            if (visibleRows.length === 0) {
+                if (window.app && typeof window.app.generateReport === 'function') {
+                    if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تحميل البيانات...';
+                    await window.app.generateReport();
+                    rows = Array.from(document.querySelectorAll('#report-results-list tr'));
+                    visibleRows = rows.filter(r => r.style.display !== 'none' && r.cells.length > 5);
+                }
+            }
+
+            if (visibleRows.length === 0) {
+                alert('لا توجد بيانات متاحة للتصدير. يرجى التأكد من وجود عمالة معتمدة في الفترة المحددة.');
+                return;
+            }
+
             // Fetch users to accurately determine roles
             let usersList = [];
             try {
-                usersList = await db.getAll('users');
+                if (window.app && window.app.db && typeof window.app.db.getAll === 'function') {
+                    usersList = await window.app.db.getAll('users');
+                } else if (typeof db !== 'undefined' && typeof db.getAll === 'function') {
+                    usersList = await db.getAll('users');
+                }
             } catch(e) {
                 console.warn("Could not fetch users in exportWorkerReceiptsExcel", e);
             }
@@ -10305,20 +10319,22 @@ document.addEventListener('click', (e) => {
             const workerStats = {};
             
             visibleRows.forEach(row => {
-                const name = row.cells[0].innerText.trim();
-                const type = row.cells[1].innerText.trim();
+                const name = (row.cells[0]?.innerText || '').trim();
+                const type = (row.cells[1]?.innerText || '').trim();
                 const supervisorCell = row.cells[2];
                 const supervisor = supervisorCell ? supervisorCell.innerText.trim() : '';
                 const cellRole = supervisorCell ? (supervisorCell.getAttribute('data-role') || '') : '';
-                const date = row.cells[3].innerText.trim();
-                const grossAmount = parseFloat(row.cells[4].innerText.replace(/,/g, '').trim()) || 0;
-                const deduction = parseFloat(row.cells[5].innerText.replace(/,/g, '').trim()) || 0;
-                const netAmount = parseFloat(row.cells[6].innerText.replace(/,/g, '').trim()) || 0;
+                const date = (row.cells[3]?.innerText || '').trim();
+                const grossAmount = parseFloat((row.cells[4]?.innerText || '0').replace(/,/g, '').trim()) || 0;
+                const deduction = parseFloat((row.cells[5]?.innerText || '0').replace(/,/g, '').trim()) || 0;
+                const netAmount = parseFloat((row.cells[6]?.innerText || '0').replace(/,/g, '').trim()) || 0;
                 const location = row.cells[8] ? row.cells[8].innerText.trim() : '';
                 const task = row.cells[9] ? row.cells[9].innerText.trim() : '';
                 const contractor = row.cells[10] ? row.cells[10].innerText.trim() : '';
                 const notes = row.cells[11] ? row.cells[11].innerText.trim() : '';
                 
+                if (!name) return;
+
                 if (!workerStats[name]) {
                     workerStats[name] = { 
                         type: type, 
@@ -10345,6 +10361,11 @@ document.addEventListener('click', (e) => {
                     notes: notes
                 });
             });
+
+            if (Object.keys(workerStats).length === 0) {
+                alert('لا توجد بيانات عمالة صالحة للتصدير في النتائج المعروضة.');
+                return;
+            }
 
             const dateRange = document.getElementById('print-date-range') ? document.getElementById('print-date-range').innerText : '';
             const workbook = new ExcelJS.Workbook();
@@ -10374,11 +10395,12 @@ document.addEventListener('click', (e) => {
                     }
                 }
                 
-                let safeName = name.replace(/[\*\?\:\[\]\\\/]/g, '').substring(0, 31);
-                let sheetName = safeName || "سركى";
+                let safeName = name.replace(/[\*\?\:\[\]\\\/]/g, '').trim().substring(0, 31);
+                let baseSheetName = safeName || "سركى";
+                let sheetName = baseSheetName;
                 let counter = 1;
                 while(workbook.getWorksheet(sheetName)) {
-                    sheetName = safeName.substring(0, 27) + '(' + counter + ')';
+                    sheetName = baseSheetName.substring(0, 27) + '(' + counter + ')';
                     counter++;
                 }
 
@@ -10655,18 +10677,32 @@ document.addEventListener('click', (e) => {
 
             const buffer = await workbook.xlsx.writeBuffer();
             const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'سراكى_العمال_' + new Date().toISOString().split('T')[0] + '.xlsx';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
+            const today = new Date().toISOString().split('T')[0];
+            const filename = `سراكى_العمال_${today}.xlsx`;
+
+            if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                window.navigator.msSaveOrOpenBlob(blob, filename);
+            } else {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    if (a.parentNode) document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 60000);
+            }
+
+            if (window.UI && typeof window.UI.notify === 'function') {
+                window.UI.notify('تم تصدير سركي العامل Excel بنجاح', 'success');
+            }
 
         } catch (error) {
             console.error('Excel Export Error:', error);
-            alert('حدث خطأ أثناء تصدير ملف الإكسيل.');
+            alert('حدث خطأ أثناء تصدير ملف الإكسيل: ' + (error.message || error));
         } finally {
             if (submitBtn) {
                 submitBtn.innerHTML = originalHtml;
@@ -10961,14 +10997,28 @@ document.addEventListener('click', (e) => {
         // Download file
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'تقرير_خصومات_المقاولين_' + new Date().toISOString().split('T')[0] + '.xlsx';
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        const today = new Date().toISOString().split('T')[0];
+        const filename = `تقرير_خصومات_المقاولين_${today}.xlsx`;
+
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(blob, filename);
+        } else {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                if (a.parentNode) document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 60000);
+        }
+
+        if (window.UI && typeof window.UI.notify === 'function') {
+            window.UI.notify('تم تصدير تقرير خصومات المقاولين Excel بنجاح', 'success');
+        }
     };
 
     // --- New Feature: Contractor Deductions PDF Export/Print ---
