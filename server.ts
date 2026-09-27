@@ -573,6 +573,47 @@ async function handler(req: Request): Promise<Response> {
             }
         }
 
+        if (url.pathname === "/api/test-push" && method === "POST") {
+            try {
+                const body = await req.json().catch(() => ({}));
+                const targetUserId = body.userId;
+                const title = body.title || "🔔 اختبار وصول الإشعار";
+                const testBody = body.body || "تهانينا! يعمل استقبال الإشعارات على هذا الجهاز بنجاح وبأعلى كفاءة.";
+
+                let targetIds: string[] = [];
+                if (targetUserId) {
+                    targetIds = [targetUserId];
+                } else {
+                    const users = kv.list({ prefix: ["users"] });
+                    for await (const u of users) {
+                        targetIds.push(u.key[1]);
+                    }
+                }
+
+                let sentCount = 0;
+                const results: any[] = [];
+                for (const tId of targetIds) {
+                    const subEntries = kv.list({ prefix: ["push_subscriptions", tId] });
+                    for await (const subEntry of subEntries) {
+                        try {
+                            await webPush.sendNotification(
+                                subEntry.value,
+                                JSON.stringify({ title, body: testBody, url: "/" })
+                            );
+                            sentCount++;
+                            results.push({ key: subEntry.key, status: 201, ok: true });
+                        } catch (err: any) {
+                            if (err.statusCode === 410) await kv.delete(subEntry.key);
+                            results.push({ key: subEntry.key, status: err.statusCode, error: err.message });
+                        }
+                    }
+                }
+                return new Response(JSON.stringify({ success: true, count: sentCount, details: results }), { status: 200, headers: { "Content-Type": "application/json" } });
+            } catch (err: any) {
+                return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { "Content-Type": "application/json" } });
+            }
+        }
+
         if (url.pathname === "/api/import" && method === "POST") {
             const data = await req.json();
             for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system"]) {

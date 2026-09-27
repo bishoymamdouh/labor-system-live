@@ -5,7 +5,7 @@ export default {
     async fetch(request: Request, env: any, ctx: any): Promise<Response> {
         const url = new URL(request.url);
         if (url.pathname.startsWith("/api/")) {
-            return await onRequest({ request, env });
+            return await onRequest({ request, env, ctx });
         }
         if (env.ASSETS) {
             const response = await env.ASSETS.fetch(request);

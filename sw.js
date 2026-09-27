@@ -1,4 +1,4 @@
-// Service Worker v5.4 - Push only, native network routing
+// Service Worker v5.5 - Universal Web Push (iOS, Android, Windows, Mac)
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
@@ -16,17 +16,41 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('push', e => {
-    const data = e.data ? e.data.json() : { title: 'نظام السراكي', body: 'إشعار جديد', url: '/' };
+    let data = { title: 'نظام السراكي', body: 'إشعار جديد 🔔', url: '/' };
+    try {
+        if (e.data) {
+            data = e.data.json();
+        }
+    } catch (err) {
+        if (e.data) {
+            data.body = e.data.text();
+        }
+    }
+
     const options = {
-        body: data.body,
+        body: data.body || '',
         icon: '/logo.png',
         badge: '/logo.png',
-        data: data.url,
-        requireInteraction: true,
-        vibrate: [200, 100, 200]
+        data: data.url || '/',
+        tag: data.tag || ('notif_' + Date.now()),
+        renotify: true
     };
+
+    // Only add vibrate if navigator.vibrate is supported (Android / Chrome)
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        options.vibrate = [200, 100, 200];
+    }
+
     e.waitUntil(
-        self.registration.showNotification(data.title, options)
+        self.registration.showNotification(data.title || 'نظام السراكي', options).catch(err => {
+            console.error('showNotification error:', err);
+            // Fallback with minimal options for strict iOS Safari versions
+            return self.registration.showNotification(data.title || 'نظام السراكي', {
+                body: data.body || '',
+                icon: '/logo.png',
+                data: data.url || '/'
+            });
+        })
     );
 });
 

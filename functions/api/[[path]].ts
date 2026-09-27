@@ -3,6 +3,8 @@
 // Real-time synchronization with Cloudflare D1 (Serverless SQLite)
 
 const VAPID_PUBLIC = "BMnqakLZm3Nd93xNUMPOEcOKzmONIusdFaOhuk59jc46aR4b_D2frW_0nryIGSUZbwhMG_2WwLppzRqE0pVDKAc";
+const VAPID_PRIVATE = "4vLaY01kxCnkgqgsvRkBKarGcH1yyU5o47ezN5kPYDE";
+const VAPID_SUBJECT = "mailto:admin@example.com";
 
 const corsHeaders: Record<string, string> = {
     "Access-Control-Allow-Origin": "*",
@@ -63,10 +65,374 @@ class D1Store {
             return [];
         }
     }
+
+    async getSubscriptionsForUser(userId: string) {
+        try {
+            const { results } = await this.db.prepare(
+                "SELECT key, value FROM kv WHERE collection = 'push_subscriptions' AND (key = ? OR key LIKE ?)"
+            ).bind(userId, `${userId}:::%`).all();
+            return (results || []).map((r: any) => {
+                let v = r.value;
+                try { v = JSON.parse(r.value); } catch {}
+                return { key: r.key, value: v };
+            });
+        } catch (e: any) {
+            console.error("getSubscriptionsForUser error:", e);
+            return [];
+        }
+    }
+
+    async deleteSubscription(key: string) {
+        try {
+            await this.db.prepare("DELETE FROM kv WHERE collection = 'push_subscriptions' AND key = ?").bind(key).run();
+        } catch (e: any) {
+            console.error("deleteSubscription error:", e);
+        }
+    }
+}
+
+// ========================================================
+// --- Pure WebCrypto WebPush Engine (RFC 8291 / 8292) ---
+// ========================================================
+function b64ToUrlB64(str: string): string {
+    return str.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function urlB64ToB64(str: string): string {
+    return str.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - (str.length % 4)) % 4);
+}
+
+function uint8ToUrlB64(bytes: Uint8Array): string {
+    let binary = "";
+    for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return b64ToUrlB64(btoa(binary));
+}
+
+function urlB64ToUint8(str: string): Uint8Array {
+    const b64 = urlB64ToB64(str);
+    const bin = atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) {
+        arr[i] = bin.charCodeAt(i);
+    }
+    return arr;
+}
+
+function concatUint8(...arrays: Uint8Array[]): Uint8Array {
+    const totalLength = arrays.reduce((acc, a) => acc + a.length, 0);
+    const result = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const a of arrays) {
+        result.set(a, offset);
+        offset += a.length;
+    }
+    return result;
+}
+
+async function createVapidJwt(audience: string): Promise<string> {
+    const pubBytes = urlB64ToUint8(VAPID_PUBLIC);
+    const x = uint8ToUrlB64(pubBytes.slice(1, 33));
+    const y = uint8ToUrlB64(pubBytes.slice(33, 65));
+
+    const jwk = {
+        kty: "EC",
+        crv: "P-256",
+        x,
+        y,
+        d: VAPID_PRIVATE,
+        ext: true
+    };
+
+    const key = await crypto.subtle.importKey(
+        "jwk",
+        jwk,
+        { name: "ECDSA", namedCurve: "P-256" },
+        false,
+        ["sign"]
+    );
+
+    const header = { alg: "ES256", typ: "JWT" };
+    const exp = Math.floor(Date.now() / 1000) + 12 * 3600;
+    const payload = {
+        aud: audience,
+        exp,
+        sub: VAPID_SUBJECT
+    };
+
+    const enc = new TextEncoder();
+    const tokenPart = `${uint8ToUrlB64(enc.encode(JSON.stringify(header)))}.${uint8ToUrlB64(enc.encode(JSON.stringify(payload)))}`;
+    const sig = await crypto.subtle.sign(
+        { name: "ECDSA", hash: "SHA-256" },
+        key,
+        enc.encode(tokenPart)
+    );
+
+    const sigBytes = new Uint8Array(sig);
+    return `${tokenPart}.${uint8ToUrlB64(sigBytes)}`;
+}
+
+async function encryptPayload(subscriberPublicKeyB64: string, subscriberAuthB64: string, payloadText: string) {
+    const userPublicKeyBytes = urlB64ToUint8(subscriberPublicKeyB64);
+    const userAuthBytes = urlB64ToUint8(subscriberAuthB64);
+
+    const userKey = await crypto.subtle.importKey(
+        "raw",
+        userPublicKeyBytes,
+        { name: "ECDH", namedCurve: "P-256" },
+        true,
+        []
+    );
+
+    const localKeyPair = await crypto.subtle.generateKey(
+        { name: "ECDH", namedCurve: "P-256" },
+        true,
+        ["deriveBits"]
+    );
+
+    const localPublicKeyRaw = new Uint8Array(await crypto.subtle.exportKey("raw", localKeyPair.publicKey));
+
+    const sharedSecretBits = await crypto.subtle.deriveBits(
+        { name: "ECDH", public: userKey },
+        localKeyPair.privateKey,
+        256
+    );
+    const sharedSecret = new Uint8Array(sharedSecretBits);
+
+    const enc = new TextEncoder();
+    const keyInfo = concatUint8(
+        enc.encode("WebPush: info\0"),
+        userPublicKeyBytes,
+        localPublicKeyRaw
+    );
+
+    const authKey = await crypto.subtle.importKey(
+        "raw",
+        userAuthBytes,
+        { name: "HKDF" },
+        false,
+        ["deriveBits"]
+    );
+
+    const ikmBits = await crypto.subtle.deriveBits(
+        {
+            name: "HKDF",
+            hash: "SHA-256",
+            salt: sharedSecret,
+            info: keyInfo
+        },
+        authKey,
+        256
+    );
+
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const ikmKey = await crypto.subtle.importKey(
+        "raw",
+        ikmBits,
+        { name: "HKDF" },
+        false,
+        ["deriveBits"]
+    );
+
+    const cekInfo = enc.encode("Content-Encoding: aes128gcm\0");
+    const nonceInfo = enc.encode("Content-Encoding: nonce\0");
+
+    const cekBits = await crypto.subtle.deriveBits(
+        { name: "HKDF", hash: "SHA-256", salt, info: cekInfo },
+        ikmKey,
+        128
+    );
+
+    const nonceBits = await crypto.subtle.deriveBits(
+        { name: "HKDF", hash: "SHA-256", salt, info: nonceInfo },
+        ikmKey,
+        96
+    );
+
+    const aesKey = await crypto.subtle.importKey(
+        "raw",
+        cekBits,
+        { name: "AES-GCM" },
+        false,
+        ["encrypt"]
+    );
+
+    const dataBytes = enc.encode(payloadText);
+    const plaintext = concatUint8(dataBytes, new Uint8Array([2]));
+
+    const ciphertextWithTag = new Uint8Array(
+        await crypto.subtle.encrypt(
+            { name: "AES-GCM", iv: new Uint8Array(nonceBits), tagLength: 128 },
+            aesKey,
+            plaintext
+        )
+    );
+
+    const header = new Uint8Array(16 + 4 + 1 + 65);
+    header.set(salt, 0);
+    const view = new DataView(header.buffer);
+    view.setUint32(16, 4096, false);
+    header[20] = 65;
+    header.set(localPublicKeyRaw, 21);
+
+    return concatUint8(header, ciphertextWithTag);
+}
+
+async function sendWebPush(subscription: any, payload: string) {
+    if (!subscription || !subscription.endpoint || !subscription.keys?.p256dh || !subscription.keys?.auth) {
+        throw new Error("Invalid push subscription structure");
+    }
+    const endpointUrl = new URL(subscription.endpoint);
+    const audience = `${endpointUrl.protocol}//${endpointUrl.host}`;
+    const jwt = await createVapidJwt(audience);
+
+    const bodyBytes = await encryptPayload(
+        subscription.keys.p256dh,
+        subscription.keys.auth,
+        payload
+    );
+
+    const headers: Record<string, string> = {
+        "TTL": "86400",
+        "Content-Encoding": "aes128gcm",
+        "Content-Type": "application/octet-stream",
+        "Authorization": `vapid t=${jwt}, k=${VAPID_PUBLIC}`
+    };
+
+    const res = await fetch(subscription.endpoint, {
+        method: "POST",
+        headers,
+        body: bodyBytes
+    });
+
+    const bodyText = await res.text();
+    return {
+        status: res.status,
+        statusText: res.statusText,
+        body: bodyText,
+        ok: res.ok
+    };
+}
+
+async function dispatchInstantAlerts(store: D1Store, triggerEvent: string, context: {
+    recordId?: string;
+    supervisorId?: string;
+    engineerId?: string;
+    supervisorName?: string;
+    date?: string;
+    status?: string;
+    workerName?: string;
+}) {
+    try {
+        const notifCfg = (await store.get("system", "notificationsConfig")) || {};
+        let alerts: any[] = [];
+        if (Array.isArray(notifCfg.instantAlerts) && notifCfg.instantAlerts.length > 0) {
+            alerts = notifCfg.instantAlerts;
+        } else {
+            const b = notifCfg.builtInAlerts || {};
+            alerts = [
+                { id: "newRecord", name: "طلب اعتماد سركي جديد", trigger: "new_record", targetRole: "record_engineer", isActive: b.newRecord?.isActive !== false, title: b.newRecord?.title || "طلب اعتماد سركي جديد", text: b.newRecord?.text || "قام المشرف {supervisor} بتقديم سركي جديد بانتظار اعتمادك (إجمالي المعلق: {count})" },
+                { id: "recordApproved", name: "اعتماد السركي", trigger: "record_approved", targetRole: "record_supervisor", isActive: b.recordReview?.isActive !== false, title: "تم اعتماد طلبك ✅", text: "تم اعتماد السركي الخاص بيوم {date}" },
+                { id: "recordRejected", name: "رفض السركي", trigger: "record_rejected", targetRole: "record_supervisor", isActive: b.recordReview?.isActive !== false, title: "تم رفض السركي ⚠️", text: "تم رفض السركي الخاص بيوم {date}، يرجى مراجعته وتعديله." },
+                { id: "recordResubmit", name: "إعادة إرسال أو تعديل", trigger: "record_resubmit", targetRole: "record_engineer", isActive: b.recordResubmit?.isActive !== false, title: "إعادة تقديم سركي", text: "قام المشرف {supervisor} بتعديل وإعادة تقديم السركي الخاص بيوم {date}" }
+            ];
+        }
+
+        const matching = alerts.filter(a => {
+            if (a.isActive === false) return false;
+            if (a.trigger === triggerEvent) return true;
+            if (triggerEvent === "record_approved" && (a.trigger === "record_approved" || a.trigger === "record_review")) return true;
+            if (triggerEvent === "record_rejected" && (a.trigger === "record_rejected" || a.trigger === "record_review")) return true;
+            return false;
+        });
+
+        if (matching.length === 0) return;
+
+        const usersList = await store.list("users");
+        const users = usersList.map(u => ({ id: u.id, ...u.value }));
+
+        let supervisorName = context.supervisorName;
+        if (!supervisorName && context.supervisorId) {
+            const found = users.find(u => u.id === String(context.supervisorId));
+            supervisorName = found?.name || found?.username || "مشرف";
+        }
+
+        const statusLabel = context.status === "approved" ? "اعتماد" : (context.status === "rejected" ? "رفض" : (context.status || ""));
+
+        let pendingCount = 0;
+        if (triggerEvent === "new_record" || triggerEvent === "record_resubmit") {
+            const recordsList = await store.list("records");
+            pendingCount = recordsList.filter(r => r.value?.status === "pending" || !r.value?.status).length;
+        }
+
+        for (const alert of matching) {
+            const targetIds = new Set<string>();
+            const role = alert.targetRole || (alert.trigger === "new_record" || alert.trigger === "record_resubmit" ? "record_engineer" : "record_supervisor");
+
+            if (role === "record_engineer") {
+                if (context.engineerId) targetIds.add(String(context.engineerId));
+                users.filter(u => u.role === "admin").forEach(u => targetIds.add(u.id));
+                if (!context.engineerId) {
+                    users.filter(u => u.role === "engineer").forEach(u => targetIds.add(u.id));
+                }
+            } else if (role === "record_supervisor") {
+                if (context.supervisorId) targetIds.add(String(context.supervisorId));
+            } else if (role === "engineer") {
+                if (context.engineerId) targetIds.add(String(context.engineerId));
+                users.filter(u => u.role === "engineer" || u.role === "admin").forEach(u => targetIds.add(u.id));
+            } else if (role === "supervisor") {
+                if (context.supervisorId) targetIds.add(String(context.supervisorId));
+                users.filter(u => u.role === "supervisor").forEach(u => targetIds.add(u.id));
+            } else {
+                users.forEach(u => {
+                    if (role === "all" || u.role === role) targetIds.add(u.id);
+                });
+            }
+
+            const titleText = (alert.title || alert.name || "تنبيه نظام السراكي")
+                .replace(/\{status\}/g, statusLabel)
+                .replace(/\{supervisor\}/g, supervisorName || "")
+                .replace(/\{date\}/g, context.date || "");
+
+            const bodyText = (alert.text || "")
+                .replace(/\{supervisor\}/g, supervisorName || "")
+                .replace(/\{count\}/g, String(pendingCount))
+                .replace(/\{status\}/g, statusLabel)
+                .replace(/\{date\}/g, context.date || "")
+                .replace(/\{worker\}/g, context.workerName || "");
+
+            const payloadStr = JSON.stringify({
+                title: titleText,
+                body: bodyText,
+                url: context.recordId ? "/?view_record=" + context.recordId : "/",
+                badgeCount: pendingCount
+            });
+
+            for (const targetId of targetIds) {
+                const subEntries = await store.getSubscriptionsForUser(targetId);
+                for (const subItem of subEntries) {
+                    const sub = subItem.value?.endpoint ? subItem.value : subItem.value?.subscription;
+                    if (!sub || !sub.endpoint) continue;
+                    try {
+                        const res = await sendWebPush(sub, payloadStr);
+                        if (res.status === 410 || res.status === 404) {
+                            console.log(`Deleting expired subscription [${subItem.key}]`);
+                            await store.deleteSubscription(subItem.key);
+                        }
+                    } catch (pushErr: any) {
+                        console.error(`Push Error for [${targetId}]:`, pushErr);
+                    }
+                }
+            }
+        }
+    } catch (e: any) {
+        console.error("dispatchInstantAlerts error:", e);
+    }
 }
 
 export async function onRequest(context: any): Promise<Response> {
-    const { request, env } = context;
+    const { request, env, ctx } = context;
     const url = new URL(request.url);
     const method = request.method;
 
@@ -606,11 +972,186 @@ export async function onRequest(context: any): Promise<Response> {
             return jsonResponse({ success: true, count: statements.length, message: "Imported successfully into Cloudflare D1" });
         }
 
-        // 9. Broadcast & Push Stubs
-        if (resource === "broadcast" && method === "POST") {
-            return jsonResponse({ success: true, sent: 0, message: "Broadcast handled" });
+        // 9. Notifications Hub & Push Services
+        if (resource === "subscribe" && method === "POST") {
+            try {
+                const body = await request.json();
+                const userId = body.userId;
+                const subscription = body.subscription;
+                if (!userId || !subscription || !subscription.endpoint) {
+                    return errorResponse("Missing userId or subscription", 400);
+                }
+
+                // Create a unique key per device: userId:::endpointHash
+                const endpoint = subscription.endpoint;
+                let hash = 0;
+                for (let i = 0; i < endpoint.length; i++) {
+                    hash = ((hash << 5) - hash) + endpoint.charCodeAt(i);
+                    hash |= 0;
+                }
+                const deviceKey = `${userId}:::${Math.abs(hash).toString(36)}`;
+
+                const subRecord = {
+                    userId,
+                    role: body.role || "user",
+                    endpoint: subscription.endpoint,
+                    keys: subscription.keys,
+                    userAgent: request.headers.get("user-agent") || "",
+                    updatedAt: new Date().toISOString()
+                };
+
+                await store.set("push_subscriptions", deviceKey, subRecord);
+
+                // Clean legacy single-key subscription if present
+                await store.delete("push_subscriptions", userId);
+
+                return jsonResponse({ success: true, message: "تم تسجيل اشتراك الإشعارات للجهاز بنجاح", key: deviceKey });
+            } catch (err: any) {
+                console.error("Subscribe API error:", err);
+                return errorResponse(err.message, 500);
+            }
         }
-        if ((resource === "subscribe" || resource === "unsubscribe" || resource === "triggerNotificationTasks") && method === "POST") {
+
+        if (resource === "unsubscribe" && method === "POST") {
+            try {
+                const body = await request.json();
+                const { userId, endpoint } = body;
+                if (userId) {
+                    const subs = await store.getSubscriptionsForUser(userId);
+                    for (const s of subs) {
+                        if (!endpoint || s.value?.endpoint === endpoint) {
+                            await store.deleteSubscription(s.key);
+                        }
+                    }
+                }
+                return jsonResponse({ success: true });
+            } catch (err: any) {
+                return errorResponse(err.message, 500);
+            }
+        }
+
+        if (resource === "notificationsConfig") {
+            if (method === "GET") {
+                const cfg = await store.get("system", "notificationsConfig");
+                return jsonResponse(cfg || {});
+            }
+            if (method === "POST") {
+                const body = await request.json();
+                await store.set("system", "notificationsConfig", body);
+                return jsonResponse({ success: true });
+            }
+        }
+
+        if (resource === "broadcast" && method === "POST") {
+            try {
+                const body = await request.json();
+                const { title, message, target, url: notifUrl } = body;
+
+                let targetUserIds: string[] = [];
+                const allUsers = (await store.list("users")).map(u => ({ id: u.id, ...u.value }));
+
+                if (target === "all" || !target) {
+                    targetUserIds = allUsers.map(u => u.id);
+                } else if (Array.isArray(target)) {
+                    targetUserIds = target;
+                } else if (typeof target === "string") {
+                    if (["admin", "engineer", "supervisor", "warehouse_manager", "surveyor", "operator_supervisor"].includes(target)) {
+                        targetUserIds = allUsers.filter(u => u.role === target).map(u => u.id);
+                    } else {
+                        targetUserIds = target.split(",").map(s => s.trim());
+                    }
+                }
+
+                const payload = JSON.stringify({
+                    title: title || "تنبيه من الإدارة",
+                    body: message || "",
+                    url: notifUrl || "/"
+                });
+
+                let sentCount = 0;
+                let failCount = 0;
+
+                for (const uId of targetUserIds) {
+                    const subs = await store.getSubscriptionsForUser(uId);
+                    for (const subItem of subs) {
+                        const sub = subItem.value?.endpoint ? subItem.value : subItem.value?.subscription;
+                        if (!sub || !sub.endpoint) continue;
+                        try {
+                            const res = await sendWebPush(sub, payload);
+                            if (res.ok) {
+                                sentCount++;
+                            } else if (res.status === 410 || res.status === 404) {
+                                await store.deleteSubscription(subItem.key);
+                                failCount++;
+                            } else {
+                                failCount++;
+                            }
+                        } catch (e) {
+                            failCount++;
+                        }
+                    }
+                }
+
+                return jsonResponse({ success: true, sent: sentCount, failed: failCount });
+            } catch (err: any) {
+                console.error("Broadcast error:", err);
+                return errorResponse(err.message, 500);
+            }
+        }
+
+        if (resource === "test-push" && method === "POST") {
+            try {
+                const body = await request.json().catch(() => ({}));
+                const targetUserId = body.userId;
+                const title = body.title || "🔔 اختبار وصول الإشعار";
+                const testBody = body.body || "تهانينا! يعمل استقبال الإشعارات على هذا الجهاز بنجاح وبأعلى كفاءة.";
+
+                let subs: any[] = [];
+                if (targetUserId) {
+                    subs = await store.getSubscriptionsForUser(targetUserId);
+                } else {
+                    const allSubs = await store.list("push_subscriptions");
+                    subs = allSubs;
+                }
+
+                const payload = JSON.stringify({
+                    title,
+                    body: testBody,
+                    url: "/"
+                });
+
+                const results: any[] = [];
+                for (const subItem of subs) {
+                    const sub = subItem.value?.endpoint ? subItem.value : subItem.value?.subscription;
+                    if (!sub || !sub.endpoint) continue;
+                    try {
+                        const res = await sendWebPush(sub, payload);
+                        results.push({
+                            key: subItem.key,
+                            endpoint: sub.endpoint.slice(0, 45) + "...",
+                            status: res.status,
+                            statusText: res.statusText,
+                            ok: res.ok
+                        });
+                        if (res.status === 410 || res.status === 404) {
+                            await store.deleteSubscription(subItem.key);
+                        }
+                    } catch (e: any) {
+                        results.push({
+                            key: subItem.key,
+                            endpoint: sub.endpoint.slice(0, 45) + "...",
+                            error: e.message
+                        });
+                    }
+                }
+
+                return jsonResponse({ success: true, count: results.length, details: results });
+            } catch (err: any) {
+                return errorResponse(err.message, 500);
+            }
+        }
+
+        if (resource === "triggerNotificationTasks" && method === "POST") {
             return jsonResponse({ success: true });
         }
 
@@ -651,6 +1192,23 @@ export async function onRequest(context: any): Promise<Response> {
                 const id = body.id || crypto.randomUUID();
                 const recordData = { ...body, id };
                 await store.set(resource, id, recordData);
+
+                // Dispatch notification for new record
+                if (resource === "records") {
+                    const alertPromise = dispatchInstantAlerts(store, "new_record", {
+                        recordId: id,
+                        supervisorId: recordData.supervisorId,
+                        engineerId: recordData.engineerId,
+                        supervisorName: recordData.supervisorName,
+                        date: recordData.date
+                    });
+                    if (ctx && typeof ctx.waitUntil === "function") {
+                        ctx.waitUntil(alertPromise);
+                    } else {
+                        await alertPromise;
+                    }
+                }
+
                 return jsonResponse(recordData, 201);
             }
 
@@ -660,6 +1218,31 @@ export async function onRequest(context: any): Promise<Response> {
                 const current = await store.get(resource, resourceId) || {};
                 const updated = { ...current, ...body, id: resourceId };
                 await store.set(resource, resourceId, updated);
+
+                // Dispatch notification for record status update
+                if (resource === "records" && body.status && body.status !== current.status) {
+                    let triggerEvent = "";
+                    if (body.status === "approved") triggerEvent = "record_approved";
+                    else if (body.status === "rejected") triggerEvent = "record_rejected";
+                    else if (body.status === "pending" && current.status === "rejected") triggerEvent = "record_resubmit";
+
+                    if (triggerEvent) {
+                        const alertPromise = dispatchInstantAlerts(store, triggerEvent, {
+                            recordId: resourceId,
+                            supervisorId: current.supervisorId || body.supervisorId,
+                            engineerId: current.engineerId || body.engineerId,
+                            supervisorName: current.supervisorName || body.supervisorName,
+                            date: current.date || body.date,
+                            status: body.status
+                        });
+                        if (ctx && typeof ctx.waitUntil === "function") {
+                            ctx.waitUntil(alertPromise);
+                        } else {
+                            await alertPromise;
+                        }
+                    }
+                }
+
                 return jsonResponse({ success: true, ...updated });
             }
 

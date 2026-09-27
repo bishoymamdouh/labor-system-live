@@ -1528,8 +1528,8 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=' + Date.now()).then(reg => {
-                console.log('ServiceWorker registered cleanly.');
+            navigator.serviceWorker.register('/sw.js?v=5.5').then(reg => {
+                console.log('ServiceWorker v5.5 registered cleanly.');
             });
         }
     </script>
@@ -2738,6 +2738,9 @@ select {
                             <span class="notif-slider"></span>
                         </label>
                     </div>
+                    <button type="button" class="btn btn-primary btn-sm" id="btn-test-my-phone-push" style="background: #10b981; border: 1px solid #059669; color: #fff; font-weight: 600;" title="إرسال إشعار تجريبي فوري لهذا الجهاز للتأكد من وصوله">
+                        <i class="fas fa-paper-plane"></i> تجربة إشعار لهاتفي 🔔
+                    </button>
                     <button type="button" class="btn btn-secondary btn-sm" id="btn-trigger-notifs-now" style="background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid #6366f1;" title="فحص مستحقات التذكيرات والإشعارات المجدولة وتشغيلها على الفور">
                         <i class="fas fa-bolt"></i> فحص وإرسال المستحق الآن ⚡
                     </button>
@@ -5523,6 +5526,38 @@ document.addEventListener('keydown', (e) => {
         if (btnAddInstantAlert) {
             btnAddInstantAlert.addEventListener('click', () => {
                 this.openInstantAlertModal(null);
+            });
+        }
+
+        const btnTestPush = document.getElementById('btn-test-my-phone-push');
+        if (btnTestPush) {
+            btnTestPush.addEventListener('click', async () => {
+                if (!auth.isLoggedIn()) {
+                    alert('يرجى تسجيل الدخول أولاً');
+                    return;
+                }
+                const oldHtml = btnTestPush.innerHTML;
+                btnTestPush.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+                btnTestPush.disabled = true;
+                try {
+                    await this.subscribeUserToPush();
+                    const res = await fetch('/api/test-push', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: auth.currentUser.id })
+                    });
+                    const data = await res.json();
+                    if (data.success && data.count > 0) {
+                        alert('✅ تم إرسال الإشعار التجريبي بنجاح إلى (' + data.count + ') جهاز مسجل لحسابك!\nتفقد شاشة هاتفك/جهازك الآن 🔔');
+                    } else {
+                        alert('⚠️ لم يتم العثور على أجهزة مسجلة لحسابك.\nتأكد أولاً من تفعيل زر "إشعارات هذا الجهاز" والسماح بالأذونات في المتصفح.');
+                    }
+                } catch (err) {
+                    alert('حدث خطأ أثناء إرسال الإشعار التجريبي: ' + err.message);
+                } finally {
+                    btnTestPush.innerHTML = oldHtml;
+                    btnTestPush.disabled = false;
+                }
             });
         }
 
@@ -8535,16 +8570,26 @@ document.addEventListener('keydown', (e) => {
             const vapidPublicKey = await res.text();
             const convertedVapidKey = this.urlBase64ToUint8Array(vapidPublicKey);
             
-            const subscription = await reg.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: convertedVapidKey
-            });
+            let subscription = await reg.pushManager.getSubscription();
+            if (!subscription) {
+                subscription = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: convertedVapidKey
+                });
+            }
             
-            await fetch('/api/subscribe', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: auth.currentUser.id, subscription })
-            });
+            if (auth && auth.currentUser && auth.currentUser.id) {
+                await fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: auth.currentUser.id,
+                        role: auth.getRole ? auth.getRole() : auth.currentUser.role,
+                        subscription
+                    })
+                });
+                console.log('✅ Push subscription synced successfully for:', auth.currentUser.id);
+            }
         } catch (e) {
             console.error('Push subscription failed:', e);
         }
@@ -9271,6 +9316,15 @@ document.addEventListener('keydown', (e) => {
     }
 
     async handleDevicePushSwitch(enable) {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+
+        if (enable && isIOS && !isStandalone && !('PushManager' in window)) {
+            alert('📌 تنبيه هام لمستخدمي الآيفون (iPhone / iPad):\n\nلتشغيل الإشعارات على نظام iOS، يشترط نظام أبل إضافة التطبيق إلى الشاشة الرئيسية أولاً:\n1. اضغط على زر المشاركة (Share ⎘) في أسفل متصفح Safari.\n2. اختر "إضافة إلى الصفحة الرئيسية" (Add to Home Screen ➕).\n3. افتح التطبيق من الأيقونة على الشاشة الرئيسية ثم فعل الإشعارات.');
+            this.updateDeviceNotificationStatus();
+            return;
+        }
+
         if (!('Notification' in window)) {
             alert('متصفحك لا يدعم خاصية Web Notifications.');
             this.updateDeviceNotificationStatus();
@@ -10144,16 +10198,6 @@ UI.applyServerMonitorVisibility();
         }
 
 
-// Register Service Worker for PWA
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js?v=8').then(registration => {
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        }, err => {
-            console.log('ServiceWorker registration failed: ', err);
-        });
-    });
-}
 
 // Global Event Listeners for dynamically generated buttons
 document.addEventListener('click', (e) => {
