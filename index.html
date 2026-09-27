@@ -9904,16 +9904,20 @@ window.closeServerMetricsModal = function() {
 
 // --- 70% Alert & Purge Records Logic ---
 window.testQuotaAlertNotification = async function() {
-    window.showAppNotification({
-        title: '🔔 تجربة تنبيه: استهلاك السيرفر تجاوز 70%',
-        message: 'هذا إشعار تجريبي لاختبار ظهور الإشعارات الفورية بالصوت والصورة داخل البرنامج وعلى جهازك بنجاح!',
-        type: 'success',
-        duration: 6000
-    });
-    
-    // Request permission if not determined
-    if ('Notification' in window && Notification.permission === 'default') {
-        try { await Notification.requestPermission(); } catch(e) {}
+    try {
+        if (auth && auth.isLoggedIn()) {
+            await fetch('/api/test-push', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: auth.currentUser.id,
+                    title: '🔔 تنبيه: استهلاك السيرفر تجاوز 70%',
+                    body: 'إشعار تجريبي لاختبار وصول تنبيهات السيرفر لهاتفك وجهازك بنجاح.'
+                })
+            });
+        }
+    } catch(e) {
+        console.error(e);
     }
 };
 
@@ -10078,15 +10082,19 @@ window.refreshServerMetrics = async function() {
                 const alertMsg = data.quotaAlert.isRequestsAlert70
                     ? '⚠️ تحذير: استهلاك الطلبات اليومية تجاوز 70% (' + (data.requests?.today || 0).toLocaleString() + ' / 100,000)!'
                     : '⚠️ تحذير: استهلاك مساحة قاعدة البيانات تجاوز 70% من الـ 5 جيجابايت!';
-                if (window.showAppNotification) {
-                    window.showAppNotification({
-                        title: '⚠️ تحذير: استهلاك السيرفر تجاوز 70%',
-                        message: alertMsg,
-                        type: 'warning',
-                        duration: 8000,
-                        action: () => window.openServerMetricsModal('alert')
-                    });
-                }
+                try {
+                    if (auth && auth.isLoggedIn()) {
+                        fetch('/api/test-push', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                userId: auth.currentUser.id,
+                                title: '⚠️ تحذير: استهلاك السيرفر تجاوز 70%',
+                                body: alertMsg
+                            })
+                        }).catch(() => {});
+                    }
+                } catch(e) {}
             }
         }
         // Requests
