@@ -82,9 +82,10 @@ class D1Store {
         }
     }
 
-    async deleteSubscription(key: string) {
+    async deleteSubscription(key: any) {
         try {
-            await this.db.prepare("DELETE FROM kv WHERE collection = 'push_subscriptions' AND key = ?").bind(key).run();
+            const keyStr = Array.isArray(key) ? (key[1] || key[0]) : (key?.id || key);
+            await this.db.prepare("DELETE FROM kv WHERE collection = 'push_subscriptions' AND key = ?").bind(String(keyStr)).run();
         } catch (e: any) {
             console.error("deleteSubscription error:", e);
         }
