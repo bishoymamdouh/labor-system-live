@@ -12274,19 +12274,17 @@ document.addEventListener('click', (e) => {
                 }
 
                 /* DENSITY TIERS FOR FIT-TO-PAPER */
-                /* Normal (1-7 rows): Generous vertical cell height */
+                /* Normal (1-8 rows): Extra generous vertical cell height */
                 .density-normal table { font-size: 12px; }
-                .density-normal th { padding: 11px 5px; font-size: 12px; }
-                .density-normal td { padding: 10.5px 5px; }
-                .density-normal .name-cell { font-size: 13.5px; }
+                .density-normal th { padding: 13.5px 6px; font-size: 12.5px; }
+                .density-normal td { padding: 13px 6px; }
+                .density-normal .name-cell { font-size: 14px; }
 
-                /* Snug (8-14 rows) */
+                /* Snug (9-14 rows) */
                 .density-snug table { font-size: 10.5px; }
-                .density-snug th { padding: 7px 4px; font-size: 11px; }
-                .density-snug td { padding: 6.5px 4px; }
-                .density-snug .name-cell { font-size: 12px; }
-                .density-snug .table-container { margin-bottom: 6px; }
-                .density-snug .summary { margin-bottom: 8px; }
+                .density-snug th { padding: 7.5px 4px; font-size: 11px; }
+                .density-snug td { padding: 7px 4px; }
+                .density-snug .name-cell { font-size: 12.5px; }
 
                 /* Medium (15-22 rows) */
                 .density-medium table { font-size: 9px; }
@@ -12371,7 +12369,7 @@ document.addEventListener('click', (e) => {
             let densityClass = 'density-normal';
             if (rowCount > 22) densityClass = 'density-compact';
             else if (rowCount > 14) densityClass = 'density-medium';
-            else if (rowCount >= 8) densityClass = 'density-snug';
+            else if (rowCount > 8) densityClass = 'density-snug';
 
             let recordsHtml = `<table>
                 <thead>
@@ -12516,27 +12514,12 @@ document.addEventListener('click', (e) => {
         
         iframe.onload = function() {
             setTimeout(() => {
-                try {
-                    // Fail-safe auto-fit: check if any page exceeds printable height and scale down smoothly if needed
-                    const doc = iframe.contentDocument || iframe.contentWindow.document;
-                    if (doc) {
-                        const pages = doc.querySelectorAll('.receipt-page');
-                        pages.forEach(p => {
-                            if (p.scrollHeight > p.clientHeight + 2) {
-                                const ratio = (p.clientHeight - 4) / p.scrollHeight;
-                                p.style.transformOrigin = 'top center';
-                                p.style.transform = `scale(${ratio})`;
-                            }
-                        });
-                    }
-                } catch (e) {
-                    console.warn("Print auto-fit check notice:", e);
-                }
-
                 iframe.contentWindow.focus();
                 iframe.contentWindow.print();
                 setTimeout(() => {
-                    document.body.removeChild(iframe);
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
                 }, 5000); // Cleanup after a delay
             }, 500); // Wait for fonts and images to render
         };
