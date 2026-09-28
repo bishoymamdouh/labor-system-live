@@ -7526,6 +7526,7 @@ document.addEventListener('keydown', (e) => {
             const recordId = await db.add('records', {
                 date: date,
                 supervisorId: auth.currentUser.id,
+                supervisorName: auth.currentUser?.username || auth.currentUser?.name || 'مشرف',
                 engineerId: engineerId,
                 status: recordStatus,
                 totalWorkers: validWorkersCount,
@@ -8335,6 +8336,14 @@ document.addEventListener('keydown', (e) => {
         setTimeout(check, 1000);
         // Real-time polling every 10 seconds for instant sync across all users
         this.notifInterval = setInterval(check, 10000);
+
+        // Background server-side notification runner heartbeat every 60 seconds
+        if (!this._notifTasksInterval) {
+            fetch('/api/triggerNotificationTasks', { method: 'POST' }).catch(() => {});
+            this._notifTasksInterval = setInterval(() => {
+                fetch('/api/triggerNotificationTasks', { method: 'POST' }).catch(() => {});
+            }, 60000);
+        }
 
         // Immediate refresh when user switches tabs or unlocks mobile
         if (!this._visibilityBound) {

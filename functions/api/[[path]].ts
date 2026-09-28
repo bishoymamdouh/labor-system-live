@@ -27,7 +27,7 @@ function errorResponse(message: string, status = 500) {
     return jsonResponse({ error: message }, status);
 }
 
-class D1Store {
+export class D1Store {
     constructor(private db: any) {}
 
     async get(col: string, key: string) {
@@ -440,6 +440,303 @@ async function dispatchInstantAlerts(store: D1Store, triggerEvent: string, conte
     } catch (e: any) {
         console.error("dispatchInstantAlerts error:", e);
     }
+}
+
+function parseTimeToMinutes(timeStr: string): number {
+    if (!timeStr) return 0;
+    const str = String(timeStr).trim().toUpperCase();
+    let hour = 0;
+    let min = 0;
+    if (str.includes("AM") || str.includes("PM")) {
+        const parts = str.split(" ");
+        const hm = (parts[0] || "").split(":");
+        hour = parseInt(hm[0] || "0", 10);
+        min = parseInt(hm[1] || "0", 10);
+        if (parts[1] === "PM" && hour < 12) hour += 12;
+        if (parts[1] === "AM" && hour === 12) hour = 0;
+    } else {
+        const hm = str.split(":");
+        hour = parseInt(hm[0] || "0", 10);
+        min = parseInt(hm[1] || "0", 10);
+    }
+    return hour * 60 + min;
+}
+
+function getCairoTimeParts() {
+    const now = new Date();
+    try {
+        const dtf = new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Africa/Cairo",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        });
+        const parts = dtf.formatToParts(now);
+        const map: any = {};
+        parts.forEach(p => map[p.type] = p.value);
+        const dateStr = `${map.year}-${map.month}-${map.day}`;
+        const hour = parseInt(map.hour, 10);
+        const minute = parseInt(map.minute, 10);
+        return { dateStr, hour, minute };
+    } catch (_e) {
+        const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const cairoDate = new Date(utcMs + (3 * 60 * 60 * 1000));
+        const dateStr = cairoDate.toISOString().split("T")[0];
+        return { dateStr, hour: cairoDate.getHours(), minute: cairoDate.getMinutes() };
+    }
+}
+
+export async function runNotificationTasks(store: D1Store, forceRun: boolean = false) {
+    const config = (await store.get("system", "notificationsConfig")) || {};
+    const results: any = {
+        pendingSent: 0,
+        scheduledSent: 0,
+        pendingDetails: [],
+        scheduledDetails: [],
+        errors: []
+    };
+
+    const cairo = getCairoTimeParts();
+    const currentMins = cairo.hour * 60 + cairo.minute;
+    const nowTime = Date.now();
+    const nowIso = new Date().toISOString();
+
+    // ----------------------------------------------------
+    // 1. Pending Reminders for Engineers
+    // ----------------------------------------------------
+    try {
+        const pendingConfig = config.systemReminders?.pendingReminder || {
+            isActive: config.system?.pendingReminderActive ?? true,
+            hours: config.system?.pendingReminderHours ?? 1,
+            text: config.system?.pendingReminderText || "يوجد سركي معلق بانتظار اعتمادك منذ أكثر من {hours} ساعات، يرجى مراجعته.",
+            windowActive: true,
+            startTime: "08:30 AM",
+            endTime: "04:30 PM"
+        };
+
+        if (pendingConfig.isActive || forceRun) {
+            let isWithinWindow = true;
+            if (pendingConfig.windowActive && !forceRun) {
+                const startMins = parseTimeToMinutes(pendingConfig.startTime || "08:30 AM");
+                const endMins = parseTimeToMinutes(pendingConfig.endTime || "04:30 PM");
+                if (startMins <= endMins) {
+                    isWithinWindow = currentMins >= startMins && currentMins <= endMins;
+                } else {
+                    isWithinWindow = currentMins >= startMins || currentMins <= endMins;
+                }
+            }
+
+            if (isWithinWindow || forceRun) {
+                const hours = Number(pendingConfig.hours) || 1;
+                const reminderIntervalMs = hours * 60 * 60 * 1000;
+
+                const [recordsList, usersList] = await Promise.all([
+                    store.list("records"),
+                    store.list("users")
+                ]);
+
+                const usersMap: Record<string, any> = {};
+                for (const u of usersList) {
+                    if (u.value) usersMap[u.id] = u.value;
+                }
+
+                // Group all qualifying pending records by engineer
+                const pendingByEngineer: Record<string, any[]> = {};
+                for (const r of recordsList) {
+                    const rec = r.value;
+                    if (!rec) continue;
+                    const isPending = rec.status === "pending" || !rec.status;
+                    if (!isPending) continue;
+
+                    const engId = String(rec.engineerId || "");
+                    if (!engId) continue;
+
+                    const createdTime = rec.createdAt ? new Date(rec.createdAt).getTime() : 0;
+                    // Check creation age if not forced
+                    if (!forceRun && createdTime > 0 && (nowTime - createdTime < reminderIntervalMs)) {
+                        continue;
+                    }
+
+                    // Check lastReminderSentAt if not forced
+                    if (!forceRun && rec.lastReminderSentAt) {
+                        const lastSent = new Date(rec.lastReminderSentAt).getTime();
+                        if (nowTime - lastSent < reminderIntervalMs) {
+                            continue;
+                        }
+                    }
+
+                    if (!pendingByEngineer[engId]) {
+                        pendingByEngineer[engId] = [];
+                    }
+                    pendingByEngineer[engId].push({ id: r.id, ...rec });
+                }
+
+                // Send consolidated reminder per engineer
+                for (const engId in pendingByEngineer) {
+                    const engRecords = pendingByEngineer[engId];
+                    const count = engRecords.length;
+                    const engineerUser = usersMap[engId];
+                    const engineerName = engineerUser?.username || engineerUser?.name || "مهندس";
+
+                    const title = count === 1
+                        ? "⏰ تذكير: سركي معلق بانتظار الاعتماد"
+                        : `⏰ تذكير: لديك (${count}) سراكي معلقة بانتظار الاعتماد`;
+
+                    let bodyText = (pendingConfig.text || "يوجد سركي معلق بانتظار اعتمادك منذ أكثر من {hours} ساعات، يرجى مراجعته.")
+                        .replace(/\{hours\}/g, String(hours))
+                        .replace(/\{name\}/g, engineerName)
+                        .replace(/\{count\}/g, String(count));
+
+                    if (count > 1 && !pendingConfig.text?.includes("{count}")) {
+                        bodyText = `يوجد (${count}) سراكي معلقة بانتظار اعتمادك منذ أكثر من ${hours} ساعات، يرجى مراجعتها والرد عليها.`;
+                    }
+
+                    const payloadStr = JSON.stringify({
+                        title,
+                        body: bodyText,
+                        url: count === 1 ? "/?view_record=" + engRecords[0].id : "/?filter_status=pending",
+                        badgeCount: count
+                    });
+
+                    // Target subscriptions for this engineer
+                    const subEntries = await store.getSubscriptionsForUser(engId);
+                    let sentForEngineer = 0;
+
+                    for (const subItem of subEntries) {
+                        const sub = subItem.value?.endpoint ? subItem.value : subItem.value?.subscription;
+                        if (!sub || !sub.endpoint) continue;
+                        try {
+                            const res = await sendWebPush(sub, payloadStr);
+                            if (res.ok) {
+                                results.pendingSent++;
+                                sentForEngineer++;
+                            } else if (res.status === 410 || res.status === 404) {
+                                await store.deleteSubscription(subItem.key);
+                            }
+                        } catch (err: any) {
+                            results.errors.push(`Pending push error (${engId}): ${err.message}`);
+                        }
+                    }
+
+                    // Update lastReminderSentAt on records in D1
+                    for (const rec of engRecords) {
+                        const updated = { ...rec, lastReminderSentAt: nowIso };
+                        await store.set("records", rec.id, updated);
+                    }
+
+                    results.pendingDetails.push({
+                        engineerId: engId,
+                        engineerName,
+                        pendingCount: count,
+                        sentDevices: sentForEngineer
+                    });
+                }
+            } else {
+                results.pendingSkippedOutsideWindow = true;
+            }
+        }
+    } catch (e: any) {
+        console.error("Pending reminders check error:", e);
+        results.errors.push("Pending check error: " + e.message);
+    }
+
+    // ----------------------------------------------------
+    // 2. Cairo Daily Scheduled Notifications
+    // ----------------------------------------------------
+    try {
+        let configUpdated = false;
+        const scheduledList = config.scheduled || [];
+
+        for (const item of scheduledList) {
+            if (item.isActive === false && !forceRun) continue;
+
+            const timesList: string[] = (Array.isArray(item.times) && item.times.length > 0)
+                ? item.times
+                : (item.time ? [String(item.time)] : []);
+            if (timesList.length === 0) continue;
+
+            if (!Array.isArray(item.sentTimesToday)) {
+                item.sentTimesToday = [];
+            }
+            if (item.lastSentDate !== cairo.dateStr) {
+                item.sentTimesToday = [];
+                item.lastSentDate = cairo.dateStr;
+                configUpdated = true;
+            }
+
+            for (const timeStr of timesList) {
+                if (!forceRun && item.sentTimesToday.includes(timeStr)) continue;
+
+                const targetMins = parseTimeToMinutes(timeStr);
+                // Trigger if current Cairo time reached target time within 2h window, or forceRun
+                if (forceRun || (currentMins >= targetMins && currentMins <= targetMins + 120)) {
+                    const targetIds = new Set<string>();
+
+                    const explicitUsers = item.targets?.userIds || item.targets?.users || [];
+                    explicitUsers.forEach((uId: any) => targetIds.add(String(uId)));
+
+                    const targetRoles = item.targets?.roles || [];
+                    if (targetRoles.length > 0) {
+                        const usersList = await store.list("users");
+                        for (const u of usersList) {
+                            if (u.value && targetRoles.includes(u.value.role)) {
+                                targetIds.add(String(u.id));
+                            }
+                        }
+                    }
+
+                    const payloadStr = JSON.stringify({
+                        title: item.title || "تذكير يومي",
+                        body: item.message || "",
+                        url: "/"
+                    });
+
+                    let sentForItem = 0;
+                    for (const uId of targetIds) {
+                        const subEntries = await store.getSubscriptionsForUser(uId);
+                        for (const subItem of subEntries) {
+                            const sub = subItem.value?.endpoint ? subItem.value : subItem.value?.subscription;
+                            if (!sub || !sub.endpoint) continue;
+                            try {
+                                const res = await sendWebPush(sub, payloadStr);
+                                if (res.ok) {
+                                    results.scheduledSent++;
+                                    sentForItem++;
+                                } else if (res.status === 410 || res.status === 404) {
+                                    await store.deleteSubscription(subItem.key);
+                                }
+                            } catch (err: any) {
+                                results.errors.push(`Scheduled push error (${uId}): ${err.message}`);
+                            }
+                        }
+                    }
+
+                    if (!item.sentTimesToday.includes(timeStr)) {
+                        item.sentTimesToday.push(timeStr);
+                    }
+                    configUpdated = true;
+
+                    results.scheduledDetails.push({
+                        title: item.title,
+                        time: timeStr,
+                        sentDevices: sentForItem
+                    });
+                }
+            }
+        }
+
+        if (configUpdated) {
+            await store.set("system", "notificationsConfig", config);
+        }
+    } catch (e: any) {
+        console.error("Scheduled check error:", e);
+        results.errors.push("Scheduled check error: " + e.message);
+    }
+
+    return results;
 }
 
 export async function onRequest(context: any): Promise<Response> {
@@ -1162,8 +1459,21 @@ export async function onRequest(context: any): Promise<Response> {
             }
         }
 
-        if (resource === "triggerNotificationTasks" && method === "POST") {
-            return jsonResponse({ success: true });
+        if (resource === "triggerNotificationTasks") {
+            const force = url.searchParams.get("force") === "true";
+            let bodyForce = false;
+            if (method === "POST") {
+                try {
+                    const b = await request.json().catch(() => ({}));
+                    if (b && b.force) bodyForce = true;
+                } catch {}
+            }
+            const forceRun = force || bodyForce;
+            const res = await runNotificationTasks(store, forceRun);
+            return jsonResponse({
+                success: true,
+                result: res
+            });
         }
 
         // 10. CRUD Collections: users, records, workers, worker_directory, push_subscriptions
@@ -1215,9 +1525,8 @@ export async function onRequest(context: any): Promise<Response> {
                     });
                     if (ctx && typeof ctx.waitUntil === "function") {
                         ctx.waitUntil(alertPromise);
-                    } else {
-                        await alertPromise;
                     }
+                    await alertPromise;
                 }
 
                 return jsonResponse(recordData, 201);
@@ -1248,9 +1557,8 @@ export async function onRequest(context: any): Promise<Response> {
                         });
                         if (ctx && typeof ctx.waitUntil === "function") {
                             ctx.waitUntil(alertPromise);
-                        } else {
-                            await alertPromise;
                         }
+                        await alertPromise;
                     }
                 }
 
