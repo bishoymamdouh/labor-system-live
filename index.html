@@ -10349,11 +10349,11 @@ document.addEventListener('click', (e) => {
                     orientation: 'portrait',
                     fitToPage: true,
                     fitToWidth: 1,
-                    fitToHeight: 0,
+                    fitToHeight: 1,
                     horizontalCentered: true,
                     margins: {
-                        left: 0.4,
-                        right: 0.4,
+                        left: 0.6,
+                        right: 0.6,
                         top: 0.4,
                         bottom: 0.4,
                         header: 0.2,
@@ -10362,12 +10362,12 @@ document.addEventListener('click', (e) => {
                 }
             });
 
-            // Columns widths matching portrait layout
+            // Columns widths matching portrait layout and signature line proportions
             ws.columns = [
-                { width: 10 }, // A: Sl
-                { width: 30 }, // B: Name
-                { width: 26 }, // C: Job Type
-                { width: 22 }  // D: Net Salary
+                { width: 16 }, // A: Sl & Project Manager
+                { width: 28 }, // B: Name & Supervisor
+                { width: 24 }, // C: Job Type & Site Accountant
+                { width: 20 }  // D: Net Salary & HR Department
             ];
 
             // Rows 1-3: Logo on top right (Col C-D)
@@ -10520,43 +10520,44 @@ document.addEventListener('click', (e) => {
                 };
             });
 
-            // Signatures Section
+            // Signatures Section (Matching PDF & سركي العامل: 4 signatures in a single row at page bottom)
             currentRow = totalRowIdx + 1;
-            ws.getRow(currentRow).height = 16; // Spacer
+            ws.getRow(currentRow).height = 18; // Spacer after table
 
-            currentRow++;
-            ws.getRow(currentRow).height = 24;
+            const sigTitlesRow = currentRow + 1;
+            ws.getRow(sigTitlesRow).height = 24;
 
-            const pmCell = ws.getCell('A' + currentRow);
-            pmCell.value = 'Project Manager';
-            pmCell.font = { name: 'Calibri', size: 11, bold: true };
-            pmCell.alignment = { vertical: 'middle', horizontal: 'center' };
+            const sigs = [
+                { col: 'A', title: 'Project Manager' },
+                { col: 'B', title: 'Supervisor' },
+                { col: 'C', title: 'Site Accountant' },
+                { col: 'D', title: 'HR Department' }
+            ];
 
-            ws.mergeCells(`B${currentRow}:C${currentRow}`);
-            const supCell = ws.getCell('B' + currentRow);
-            supCell.value = 'Supervisor';
-            supCell.font = { name: 'Calibri', size: 11, bold: true };
-            supCell.alignment = { vertical: 'middle', horizontal: 'center' };
+            sigs.forEach(s => {
+                const cell = ws.getCell(s.col + sigTitlesRow);
+                cell.value = s.title;
+                cell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FF000000' } };
+                cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            });
 
-            const accCell = ws.getCell('D' + currentRow);
-            accCell.value = 'Site Accountant';
-            accCell.font = { name: 'Calibri', size: 11, bold: true };
-            accCell.alignment = { vertical: 'middle', horizontal: 'center' };
+            // Spacer row for signing / stamps
+            const sigSpaceRow = sigTitlesRow + 1;
+            ws.getRow(sigSpaceRow).height = 32;
 
-            // Spacer rows for stamps/signatures
-            for (let i = 0; i < 3; i++) {
-                currentRow++;
-                ws.getRow(currentRow).height = 18;
-            }
+            // Signature line row
+            const sigLineRow = sigSpaceRow + 1;
+            ws.getRow(sigLineRow).height = 16;
 
-            // HR Department line
-            currentRow++;
-            ws.getRow(currentRow).height = 24;
-            ws.mergeCells(`A${currentRow}:D${currentRow}`);
-            const hrCell = ws.getCell('A' + currentRow);
-            hrCell.value = 'HR Department';
-            hrCell.font = { name: 'Calibri', size: 11, bold: true };
-            hrCell.alignment = { vertical: 'middle', horizontal: 'center' };
+            sigs.forEach(s => {
+                const cell = ws.getCell(s.col + sigLineRow);
+                cell.value = '━━━━━━━━━━━';
+                cell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FF000000' } };
+                cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                cell.border = {
+                    bottom: { style: 'thin', color: { argb: 'FF000000' } }
+                };
+            });
 
             // Export workbook to file
             const buffer = await workbook.xlsx.writeBuffer();
@@ -10712,6 +10713,7 @@ document.addEventListener('click', (e) => {
                     .page-container {
                         width: 100%;
                         height: 100%;
+                        min-height: 275mm;
                         max-height: 280mm;
                         padding: 0.2cm 0.4cm;
                         box-sizing: border-box;
@@ -10825,8 +10827,7 @@ document.addEventListener('click', (e) => {
                     .density-normal table.wages-table th { padding: 9px 6px; font-size: 13px; }
                     .density-normal table.wages-table td { padding: 8.5px 6px; font-size: 12.5px; }
                     .density-normal table.wages-table tr.total-row td { padding: 9px 6px; font-size: 13.5px; }
-                    .density-normal .sig-spacer { height: 42px; }
-                    .density-normal .sig-spacer-small { height: 28px; }
+                    .density-normal .sig-line { margin-top: 36px; }
 
                     /* Snug (13-20 rows) */
                     .density-snug table.wages-table th { padding: 6.5px 5px; font-size: 12px; }
@@ -10835,8 +10836,7 @@ document.addEventListener('click', (e) => {
                     .density-snug .header h1 { font-size: 19px; margin: 3px 0 1px 0; }
                     .density-snug .project-title-box { font-size: 12.5px; padding: 4px 14px; }
                     .density-snug .logo-img { max-height: 45px; }
-                    .density-snug .sig-spacer { height: 32px; }
-                    .density-snug .sig-spacer-small { height: 22px; }
+                    .density-snug .sig-line { margin-top: 26px; }
 
                     /* Medium (21-28 rows) */
                     .density-medium table.wages-table th { padding: 4.5px 4px; font-size: 10.5px; }
@@ -10846,9 +10846,8 @@ document.addEventListener('click', (e) => {
                     .density-medium .header h1 { font-size: 17px; margin: 2px 0 1px 0; }
                     .density-medium .project-title-box { font-size: 11.5px; padding: 3px 12px; }
                     .density-medium .logo-img { max-height: 40px; }
-                    .density-medium .sig-spacer { height: 22px; }
-                    .density-medium .sig-spacer-small { height: 16px; }
-                    .density-medium .sig-row-top, .density-medium .sig-row-bottom { font-size: 11.5px; }
+                    .density-medium .sig-line { margin-top: 18px; }
+                    .density-medium .sig-title { font-size: 11px; }
 
                     /* Compact (29-40 rows) */
                     .density-compact table.wages-table th { padding: 3px 3px; font-size: 9px; line-height: 1.15; }
@@ -10859,10 +10858,9 @@ document.addEventListener('click', (e) => {
                     .density-compact .project-title-box { font-size: 10.5px; padding: 2px 10px; }
                     .density-compact .header p { font-size: 11px; margin: 1px 0 0 0; }
                     .density-compact .logo-img { max-height: 35px; }
-                    .density-compact .signatures-area { margin-top: 5px; }
-                    .density-compact .sig-spacer { height: 15px; }
-                    .density-compact .sig-spacer-small { height: 10px; }
-                    .density-compact .sig-row-top, .density-compact .sig-row-bottom { font-size: 10px; }
+                    .density-compact .signatures-area { padding-top: 8px; }
+                    .density-compact .sig-line { margin-top: 12px; }
+                    .density-compact .sig-title { font-size: 9.5px; }
 
                     /* Ultra-Compact (41+ rows) */
                     .density-ultracompact table.wages-table th { padding: 1.8px 2px; font-size: 8px; line-height: 1.1; }
@@ -10873,51 +10871,44 @@ document.addEventListener('click', (e) => {
                     .density-ultracompact .project-title-box { font-size: 10px; padding: 2px 8px; }
                     .density-ultracompact .header p { font-size: 10px; margin: 1px 0 0 0; }
                     .density-ultracompact .logo-img { max-height: 30px; }
-                    .density-ultracompact .signatures-area { margin-top: 3px; }
-                    .density-ultracompact .sig-spacer { height: 10px; }
-                    .density-ultracompact .sig-spacer-small { height: 6px; }
-                    .density-ultracompact .sig-row-top, .density-ultracompact .sig-row-bottom { font-size: 9px; }
+                    .density-ultracompact .signatures-area { padding-top: 4px; }
+                    .density-ultracompact .sig-line { margin-top: 8px; }
+                    .density-ultracompact .sig-title { font-size: 8.5px; }
 
-                    /* SIGNATURES AREA */
+                    /* SIGNATURES AREA (SINGLE ROW AT PAGE BOTTOM MATCHING سركي العامل) */
                     .signatures-area {
-                        margin-top: 10px;
+                        margin-top: auto;
+                        padding-top: 14px;
                         page-break-inside: avoid !important;
                         break-inside: avoid !important;
                         flex-shrink: 0;
+                        width: 100%;
                         direction: ltr;
                     }
-                    .sig-row-top {
+                    .signatures {
                         display: flex;
                         justify-content: space-between;
-                        text-align: center;
-                        font-weight: 700;
-                        font-size: 12px;
-                        padding: 0 15px;
+                        align-items: flex-end;
+                        width: 100%;
+                        direction: ltr;
+                        padding: 0 4px;
                     }
-                    .sig-col {
-                        width: 28%;
+                    .sig-box {
                         text-align: center;
+                        width: 22%;
+                        page-break-inside: avoid !important;
+                        break-inside: avoid !important;
                     }
                     .sig-title {
-                        font-weight: 700;
-                    }
-                    .sig-spacer {
-                        height: 36px;
-                    }
-                    .sig-row-bottom {
-                        display: flex;
-                        justify-content: center;
-                        text-align: center;
-                        font-weight: 700;
                         font-size: 12px;
-                        margin-top: 2px;
+                        font-weight: 700;
+                        color: #000000;
+                        margin-bottom: 2px;
                     }
-                    .sig-col-center {
-                        width: 32%;
-                        text-align: center;
-                    }
-                    .sig-spacer-small {
-                        height: 22px;
+                    .sig-line {
+                        border-bottom: 1.5px solid #000000;
+                        margin-top: 36px;
+                        width: 100%;
                     }
                 </style>
             </head>
@@ -10951,24 +10942,22 @@ document.addEventListener('click', (e) => {
                     </div>
 
                     <div class="signatures-area">
-                        <div class="sig-row-top">
-                            <div class="sig-col">
+                        <div class="signatures">
+                            <div class="sig-box">
                                 <div class="sig-title">Project Manager</div>
-                                <div class="sig-spacer"></div>
+                                <div class="sig-line"></div>
                             </div>
-                            <div class="sig-col">
+                            <div class="sig-box">
                                 <div class="sig-title">Supervisor</div>
-                                <div class="sig-spacer"></div>
+                                <div class="sig-line"></div>
                             </div>
-                            <div class="sig-col">
+                            <div class="sig-box">
                                 <div class="sig-title">Site Accountant</div>
-                                <div class="sig-spacer"></div>
+                                <div class="sig-line"></div>
                             </div>
-                        </div>
-                        <div class="sig-row-bottom">
-                            <div class="sig-col-center">
+                            <div class="sig-box">
                                 <div class="sig-title">HR Department</div>
-                                <div class="sig-spacer-small"></div>
+                                <div class="sig-line"></div>
                             </div>
                         </div>
                     </div>
