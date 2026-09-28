@@ -1,4 +1,4 @@
-// Service Worker v5.5 - Universal Web Push (iOS, Android, Windows, Mac)
+// Service Worker v5.6 - Universal Web Push (iOS, Android, Windows, Mac)
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
@@ -23,7 +23,7 @@ self.addEventListener('push', e => {
         }
     } catch (err) {
         if (e.data) {
-            data.body = e.data.text();
+            try { data.body = e.data.text(); } catch(e2) {}
         }
     }
 
@@ -33,7 +33,8 @@ self.addEventListener('push', e => {
         badge: '/logo.png',
         data: data.url || '/',
         tag: data.tag || ('notif_' + Date.now()),
-        renotify: true
+        renotify: true,
+        requireInteraction: true
     };
 
     // Only add vibrate if navigator.vibrate is supported (Android / Chrome)
@@ -43,12 +44,18 @@ self.addEventListener('push', e => {
 
     e.waitUntil(
         self.registration.showNotification(data.title || 'نظام السراكي', options).catch(err => {
-            console.error('showNotification error:', err);
-            // Fallback with minimal options for strict iOS Safari versions
+            console.error('showNotification primary error:', err);
+            // Tier 2 fallback: without vibrate or badge for strict iOS Safari
             return self.registration.showNotification(data.title || 'نظام السراكي', {
                 body: data.body || '',
                 icon: '/logo.png',
                 data: data.url || '/'
+            }).catch(err2 => {
+                console.error('showNotification tier 2 error:', err2);
+                // Tier 3 fallback: bare minimum for any restrictive browser
+                return self.registration.showNotification(data.title || 'نظام السراكي', {
+                    body: data.body || ''
+                });
             });
         })
     );
