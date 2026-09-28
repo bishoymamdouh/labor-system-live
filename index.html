@@ -10773,10 +10773,7 @@ document.addEventListener('click', (e) => {
                     /* TABLE CONTAINER & TABLE */
                     .table-container {
                         width: 100%;
-                        flex: 1 1 auto;
-                        display: flex;
-                        align-items: flex-start;
-                        overflow: hidden;
+                        overflow: visible;
                         page-break-inside: avoid !important;
                         break-inside: avoid !important;
                     }
@@ -10784,6 +10781,7 @@ document.addEventListener('click', (e) => {
                         width: 100%;
                         border-collapse: collapse;
                         margin: 0;
+                        border: 1.5px solid #000000;
                         page-break-inside: avoid !important;
                         break-inside: avoid !important;
                     }
@@ -12239,13 +12237,10 @@ document.addEventListener('click', (e) => {
                 /* TABLE WRAPPER */
                 .table-container {
                     width: 100%;
-                    flex: 1 1 auto;
-                    display: flex;
-                    align-items: flex-start;
-                    margin-bottom: 10px;
+                    margin-bottom: 8px;
                     page-break-inside: avoid;
                     break-inside: avoid;
-                    overflow: hidden;
+                    overflow: visible;
                 }
 
                 table { 
@@ -12254,13 +12249,14 @@ document.addEventListener('click', (e) => {
                     margin: 0;
                     page-break-inside: avoid;
                     break-inside: avoid;
+                    border: 1.5px solid #000;
                 }
                 th, td { 
                     border: 1px solid #000; 
                     text-align: center; 
                     vertical-align: middle; 
                     word-wrap: break-word; 
-                    line-height: 1.4;
+                    line-height: 1.35;
                 }
                 th { 
                     background-color: #f1f1f1 !important; 
@@ -12272,19 +12268,25 @@ document.addEventListener('click', (e) => {
                     vertical-align: middle;
                     font-weight: bold;
                 }
+                table tr:last-child td,
+                table td.rowspan-cell {
+                    border-bottom: 1.5px solid #000 !important;
+                }
 
                 /* DENSITY TIERS FOR FIT-TO-PAPER */
-                /* Normal (1-8 rows): Extra generous vertical cell height */
+                /* Normal (1-7 rows): Generous vertical cell height */
                 .density-normal table { font-size: 12px; }
-                .density-normal th { padding: 14px 6px; font-size: 12.5px; }
-                .density-normal td { padding: 13.5px 6px; }
-                .density-normal .name-cell { font-size: 14px; }
+                .density-normal th { padding: 11px 5px; font-size: 12px; }
+                .density-normal td { padding: 10.5px 5px; }
+                .density-normal .name-cell { font-size: 13.5px; }
 
-                /* Snug (9-14 rows) */
+                /* Snug (8-14 rows) */
                 .density-snug table { font-size: 10.5px; }
-                .density-snug th { padding: 7.5px 4px; font-size: 11px; }
-                .density-snug td { padding: 7px 4px; }
-                .density-snug .name-cell { font-size: 12.5px; }
+                .density-snug th { padding: 7px 4px; font-size: 11px; }
+                .density-snug td { padding: 6.5px 4px; }
+                .density-snug .name-cell { font-size: 12px; }
+                .density-snug .table-container { margin-bottom: 6px; }
+                .density-snug .summary { margin-bottom: 8px; }
 
                 /* Medium (15-22 rows) */
                 .density-medium table { font-size: 9px; }
@@ -12369,7 +12371,7 @@ document.addEventListener('click', (e) => {
             let densityClass = 'density-normal';
             if (rowCount > 22) densityClass = 'density-compact';
             else if (rowCount > 14) densityClass = 'density-medium';
-            else if (rowCount > 8) densityClass = 'density-snug';
+            else if (rowCount >= 8) densityClass = 'density-snug';
 
             let recordsHtml = `<table>
                 <thead>
