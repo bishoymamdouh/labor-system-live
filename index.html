@@ -10647,16 +10647,23 @@ document.addEventListener('click', (e) => {
                 }
             }
 
+            const rowCount = workersList.length;
+            let densityClass = 'density-normal';
+            if (rowCount > 40) densityClass = 'density-ultracompact';
+            else if (rowCount > 28) densityClass = 'density-compact';
+            else if (rowCount > 20) densityClass = 'density-medium';
+            else if (rowCount > 12) densityClass = 'density-snug';
+
             let grandTotal = 0;
             let rowsHtml = '';
             workersList.forEach((w, idx) => {
                 grandTotal += w.netSalary;
                 rowsHtml += `
                     <tr>
-                        <td style="border: 1px solid #000; padding: 6px 4px; font-weight: bold; text-align: center;">${idx + 1}</td>
-                        <td style="border: 1px solid #000; padding: 6px 4px; font-weight: bold; text-align: center;" class="col-name">${w.name}</td>
-                        <td style="border: 1px solid #000; padding: 6px 4px; font-weight: bold; text-align: center;" class="col-job">${w.jobType}</td>
-                        <td style="border: 1px solid #000; padding: 6px 4px; font-weight: bold; text-align: center;">${w.netSalary.toLocaleString()}</td>
+                        <td class="col-sl">${idx + 1}</td>
+                        <td class="col-name">${w.name}</td>
+                        <td class="col-job">${w.jobType}</td>
+                        <td class="col-salary">${w.netSalary.toLocaleString()}</td>
                     </tr>
                 `;
             });
@@ -10669,144 +10676,302 @@ document.addEventListener('click', (e) => {
                 <title>كشف أجور العمال</title>
                 <base href="${window.location.origin}">
                 <style>
-                    @page {
-                        size: A4 portrait;
-                        margin: 10mm 12mm 10mm 12mm;
+                    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+                    @media print {
+                        @page {
+                            size: A4 portrait;
+                            margin: 0.6cm 1.6cm;
+                        }
+                        html, body {
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            width: 100% !important;
+                            height: 100% !important;
+                            overflow: hidden !important;
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                        }
+                        .page-container {
+                            page-break-inside: avoid !important;
+                            break-inside: avoid !important;
+                            page-break-after: avoid !important;
+                            break-after: avoid !important;
+                        }
                     }
                     * {
                         box-sizing: border-box;
-                        font-family: 'Calibri', 'Segoe UI', Tahoma, sans-serif;
                     }
                     body {
+                        font-family: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif;
                         margin: 0;
                         padding: 0;
-                        color: #000000;
                         background: #ffffff;
+                        color: #000000;
                         direction: rtl;
                     }
-                    .header-container {
+                    .page-container {
+                        width: 100%;
+                        height: 100%;
+                        max-height: 280mm;
+                        padding: 0.2cm 0.4cm;
+                        box-sizing: border-box;
                         display: flex;
-                        justify-content: flex-end;
-                        align-items: center;
-                        margin-bottom: 8px;
-                        min-height: 52px;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        overflow: hidden;
+                        page-break-inside: avoid !important;
+                        break-inside: avoid !important;
                     }
-                    .header-logo {
-                        height: 48px;
+
+                    /* HEADER (EXACTLY MATCHING سركي العامل) */
+                    .header {
+                        position: relative;
+                        text-align: center;
+                        margin-bottom: 8px;
+                        border-bottom: 2px solid #000000;
+                        padding-bottom: 8px;
+                        page-break-inside: avoid !important;
+                        break-inside: avoid !important;
+                        flex-shrink: 0;
+                    }
+                    .header h1 {
+                        margin: 4px 0 2px 0;
+                        font-size: 21px;
+                        font-weight: 800;
+                        color: #000000;
+                    }
+                    .project-title-box {
+                        background-color: #eef5fb;
+                        color: #003366;
+                        padding: 5px 18px;
+                        border-radius: 6px;
+                        display: inline-block;
+                        font-size: 13.5px;
+                        font-weight: bold;
+                        margin: 0;
+                        border: 1px solid #b8d4f0;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
+                    .header p {
+                        margin: 3px 0 0 0;
+                        font-size: 12.5px;
+                        font-weight: 600;
+                        color: #222222;
+                    }
+                    .logo-img {
+                        position: absolute;
+                        right: 0;
+                        top: 0;
+                        max-height: 50px;
                         width: auto;
                         object-fit: contain;
                     }
-                    .blue-banner {
-                        background-color: #BDD7EE;
-                        border: 1px solid #000000;
-                        text-align: center;
-                        font-weight: bold;
-                        font-size: 15px;
-                        padding: 5px 0;
-                        margin-bottom: 4px;
-                        letter-spacing: 0.5px;
-                    }
-                    .title-box {
-                        border: 2px solid #000000;
-                        text-align: center;
-                        font-weight: bold;
-                        font-size: 13.5px;
-                        padding: 6px 10px;
-                        margin-bottom: 12px;
-                        background: #ffffff;
+
+                    /* TABLE CONTAINER & TABLE */
+                    .table-container {
+                        width: 100%;
+                        flex: 1 1 auto;
+                        display: flex;
+                        align-items: flex-start;
+                        overflow: hidden;
+                        page-break-inside: avoid !important;
+                        break-inside: avoid !important;
                     }
                     table.wages-table {
                         width: 100%;
                         border-collapse: collapse;
-                        text-align: center;
-                        direction: ltr;
+                        margin: 0;
+                        page-break-inside: avoid !important;
+                        break-inside: avoid !important;
                     }
                     table.wages-table th {
-                        background-color: #F8CBAD;
+                        background-color: #F8CBAD !important;
                         color: #000000;
-                        font-weight: bold;
-                        font-size: 13px;
-                        padding: 7px 6px;
+                        font-weight: 800;
                         border: 1px solid #000000;
+                        text-align: center;
+                        vertical-align: middle;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
                     }
                     table.wages-table td {
                         border: 1px solid #000000;
-                        padding: 6px 6px;
-                        font-size: 12.5px;
-                        font-weight: 600;
+                        text-align: center;
+                        vertical-align: middle;
+                        font-weight: 700;
                         color: #000000;
                     }
-                    table.wages-table td.col-name {
-                        direction: rtl;
-                    }
+                    table.wages-table td.col-name,
                     table.wages-table td.col-job {
                         direction: rtl;
                     }
+                    table.wages-table td.col-sl,
+                    table.wages-table td.col-salary,
                     table.wages-table tr.total-row td {
-                        font-weight: bold;
-                        font-size: 13.5px;
+                        direction: ltr;
+                    }
+                    table.wages-table tr.total-row td {
+                        font-weight: 800;
                         border-top: 2px solid #000000;
                         border-bottom: 2px solid #000000;
-                        padding: 7px 6px;
+                        background-color: #f7f7f7 !important;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
                     }
+
+                    /* DENSITY TIERS FOR 1-PAGE FIT (A4 PORTRAIT) */
+                    /* Normal (1-12 rows) */
+                    .density-normal table.wages-table th { padding: 9px 6px; font-size: 13px; }
+                    .density-normal table.wages-table td { padding: 8.5px 6px; font-size: 12.5px; }
+                    .density-normal table.wages-table tr.total-row td { padding: 9px 6px; font-size: 13.5px; }
+                    .density-normal .sig-spacer { height: 42px; }
+                    .density-normal .sig-spacer-small { height: 28px; }
+
+                    /* Snug (13-20 rows) */
+                    .density-snug table.wages-table th { padding: 6.5px 5px; font-size: 12px; }
+                    .density-snug table.wages-table td { padding: 6px 5px; font-size: 11.5px; }
+                    .density-snug table.wages-table tr.total-row td { padding: 7px 5px; font-size: 12.5px; }
+                    .density-snug .header h1 { font-size: 19px; margin: 3px 0 1px 0; }
+                    .density-snug .project-title-box { font-size: 12.5px; padding: 4px 14px; }
+                    .density-snug .logo-img { max-height: 45px; }
+                    .density-snug .sig-spacer { height: 32px; }
+                    .density-snug .sig-spacer-small { height: 22px; }
+
+                    /* Medium (21-28 rows) */
+                    .density-medium table.wages-table th { padding: 4.5px 4px; font-size: 10.5px; }
+                    .density-medium table.wages-table td { padding: 4px 4px; font-size: 10px; }
+                    .density-medium table.wages-table tr.total-row td { padding: 5px 4px; font-size: 11px; }
+                    .density-medium .header { margin-bottom: 5px; padding-bottom: 5px; }
+                    .density-medium .header h1 { font-size: 17px; margin: 2px 0 1px 0; }
+                    .density-medium .project-title-box { font-size: 11.5px; padding: 3px 12px; }
+                    .density-medium .logo-img { max-height: 40px; }
+                    .density-medium .sig-spacer { height: 22px; }
+                    .density-medium .sig-spacer-small { height: 16px; }
+                    .density-medium .sig-row-top, .density-medium .sig-row-bottom { font-size: 11.5px; }
+
+                    /* Compact (29-40 rows) */
+                    .density-compact table.wages-table th { padding: 3px 3px; font-size: 9px; line-height: 1.15; }
+                    .density-compact table.wages-table td { padding: 2.5px 3px; font-size: 8.5px; line-height: 1.15; }
+                    .density-compact table.wages-table tr.total-row td { padding: 3.5px 3px; font-size: 9.5px; }
+                    .density-compact .header { margin-bottom: 3px; padding-bottom: 3px; }
+                    .density-compact .header h1 { font-size: 15px; margin: 1px 0; }
+                    .density-compact .project-title-box { font-size: 10.5px; padding: 2px 10px; }
+                    .density-compact .header p { font-size: 11px; margin: 1px 0 0 0; }
+                    .density-compact .logo-img { max-height: 35px; }
+                    .density-compact .signatures-area { margin-top: 5px; }
+                    .density-compact .sig-spacer { height: 15px; }
+                    .density-compact .sig-spacer-small { height: 10px; }
+                    .density-compact .sig-row-top, .density-compact .sig-row-bottom { font-size: 10px; }
+
+                    /* Ultra-Compact (41+ rows) */
+                    .density-ultracompact table.wages-table th { padding: 1.8px 2px; font-size: 8px; line-height: 1.1; }
+                    .density-ultracompact table.wages-table td { padding: 1.5px 2px; font-size: 7.8px; line-height: 1.1; }
+                    .density-ultracompact table.wages-table tr.total-row td { padding: 2px 2px; font-size: 8.5px; }
+                    .density-ultracompact .header { margin-bottom: 2px; padding-bottom: 2px; }
+                    .density-ultracompact .header h1 { font-size: 14px; margin: 1px 0; }
+                    .density-ultracompact .project-title-box { font-size: 10px; padding: 2px 8px; }
+                    .density-ultracompact .header p { font-size: 10px; margin: 1px 0 0 0; }
+                    .density-ultracompact .logo-img { max-height: 30px; }
+                    .density-ultracompact .signatures-area { margin-top: 3px; }
+                    .density-ultracompact .sig-spacer { height: 10px; }
+                    .density-ultracompact .sig-spacer-small { height: 6px; }
+                    .density-ultracompact .sig-row-top, .density-ultracompact .sig-row-bottom { font-size: 9px; }
+
+                    /* SIGNATURES AREA */
                     .signatures-area {
-                        margin-top: 25px;
-                        page-break-inside: avoid;
+                        margin-top: 10px;
+                        page-break-inside: avoid !important;
+                        break-inside: avoid !important;
+                        flex-shrink: 0;
                         direction: ltr;
                     }
                     .sig-row-top {
                         display: flex;
                         justify-content: space-between;
                         text-align: center;
-                        font-weight: bold;
-                        font-size: 13px;
+                        font-weight: 700;
+                        font-size: 12px;
                         padding: 0 15px;
                     }
                     .sig-col {
                         width: 28%;
                         text-align: center;
                     }
+                    .sig-title {
+                        font-weight: 700;
+                    }
                     .sig-spacer {
-                        height: 48px;
+                        height: 36px;
                     }
                     .sig-row-bottom {
+                        display: flex;
+                        justify-content: center;
                         text-align: center;
-                        font-weight: bold;
-                        font-size: 13px;
+                        font-weight: 700;
+                        font-size: 12px;
+                        margin-top: 2px;
+                    }
+                    .sig-col-center {
+                        width: 32%;
+                        text-align: center;
+                    }
+                    .sig-spacer-small {
+                        height: 22px;
                     }
                 </style>
             </head>
             <body>
-                <div class="header-container">
-                    <img class="header-logo" src="data:image/png;base64,${window.CORNERSTONE_LOGO_BASE64}" alt="Cornerstone Development" />
-                </div>
-                <div class="blue-banner">Cornerstone Development</div>
-                <div class="title-box">${dateRangeText}</div>
-                <table class="wages-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 10%;">Sl</th>
-                            <th style="width: 38%;">Name</th>
-                            <th style="width: 30%;">Job Type</th>
-                            <th style="width: 22%;">Net Salary</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${rowsHtml}
-                        <tr class="total-row">
-                            <td colspan="3" style="text-align: center;">Total</td>
-                            <td style="text-align: center;">${grandTotal.toLocaleString()}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="signatures-area">
-                    <div class="sig-row-top">
-                        <div class="sig-col">Project Manager</div>
-                        <div class="sig-col">Supervisor</div>
-                        <div class="sig-col">Site Accountant</div>
+                <div class="page-container ${densityClass}">
+                    <div class="header">
+                        <img src="/logo.png?v=2" class="logo-img" alt="Logo" onerror="this.src='data:image/png;base64,${window.CORNERSTONE_LOGO_BASE64}'">
+                        <div class="project-title-box">Cornerstone Development - Project: The Curve</div>
+                        <h1>كشف أجور العمال</h1>
+                        <p>${dateRangeText}</p>
                     </div>
-                    <div class="sig-spacer"></div>
-                    <div class="sig-row-bottom">HR Department</div>
+
+                    <div class="table-container">
+                        <table class="wages-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 9%;">Sl</th>
+                                    <th style="width: 38%;">Name</th>
+                                    <th style="width: 29%;">Job Type</th>
+                                    <th style="width: 24%;">Net Salary</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHtml}
+                                <tr class="total-row">
+                                    <td colspan="3" style="text-align: center;">Total</td>
+                                    <td style="text-align: center;">${grandTotal.toLocaleString()}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="signatures-area">
+                        <div class="sig-row-top">
+                            <div class="sig-col">
+                                <div class="sig-title">Project Manager</div>
+                                <div class="sig-spacer"></div>
+                            </div>
+                            <div class="sig-col">
+                                <div class="sig-title">Supervisor</div>
+                                <div class="sig-spacer"></div>
+                            </div>
+                            <div class="sig-col">
+                                <div class="sig-title">Site Accountant</div>
+                                <div class="sig-spacer"></div>
+                            </div>
+                        </div>
+                        <div class="sig-row-bottom">
+                            <div class="sig-col-center">
+                                <div class="sig-title">HR Department</div>
+                                <div class="sig-spacer-small"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </body>
             </html>
@@ -10822,13 +10987,25 @@ document.addEventListener('click', (e) => {
             document.body.appendChild(iframe);
             
             iframe.onload = function() {
-                setTimeout(() => {
+                const triggerPrint = () => {
                     iframe.contentWindow.focus();
                     iframe.contentWindow.print();
                     setTimeout(() => {
-                        document.body.removeChild(iframe);
+                        if (document.body.contains(iframe)) {
+                            document.body.removeChild(iframe);
+                        }
                     }, 5000);
-                }, 500);
+                };
+
+                if (iframe.contentDocument && iframe.contentDocument.fonts) {
+                    iframe.contentDocument.fonts.ready.then(() => {
+                        setTimeout(triggerPrint, 150);
+                    }).catch(() => {
+                        setTimeout(triggerPrint, 350);
+                    });
+                } else {
+                    setTimeout(triggerPrint, 400);
+                }
             };
         } catch (error) {
             console.error('Error in printWagesSummaryPDF:', error);
