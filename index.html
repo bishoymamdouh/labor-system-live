@@ -12373,48 +12373,82 @@ document.addEventListener('click', (e) => {
             stats.records.sort((a, b) => a.date.localeCompare(b.date));
             const rowCount = stats.records.length;
             
-            let densityClass = 'density-normal';
-            if (rowCount > 18) densityClass = 'density-compact';
-            else if (rowCount > 11) densityClass = 'density-medium';
-            else if (rowCount > 6) densityClass = 'density-snug';
+            // Calculate dynamic row height and typography to beautifully fill the entire page height
+            const targetBodyHeight = 510;
+            const calcRowHeight = Math.floor(targetBodyHeight / Math.max(1, rowCount));
+            const rowHeight = Math.max(16, Math.min(85, calcRowHeight));
 
-            let recordsHtml = `<table>
+            let fontSize = 12.5;
+            let nameFontSize = 14.5;
+            let paddingV = 6;
+            let lineHeight = 1.25;
+
+            if (rowHeight >= 60) {
+                fontSize = 12.5;
+                nameFontSize = 14.5;
+                paddingV = 6;
+            } else if (rowHeight >= 45) {
+                fontSize = 11.5;
+                nameFontSize = 13.5;
+                paddingV = 5;
+            } else if (rowHeight >= 32) {
+                fontSize = 10.5;
+                nameFontSize = 12;
+                paddingV = 4;
+            } else if (rowHeight >= 24) {
+                fontSize = 9.5;
+                nameFontSize = 11;
+                paddingV = 3;
+            } else if (rowHeight >= 19) {
+                fontSize = 8.5;
+                nameFontSize = 10;
+                paddingV = 2;
+            } else {
+                fontSize = 8;
+                nameFontSize = 9;
+                paddingV = 1;
+                lineHeight = 1.15;
+            }
+
+            const thPadding = rowHeight >= 45 ? '8px 3px' : rowHeight >= 28 ? '5px 2px' : '3px 2px';
+
+            let recordsHtml = `<table style="font-size: ${fontSize}px; line-height: ${lineHeight};">
                 <thead>
-                    <tr>
-                        <th style="width: 2.5%;">م</th>
-                        <th style="width: 10%;">الاسم</th>
-                        <th style="width: 8%;">النوع</th>
-                        <th style="width: 8%;">التاريخ</th>
-                        <th style="width: 6.5%;">المشروع</th>
-                        <th style="width: 8%;">مكان العمل</th>
-                        <th style="width: 23%;">بند العمل (بالتفصيل)</th>
-                        <th style="width: 8%;">خصم على مقاول<br><span style="font-size:0.85em; font-weight:normal;">(اسم المقاول)</span></th>
-                        <th style="width: 7%;">الملاحظات</th>
-                        <th style="width: 5.5%;">سعر الساعة</th>
-                        <th style="width: 4.5%;">ساعات العمل</th>
-                        <th style="width: 4%;">خصم</th>
-                        <th style="width: 6%;">صافية اليومية</th>
+                    <tr style="height: ${rowHeight >= 45 ? 36 : 28}px;">
+                        <th style="width: 2.5%; padding: ${thPadding};">م</th>
+                        <th style="width: 10%; padding: ${thPadding};">الاسم</th>
+                        <th style="width: 8%; padding: ${thPadding};">النوع</th>
+                        <th style="width: 8%; padding: ${thPadding};">التاريخ</th>
+                        <th style="width: 6.5%; padding: ${thPadding};">المشروع</th>
+                        <th style="width: 8%; padding: ${thPadding};">مكان العمل</th>
+                        <th style="width: 23%; padding: ${thPadding};">بند العمل (بالتفصيل)</th>
+                        <th style="width: 8%; padding: ${thPadding};">خصم على مقاول<br><span style="font-size:0.85em; font-weight:normal;">(اسم المقاول)</span></th>
+                        <th style="width: 7%; padding: ${thPadding};">الملاحظات</th>
+                        <th style="width: 5.5%; padding: ${thPadding};">سعر الساعة</th>
+                        <th style="width: 4.5%; padding: ${thPadding};">ساعات العمل</th>
+                        <th style="width: 4%; padding: ${thPadding};">خصم</th>
+                        <th style="width: 6%; padding: ${thPadding};">صافية اليومية</th>
                     </tr>
                 </thead>
                 <tbody>`;
 
             stats.records.forEach((r, index) => {
-                recordsHtml += '<tr>';
+                recordsHtml += `<tr style="height: ${rowHeight}px;">`;
                 // Serial
-                recordsHtml += `<td>${index + 1}</td>`;
+                recordsHtml += `<td style="padding: ${paddingV}px 2px;">${index + 1}</td>`;
                 
                 // Name (rowspan)
                 if (index === 0) {
-                    recordsHtml += `<td rowspan="${stats.records.length}" class="rowspan-cell name-cell">${name}</td>`;
+                    recordsHtml += `<td rowspan="${stats.records.length}" class="rowspan-cell name-cell" style="font-size: ${nameFontSize}px; padding: 2px;">${name}</td>`;
                 }
                 
                 // Type (rowspan)
                 if (index === 0) {
-                    recordsHtml += `<td rowspan="${stats.records.length}" class="rowspan-cell">${r.type}</td>`;
+                    recordsHtml += `<td rowspan="${stats.records.length}" class="rowspan-cell" style="padding: 2px;">${r.type}</td>`;
                 }
                 
                 // Date
-                recordsHtml += `<td style="white-space: nowrap;">${r.date}</td>`;
+                recordsHtml += `<td style="white-space: nowrap; padding: ${paddingV}px 2px;">${r.date}</td>`;
                 
                 // Project (rowspan)
                 if (index === 0) {
@@ -12422,29 +12456,29 @@ document.addEventListener('click', (e) => {
                 }
                 
                 // Location
-                recordsHtml += `<td>${r.location}</td>`;
+                recordsHtml += `<td style="padding: ${paddingV}px 2px;">${r.location}</td>`;
                 
                 // Task
-                recordsHtml += `<td>${r.task || '-'}</td>`;
+                recordsHtml += `<td style="padding: ${paddingV}px 2px;">${r.task || '-'}</td>`;
                 
                 // Contractor
-                recordsHtml += `<td>${r.contractor || '-'}</td>`;
+                recordsHtml += `<td style="padding: ${paddingV}px 2px;">${r.contractor || '-'}</td>`;
                 
                 // Notes
-                recordsHtml += `<td>${r.notes || ''}</td>`;
+                recordsHtml += `<td style="padding: ${paddingV}px 2px;">${r.notes || ''}</td>`;
                 
                 // Hourly Rate (Gross / 8)
                 const hourlyRate = (r.gross / 8).toFixed(2);
-                recordsHtml += `<td>${hourlyRate}</td>`;
+                recordsHtml += `<td style="padding: ${paddingV}px 2px;">${hourlyRate}</td>`;
                 
                 // Working Hours
-                recordsHtml += `<td>8</td>`;
+                recordsHtml += `<td style="padding: ${paddingV}px 2px;">8</td>`;
                 
                 // Deduction
-                recordsHtml += `<td>${r.deduction}</td>`;
+                recordsHtml += `<td style="padding: ${paddingV}px 2px;">${r.deduction}</td>`;
                 
                 // Net Amount
-                recordsHtml += `<td>${r.net}</td>`;
+                recordsHtml += `<td style="padding: ${paddingV}px 2px;">${r.net}</td>`;
                 
                 recordsHtml += '</tr>';
             });
@@ -12461,7 +12495,7 @@ document.addEventListener('click', (e) => {
             }
 
             printHtml += `
-            <div class="receipt-page ${densityClass}">
+            <div class="receipt-page">
                 <div class="header">
                     <img src="/logo.png?v=2" class="logo-img" alt="Logo" onerror="this.style.display='none'">
                     <div class="project-title-box">Cornerstone Development - Project: The Curve</div>
@@ -12528,10 +12562,14 @@ document.addEventListener('click', (e) => {
                         let attempts = 0;
                         const tbl = page.querySelector('table');
                         if (tbl) {
-                            while (page.scrollHeight > page.clientHeight && attempts < 10) {
+                            while (page.scrollHeight > page.clientHeight && attempts < 12) {
                                 attempts++;
                                 const curSize = parseFloat(window.getComputedStyle(tbl).fontSize) || 9;
                                 tbl.style.fontSize = (curSize - 0.4) + 'px';
+                                tbl.querySelectorAll('tr').forEach(r => {
+                                    const h = parseFloat(r.style.height) || 20;
+                                    if (h > 15) r.style.height = (h - 2) + 'px';
+                                });
                                 tbl.querySelectorAll('th, td').forEach(c => {
                                     c.style.paddingTop = '1px';
                                     c.style.paddingBottom = '1px';
