@@ -4364,7 +4364,10 @@ class UI {
         if (status === 'pending') return '<span class="badge badge-pending">قيد المراجعة</span>';
         if (status === 'approved') {
             const approveTime = (record && record.approvedAt) ? UI.formatCairoTime(record.approvedAt) : '';
-            return `<span class="badge badge-approved" style="display: inline-flex; align-items: center; gap: 4px;" title="${approveTime ? `توقيت الاعتماد: ${approveTime}` : 'معتمد'}"><span>معتمد</span>${approveTime ? ` <span style="font-size: 0.88em; font-weight: 600; opacity: 0.95; margin-right: 2px;"><i class="far fa-clock" style="margin-left: 2px;"></i>(${approveTime})</span>` : ''}</span>`;
+            return `<span style="display: inline-flex; align-items: center; gap: 8px;">
+                <span class="badge badge-approved">معتمد</span>
+                ${approveTime ? `<span style="font-size: 0.85em; color: var(--text-muted); white-space: nowrap;"><i class="far fa-clock"></i> (${approveTime})</span>` : ''}
+            </span>`;
         }
         if (status === 'rejected') return '<span class="badge badge-rejected">مرفوض</span>';
         return status;
