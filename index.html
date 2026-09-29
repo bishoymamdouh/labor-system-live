@@ -2669,17 +2669,64 @@ select {
 
             <!-- Engineer View: Approve Records -->
             <section id="view-engineer" class="view hidden">
-                <header class="view-header flex-between" style="align-items: center; margin-bottom: 20px;">
-                    <h2><i class="fas fa-check-double"></i> اعتماد السراكي</h2>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                                                                        <select id="engineer-status-filter" class="modal-input" style="width: auto; margin-bottom: 0; padding: 5px 15px;" onchange="app.loadEngineerData()">
-                            <option value="all">الكل</option>
-                            <option value="pending" selected>قيد الانتظار</option>
-                            <option value="approved">معتمد</option>
-                            <option value="rejected">مرفوض</option>
-                        </select>
-                        <input type="date" id="engineer-date-filter" class="modal-input" style="width: auto; margin-bottom: 0; padding: 5px 15px;" onchange="app.loadEngineerData()">
+                <header class="view-header" style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                        <h2 style="margin: 0;"><i class="fas fa-check-double"></i> اعتماد السراكي</h2>
+                        
+                        <!-- Pending Money & Count Summary Card -->
+                        <div id="engineer-pending-summary" style="display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #f59e0b; border-radius: 10px; padding: 8px 16px; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.12);">
+                            <div style="width: 38px; height: 38px; border-radius: 50%; background: #fef08a; display: flex; align-items: center; justify-content: center; color: #b45309; font-size: 1.15rem; flex-shrink: 0;">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.78rem; font-weight: 700; color: #92400e; margin-bottom: 2px;" id="engineer-pending-title">إجمالي مبالغ طلبات قيد الانتظار</div>
+                                <div style="display: flex; align-items: baseline; gap: 8px;">
+                                    <span id="engineer-pending-total-amount" style="font-size: 1.35rem; font-weight: 800; color: #78350f;">0 ج.م</span>
+                                    <span id="engineer-pending-total-count" style="font-size: 0.8rem; font-weight: 700; color: #92400e; background: #fef08a; padding: 2px 8px; border-radius: 12px;">(0 سركي)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- Enhanced Filter Toolbar -->
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: var(--surface-color); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <!-- 1. Status Filter -->
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label style="font-size: 0.84rem; font-weight: 700; color: var(--text-color); margin: 0; white-space: nowrap;"><i class="fas fa-filter"></i> الحالة:</label>
+                            <select id="engineer-status-filter" class="modal-input" style="width: auto; margin-bottom: 0; padding: 5px 12px; font-weight: 600;" onchange="app.loadEngineerData()">
+                                <option value="all">الكل</option>
+                                <option value="pending" selected>قيد الانتظار</option>
+                                <option value="approved">معتمد</option>
+                                <option value="rejected">مرفوض</option>
+                            </select>
+                        </div>
+
+                        <!-- 2. Engineer Filter -->
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label style="font-size: 0.84rem; font-weight: 700; color: var(--text-color); margin: 0; white-space: nowrap;"><i class="fas fa-hard-hat"></i> المهندس:</label>
+                            <select id="engineer-engineer-filter" class="modal-input" style="width: auto; margin-bottom: 0; padding: 5px 12px;" onchange="app.loadEngineerData()">
+                                <option value="all">جميع المهندسين</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. Supervisor Filter -->
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label style="font-size: 0.84rem; font-weight: 700; color: var(--text-color); margin: 0; white-space: nowrap;"><i class="fas fa-user-tie"></i> المشرف:</label>
+                            <select id="engineer-supervisor-filter" class="modal-input" style="width: auto; margin-bottom: 0; padding: 5px 12px;" onchange="app.loadEngineerData()">
+                                <option value="all">جميع المشرفين</option>
+                            </select>
+                        </div>
+
+                        <!-- 4. Date Filter -->
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label style="font-size: 0.84rem; font-weight: 700; color: var(--text-color); margin: 0; white-space: nowrap;"><i class="far fa-calendar-alt"></i> التاريخ:</label>
+                            <input type="date" id="engineer-date-filter" class="modal-input" style="width: auto; margin-bottom: 0; padding: 5px 12px;" onchange="app.loadEngineerData()">
+                        </div>
+
+                        <!-- 5. Reset Filter Button -->
+                        <button type="button" class="btn btn-secondary btn-sm" style="margin-bottom: 0; padding: 6px 12px; margin-right: auto;" onclick="app.resetEngineerFilters()" title="إعادة تعيين الفلاتر">
+                            <i class="fas fa-undo"></i> إعادة ضبط
+                        </button>
                     </div>
                 </header>
                 <div id="engineer-records-container" class="records-container">
@@ -4982,145 +5029,283 @@ document.addEventListener('keydown', (e) => {
     }
 
     async exportStyledExcel() {
-        try {
-            const btn = document.querySelector('button[onclick="app.exportStyledExcel()"]');
-            const originalText = btn.innerHTML;
+        const btn = document.querySelector('button[onclick="app.exportStyledExcel()"]') ||
+                    document.querySelector('button[onclick*="exportStyledExcel"]');
+        const originalText = btn ? btn.innerHTML : '';
+        if (btn) {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحضير...';
             btn.disabled = true;
+        }
 
-            // 1. Trigger the background database backup just like auto-backup
-            await fetch('/api/backup', { method: 'POST' });
+        try {
+            if (typeof ExcelJS === 'undefined') {
+                throw new Error("مكتبة ExcelJS غير محملة في المتصفح");
+            }
 
-            // 2. Clone the table to parse
-            const table = document.getElementById('reports-table-full');
-            if (!table) throw new Error("Table not found");
-            const clone = table.cloneNode(true);
-            clone.querySelectorAll('.screen-only').forEach(el => el.remove());
-            clone.querySelectorAll('.th-filter-icon').forEach(el => el.remove());
+            // 1. Ensure report results exist or auto-generate
+            let rows = Array.from(document.querySelectorAll('#report-results-list tr'));
+            let visibleRows = rows.filter(r => r.style.display !== 'none' && r.id !== 'no-filter-results-row' && r.cells.length > 5);
 
-            // 3. Create ExcelJS Workbook
+            if (visibleRows.length === 0) {
+                if (typeof this.generateReport === 'function') {
+                    await this.generateReport();
+                    rows = Array.from(document.querySelectorAll('#report-results-list tr'));
+                    visibleRows = rows.filter(r => r.style.display !== 'none' && r.id !== 'no-filter-results-row' && r.cells.length > 5);
+                }
+            }
+
+            if (visibleRows.length === 0) {
+                alert('لا توجد بيانات متاحة للتصدير. يرجى التأكد من اختيار فترة زمنية تحتوي على عمالة معتمدة.');
+                if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
+                return;
+            }
+
+            // Optional non-blocking backup ping
+            try {
+                fetch('/api/backup', { method: 'POST' }).catch(() => {});
+            } catch (_) {}
+
+            // 2. Create ExcelJS Workbook & Worksheet
             const wb = new ExcelJS.Workbook();
-            const ws = wb.addWorksheet('تفاصيل العمالة', { views: [{ rightToLeft: true }] });
-
-            // Set column widths
-            ws.columns = [
-                { width: 25 }, { width: 15 }, { width: 20 }, { width: 15 },
-                { width: 15 }, { width: 15 }, { width: 15 }, { width: 25 }, { width: 30 }
-            ];
-
-            // 4. Iterate over rows
-            const rows = clone.querySelectorAll('tr');
-            rows.forEach((tr, rIndex) => {
-                if (tr.style.display === 'none' || tr.id === 'no-filter-results-row') return;
-                const excelRow = ws.addRow([]);
-                let colIndex = 1;
-                
-                const cells = tr.querySelectorAll('th, td');
-                cells.forEach(cell => {
-                    const colspan = parseInt(cell.getAttribute('colspan') || '1', 10);
-                    const isTh = cell.tagName.toLowerCase() === 'th';
-                    
-                    const excelCell = excelRow.getCell(colIndex);
-                    
-                    let val = cell.innerText.trim();
-                    // Convert numeric strings to numbers for better Excel support
-                    if (!isNaN(val) && val !== '' && !val.includes('-')) {
-                        val = Number(val);
-                    }
-                    excelCell.value = val;
-                    
-                    excelCell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-                    excelCell.border = {
-                        top: { style: 'thin' }, left: { style: 'thin' },
-                        bottom: { style: 'thin' }, right: { style: 'thin' }
-                    };
-
-                    if (isTh) {
-                        excelCell.font = { bold: true };
-                        excelCell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: { argb: 'FFEFEFEF' }
-                        };
-                    } else if (cell.style.fontWeight === 'bold' || cell.querySelector('strong')) {
-                        excelCell.font = { bold: true };
-                    }
-
-                    if (colspan > 1) {
-                        ws.mergeCells(excelRow.number, colIndex, excelRow.number, colIndex + colspan - 1);
-                        // Apply border to merged cells as well
-                        for(let c = 1; c < colspan; c++) {
-                            const mergedCell = excelRow.getCell(colIndex + c);
-                            mergedCell.border = excelCell.border;
-                        }
-                    }
-                    colIndex += colspan;
-                });
+            wb.creator = 'Cornerstone Development';
+            const ws = wb.addWorksheet('تفاصيل العمالة', {
+                views: [{ rightToLeft: true }],
+                pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0 }
             });
 
-            // 5. Add total days row
-            const totalDays = document.getElementById('report-total-days').innerText || '0';
-            const footerRow = ws.addRow([]);
-            footerRow.getCell(1).value = 'إجمالي عدد اليوميات:';
-            footerRow.getCell(1).font = { bold: true };
-            footerRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' };
-            
-            footerRow.getCell(5).value = Number(totalDays);
-            footerRow.getCell(5).font = { bold: true, color: { argb: 'FF217346' } };
-            footerRow.getCell(5).alignment = { vertical: 'middle', horizontal: 'center' };
-            
-            for(let i=1; i<=9; i++) {
-                footerRow.getCell(i).border = {
-                    top: { style: 'thin' }, left: { style: 'thin' },
-                    bottom: { style: 'thin' }, right: { style: 'thin' }
+            // Set column widths for all 12 columns
+            ws.columns = [
+                { key: 'col1', width: 26 }, // اسم العامل
+                { key: 'col2', width: 16 }, // النوع / المهنة
+                { key: 'col3', width: 20 }, // المشرف
+                { key: 'col4', width: 14 }, // التاريخ
+                { key: 'col5', width: 14 }, // اليومية
+                { key: 'col6', width: 14 }, // الخصم
+                { key: 'col7', width: 14 }, // الصافي
+                { key: 'col8', width: 20 }, // المهندس المعتمد
+                { key: 'col9', width: 24 }, // مكان العمل
+                { key: 'col10', width: 28 }, // بند العمل
+                { key: 'col11', width: 20 }, // خصم مقاول
+                { key: 'col12', width: 24 }  // ملاحظات
+            ];
+
+            // 3. Header Titles (Banner)
+            const startVal = document.getElementById('filter-start-date')?.value || '';
+            const endVal = document.getElementById('filter-end-date')?.value || '';
+            let dateRangeText = (startVal && endVal) ? `عن الفترة من ${startVal} إلى ${endVal}` : 'عن جميع السجلات المعتمدة';
+
+            // Main Title
+            const titleRow = ws.addRow(['مشروع The Curve - كشف تفاصيل العمالة']);
+            ws.mergeCells(titleRow.number, 1, titleRow.number, 12);
+            titleRow.height = 36;
+            const titleCell = titleRow.getCell(1);
+            titleCell.font = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } };
+            titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
+            titleCell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FF1F2937' } // Dark charcoal
+            };
+
+            // Subtitle
+            const subRow = ws.addRow([dateRangeText]);
+            ws.mergeCells(subRow.number, 1, subRow.number, 12);
+            subRow.height = 24;
+            const subCell = subRow.getCell(1);
+            subCell.font = { bold: true, size: 11, color: { argb: 'FF374151' } };
+            subCell.alignment = { vertical: 'middle', horizontal: 'center' };
+            subCell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFF3F4F6' }
+            };
+
+            // Spacer row
+            const emptyRow = ws.addRow([]);
+            emptyRow.height = 8;
+
+            // 4. Column Headers
+            const headerTitles = [
+                'اسم العامل',
+                'النوع / المهنة',
+                'المشرف',
+                'التاريخ',
+                'اليومية (ج.م)',
+                'الخصم (ج.م)',
+                'الصافي (ج.م)',
+                'المهندس المعتمد',
+                'مكان العمل',
+                'بند العمل',
+                'خصم على مقاول',
+                'ملاحظات'
+            ];
+            const headerRow = ws.addRow(headerTitles);
+            headerRow.height = 28;
+            for (let c = 1; c <= 12; c++) {
+                const cell = headerRow.getCell(c);
+                cell.font = { bold: true, size: 11, color: { argb: 'FFFFFFFF' } };
+                cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                cell.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FF2563EB' } // Royal blue header
+                };
+                cell.border = {
+                    top: { style: 'medium', color: { argb: 'FF1D4ED8' } },
+                    bottom: { style: 'medium', color: { argb: 'FF1D4ED8' } },
+                    left: { style: 'thin', color: { argb: 'FF93C5FD' } },
+                    right: { style: 'thin', color: { argb: 'FF93C5FD' } }
                 };
             }
-            ws.mergeCells(footerRow.number, 1, footerRow.number, 4);
-            ws.mergeCells(footerRow.number, 5, footerRow.number, 9);
 
-            // 6. Generate and Download
+            // 5. Data Rows
+            let totalDays = 0;
+            let totalGross = 0;
+            let totalDeduction = 0;
+            let totalNet = 0;
+
+            visibleRows.forEach((tr, rIdx) => {
+                const cells = tr.querySelectorAll('td');
+                if (cells.length < 7) return;
+
+                const name = (cells[0]?.innerText || '').trim();
+                const type = (cells[1]?.innerText || '').trim();
+                const supervisor = (cells[2]?.innerText || '').trim();
+                const date = (cells[3]?.innerText || '').trim();
+                const amount = parseFloat((cells[4]?.innerText || '0').replace(/,/g, '').trim()) || 0;
+                const deduction = parseFloat((cells[5]?.innerText || '0').replace(/,/g, '').trim()) || 0;
+                const net = parseFloat((cells[6]?.innerText || '0').replace(/,/g, '').trim()) || (amount - deduction);
+                const engineer = (cells[7]?.innerText || '').trim();
+                const location = (cells[8]?.innerText || '').trim();
+                const task = (cells[9]?.innerText || '').trim();
+                const contractor = (cells[10]?.innerText || '').trim();
+                const notes = (cells[11]?.innerText || '').trim();
+
+                totalDays += 1;
+                totalGross += amount;
+                totalDeduction += deduction;
+                totalNet += net;
+
+                const dataRow = ws.addRow([
+                    name,
+                    type,
+                    supervisor,
+                    date,
+                    amount,
+                    deduction,
+                    net,
+                    engineer,
+                    location,
+                    task,
+                    contractor,
+                    notes
+                ]);
+                dataRow.height = 24;
+
+                const isEven = (rIdx % 2 === 0);
+                const rowBg = isEven ? 'FFFFFFFF' : 'FFF9FAFB';
+
+                for (let c = 1; c <= 12; c++) {
+                    const cell = dataRow.getCell(c);
+                    cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                    cell.border = {
+                        top: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+                        bottom: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+                        left: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+                        right: { style: 'thin', color: { argb: 'FFE5E7EB' } }
+                    };
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: rowBg }
+                    };
+
+                    if (c === 5 || c === 6 || c === 7) {
+                        cell.numFmt = '#,##0.00';
+                        if (c === 7) {
+                            cell.font = { bold: true, color: { argb: 'FF16A34A' } }; // Green for Net
+                        }
+                    }
+                    if (c === 1) {
+                        cell.font = { bold: true };
+                    }
+                }
+            });
+
+            // 6. Summary / Footer Row
+            const footerRow = ws.addRow([
+                `الإجمالي العام (${totalDays} يومية)`,
+                '', '', '',
+                totalGross,
+                totalDeduction,
+                totalNet,
+                '', '', '', '', ''
+            ]);
+            footerRow.height = 30;
+
+            ws.mergeCells(footerRow.number, 1, footerRow.number, 4);
+            const footerLabel = footerRow.getCell(1);
+            footerLabel.font = { bold: true, size: 12, color: { argb: 'FF1F2937' } };
+            footerLabel.alignment = { vertical: 'middle', horizontal: 'center' };
+
+            for (let c = 1; c <= 12; c++) {
+                const cell = footerRow.getCell(c);
+                cell.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FFFEF3C7' } // Warm amber accent
+                };
+                cell.border = {
+                    top: { style: 'medium', color: { argb: 'FFD97706' } },
+                    bottom: { style: 'medium', color: { argb: 'FFD97706' } },
+                    left: { style: 'thin', color: { argb: 'FFD97706' } },
+                    right: { style: 'thin', color: { argb: 'FFD97706' } }
+                };
+            }
+
+            footerRow.getCell(5).font = { bold: true, size: 11, color: { argb: 'FF1F2937' } };
+            footerRow.getCell(5).numFmt = '#,##0.00';
+            footerRow.getCell(5).alignment = { vertical: 'middle', horizontal: 'center' };
+
+            footerRow.getCell(6).font = { bold: true, size: 11, color: { argb: 'FFDC2626' } };
+            footerRow.getCell(6).numFmt = '#,##0.00';
+            footerRow.getCell(6).alignment = { vertical: 'middle', horizontal: 'center' };
+
+            footerRow.getCell(7).font = { bold: true, size: 12, color: { argb: 'FF15803D' } };
+            footerRow.getCell(7).numFmt = '#,##0.00';
+            footerRow.getCell(7).alignment = { vertical: 'middle', horizontal: 'center' };
+
+            // 7. Write Buffer & Trigger Download
             const buffer = await wb.xlsx.writeBuffer();
             const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             
             const today = new Date().toISOString().split('T')[0];
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `labor_report_${today}.xlsx`;
+            link.download = `تفاصيل_العمالة_${today}.xlsx`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
 
-            // 7. Also download full system backup (.json) automatically
-            try {
-                const exportRes = await fetch('/api/export');
-                if (exportRes.ok) {
-                    const exportData = await exportRes.text();
-                    const jsonBlob = new Blob([exportData], { type: 'application/json' });
-                    const jsonLink = document.createElement('a');
-                    jsonLink.href = URL.createObjectURL(jsonBlob);
-                    jsonLink.download = `system_backup_${today}.json`;
-                    document.body.appendChild(jsonLink);
-                    jsonLink.click();
-                    document.body.removeChild(jsonLink);
-                }
-            } catch (jsonErr) {
-                console.error("Failed to download JSON backup:", jsonErr);
+            if (btn) {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
 
-            btn.innerHTML = originalText;
-            btn.disabled = false;
             if (window.showAppNotification) {
                 window.showAppNotification({
-                    title: '📊 تم تصدير ملف الإكسيل والنسخة الاحتياطية',
-                    message: 'تم تجهيز وتنزيل ملف Excel ونسخة الأمان الاحتياطية بنجاح على جهازك.',
+                    title: '📊 تم تصدير ملف الإكسيل بنجاح',
+                    message: `تم تجهيز وتنزيل كشف تفاصيل العمالة (${totalDays} يومية).`,
                     type: 'success'
                 });
             }
         } catch (e) {
-            console.error(e);
-            alert('حدث خطأ أثناء تصدير الإكسيل.');
-            const btn = document.querySelector('button[onclick="app.exportStyledExcel()"]');
-            if(btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-file-excel"></i> إكسيل <i class="fas fa-download"></i>'; }
+            console.error('Error in exportStyledExcel:', e);
+            alert('حدث خطأ أثناء تصدير الإكسيل: ' + (e.message || e));
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalText || '<i class="fas fa-file-excel"></i> إكسيل <i class="fas fa-download"></i>';
+            }
         }
     }
 
@@ -7701,14 +7886,135 @@ document.addEventListener('keydown', (e) => {
     }
 
     async loadEngineerData() {
+        let users = [];
         try {
-            const users = await db.getAll('users');
+            users = await db.getAll('users');
             window.engineerUsersCache = users.filter(u => u.role === 'engineer' || u.role === 'admin');
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error('Error fetching users:', e); }
         
         const role = auth.getRole();
-        const engineerId = role === 'admin' ? null : auth.currentUser.id;
-        
+        const currentUserId = auth.currentUser ? String(auth.currentUser.id) : null;
+
+        // 1. Fetch all records with details (needed for pending totals, supervisor list, and filtering)
+        let allRawRecords = [];
+        try {
+            allRawRecords = await db.getRecordsWithDetails(null, null, null, null);
+        } catch (e) {
+            console.error('Error fetching records in loadEngineerData:', e);
+            allRawRecords = [];
+        }
+
+        // 2. Setup / populate Engineer Filter dropdown
+        const engSelect = document.getElementById('engineer-engineer-filter');
+        if (engSelect) {
+            if (engSelect.options.length <= 1 || engSelect.getAttribute('data-loaded') !== 'true') {
+                const initialVal = (role === 'admin') ? 'all' : (currentUserId || 'all');
+                let engOptions = '<option value="all">جميع المهندسين</option>';
+                const engineers = (users || []).filter(u => u.role === 'engineer' || u.role === 'admin');
+                engineers.sort((a, b) => (a.username || a.name || '').localeCompare(b.username || b.name || '', 'ar'));
+                
+                engineers.forEach(u => {
+                    const displayName = u.username === 'admin' ? 'Bishoy Mamdouh (Admin)' : (u.username || u.name);
+                    engOptions += `<option value="${u.id}">${displayName}</option>`;
+                });
+                
+                engSelect.innerHTML = engOptions;
+                engSelect.value = initialVal;
+                engSelect.setAttribute('data-loaded', 'true');
+            }
+        }
+
+        // 3. Setup / populate Supervisor Filter dropdown
+        const supSelect = document.getElementById('engineer-supervisor-filter');
+        if (supSelect) {
+            if (supSelect.options.length <= 1 || supSelect.getAttribute('data-loaded') !== 'true') {
+                let supOptions = '<option value="all">جميع المشرفين</option>';
+                const supervisors = (users || []).filter(u => u.role === 'supervisor');
+                const knownSupIds = new Set(supervisors.map(u => String(u.id)));
+
+                allRawRecords.forEach(r => {
+                    if (r.supervisorId && !knownSupIds.has(String(r.supervisorId))) {
+                        knownSupIds.add(String(r.supervisorId));
+                        supervisors.push({
+                            id: r.supervisorId,
+                            username: r.supervisorName || `مشرف (${r.supervisorId})`
+                        });
+                    }
+                });
+
+                supervisors.sort((a, b) => (a.username || a.name || '').localeCompare(b.username || b.name || '', 'ar'));
+                
+                supervisors.forEach(u => {
+                    const displayName = u.username === 'admin' ? 'Bishoy Mamdouh' : (u.username || u.name);
+                    supOptions += `<option value="${u.id}">${displayName}</option>`;
+                });
+
+                supSelect.innerHTML = supOptions;
+                supSelect.value = 'all';
+                supSelect.setAttribute('data-loaded', 'true');
+            }
+        }
+
+        // 4. Calculate Pending Money and Count
+        const selectedEng = engSelect ? engSelect.value : (role === 'admin' ? 'all' : (currentUserId || 'all'));
+        const selectedSup = supSelect ? supSelect.value : 'all';
+
+        let pendingRecords = allRawRecords.filter(r => r.status === 'pending');
+        if (selectedEng && selectedEng !== 'all') {
+            pendingRecords = pendingRecords.filter(r => String(r.engineerId) === String(selectedEng));
+        }
+        if (selectedSup && selectedSup !== 'all') {
+            pendingRecords = pendingRecords.filter(r => String(r.supervisorId) === String(selectedSup));
+        }
+
+        let totalPendingAmount = 0;
+        const totalPendingCount = pendingRecords.length;
+
+        pendingRecords.forEach(r => {
+            if (Array.isArray(r.workers) && r.workers.length > 0) {
+                const recNet = r.workers.reduce((sum, w) => {
+                    if (w.isDeleted) return sum;
+                    const amt = Number(w.amount) || 0;
+                    const ded = Number(w.deduction) || 0;
+                    return sum + (amt - ded);
+                }, 0);
+                totalPendingAmount += recNet;
+            } else {
+                totalPendingAmount += (Number(r.totalAmount) || 0);
+            }
+        });
+
+        const pendingAmountEl = document.getElementById('engineer-pending-total-amount');
+        const pendingCountEl = document.getElementById('engineer-pending-total-count');
+        const pendingTitleEl = document.getElementById('engineer-pending-title');
+
+        if (pendingAmountEl) {
+            pendingAmountEl.innerText = `${Math.round(totalPendingAmount).toLocaleString()} ج.م`;
+        }
+        if (pendingCountEl) {
+            pendingCountEl.innerText = `(${totalPendingCount} سركي)`;
+        }
+        if (pendingTitleEl) {
+            if (selectedEng !== 'all' || selectedSup !== 'all') {
+                pendingTitleEl.innerText = 'إجمالي مبالغ قيد الانتظار (حسب الفلتر المحدد)';
+            } else {
+                pendingTitleEl.innerText = 'إجمالي مبالغ طلبات قيد الانتظار';
+            }
+        }
+
+        // Update nav badge
+        const navBadge = document.getElementById('nav-badge-engineer');
+        if (navBadge) {
+            const myPending = allRawRecords.filter(r => r.status === 'pending' && (role === 'admin' || String(r.engineerId) === currentUserId));
+            if (myPending.length > 0) {
+                navBadge.innerText = myPending.length;
+                navBadge.style.display = 'inline-block';
+            } else {
+                navBadge.style.display = 'none';
+            }
+        }
+
+        // 5. Read filters for displayed records
         let filterStatus = 'pending';
         const filterSelect = document.getElementById('engineer-status-filter');
         if (filterSelect) {
@@ -7725,12 +8031,39 @@ document.addEventListener('keydown', (e) => {
             filterDate = { start: dateInput.value, end: dateInput.value };
         }
 
-        let records = await db.getRecordsWithDetails(filterStatus, null, engineerId, filterDate);
+        let records = allRawRecords.filter(r => {
+            if (filterStatus && r.status !== filterStatus) return false;
+            if (selectedEng && selectedEng !== 'all' && String(r.engineerId) !== String(selectedEng)) return false;
+            if (selectedSup && selectedSup !== 'all' && String(r.supervisorId) !== String(selectedSup)) return false;
+            if (filterDate && filterDate.start && (r.date < filterDate.start || r.date > filterDate.end)) return false;
+            return true;
+        });
+
         if (!filterStatus && records.length > 50) {
             records = records.slice(0, 50);
         }
+
         UI.renderEngineerRecords(records, role);
         this.highlightRecordFromURL();
+    }
+
+    resetEngineerFilters() {
+        const statusSelect = document.getElementById('engineer-status-filter');
+        if (statusSelect) statusSelect.value = 'pending';
+        
+        const role = auth.getRole();
+        const engSelect = document.getElementById('engineer-engineer-filter');
+        if (engSelect) {
+            engSelect.value = (role === 'admin') ? 'all' : (auth.currentUser ? String(auth.currentUser.id) : 'all');
+        }
+        
+        const supSelect = document.getElementById('engineer-supervisor-filter');
+        if (supSelect) supSelect.value = 'all';
+        
+        const dateInput = document.getElementById('engineer-date-filter');
+        if (dateInput) dateInput.value = '';
+        
+        this.loadEngineerData();
     }
     
     async viewRecordDetails(recordId, readOnly = false) {
@@ -10273,6 +10606,13 @@ document.addEventListener('click', (e) => {
                     window.exportContractorDeductionsExcel();
                 }
             }
+        }
+    };
+
+    // --- Labor Details Excel Export (تفاصيل العمالة) ---
+    window.exportStyledExcel = async function() {
+        if (window.app && typeof window.app.exportStyledExcel === 'function') {
+            return await window.app.exportStyledExcel();
         }
     };
 
