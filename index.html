@@ -1561,9 +1561,9 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=5.7').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=5.8').then(reg => {
                 reg.update();
-                console.log('ServiceWorker v5.7 registered cleanly.');
+                console.log('ServiceWorker v5.8 registered cleanly.');
             });
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -3732,6 +3732,17 @@ class UI {
         }
     }
 
+    static formatCairoDate(dateInput) {
+        if (!dateInput) return '';
+        try {
+            const d = new Date(dateInput);
+            if (isNaN(d.getTime())) return '';
+            return d.toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' });
+        } catch {
+            return '';
+        }
+    }
+
     static formatCairoDateTime(dateInput) {
         if (!dateInput) return '-';
         try {
@@ -4372,9 +4383,10 @@ class UI {
         if (status === 'pending') return '<span class="badge badge-pending">قيد المراجعة</span>';
         if (status === 'approved') {
             const approveTime = (record && record.approvedAt) ? UI.formatCairoTime(record.approvedAt) : '';
+            const approveDate = (record && record.approvedAt) ? UI.formatCairoDate(record.approvedAt) : '';
             return `<span style="display: inline-flex; align-items: center; gap: 8px;">
                 <span class="badge badge-approved">معتمد</span>
-                ${approveTime ? `<span style="font-size: 0.85em; color: var(--text-muted); white-space: nowrap;"><i class="far fa-clock"></i> (${approveTime})</span>` : ''}
+                ${approveTime ? `<span style="font-size: 0.85em; color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;"><span><i class="far fa-clock"></i> (${approveTime})</span>${approveDate ? `<span>-</span><span dir="ltr">${approveDate}</span>` : ''}</span>` : ''}
             </span>`;
         }
         if (status === 'rejected') return '<span class="badge badge-rejected">مرفوض</span>';
