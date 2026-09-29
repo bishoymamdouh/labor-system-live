@@ -12237,10 +12237,17 @@ document.addEventListener('click', (e) => {
                 /* TABLE WRAPPER */
                 .table-container {
                     width: 100%;
-                    margin-bottom: 4px;
+                    margin-bottom: 8px;
                     page-break-inside: avoid;
                     break-inside: avoid;
                     overflow: visible;
+                    flex-shrink: 0;
+                }
+                .density-medium .table-container {
+                    margin-bottom: 6px;
+                }
+                .density-compact .table-container {
+                    margin-bottom: 4px;
                 }
 
                 table { 
@@ -12312,8 +12319,8 @@ document.addEventListener('click', (e) => {
                     justify-content: space-between; 
                     align-items: center; 
                     font-size: 12px; 
-                    margin-top: auto;
-                    margin-bottom: 5px; 
+                    margin-top: 0;
+                    margin-bottom: 10px; 
                     font-weight: bold; 
                     border: 1px solid #000; 
                     padding: 5px 14px; 
@@ -12327,12 +12334,14 @@ document.addEventListener('click', (e) => {
                 .density-medium .summary {
                     font-size: 11px;
                     padding: 3.5px 10px;
-                    margin-bottom: 4px;
+                    margin-top: 0;
+                    margin-bottom: 7px;
                 }
                 .density-compact .summary { 
                     font-size: 10px; 
                     padding: 2px 8px; 
-                    margin-bottom: 2px; 
+                    margin-top: 0;
+                    margin-bottom: 4px; 
                 }
 
                 /* SIGNATURES */
@@ -12374,7 +12383,7 @@ document.addEventListener('click', (e) => {
             const rowCount = stats.records.length;
             
             // Calculate dynamic row height and typography to beautifully fill the entire page height
-            const targetBodyHeight = 500;
+            const targetBodyHeight = 490;
             const calcRowHeight = Math.floor(targetBodyHeight / Math.max(1, rowCount));
             const rowHeight = Math.max(16, Math.min(85, calcRowHeight));
 
