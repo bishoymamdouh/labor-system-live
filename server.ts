@@ -701,6 +701,7 @@ async function handler(req: Request): Promise<Response> {
                 ...r,
                 supervisorName: usersMap[r.supervisorId] || 'غير معروف',
                 engineerName: usersMap[r.engineerId] || 'غير معروف',
+                approvedByName: r.approvedByName || (r.approvedById ? (usersMap[r.approvedById] === "admin" ? "Bishoy Mamdouh" : usersMap[r.approvedById]) : ""),
                 workers: workersByRecord[r.id] || []
             }));
 
@@ -778,6 +779,12 @@ async function handler(req: Request): Promise<Response> {
                 body.createdAt = new Date().toISOString();
                 if (body.status === "approved") {
                     body.approvedAt = new Date().toISOString();
+                    if (body.approvedById) body.approvedById = body.approvedById;
+                    if (body.approvedByName) body.approvedByName = body.approvedByName;
+                } else {
+                    body.approvedAt = null;
+                    body.approvedById = null;
+                    body.approvedByName = null;
                 }
             }
 
@@ -822,16 +829,16 @@ async function handler(req: Request): Promise<Response> {
             }
 
             // Server-authoritative approval timestamp:
-            // Completely bypasses engineer's mobile or computer clock
+            // Always updates to current server clock on approval
             if (collection === "records") {
                 if (body.status === "approved") {
-                    if (current.value.status !== "approved" || !current.value.approvedAt) {
-                        body.approvedAt = new Date().toISOString();
-                    } else if (current.value.approvedAt) {
-                        body.approvedAt = current.value.approvedAt;
-                    }
+                    body.approvedAt = new Date().toISOString();
+                    if (body.approvedById) body.approvedById = body.approvedById;
+                    if (body.approvedByName) body.approvedByName = body.approvedByName;
                 } else if (body.status === "pending" || body.status === "rejected") {
                     body.approvedAt = null;
+                    body.approvedById = null;
+                    body.approvedByName = null;
                 }
             }
 

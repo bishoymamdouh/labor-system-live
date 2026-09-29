@@ -1,4 +1,4 @@
-// Service Worker v5.9 - Universal Web Push (iOS, Android, Windows, Mac)
+// Service Worker v6.0 - Universal Web Push (iOS, Android, Windows, Mac)
 self.addEventListener('install', e => {
   self.skipWaiting();
 });

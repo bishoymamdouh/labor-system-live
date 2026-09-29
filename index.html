@@ -1561,9 +1561,9 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=5.9').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=6.0').then(reg => {
                 reg.update();
-                console.log('ServiceWorker v5.9 registered cleanly.');
+                console.log('ServiceWorker v6.0 registered cleanly.');
             });
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -4404,9 +4404,34 @@ class UI {
         if (status === 'approved') {
             const approveTime = (record && record.approvedAt) ? UI.formatCairoTime(record.approvedAt) : '';
             const approveDate = (record && record.approvedAt) ? UI.formatCairoDate(record.approvedAt) : '';
+            
+            let approverNotice = '';
+            if (record && (record.approvedByName || record.approvedById)) {
+                const assignedEngId = record.engineerId ? String(record.engineerId) : '';
+                const approverId = record.approvedById ? String(record.approvedById) : '';
+                const assignedEngName = (record.engineerName || '').trim();
+                const approverName = (record.approvedByName || '').trim();
+                
+                const isDifferent = (approverId && assignedEngId) 
+                    ? (approverId !== assignedEngId)
+                    : (approverName && assignedEngName && approverName !== assignedEngName);
+                
+                if (isDifferent && approverName) {
+                    let engTitle = 'مهندس ';
+                    if (/^(مهندس|م\/|م\.)\s*/i.test(approverName)) {
+                        engTitle = '';
+                    }
+                    approverNotice = `(اعتمد بواسطة ${engTitle}${approverName})`;
+                }
+            }
+
             return `<span style="display: inline-flex; align-items: center; gap: 8px;">
                 <span class="badge badge-approved">معتمد</span>
-                ${approveTime ? `<span style="font-size: 0.85em; color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;"><span><i class="far fa-clock"></i> (${approveTime})</span>${approveDate ? `<span>-</span><span dir="ltr">${approveDate}</span>` : ''}</span>` : ''}
+                ${approveTime ? `<span style="font-size: 0.85em; color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
+                    <span><i class="far fa-clock"></i> (${approveTime})</span>
+                    ${approveDate ? `<span>-</span><span dir="ltr">${approveDate}</span>` : ''}
+                    ${approverNotice ? `<span>-</span><span style="color: #4f46e5; font-weight: 600;">${approverNotice}</span>` : ''}
+                </span>` : ''}
             </span>`;
         }
         if (status === 'rejected') return '<span class="badge badge-rejected">مرفوض</span>';
@@ -7832,6 +7857,7 @@ document.addEventListener('keydown', (e) => {
             // Check auto approve permission
             const isAutoApprove = this.canAutoApprove(auth.currentUser);
             const recordStatus = isAutoApprove ? 'approved' : 'pending';
+            const curApproverName = (auth.currentUser?.username === 'admin') ? 'Bishoy Mamdouh' : (auth.currentUser?.username || auth.currentUser?.name || '');
 
             // Create Record
             const recordId = await db.add('records', {
@@ -7840,6 +7866,8 @@ document.addEventListener('keydown', (e) => {
                 supervisorName: auth.currentUser?.username || auth.currentUser?.name || 'مشرف',
                 engineerId: engineerId,
                 status: recordStatus,
+                approvedById: isAutoApprove ? auth.currentUser.id : null,
+                approvedByName: isAutoApprove ? curApproverName : null,
                 totalWorkers: validWorkersCount,
                 totalAmount: totalAmount,
                 createdAt: new Date().toISOString()
@@ -7899,6 +7927,7 @@ document.addEventListener('keydown', (e) => {
             if (!navigator.onLine || error.message.includes('fetch') || error.message.includes('retries')) {
                 const isAutoApprove = this.canAutoApprove(auth.currentUser);
                 const recordStatus = isAutoApprove ? 'approved' : 'pending';
+                const curApproverName = (auth.currentUser?.username === 'admin') ? 'Bishoy Mamdouh' : (auth.currentUser?.username || auth.currentUser?.name || '');
                 const offlinePayload = {
                     record: {
                         id: crypto.randomUUID(),
@@ -7906,6 +7935,8 @@ document.addEventListener('keydown', (e) => {
                         supervisorId: auth.currentUser.id,
                         engineerId: engineerId,
                         status: recordStatus,
+                        approvedById: isAutoApprove ? auth.currentUser.id : null,
+                        approvedByName: isAutoApprove ? curApproverName : null,
                         totalWorkers: validWorkersCount,
                         totalAmount: totalAmount,
                         createdAt: new Date().toISOString()
@@ -8496,6 +8527,13 @@ document.addEventListener('keydown', (e) => {
                 }
                 
                 record.status = status;
+                if (status === 'approved') {
+                    record.approvedById = auth.currentUser.id;
+                    record.approvedByName = (auth.currentUser.username === 'admin') ? 'Bishoy Mamdouh' : (auth.currentUser.username || auth.currentUser.name);
+                } else {
+                    record.approvedById = null;
+                    record.approvedByName = null;
+                }
                 await db.update('records', recordId, record); 
                 document.getElementById('record-modal').classList.add('hidden');
                 
