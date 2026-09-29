@@ -1561,9 +1561,9 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=5.8').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=5.9').then(reg => {
                 reg.update();
-                console.log('ServiceWorker v5.8 registered cleanly.');
+                console.log('ServiceWorker v5.9 registered cleanly.');
             });
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -3732,12 +3732,32 @@ class UI {
         }
     }
 
+    static formatDisplayDate(dateInput) {
+        if (!dateInput) return '';
+        if (typeof dateInput === 'string') {
+            if (/^\d{2}-\d{2}-\d{4}$/.test(dateInput)) return dateInput;
+            const m = dateInput.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (m) {
+                return `${m[3]}-${m[2]}-${m[1]}`;
+            }
+        }
+        try {
+            const d = new Date(dateInput);
+            if (isNaN(d.getTime())) return String(dateInput);
+            const parts = d.toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }).split('-');
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        } catch {
+            return String(dateInput);
+        }
+    }
+
     static formatCairoDate(dateInput) {
         if (!dateInput) return '';
         try {
             const d = new Date(dateInput);
             if (isNaN(d.getTime())) return '';
-            return d.toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' });
+            const parts = d.toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }).split('-');
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
         } catch {
             return '';
         }
@@ -3998,7 +4018,7 @@ class UI {
             <div id="record-card-${r.id}" class="card mb-30 record-scroll-target" style="margin-bottom: 30px;">
                 <div class="record-card-header flex-between mb-10" style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
                     <div>
-                        <strong>${r.date}</strong> ${r.createdAt ? `<span style="font-size:0.85em; color:var(--text-muted); margin-right: 6px;"><i class="far fa-clock"></i> (${timeStr})</span>` : ''}
+                        <strong><span dir="ltr">${UI.formatDisplayDate(r.date)}</span></strong> ${r.createdAt ? `<span style="font-size:0.85em; color:var(--text-muted); margin-right: 6px;"><i class="far fa-clock"></i> (${timeStr})</span>` : ''}
                     </div>
                     <div>${statusBadge}</div>
                 </div>
@@ -4199,7 +4219,7 @@ class UI {
         let html = `
             <div class="form-row mb-10" style="align-items: center;">
                 <div class="half">
-                    <strong>التاريخ:</strong> ${record.date}
+                    <strong>التاريخ:</strong> <span dir="ltr">${UI.formatDisplayDate(record.date)}</span>
                     ${record.createdAt ? `<span style="font-size:0.85em; color:var(--text-muted); margin-right: 6px;"><i class="far fa-clock"></i> (${UI.formatCairoTime(record.createdAt)})</span>` : ''}
                 </div>
                 <div class="half" style="display: flex; align-items: center; justify-content: space-between;">
@@ -4431,7 +4451,7 @@ class UI {
                             <td><strong>${w.name || ''}</strong></td>
                             <td><span class="cell-type-text" title="${w.type || ''}">${w.type || ''}</span></td>
                             <td data-role="${supervisorRole}">${supervisorName}</td>
-                            <td style="white-space: nowrap;">${record.date || ''}</td>
+                            <td style="white-space: nowrap;"><span dir="ltr">${UI.formatDisplayDate(record.date || '')}</span></td>
                             <td>${amount}</td>
                             <td>${deduction}</td>
                             <td><strong>${netAmount}</strong></td>
@@ -7151,7 +7171,7 @@ document.addEventListener('keydown', (e) => {
 
                 const rowData = [
                     idx + 1,
-                    rec.date || '',
+                    UI.formatDisplayDate(rec.date || ''),
                     app.getArabicDayName(rec.date),
                     w.name || '',
                     w.type || '',
@@ -7315,7 +7335,7 @@ document.addEventListener('keydown', (e) => {
 
                 const rowData = [
                     idx + 1,
-                    r.date || '',
+                    UI.formatDisplayDate(r.date || ''),
                     app.getArabicDayName(r.date),
                     usersMap[r.supervisorId] || r.supervisorName || 'غير معروف',
                     usersMap[r.engineerId] || r.engineerName || 'غير معروف',
@@ -8540,7 +8560,7 @@ document.addEventListener('keydown', (e) => {
         const workerName = document.getElementById('filter-worker-name').value.trim().toLowerCase();
         
         if (startDate && endDate) {
-            document.getElementById('print-date-range').innerText = `الفترة من ${startDate} إلى ${endDate}`;
+            document.getElementById('print-date-range').innerText = `الفترة من ${UI.formatDisplayDate(startDate)} إلى ${UI.formatDisplayDate(endDate)}`;
         } else {
             document.getElementById('print-date-range').innerText = `جميع السجلات من بداية العمل`;
         }
@@ -10773,9 +10793,9 @@ document.addEventListener('click', (e) => {
             const endVal = document.getElementById('filter-end-date')?.value || '';
             let dateRangeText = '';
             if (startVal && endVal) {
-                dateRangeText = `كشف اجور العمال بمشروع The Curve  عن فترة من   ${startVal}   الى   ${endVal}`;
+                dateRangeText = `كشف اجور العمال بمشروع The Curve  عن فترة من   ${UI.formatDisplayDate(startVal)}   الى   ${UI.formatDisplayDate(endVal)}`;
             } else if (startVal) {
-                dateRangeText = `كشف اجور العمال بمشروع The Curve  عن فترة من   ${startVal}`;
+                dateRangeText = `كشف اجور العمال بمشروع The Curve  عن فترة من   ${UI.formatDisplayDate(startVal)}`;
             } else {
                 const printRangeEl = document.getElementById('print-date-range');
                 const rText = printRangeEl ? printRangeEl.innerText.trim() : '';
@@ -11081,9 +11101,9 @@ document.addEventListener('click', (e) => {
             const endVal = document.getElementById('filter-end-date')?.value || '';
             let dateRangeText = '';
             if (startVal && endVal) {
-                dateRangeText = `كشف اجور العمال بمشروع The Curve  عن فترة من   ${startVal}   الى   ${endVal}`;
+                dateRangeText = `كشف اجور العمال بمشروع The Curve  عن فترة من   ${UI.formatDisplayDate(startVal)}   الى   ${UI.formatDisplayDate(endVal)}`;
             } else if (startVal) {
-                dateRangeText = `كشف اجور العمال بمشروع The Curve  عن فترة من   ${startVal}`;
+                dateRangeText = `كشف اجور العمال بمشروع The Curve  عن فترة من   ${UI.formatDisplayDate(startVal)}`;
             } else {
                 const printRangeEl = document.getElementById('print-date-range');
                 const rText = printRangeEl ? printRangeEl.innerText.trim() : '';
@@ -11724,7 +11744,7 @@ document.addEventListener('click', (e) => {
                     row.getCell(1).value = idx + 1;
                     row.getCell(2).value = stats.name || name;
                     row.getCell(3).value = r.type;
-                    row.getCell(4).value = r.date;
+                    row.getCell(4).value = UI.formatDisplayDate(r.date);
                     row.getCell(5).value = 'The Curve';
                     row.getCell(6).value = r.location;
                     row.getCell(7).value = r.task || '';
@@ -12111,7 +12131,7 @@ document.addEventListener('click', (e) => {
                 row.getCell(1).value = globalIndex++;
                 row.getCell(2).value = r.contractor;
                 row.getCell(3).value = r.supervisor;
-                row.getCell(4).value = r.date;
+                row.getCell(4).value = UI.formatDisplayDate(r.date);
                 row.getCell(5).value = r.workerName;
                 row.getCell(6).value = r.type;
                 row.getCell(7).value = r.location;
@@ -12315,7 +12335,7 @@ document.addEventListener('click', (e) => {
                     tableRowsHtml += `<td rowspan="${group.records.length}" style="vertical-align: middle; font-weight: bold; font-size: 12px; color: #4a148c; background: #faf5ff;">${r.contractor}</td>`;
                 }
                 tableRowsHtml += `<td>${r.supervisor}</td>`;
-                tableRowsHtml += `<td style="white-space: nowrap;">${r.date}</td>`;
+                tableRowsHtml += `<td style="white-space: nowrap;"><span dir="ltr">${UI.formatDisplayDate(r.date)}</span></td>`;
                 tableRowsHtml += `<td><strong>${r.workerName}</strong></td>`;
                 tableRowsHtml += `<td>${r.type}</td>`;
                 tableRowsHtml += `<td>${r.location || ''}</td>`;
@@ -12929,7 +12949,7 @@ document.addEventListener('click', (e) => {
                 }
                 
                 // Date
-                recordsHtml += `<td style="white-space: nowrap; padding: ${paddingV}px 2px;">${r.date}</td>`;
+                recordsHtml += `<td style="white-space: nowrap; padding: ${paddingV}px 2px;"><span dir="ltr">${UI.formatDisplayDate(r.date)}</span></td>`;
                 
                 // Project (rowspan)
                 if (index === 0) {
