@@ -1512,6 +1512,12 @@ export async function onRequest(context: any): Promise<Response> {
                 const body = await request.json();
                 const id = body.id || crypto.randomUUID();
                 const recordData = { ...body, id };
+                if (resource === "records") {
+                    recordData.createdAt = new Date().toISOString();
+                    if (recordData.status === "approved") {
+                        recordData.approvedAt = new Date().toISOString();
+                    }
+                }
                 await store.set(resource, id, recordData);
 
                 // Dispatch notification for new record
@@ -1536,6 +1542,26 @@ export async function onRequest(context: any): Promise<Response> {
             if (method === "PUT" && resourceId) {
                 const body = await request.json();
                 const current = await store.get(resource, resourceId) || {};
+
+                // Defensive: preserve authoritative original creation timestamp
+                if (resource === "records" && current.createdAt) {
+                    body.createdAt = current.createdAt;
+                }
+
+                // Server-authoritative approval timestamp:
+                // Completely bypasses engineer's mobile or computer clock
+                if (resource === "records") {
+                    if (body.status === "approved") {
+                        if (current.status !== "approved" || !current.approvedAt) {
+                            body.approvedAt = new Date().toISOString();
+                        } else if (current.approvedAt) {
+                            body.approvedAt = current.approvedAt;
+                        }
+                    } else if (body.status === "pending" || body.status === "rejected") {
+                        body.approvedAt = null;
+                    }
+                }
+
                 const updated = { ...current, ...body, id: resourceId };
                 await store.set(resource, resourceId, updated);
 

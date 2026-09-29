@@ -776,6 +776,9 @@ async function handler(req: Request): Promise<Response> {
             // Completely bypasses supervisor's phone clock and records official time at transmission
             if (collection === "records") {
                 body.createdAt = new Date().toISOString();
+                if (body.status === "approved") {
+                    body.approvedAt = new Date().toISOString();
+                }
             }
 
             await kv.set([collection, id], body);
@@ -818,6 +821,20 @@ async function handler(req: Request): Promise<Response> {
                 body.createdAt = current.value.createdAt;
             }
 
+            // Server-authoritative approval timestamp:
+            // Completely bypasses engineer's mobile or computer clock
+            if (collection === "records") {
+                if (body.status === "approved") {
+                    if (current.value.status !== "approved" || !current.value.approvedAt) {
+                        body.approvedAt = new Date().toISOString();
+                    } else if (current.value.approvedAt) {
+                        body.approvedAt = current.value.approvedAt;
+                    }
+                } else if (body.status === "pending" || body.status === "rejected") {
+                    body.approvedAt = null;
+                }
+            }
+
             await kv.set([collection, id], { ...current.value, ...body });
             invalidateCache(collection);
             if (collection === "records") {
@@ -849,7 +866,7 @@ async function handler(req: Request): Promise<Response> {
                 }
             }
             
-            return new Response(JSON.stringify({ success: true }), { status: 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+            return new Response(JSON.stringify({ success: true, approvedAt: body.approvedAt }), { status: 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
         }
 
         if (method === "DELETE") {

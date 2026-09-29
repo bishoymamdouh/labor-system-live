@@ -635,8 +635,45 @@ h1, h2, h3, h4 {
     
     .print-header {
         display: block !important;
+        position: relative !important;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 12px;
+        border-bottom: 2px solid #003366;
+        padding-bottom: 8px;
+        min-height: 60px;
+    }
+    .print-header .logo-img {
+        position: absolute !important;
+        right: 0 !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        max-height: 58px !important;
+        width: auto !important;
+        object-fit: contain !important;
+    }
+    .print-header .project-title-box {
+        background-color: #eef5fb !important;
+        color: #003366 !important;
+        padding: 4px 16px !important;
+        border-radius: 6px !important;
+        display: inline-block !important;
+        font-size: 13px !important;
+        font-weight: bold !important;
+        border: 1px solid #b8d4f0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    .print-header h1 {
+        margin: 4px 0 2px 0 !important;
+        font-size: 20px !important;
+        font-weight: 800 !important;
+        color: #003366 !important;
+    }
+    .print-header p {
+        margin: 2px 0 0 0 !important;
+        font-size: 12px !important;
+        color: #444 !important;
+        font-weight: 600 !important;
     }
     
     .card {
@@ -3119,7 +3156,9 @@ select {
                 
                                 <div class="card mt-20" id="print-area">
                     <div class="print-header hidden">
-                        <h2>تقرير العمالة اليومية</h2>
+                        <img src="/logo.png?v=2" class="logo-img" alt="Logo" onerror="if(window.CORNERSTONE_LOGO_BASE64)this.src='data:image/png;base64,'+window.CORNERSTONE_LOGO_BASE64;else this.style.display='none';">
+                        <div class="project-title-box">Cornerstone Development - Project: The Curve</div>
+                        <h1>تقرير تفاصيل العمالة</h1>
                         <p id="print-date-range"></p>
                     </div>
                     <div class="reports-summary-cards">
@@ -3302,12 +3341,13 @@ class Database {
     }
 
     async update(collectionName, id, data) {
-        await this.request(`/api/${collectionName}?id=${id}`, {
+        const res = await this.request(`/api/${collectionName}?id=${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
-        return true;
+        const resJson = await res.json().catch(() => ({ success: true }));
+        return resJson || true;
     }
 
     async getAll(collectionName) {
@@ -3932,7 +3972,7 @@ class UI {
     }
 
     static generateRecordCardHTML(r, role = 'admin', view = 'default') {
-        const statusBadge = this.getStatusBadge(r.status);
+        const statusBadge = this.getStatusBadge(r.status, r);
         const timeStr = UI.formatCairoTime(r.createdAt);
         
         let headerHtml = `
@@ -4143,7 +4183,10 @@ class UI {
                     <strong>التاريخ:</strong> ${record.date}
                     ${record.createdAt ? `<span style="font-size:0.85em; color:var(--text-muted); margin-right: 6px;"><i class="far fa-clock"></i> (${UI.formatCairoTime(record.createdAt)})</span>` : ''}
                 </div>
-                <div class="half"><strong>المشرف:</strong> <span class="badge-glow badge-glow-supervisor"><i class="fas fa-user-tie"></i> ${record.supervisorName === 'admin' ? 'Bishoy Mamdouh' : record.supervisorName}</span></div>
+                <div class="half" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div><strong>المشرف:</strong> <span class="badge-glow badge-glow-supervisor"><i class="fas fa-user-tie"></i> ${record.supervisorName === 'admin' ? 'Bishoy Mamdouh' : record.supervisorName}</span></div>
+                    <div>${UI.getStatusBadge(record.status, record)}</div>
+                </div>
             </div>
             <div style="overflow-x:auto;">
             <table class="data-table">
@@ -4317,9 +4360,12 @@ class UI {
         modal.classList.remove('hidden');
     }
 
-    static getStatusBadge(status) {
+    static getStatusBadge(status, record = null) {
         if (status === 'pending') return '<span class="badge badge-pending">قيد المراجعة</span>';
-        if (status === 'approved') return '<span class="badge badge-approved">معتمد</span>';
+        if (status === 'approved') {
+            const approveTime = (record && record.approvedAt) ? UI.formatCairoTime(record.approvedAt) : '';
+            return `<span class="badge badge-approved" style="display: inline-flex; align-items: center; gap: 4px;" title="${approveTime ? `توقيت الاعتماد: ${approveTime}` : 'معتمد'}"><span>معتمد</span>${approveTime ? ` <span style="font-size: 0.88em; font-weight: 600; opacity: 0.95; margin-right: 2px;"><i class="far fa-clock" style="margin-left: 2px;"></i>(${approveTime})</span>` : ''}</span>`;
+        }
         if (status === 'rejected') return '<span class="badge badge-rejected">مرفوض</span>';
         return status;
     }
@@ -5089,12 +5135,49 @@ document.addEventListener('keydown', (e) => {
                 { key: 'col12', width: 24 }  // ملاحظات
             ];
 
-            // 3. Header Titles (Banner)
+            // 3. Logo and Header Titles
+            let logoId = null;
+            try {
+                if (window.CORNERSTONE_LOGO_BASE64) {
+                    logoId = wb.addImage({
+                        base64: window.CORNERSTONE_LOGO_BASE64,
+                        extension: 'png'
+                    });
+                }
+            } catch (e) {
+                console.error('Could not add logo to Excel', e);
+            }
+
+            // Row 1: Project box in center (E1:H1)
+            ws.mergeCells('E1:H1');
+            const pBox = ws.getCell('E1');
+            pBox.value = 'Cornerstone Development - Project: The Curve';
+            pBox.font = { name: 'Cairo', size: 13, bold: true, color: { argb: 'FF003366' } };
+            pBox.alignment = { vertical: 'middle', horizontal: 'center' };
+            ws.getRow(1).height = 28;
+            ['E', 'F', 'G', 'H'].forEach(col => {
+                const c = ws.getCell(col + '1');
+                c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEEF5FB' } };
+                c.border = {
+                    top: { style: 'thin', color: { argb: 'FFB8D4F0' } },
+                    bottom: { style: 'thin', color: { argb: 'FFB8D4F0' } },
+                    right: col === 'E' ? { style: 'thin', color: { argb: 'FFB8D4F0' } } : undefined,
+                    left: col === 'H' ? { style: 'thin', color: { argb: 'FFB8D4F0' } } : undefined
+                };
+            });
+
+            if (logoId !== null) {
+                ws.addImage(logoId, {
+                    tl: { col: 0.1, row: 0.1 },
+                    ext: { width: 180, height: 57 }
+                });
+            }
+
+            // Row 2: Main Title
             const startVal = document.getElementById('filter-start-date')?.value || '';
             const endVal = document.getElementById('filter-end-date')?.value || '';
             let dateRangeText = (startVal && endVal) ? `عن الفترة من ${startVal} إلى ${endVal}` : 'عن جميع السجلات المعتمدة';
 
-            // Main Title
             const titleRow = ws.addRow(['مشروع The Curve - كشف تفاصيل العمالة']);
             ws.mergeCells(titleRow.number, 1, titleRow.number, 12);
             titleRow.height = 36;
@@ -5107,7 +5190,7 @@ document.addEventListener('keydown', (e) => {
                 fgColor: { argb: 'FF1F2937' } // Dark charcoal
             };
 
-            // Subtitle
+            // Row 3: Subtitle / Date range
             const subRow = ws.addRow([dateRangeText]);
             ws.mergeCells(subRow.number, 1, subRow.number, 12);
             subRow.height = 24;
@@ -5120,7 +5203,7 @@ document.addEventListener('keydown', (e) => {
                 fgColor: { argb: 'FFF3F4F6' }
             };
 
-            // Spacer row
+            // Row 4: Spacer row
             const emptyRow = ws.addRow([]);
             emptyRow.height = 8;
 
