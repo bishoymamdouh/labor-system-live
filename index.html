@@ -12186,7 +12186,7 @@ document.addEventListener('click', (e) => {
                     box-sizing: border-box; 
                     display: flex; 
                     flex-direction: column; 
-                    justify-content: space-between;
+                    justify-content: flex-start;
                     overflow: hidden;
                     page-break-inside: avoid !important;
                     break-inside: avoid !important;
@@ -12196,26 +12196,26 @@ document.addEventListener('click', (e) => {
                 .header { 
                     position: relative; 
                     text-align: center; 
-                    margin-bottom: 10px; 
+                    margin-bottom: 5px; 
                     border-bottom: 2px solid #000; 
-                    padding-bottom: 10px; 
+                    padding-bottom: 5px; 
                     page-break-inside: avoid;
                     break-inside: avoid;
                     flex-shrink: 0;
                 }
                 .header h1 { 
-                    margin: 4px 0; 
-                    font-size: 21px; 
+                    margin: 2px 0; 
+                    font-size: 19px; 
                     font-weight: 800; 
                     color: #000;
                 }
                 .project-title-box {
                     background-color: #eef5fb;
                     color: #003366;
-                    padding: 5px 18px;
+                    padding: 3px 15px;
                     border-radius: 6px;
                     display: inline-block;
-                    font-size: 14.5px;
+                    font-size: 13px;
                     font-weight: bold;
                     margin: 0;
                     border: 1px solid #b8d4f0;
@@ -12224,20 +12224,20 @@ document.addEventListener('click', (e) => {
                 }
                 .header p { 
                     margin: 2px 0 0 0; 
-                    font-size: 13px; 
+                    font-size: 12px; 
                     font-weight: 600;
                 }
                 .logo-img { 
                     position: absolute; 
                     right: 0; 
                     top: 0; 
-                    max-height: 50px; 
+                    max-height: 44px; 
                 }
 
                 /* TABLE WRAPPER */
                 .table-container {
                     width: 100%;
-                    margin-bottom: 8px;
+                    margin-bottom: 4px;
                     page-break-inside: avoid;
                     break-inside: avoid;
                     overflow: visible;
@@ -12256,7 +12256,7 @@ document.addEventListener('click', (e) => {
                     text-align: center; 
                     vertical-align: middle; 
                     word-wrap: break-word; 
-                    line-height: 1.35;
+                    line-height: 1.25;
                 }
                 th { 
                     background-color: #f1f1f1 !important; 
@@ -12274,59 +12274,65 @@ document.addEventListener('click', (e) => {
                 }
 
                 /* DENSITY TIERS FOR FIT-TO-PAPER */
-                /* Normal (1-8 rows): Extra generous vertical cell height */
-                .density-normal table { font-size: 12px; }
-                .density-normal th { padding: 13.5px 6px; font-size: 12.5px; }
-                .density-normal td { padding: 13px 6px; }
-                .density-normal .name-cell { font-size: 14px; }
+                /* Normal (1-6 rows) */
+                .density-normal table { font-size: 11.5px; }
+                .density-normal th { padding: 7px 4px; font-size: 12px; }
+                .density-normal td { padding: 7px 4px; }
+                .density-normal .name-cell { font-size: 13px; }
 
-                /* Snug (9-14 rows) */
-                .density-snug table { font-size: 10.5px; }
-                .density-snug th { padding: 7.5px 4px; font-size: 11px; }
-                .density-snug td { padding: 7px 4px; }
-                .density-snug .name-cell { font-size: 12.5px; }
+                /* Snug (7-11 rows) */
+                .density-snug table { font-size: 10px; }
+                .density-snug th { padding: 4.5px 3px; font-size: 10.5px; }
+                .density-snug td { padding: 4.5px 3px; }
+                .density-snug .name-cell { font-size: 11.5px; }
 
-                /* Medium (15-22 rows) */
-                .density-medium table { font-size: 9px; }
-                .density-medium th { padding: 4px 2px; font-size: 9px; }
-                .density-medium td { padding: 3.5px 2px; }
-                .density-medium .name-cell { font-size: 10.5px; }
-                .density-medium .header h1 { font-size: 18px; margin: 2px 0; }
-                .density-medium .project-title-box { font-size: 12.5px; padding: 3px 12px; }
-                .density-medium .logo-img { max-height: 42px; }
+                /* Medium (12-18 rows) */
+                .density-medium table { font-size: 9px; line-height: 1.2; }
+                .density-medium th { padding: 3px 2px; font-size: 9px; }
+                .density-medium td { padding: 2.5px 2px; }
+                .density-medium .name-cell { font-size: 10px; }
+                .density-medium .header h1 { font-size: 17px; margin: 1px 0; }
+                .density-medium .project-title-box { font-size: 12px; padding: 2px 10px; }
+                .density-medium .logo-img { max-height: 38px; }
 
-                /* Compact (23-31+ rows) */
+                /* Compact (19-31+ rows) */
                 .density-compact table { font-size: 8px; line-height: 1.15; }
-                .density-compact th { padding: 2.5px 2px; font-size: 8px; }
-                .density-compact td { padding: 2px 1.5px; }
-                .density-compact .name-cell { font-size: 9.5px; }
-                .density-compact .header { margin-bottom: 3px; padding-bottom: 4px; }
-                .density-compact .header h1 { font-size: 16px; margin: 1px 0; }
-                .density-compact .project-title-box { font-size: 11px; padding: 2px 10px; }
-                .density-compact .logo-img { max-height: 35px; }
-                .density-compact .header p { font-size: 11px; }
+                .density-compact th { padding: 2px 2px; font-size: 8px; }
+                .density-compact td { padding: 1px 1.5px; }
+                .density-compact .name-cell { font-size: 9px; }
+                .density-compact .header { margin-bottom: 2px; padding-bottom: 2px; }
+                .density-compact .header h1 { font-size: 15px; margin: 0; }
+                .density-compact .project-title-box { font-size: 10.5px; padding: 1px 8px; }
+                .density-compact .logo-img { max-height: 30px; }
+                .density-compact .header p { font-size: 10.5px; }
 
                 /* SUMMARY BAR */
                 .summary { 
                     display: flex; 
                     justify-content: space-between; 
-                    align-items: center;
-                    font-size: 13px; 
-                    margin-bottom: 10px; 
+                    align-items: center; 
+                    font-size: 12px; 
+                    margin-top: auto;
+                    margin-bottom: 5px; 
                     font-weight: bold; 
                     border: 1px solid #000; 
-                    padding: 8px 16px; 
-                    background: #fafafa !important;
-                    page-break-inside: avoid !important;
-                    break-inside: avoid !important;
-                    flex-shrink: 0;
-                    -webkit-print-color-adjust: exact;
-                    print-color-adjust: exact;
+                    padding: 5px 14px; 
+                    background: #fafafa !important; 
+                    page-break-inside: avoid !important; 
+                    break-inside: avoid !important; 
+                    flex-shrink: 0; 
+                    -webkit-print-color-adjust: exact; 
+                    print-color-adjust: exact; 
                 }
-                .density-compact .summary {
+                .density-medium .summary {
                     font-size: 11px;
-                    padding: 3px 8px;
+                    padding: 3.5px 10px;
                     margin-bottom: 4px;
+                }
+                .density-compact .summary { 
+                    font-size: 10px; 
+                    padding: 2px 8px; 
+                    margin-bottom: 2px; 
                 }
 
                 /* SIGNATURES */
@@ -12334,27 +12340,28 @@ document.addEventListener('click', (e) => {
                     display: flex; 
                     justify-content: space-between; 
                     margin-top: 0; 
-                    padding-top: 4px; 
-                    page-break-inside: avoid !important;
-                    break-inside: avoid !important;
-                    flex-shrink: 0;
+                    padding-top: 2px; 
+                    page-break-inside: avoid !important; 
+                    break-inside: avoid !important; 
+                    flex-shrink: 0; 
                 }
                 .sig-box { 
                     text-align: center; 
                     width: 15%; 
-                    font-size: 11.5px; 
+                    font-size: 11px; 
                     font-weight: bold; 
-                    page-break-inside: avoid !important;
-                    break-inside: avoid !important;
+                    page-break-inside: avoid !important; 
+                    break-inside: avoid !important; 
                 }
                 .sig-line { 
                     border-bottom: 1px solid #000; 
-                    margin-top: 28px; 
+                    margin-top: 22px; 
                 }
-                .density-snug .sig-line { margin-top: 20px; }
-                .density-medium .sig-line { margin-top: 15px; }
-                .density-compact .sig-line { margin-top: 12px; }
-                .density-compact .sig-box { font-size: 10px; }
+                .density-snug .sig-line { margin-top: 17px; }
+                .density-medium .sig-line { margin-top: 13px; }
+                .density-medium .sig-box { font-size: 10px; }
+                .density-compact .sig-line { margin-top: 9px; }
+                .density-compact .sig-box { font-size: 9px; }
             </style>
         </head>
         <body>
@@ -12367,21 +12374,21 @@ document.addEventListener('click', (e) => {
             const rowCount = stats.records.length;
             
             let densityClass = 'density-normal';
-            if (rowCount > 22) densityClass = 'density-compact';
-            else if (rowCount > 14) densityClass = 'density-medium';
-            else if (rowCount > 8) densityClass = 'density-snug';
+            if (rowCount > 18) densityClass = 'density-compact';
+            else if (rowCount > 11) densityClass = 'density-medium';
+            else if (rowCount > 6) densityClass = 'density-snug';
 
             let recordsHtml = `<table>
                 <thead>
                     <tr>
-                        <th style="width: 3%;">م</th>
-                        <th style="width: 11%;">الاسم</th>
-                        <th style="width: 13%;">النوع</th>
-                        <th style="width: 9%;">التاريخ</th>
-                        <th style="width: 7%;">المشروع</th>
+                        <th style="width: 2.5%;">م</th>
+                        <th style="width: 10%;">الاسم</th>
+                        <th style="width: 8%;">النوع</th>
+                        <th style="width: 8%;">التاريخ</th>
+                        <th style="width: 6.5%;">المشروع</th>
                         <th style="width: 8%;">مكان العمل</th>
-                        <th style="width: 17%;">بند العمل (بالتفصيل)</th>
-                        <th style="width: 9%;">خصم على مقاول<br><span style="font-size:0.85em; font-weight:normal;">(اسم المقاول)</span></th>
+                        <th style="width: 23%;">بند العمل (بالتفصيل)</th>
+                        <th style="width: 8%;">خصم على مقاول<br><span style="font-size:0.85em; font-weight:normal;">(اسم المقاول)</span></th>
                         <th style="width: 7%;">الملاحظات</th>
                         <th style="width: 5.5%;">سعر الساعة</th>
                         <th style="width: 4.5%;">ساعات العمل</th>
@@ -12513,6 +12520,30 @@ document.addEventListener('click', (e) => {
         document.body.appendChild(iframe);
         
         iframe.onload = function() {
+            try {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                if (doc) {
+                    const pages = doc.querySelectorAll('.receipt-page');
+                    pages.forEach(page => {
+                        let attempts = 0;
+                        const tbl = page.querySelector('table');
+                        if (tbl) {
+                            while (page.scrollHeight > page.clientHeight && attempts < 10) {
+                                attempts++;
+                                const curSize = parseFloat(window.getComputedStyle(tbl).fontSize) || 9;
+                                tbl.style.fontSize = (curSize - 0.4) + 'px';
+                                tbl.querySelectorAll('th, td').forEach(c => {
+                                    c.style.paddingTop = '1px';
+                                    c.style.paddingBottom = '1px';
+                                    c.style.lineHeight = '1.1';
+                                });
+                            }
+                        }
+                    });
+                }
+            } catch(e) {
+                console.warn("Fit adjustment error:", e);
+            }
             setTimeout(() => {
                 iframe.contentWindow.focus();
                 iframe.contentWindow.print();
