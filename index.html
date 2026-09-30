@@ -1561,7 +1561,7 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=6.1').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=6.2').then(reg => {
                 reg.update();
                 console.log('ServiceWorker v6.0 registered cleanly.');
             });
@@ -2706,7 +2706,7 @@ select {
                     </div>
                 </header>
                 <div class="card">
-                    <form id="record-form">
+                    <form id="record-form" novalidate>
                         <div class="form-row">
                             <div class="form-group half">
                                 <label for="record-date" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
@@ -7092,8 +7092,31 @@ document.addEventListener('keydown', (e) => {
         const locObj = (this.workLocations || []).find(l => l.name === selectedLoc);
         if (locObj && locObj.autoBuilding) {
             bldSelect.value = locObj.autoBuilding;
-            bldSelect.style.border = '';
+            bldSelect.dataset.autofilled = 'true';
+            bldSelect.style.border = '2px solid #10b981';
+            bldSelect.style.backgroundColor = 'rgba(16, 185, 129, 0.08)';
+            bldSelect.title = `تم تحديد العمارة تلقائياً (${locObj.autoBuilding})`;
+        } else {
+            // Not written automatically: MUST clear building so previous auto-building does not stay!
+            bldSelect.value = '';
+            delete bldSelect.dataset.autofilled;
+            bldSelect.style.border = '2px solid #f59e0b';
+            bldSelect.style.backgroundColor = '';
+            bldSelect.title = 'خانة العمارة إجبارية - يرجى الاختيار من القائمة';
         }
+        this.updateRecordSubmitButton();
+    }
+
+    onBuildingChange(id) {
+        const bldSelect = document.getElementById(`worker-building-${id}`);
+        if (!bldSelect) return;
+        if (bldSelect.value) {
+            delete bldSelect.dataset.autofilled;
+            bldSelect.style.border = '';
+            bldSelect.style.backgroundColor = '';
+            bldSelect.title = '';
+        }
+        this.updateRecordSubmitButton();
     }
 
     onCardWorkLocationChange(workerId, prefix) {
@@ -7104,7 +7127,12 @@ document.addEventListener('keydown', (e) => {
         const locObj = (this.workLocations || []).find(l => l.name === selectedLoc);
         if (locObj && locObj.autoBuilding) {
             bldSelect.value = locObj.autoBuilding;
-            bldSelect.style.border = '';
+            bldSelect.dataset.autofilled = 'true';
+            bldSelect.style.border = '2px solid #10b981';
+        } else {
+            bldSelect.value = '';
+            delete bldSelect.dataset.autofilled;
+            bldSelect.style.border = '2px solid #f59e0b';
         }
     }
 
@@ -7984,12 +8012,12 @@ document.addEventListener('keydown', (e) => {
                 </select>
             </td>
             <td>
-                <select id="worker-building-${workerId}" class="modal-input" style="min-width: 110px; width: 100%;" required onchange="this.style.border=''">
+                <select id="worker-building-${workerId}" class="modal-input" style="min-width: 110px; width: 100%;" required onchange="app.onBuildingChange(${workerId})">
                     ${app.getBuildingOptionsHtml()}
                 </select>
             </td>
             <td>
-                <textarea id="worker-task-${workerId}" class="modal-input" style="min-width: 140px; width: 100%; resize: vertical;" rows="2" placeholder="بند العمل بالتفصيل (إجباري)" required oninput="this.style.border=''"></textarea>
+                <textarea id="worker-task-${workerId}" class="modal-input" style="min-width: 140px; width: 100%; resize: vertical;" rows="2" placeholder="بند العمل بالتفصيل (إجباري)" required oninput="this.style.border=''; app.updateRecordSubmitButton();"></textarea>
             </td>
             <td>
                 <input type="text" id="worker-contractor-${workerId}" class="modal-input" style="min-width: 120px; width: 100%;" placeholder="اسم المقاول (إن وجد)">
@@ -8109,15 +8137,30 @@ document.addEventListener('keydown', (e) => {
         let totalAmount = 0;
         let validWorkersCount = 0;
         
+        // 1. Verify at least one worker is chosen
+        let hasAnyWorkerSelected = false;
         for (let id of this.currentWorkers) {
             const selectEl = document.getElementById(`worker-name-${id}`);
-            const selectedWorkerId = selectEl.value;
+            if (selectEl && selectEl.value) {
+                hasAnyWorkerSelected = true;
+                break;
+            }
+        }
+        if (!hasAnyWorkerSelected) {
+            alert('الرجاء اختيار عامل واحد على الأقل وتعبئة بياناته بالكامل.');
+            return;
+        }
+
+        for (let id of this.currentWorkers) {
+            const selectEl = document.getElementById(`worker-name-${id}`);
+            const selectedWorkerId = selectEl ? selectEl.value : '';
             if (!selectedWorkerId) continue;
             
             const workerObj = this.directoryWorkers.find(w => w.id === selectedWorkerId);
-            const name = workerObj ? workerObj.name : selectEl.options[selectEl.selectedIndex].text;
+            const name = workerObj ? workerObj.name : (selectEl.options[selectEl.selectedIndex] ? selectEl.options[selectEl.selectedIndex].text : 'عامل');
             const type = document.getElementById(`worker-type-${id}`).value;
-            const amount = Number(document.getElementById(`worker-amount-${id}`).value);
+            const amountInput = document.getElementById(`worker-amount-${id}`);
+            const amount = Number(amountInput ? amountInput.value : 0);
             const locEl = document.getElementById(`worker-location-${id}`);
             const location = (locEl ? locEl.value : '').trim();
             const bldEl = document.getElementById(`worker-building-${id}`);
@@ -8128,37 +8171,48 @@ document.addEventListener('keydown', (e) => {
             const contractor = (document.getElementById(`worker-contractor-${id}`) ? document.getElementById(`worker-contractor-${id}`).value : '').trim();
             const notes = (document.getElementById(`worker-notes-${id}`) ? document.getElementById(`worker-notes-${id}`).value : '').trim();
             
-            if (name && amount >= 0) {
-                if (!location) {
-                    alert(`خطأ: خانة "مكان العمل" إجبارية للعامل: ${name}\nالرجاء اختيار مكان العمل من القائمة!`);
-                    if (locEl) { locEl.focus(); locEl.style.border = '2px solid red'; }
-                    return;
+            if (!location) {
+                alert(`⚠️ تنبيه: لا يمكن إرسال السركي دون اختيار "مكان العمل" للعامل:\n(${name})\n\nالرجاء اختيار مكان العمل من القائمة قبل الإرسال!`);
+                if (locEl) { 
+                    locEl.focus(); 
+                    locEl.style.border = '2px solid red';
+                    locEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
-                if (!building) {
-                    alert(`خطأ: خانة "العمارة" إجبارية للعامل: ${name}\nالرجاء اختيار العمارة من القائمة!`);
-                    if (bldEl) { bldEl.focus(); bldEl.style.border = '2px solid red'; }
-                    return;
-                }
-                if (!task) {
-                    alert(`خطأ: خانة "بند العمل (بالتفصيل)" إجبارية للعامل: ${name}\nلا يمكن تركها فارغة. يجب ملء كافة الخانات الإجبارية!`);
-                    if (taskEl) { taskEl.focus(); taskEl.style.border = '2px solid red'; }
-                    return;
-                }
-                workersData.push({ 
-                    name, 
-                    type, 
-                    amount, 
-                    workLocation: location, 
-                    building: building, 
-                    location: combinedLocation, 
-                    task, 
-                    contractor, 
-                    deduction: 0, 
-                    notes: notes 
-                });
-                totalAmount += amount;
-                validWorkersCount++;
+                return;
             }
+            if (!building) {
+                alert(`⚠️ تنبيه: لا يمكن إرسال السركي دون اختيار "العمارة" للعامل:\n(${name})\n\nمكان العمل المختار غير مرتبط بعمارة تلقائياً، والخانة إجبارية ويجب اختيار العمارة من القائمة قبل الإرسال!`);
+                if (bldEl) { 
+                    bldEl.focus(); 
+                    bldEl.style.border = '2px solid red';
+                    bldEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+            if (!task) {
+                alert(`⚠️ تنبيه: خانة "بند العمل (بالتفصيل)" إجبارية للعامل:\n(${name})\n\nلا يمكن تركها فارغة. يجب ملء كافة الخانات الإجبارية!`);
+                if (taskEl) { 
+                    taskEl.focus(); 
+                    taskEl.style.border = '2px solid red';
+                    taskEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
+            workersData.push({ 
+                name, 
+                type, 
+                amount, 
+                workLocation: location, 
+                building: building, 
+                location: combinedLocation, 
+                task, 
+                contractor, 
+                deduction: 0, 
+                notes: notes 
+            });
+            totalAmount += amount;
+            validWorkersCount++;
         }
         
         if (validWorkersCount === 0) {

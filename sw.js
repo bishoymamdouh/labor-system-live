@@ -1,4 +1,4 @@
-// Service Worker v6.1 - Work Location & Building Predefined Lists & Auto-Link
+// Service Worker v6.2 - Strict Enforcement for Work Location & Building Validation
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
