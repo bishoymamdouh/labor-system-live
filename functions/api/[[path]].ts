@@ -1192,7 +1192,7 @@ export async function onRequest(context: any): Promise<Response> {
 
             if (method === "GET" || url.searchParams.get("download") === "true") {
                 const data: Record<string, any[]> = {};
-                for (const col of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system"]) {
+                for (const col of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system", "location_options"]) {
                     data[col] = await store.list(col);
                 }
                 const dateStr = nowIso.split("T")[0];
@@ -1247,7 +1247,7 @@ export async function onRequest(context: any): Promise<Response> {
 
         if (resource === "export" && method === "GET") {
             const data: Record<string, any[]> = {};
-            for (const col of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system"]) {
+            for (const col of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system", "location_options"]) {
                 data[col] = await store.list(col);
             }
             return jsonResponse(data);
@@ -1257,7 +1257,7 @@ export async function onRequest(context: any): Promise<Response> {
         if (resource === "import" && method === "POST") {
             const data = await request.json();
             const statements: any[] = [];
-            for (const col of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system"]) {
+            for (const col of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system", "location_options"]) {
                 if (Array.isArray(data[col])) {
                     for (const item of data[col]) {
                         const keyStr = Array.isArray(item.key) ? (item.key[1] || item.key[0]) : (item.id || item.key);
@@ -1477,8 +1477,8 @@ export async function onRequest(context: any): Promise<Response> {
             });
         }
 
-        // 10. CRUD Collections: users, records, workers, worker_directory, push_subscriptions
-        const validCollections = ["users", "records", "workers", "worker_directory", "push_subscriptions"];
+        // 10. CRUD Collections: users, records, workers, worker_directory, push_subscriptions, location_options
+        const validCollections = ["users", "records", "workers", "worker_directory", "push_subscriptions", "location_options"];
         if (validCollections.includes(resource)) {
             // GET single item (by /api/:col/:id OR /api/:col?id=...)
             if (method === "GET" && resourceId) {

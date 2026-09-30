@@ -1,4 +1,4 @@
-// Service Worker v6.0 - Universal Web Push (iOS, Android, Windows, Mac)
+// Service Worker v6.1 - Work Location & Building Predefined Lists & Auto-Link
 self.addEventListener('install', e => {
   self.skipWaiting();
 });

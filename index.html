@@ -1561,7 +1561,7 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=6.0').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=6.1').then(reg => {
                 reg.update();
                 console.log('ServiceWorker v6.0 registered cleanly.');
             });
@@ -1811,6 +1811,80 @@ select {
                         </table>
                     </div>
                 </details>
+
+                <!-- إدارة أماكن العمل والعمارات (الربط التلقائي والخيارات الإلزامية) -->
+                <div class="card mt-20" style="padding: 20px 22px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 14px; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #4f46e5); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.3rem; box-shadow: 0 2px 10px rgba(99, 102, 241, 0.35);">
+                                <i class="fas fa-map-marked-alt"></i>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-main);">إدارة خيارات مكان العمل والعمارات (الربط التلقائي والإلزامي)</h3>
+                                <small style="color: var(--text-muted); font-size: 0.84rem;">تحكم كامل لمدير النظام فقط في قوائم مكان العمل والعمارات، مع ميزة الربط التلقائي لملء العمارة فورياً عند اختيار مكان محدد</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+                        <!-- الجزء الأول: قائمة العمارات -->
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 15px;">
+                            <h4 style="margin-top: 0; margin-bottom: 12px; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-city text-primary"></i> 1. قائمة العمارات (خانة العمارة)
+                            </h4>
+                            <form id="add-building-form" style="display: flex; gap: 8px; margin-bottom: 15px;">
+                                <input type="text" id="new-building-name" class="modal-input" placeholder="اسم العمارة (مثل: عمارة 1، الموقع العام)" required style="flex: 1;">
+                                <button type="submit" class="btn btn-primary" style="white-space: nowrap;"><i class="fas fa-plus"></i> إضافة</button>
+                            </form>
+                            <div class="table-responsive" style="max-height: 280px; overflow-y: auto;">
+                                <table class="data-table" style="font-size: 0.9rem;">
+                                    <thead>
+                                        <tr>
+                                            <th>اسم العمارة</th>
+                                            <th style="width: 80px; text-align: center;">إجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="buildings-table-body">
+                                        <!-- Dynamic Buildings -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- الجزء الثاني: قائمة أماكن العمل مع الربط التلقائي -->
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 15px;">
+                            <h4 style="margin-top: 0; margin-bottom: 12px; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-hard-hat text-success"></i> 2. قائمة أماكن العمل (مع الربط التلقائي بالعمارة)
+                            </h4>
+                            <form id="add-work-location-form" style="margin-bottom: 15px;">
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <input type="text" id="new-work-location-name" class="modal-input" placeholder="مكان العمل (مثل: اللاندسكيب، حفر، تشطيب)" required>
+                                    <div style="display: flex; gap: 8px;">
+                                        <select id="new-work-location-autobuilding" class="modal-input" style="flex: 1;">
+                                            <option value="">-- بدون ملء تلقائي (يحدد المشرف العمارة بنفسه) --</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-success" style="white-space: nowrap;"><i class="fas fa-plus"></i> إضافة مكان</button>
+                                    </div>
+                                    <small style="color: var(--text-muted); font-size: 0.78rem;">عند اختيار هذا المكان في السركي، ستُملأ خانة العمارة تلقائياً بالقيمة المحددة أعلاه.</small>
+                                </div>
+                            </form>
+                            <div class="table-responsive" style="max-height: 280px; overflow-y: auto;">
+                                <table class="data-table" style="font-size: 0.9rem;">
+                                    <thead>
+                                        <tr>
+                                            <th>مكان العمل</th>
+                                            <th>العمارة التلقائية</th>
+                                            <th style="width: 80px; text-align: center;">إجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="work-locations-table-body">
+                                        <!-- Dynamic Work Locations -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- مركز النسخ الاحتياطي والاستعادة الشامل -->
                 <div class="card mt-20" style="padding: 20px 22px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);">
@@ -2671,6 +2745,7 @@ select {
                                             <th>النوع</th>
                                             <th>اليومية (جنيه)</th>
                                             <th>مكان العمل <span style="color: red;">*</span></th>
+                                            <th>العمارة <span style="color: red;">*</span></th>
                                             <th>بند العمل (بالتفصيل) <span style="color: red;">*</span></th>
                                             <th>خصم على مقاول<br><span style="font-size: 0.85em; font-weight: normal;">(اسم المقاول)</span></th>
                                             <th>ملاحظات</th>
@@ -2682,7 +2757,7 @@ select {
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="8">
+                                            <td colspan="9">
                                                 <button type="button" id="add-worker-btn" class="btn btn-secondary btn-small"><i class="fas fa-plus"></i> إضافة عامل</button>
                                             </td>
                                         </tr>
@@ -3989,6 +4064,60 @@ class UI {
         });
     }
 
+    static renderBuildingsTable(buildings) {
+        const tbody = document.getElementById('buildings-table-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        if (!buildings || buildings.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="2" style="text-align: center; color: var(--text-muted); padding: 12px;">لا توجد عمارات مسجلة حالياً</td></tr>';
+            return;
+        }
+        buildings.forEach(b => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${b.name}</strong></td>
+                <td style="text-align: center;">
+                    <button class="btn-icon text-primary" onclick="app.editBuilding('${b.id}', '${b.name.replace(/'/g, "\\'")}')" title="تعديل"><i class="fas fa-edit"></i></button>
+                    <button class="btn-icon text-danger" onclick="app.deleteBuilding('${b.id}', '${b.name.replace(/'/g, "\\'")}')" title="حذف"><i class="fas fa-trash"></i></button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+        const autoSelect = document.getElementById('new-work-location-autobuilding');
+        if (autoSelect) {
+            let html = '<option value="">-- بدون ملء تلقائي (يحدد المشرف العمارة بنفسه) --</option>';
+            buildings.forEach(b => {
+                html += `<option value="${b.name}">ملء تلقائي بـ: ${b.name}</option>`;
+            });
+            autoSelect.innerHTML = html;
+        }
+    }
+
+    static renderWorkLocationsTable(workLocations, buildings) {
+        const tbody = document.getElementById('work-locations-table-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        if (!workLocations || workLocations.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 12px;">لا توجد أماكن عمل مسجلة حالياً</td></tr>';
+            return;
+        }
+        workLocations.forEach(loc => {
+            const tr = document.createElement('tr');
+            const autoBadge = loc.autoBuilding 
+                ? `<span class="badge badge-approved" style="font-size: 0.8rem; font-weight: bold;"><i class="fas fa-bolt"></i> ${loc.autoBuilding}</span>`
+                : `<span style="color: var(--text-muted); font-size: 0.8rem;">(يحددها المشرف)</span>`;
+            tr.innerHTML = `
+                <td><strong>${loc.name}</strong></td>
+                <td>${autoBadge}</td>
+                <td style="text-align: center;">
+                    <button class="btn-icon text-primary" onclick="app.editWorkLocation('${loc.id}', '${loc.name.replace(/'/g, "\\'")}', '${(loc.autoBuilding || '').replace(/'/g, "\\'")}')" title="تعديل"><i class="fas fa-edit"></i></button>
+                    <button class="btn-icon text-danger" onclick="app.deleteWorkLocation('${loc.id}', '${loc.name.replace(/'/g, "\\'")}')" title="حذف"><i class="fas fa-trash"></i></button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
     static async renderEngineerOptions() {
         const users = await db.getAll('users');
         const role = auth.getRole();
@@ -4067,7 +4196,16 @@ class UI {
                             </select>
                         </td>
                         <td class="wage-col"><input type="number" id="${view}-card-amount-${w.id}" value="${w.amount}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
-                        <td><textarea id="${view}-card-location-${w.id}" class="modal-input" style="min-width: 110px; width: 100%; resize: vertical;" rows="2">${w.location || ''}</textarea></td>
+                        <td>
+                            <div style="display: flex; flex-direction: column; gap: 4px; min-width: 120px;">
+                                <select id="${view}-card-location-${w.id}" class="modal-input" onchange="app.onCardWorkLocationChange('${w.id}', '${view}-card')" title="مكان العمل">
+                                    ${app.getWorkLocationOptionsHtml(w.workLocation || (w.location ? w.location.split(' - ')[0] : ''))}
+                                </select>
+                                <select id="${view}-card-building-${w.id}" class="modal-input" title="العمارة">
+                                    ${app.getBuildingOptionsHtml(w.building || (w.location && w.location.includes(' - ') ? w.location.split(' - ')[1] : ''))}
+                                </select>
+                            </div>
+                        </td>
                         <td><textarea id="${view}-card-task-${w.id}" class="modal-input" style="min-width: 120px; width: 100%; resize: vertical;" rows="2" placeholder="بند العمل">${w.task || ''}</textarea></td>
                         <td><input type="text" id="${view}-card-contractor-${w.id}" value="${w.contractor || ''}" class="modal-input" style="min-width: 100px; width: 100%;" placeholder="اسم المقاول"></td>
                         <td><input type="number" id="${view}-card-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
@@ -4268,7 +4406,16 @@ class UI {
                             </select>
                         </td>
                         <td><input type="number" id="modal-amount-${w.id}" value="${w.amount}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
-                        <td><textarea id="modal-location-${w.id}" class="modal-input" style="min-width: 110px; width: 100%; resize: vertical;" rows="2">${w.location || ''}</textarea></td>
+                        <td>
+                            <div style="display: flex; flex-direction: column; gap: 4px; min-width: 120px;">
+                                <select id="modal-location-${w.id}" class="modal-input" onchange="app.onCardWorkLocationChange('${w.id}', 'modal')" title="مكان العمل">
+                                    ${app.getWorkLocationOptionsHtml(w.workLocation || (w.location ? w.location.split(' - ')[0] : ''))}
+                                </select>
+                                <select id="modal-building-${w.id}" class="modal-input" title="العمارة">
+                                    ${app.getBuildingOptionsHtml(w.building || (w.location && w.location.includes(' - ') ? w.location.split(' - ')[1] : ''))}
+                                </select>
+                            </div>
+                        </td>
                         <td><textarea id="modal-task-${w.id}" class="modal-input" style="min-width: 120px; width: 100%; resize: vertical;" rows="2" placeholder="بند العمل">${w.task || ''}</textarea></td>
                         <td><input type="text" id="modal-contractor-${w.id}" value="${w.contractor || ''}" class="modal-input" style="min-width: 100px; width: 100%;" placeholder="اسم المقاول"></td>
                         <td><input type="number" id="modal-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
@@ -5843,6 +5990,28 @@ document.addEventListener('keydown', (e) => {
                 alert('حدث خطأ');
             }
         });
+
+        // Admin: Add Building Form
+        document.getElementById('add-building-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('new-building-name');
+            if (input && input.value.trim()) {
+                await this.addBuilding(input.value.trim());
+                input.value = '';
+            }
+        });
+
+        // Admin: Add Work Location Form
+        document.getElementById('add-work-location-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nameInput = document.getElementById('new-work-location-name');
+            const autoSelect = document.getElementById('new-work-location-autobuilding');
+            if (nameInput && nameInput.value.trim()) {
+                await this.addWorkLocation(nameInput.value.trim(), autoSelect ? autoSelect.value : '');
+                nameInput.value = '';
+                if (autoSelect) autoSelect.value = '';
+            }
+        });
         
         // Supervisor: Add Worker Row
         document.getElementById('add-worker-btn').addEventListener('click', () => {
@@ -5959,6 +6128,7 @@ document.addEventListener('keydown', (e) => {
         }
         
         try {
+            await this.loadLocationOptions();
             if (role === 'admin') {
                 await this.loadEngineerData();
                 this.loadSupervisorData();
@@ -6021,6 +6191,7 @@ document.addEventListener('keydown', (e) => {
             dirSelect.innerHTML = app.getWorkerTypeOptionsHtml(null, false);
         }
         await this.loadBackupHub();
+        await this.loadLocationOptions();
         this.populateRoleSelectors();
         this.renderRoleDefaultPermissions();
     }
@@ -6842,6 +7013,163 @@ document.addEventListener('keydown', (e) => {
         }
     }
 
+    // --- Work Locations & Buildings Management ---
+    async loadLocationOptions() {
+        try {
+            let options = await db.getAll('location_options') || [];
+            if (!Array.isArray(options)) options = [];
+
+            // Seed initial defaults if empty
+            if (options.length === 0) {
+                const defaultBuildings = [
+                    'الموقع العام', 'عمارة 1', 'عمارة 2', 'عمارة 3', 'عمارة 4', 
+                    'عمارة 5', 'عمارة 6', 'عمارة 7', 'عمارة 8', 'الخدمات', 'الكلوب هاوس'
+                ];
+                const defaultLocations = [
+                    { name: 'الموقع العام', autoBuilding: 'الموقع العام' },
+                    { name: 'اللاندسكيب', autoBuilding: 'الموقع العام' },
+                    { name: 'السور الخارجي', autoBuilding: 'الموقع العام' },
+                    { name: 'غرفة المحولات والكهرباء', autoBuilding: 'الموقع العام' },
+                    { name: 'البدروم العام', autoBuilding: 'الموقع العام' },
+                    { name: 'حفر وتسوية', autoBuilding: 'الموقع العام' },
+                    { name: 'نظافة عامة بالموقع', autoBuilding: 'الموقع العام' },
+                    { name: 'تشطيب شقق', autoBuilding: '' },
+                    { name: 'مباني وبياض', autoBuilding: '' },
+                    { name: 'صب خرسانات وأعمدة', autoBuilding: '' },
+                    { name: 'أعمال صحي وسباكة', autoBuilding: '' },
+                    { name: 'أعمال نجارة وحدادة', autoBuilding: '' },
+                    { name: 'تكسير وتشوين', autoBuilding: '' }
+                ];
+                
+                for (const b of defaultBuildings) {
+                    await db.add('location_options', { name: b, category: 'building' });
+                }
+                for (const l of defaultLocations) {
+                    await db.add('location_options', { name: l.name, autoBuilding: l.autoBuilding, category: 'location' });
+                }
+                options = await db.getAll('location_options') || [];
+                if (!Array.isArray(options)) options = [];
+            }
+
+            this.buildings = options.filter(o => o.category === 'building').sort((a,b) => (a.name || '').localeCompare(b.name || '', 'ar'));
+            this.workLocations = options.filter(o => o.category === 'location').sort((a,b) => (a.name || '').localeCompare(b.name || '', 'ar'));
+
+            if (auth.getRole() === 'admin' || (auth.currentUser && auth.currentUser.username === 'admin')) {
+                UI.renderBuildingsTable(this.buildings);
+                UI.renderWorkLocationsTable(this.workLocations, this.buildings);
+            }
+        } catch (err) {
+            console.error("Error loading location options:", err);
+            this.buildings = this.buildings || [];
+            this.workLocations = this.workLocations || [];
+        }
+    }
+
+    getWorkLocationOptionsHtml(selectedValue = '') {
+        let html = '<option value="" disabled ' + (!selectedValue ? 'selected' : '') + '>اختر مكان العمل</option>';
+        (this.workLocations || []).forEach(loc => {
+            const isSel = (selectedValue && (selectedValue === loc.name || selectedValue.trim() === loc.name.trim())) ? 'selected' : '';
+            html += `<option value="${loc.name}" ${isSel}>${loc.name}</option>`;
+        });
+        return html;
+    }
+
+    getBuildingOptionsHtml(selectedValue = '') {
+        let html = '<option value="" disabled ' + (!selectedValue ? 'selected' : '') + '>اختر العمارة</option>';
+        (this.buildings || []).forEach(b => {
+            const isSel = (selectedValue && (selectedValue === b.name || selectedValue.trim() === b.name.trim())) ? 'selected' : '';
+            html += `<option value="${b.name}" ${isSel}>${b.name}</option>`;
+        });
+        return html;
+    }
+
+    onWorkLocationChange(id) {
+        const locSelect = document.getElementById(`worker-location-${id}`);
+        const bldSelect = document.getElementById(`worker-building-${id}`);
+        if (locSelect) locSelect.style.border = '';
+        if (!locSelect || !bldSelect) return;
+        const selectedLoc = locSelect.value;
+        const locObj = (this.workLocations || []).find(l => l.name === selectedLoc);
+        if (locObj && locObj.autoBuilding) {
+            bldSelect.value = locObj.autoBuilding;
+            bldSelect.style.border = '';
+        }
+    }
+
+    onCardWorkLocationChange(workerId, prefix) {
+        const locSelect = document.getElementById(`${prefix}-location-${workerId}`);
+        const bldSelect = document.getElementById(`${prefix}-building-${workerId}`);
+        if (!locSelect || !bldSelect) return;
+        const selectedLoc = locSelect.value;
+        const locObj = (this.workLocations || []).find(l => l.name === selectedLoc);
+        if (locObj && locObj.autoBuilding) {
+            bldSelect.value = locObj.autoBuilding;
+            bldSelect.style.border = '';
+        }
+    }
+
+    async addBuilding(name) {
+        if (!name || !name.trim()) return;
+        name = name.trim();
+        const exists = (this.buildings || []).some(b => b.name === name);
+        if (exists) {
+            alert('اسم العمارة موجود بالفعل مسبقاً!');
+            return;
+        }
+        await db.add('location_options', { name, category: 'building' });
+        await this.loadLocationOptions();
+        alert('تمت إضافة العمارة بنجاح ✓');
+    }
+
+    async editBuilding(id, currentName) {
+        const newName = prompt('تعديل اسم العمارة:', currentName);
+        if (newName === null) return;
+        if (!newName.trim() || newName.trim() === currentName) return;
+        await db.update('location_options', id, { name: newName.trim(), category: 'building' });
+        await this.loadLocationOptions();
+    }
+
+    async deleteBuilding(id, name) {
+        if (!confirm(`هل أنت متأكد من حذف العمارة "${name}"؟`)) return;
+        await db.delete('location_options', id);
+        await this.loadLocationOptions();
+    }
+
+    async addWorkLocation(name, autoBuilding = '') {
+        if (!name || !name.trim()) return;
+        name = name.trim();
+        const exists = (this.workLocations || []).some(l => l.name === name);
+        if (exists) {
+            alert('مكان العمل موجود بالفعل مسبقاً!');
+            return;
+        }
+        await db.add('location_options', { name, autoBuilding: autoBuilding.trim(), category: 'location' });
+        await this.loadLocationOptions();
+        alert('تمت إضافة مكان العمل بنجاح ✓');
+    }
+
+    async editWorkLocation(id, currentName, currentAutoBuilding) {
+        const newName = prompt('تعديل اسم مكان العمل:', currentName);
+        if (newName === null) return;
+        const finalName = newName.trim() || currentName;
+        const availableBlds = (this.buildings || []).map(b => b.name).join(' | ');
+        const promptMsg = `تحديد العمارة المرتبطة تلقائياً بـ "${finalName}":\n(اترك الخانة فارغة إذا كنت تريد أن يحدد المشرف العمارة بنفسه)\n\nالعمارات المتاحة:\n${availableBlds}`;
+        const newAutoBuilding = prompt(promptMsg, currentAutoBuilding || '');
+        if (newAutoBuilding === null) return;
+        await db.update('location_options', id, { 
+            name: finalName, 
+            autoBuilding: newAutoBuilding ? newAutoBuilding.trim() : '', 
+            category: 'location' 
+        });
+        await this.loadLocationOptions();
+    }
+
+    async deleteWorkLocation(id, name) {
+        if (!confirm(`هل أنت متأكد من حذف مكان العمل "${name}"؟`)) return;
+        await db.delete('location_options', id);
+        await this.loadLocationOptions();
+    }
+
     // --- Backup & Restore Hub Functions ---
     getArabicDayName(dateStr) {
         if (!dateStr) return '';
@@ -7651,7 +7979,14 @@ document.addEventListener('keydown', (e) => {
                 <input type="number" id="worker-amount-${workerId}" class="modal-input" style="min-width: 50px; width: 100%;" required min="0" ${auth.getRole() === "admin" || auth.getRole() === "engineer" ? "" : "readonly"} placeholder="اليومية" oninput="app.updateTotals()">
             </td>
             <td>
-                <textarea id="worker-location-${workerId}" class="modal-input" style="min-width: 120px; width: 100%; resize: vertical;" rows="2" placeholder="مكان العمل (إجباري)" required oninput="this.style.border=''"></textarea>
+                <select id="worker-location-${workerId}" class="modal-input" style="min-width: 130px; width: 100%;" required onchange="app.onWorkLocationChange(${workerId})">
+                    ${app.getWorkLocationOptionsHtml()}
+                </select>
+            </td>
+            <td>
+                <select id="worker-building-${workerId}" class="modal-input" style="min-width: 110px; width: 100%;" required onchange="this.style.border=''">
+                    ${app.getBuildingOptionsHtml()}
+                </select>
             </td>
             <td>
                 <textarea id="worker-task-${workerId}" class="modal-input" style="min-width: 140px; width: 100%; resize: vertical;" rows="2" placeholder="بند العمل بالتفصيل (إجباري)" required oninput="this.style.border=''"></textarea>
@@ -7785,29 +8120,42 @@ document.addEventListener('keydown', (e) => {
             const amount = Number(document.getElementById(`worker-amount-${id}`).value);
             const locEl = document.getElementById(`worker-location-${id}`);
             const location = (locEl ? locEl.value : '').trim();
+            const bldEl = document.getElementById(`worker-building-${id}`);
+            const building = (bldEl ? bldEl.value : '').trim();
+            const combinedLocation = [location, building].filter(Boolean).join(' - ');
             const taskEl = document.getElementById(`worker-task-${id}`);
             const task = (taskEl ? taskEl.value : '').trim();
             const contractor = (document.getElementById(`worker-contractor-${id}`) ? document.getElementById(`worker-contractor-${id}`).value : '').trim();
             const notes = (document.getElementById(`worker-notes-${id}`) ? document.getElementById(`worker-notes-${id}`).value : '').trim();
             
             if (name && amount >= 0) {
-                if (!location && !task) {
-                    alert(`خطأ: يجب ملء كل من "مكان العمل" و "بند العمل (بالتفصيل)" للعامل: ${name}\nالخانتان إجباريتان معاً ولا يمكن ترك أي منهما فارغة!`);
+                if (!location) {
+                    alert(`خطأ: خانة "مكان العمل" إجبارية للعامل: ${name}\nالرجاء اختيار مكان العمل من القائمة!`);
                     if (locEl) { locEl.focus(); locEl.style.border = '2px solid red'; }
-                    if (taskEl) { taskEl.style.border = '2px solid red'; }
                     return;
                 }
-                if (!location) {
-                    alert(`خطأ: خانة "مكان العمل" إجبارية للعامل: ${name}\nلا يمكن تركها فارغة حتى لو تم إدخال بند العمل. يجب ملء الخانتين معاً!`);
-                    if (locEl) { locEl.focus(); locEl.style.border = '2px solid red'; }
+                if (!building) {
+                    alert(`خطأ: خانة "العمارة" إجبارية للعامل: ${name}\nالرجاء اختيار العمارة من القائمة!`);
+                    if (bldEl) { bldEl.focus(); bldEl.style.border = '2px solid red'; }
                     return;
                 }
                 if (!task) {
-                    alert(`خطأ: خانة "بند العمل (بالتفصيل)" إجبارية للعامل: ${name}\nلا يمكن تركها فارغة حتى لو تم إدخال مكان العمل. يجب ملء الخانتين معاً!`);
+                    alert(`خطأ: خانة "بند العمل (بالتفصيل)" إجبارية للعامل: ${name}\nلا يمكن تركها فارغة. يجب ملء كافة الخانات الإجبارية!`);
                     if (taskEl) { taskEl.focus(); taskEl.style.border = '2px solid red'; }
                     return;
                 }
-                workersData.push({ name, type, amount, location, task, contractor, deduction: 0, notes: notes });
+                workersData.push({ 
+                    name, 
+                    type, 
+                    amount, 
+                    workLocation: location, 
+                    building: building, 
+                    location: combinedLocation, 
+                    task, 
+                    contractor, 
+                    deduction: 0, 
+                    notes: notes 
+                });
                 totalAmount += amount;
                 validWorkersCount++;
             }
@@ -7880,6 +8228,8 @@ document.addEventListener('keydown', (e) => {
                     name: worker.name,
                     type: worker.type,
                     amount: worker.amount,
+                    workLocation: worker.workLocation || '',
+                    building: worker.building || '',
                     location: worker.location,
                     task: worker.task || '',
                     contractor: worker.contractor || '',
@@ -8461,20 +8811,22 @@ document.addEventListener('keydown', (e) => {
                         const typeInput = document.getElementById(`${prefix}-type-${worker.id}`);
                         const amountInput = document.getElementById(`${prefix}-amount-${worker.id}`);
                         const locationInput = document.getElementById(`${prefix}-location-${worker.id}`);
+                        const buildingInput = document.getElementById(`${prefix}-building-${worker.id}`);
                         const taskInput = document.getElementById(`${prefix}-task-${worker.id}`);
                         const contractorInput = document.getElementById(`${prefix}-contractor-${worker.id}`);
                         const deductionInput = document.getElementById(`${prefix}-deduction-${worker.id}`);
                         const notesInput = document.getElementById(`${prefix}-notes-${worker.id}`);
                         
                         if (typeInput && amountInput) {
-                            const newLoc = locationInput ? locationInput.value.trim() : (worker.location || '').trim();
+                            const newWorkLoc = locationInput ? locationInput.value.trim() : (worker.workLocation || '').trim();
+                            const newBuilding = buildingInput ? buildingInput.value.trim() : (worker.building || '').trim();
+                            const newLoc = (newWorkLoc && newBuilding) ? `${newWorkLoc} - ${newBuilding}` : (newWorkLoc || newBuilding || (worker.location || '').trim());
                             const newTask = taskInput ? taskInput.value.trim() : (worker.task || '').trim();
                             
                             if (status === 'approved' || status === 'pending') {
-                                if (!newLoc && !newTask) {
-                                    alert(`خطأ: يجب ملء كل من "مكان العمل" و "بند العمل (بالتفصيل)" للعامل: ${worker.name}\nالخانتان إجباريتان معاً ولا يمكن ترك أي منهما فارغة!`);
+                                if (!newWorkLoc) {
+                                    alert(`خطأ: خانة "مكان العمل" إجبارية للعامل: ${worker.name}\nلا يمكن تركها فارغة. الرجاء اختيار مكان العمل!`);
                                     if (locationInput) { locationInput.focus(); locationInput.style.border = '2px solid red'; }
-                                    if (taskInput) { taskInput.style.border = '2px solid red'; }
                                     if (btn) {
                                         btn.disabled = false;
                                         btn.innerHTML = origHtml;
@@ -8483,9 +8835,9 @@ document.addEventListener('keydown', (e) => {
                                     }
                                     return;
                                 }
-                                if (!newLoc) {
-                                    alert(`خطأ: خانة "مكان العمل" إجبارية للعامل: ${worker.name}\nلا يمكن تركها فارغة حتى لو تم إدخال بند العمل. يجب ملء الخانتين معاً!`);
-                                    if (locationInput) { locationInput.focus(); locationInput.style.border = '2px solid red'; }
+                                if (!newBuilding) {
+                                    alert(`خطأ: خانة "العمارة" إجبارية للعامل: ${worker.name}\nلا يمكن تركها فارغة. الرجاء اختيار العمارة!`);
+                                    if (buildingInput) { buildingInput.focus(); buildingInput.style.border = '2px solid red'; }
                                     if (btn) {
                                         btn.disabled = false;
                                         btn.innerHTML = origHtml;
@@ -8495,7 +8847,7 @@ document.addEventListener('keydown', (e) => {
                                     return;
                                 }
                                 if (!newTask) {
-                                    alert(`خطأ: خانة "بند العمل (بالتفصيل)" إجبارية للعامل: ${worker.name}\nلا يمكن تركها فارغة حتى لو تم إدخال مكان العمل. يجب ملء الخانتين معاً!`);
+                                    alert(`خطأ: خانة "بند العمل (بالتفصيل)" إجبارية للعامل: ${worker.name}\nلا يمكن تركها فارغة. يجب ملء كافة الخانات الإجبارية!`);
                                     if (taskInput) { taskInput.focus(); taskInput.style.border = '2px solid red'; }
                                     if (btn) {
                                         btn.disabled = false;
@@ -8509,6 +8861,8 @@ document.addEventListener('keydown', (e) => {
 
                             worker.type = typeInput.value;
                             worker.amount = Number(amountInput.value);
+                            worker.workLocation = newWorkLoc;
+                            worker.building = newBuilding;
                             worker.location = newLoc;
                             worker.task = newTask;
                             worker.contractor = contractorInput ? contractorInput.value.trim() : (worker.contractor || '');
