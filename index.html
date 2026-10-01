@@ -1561,7 +1561,7 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=6.3').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=6.4').then(reg => {
                 reg.update();
                 console.log('ServiceWorker v6.0 registered cleanly.');
             });
@@ -4146,11 +4146,25 @@ class UI {
             }
         }
         if (viewId === 'view-equipment-entry') {
+            const currentUser = (auth && auth.currentUser) || (auth && typeof auth.getUser === 'function' ? auth.getUser() : null);
+            const perms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(currentUser) : {};
+            if (!perms.equipment_entry) {
+                if (window.showAppNotification) window.showAppNotification('عفواً، ليس لديك صلاحية تسجيل المعدات', 'error');
+                UI.showView('view-supervisor');
+                return;
+            }
             if (window.app && typeof window.app.loadEquipmentEntryData === 'function') {
                 window.app.loadEquipmentEntryData();
             }
         }
         if (viewId === 'view-equipment-reports') {
+            const currentUser = (auth && auth.currentUser) || (auth && typeof auth.getUser === 'function' ? auth.getUser() : null);
+            const perms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(currentUser) : {};
+            if (!perms.equipment_reports) {
+                if (window.showAppNotification) window.showAppNotification('عفواً، ليس لديك صلاحية مستخلصات المعدات', 'error');
+                UI.showView('view-supervisor');
+                return;
+            }
             if (window.app && typeof window.app.loadEquipmentReportsData === 'function') {
                 window.app.loadEquipmentReportsData();
             }
@@ -4378,10 +4392,21 @@ class UI {
             const tr = document.createElement('tr');
             tr.id = `user-row-${user.id}`;
             const userPic = user.profilePic ? `<img src="${user.profilePic}" style="width:30px; height:30px; border-radius:50%; object-fit:cover; margin-left:10px; vertical-align:middle; border:1px solid var(--primary-color);">` : `<i class="fas fa-user-circle" style="font-size:30px; margin-left:10px; vertical-align:middle; color:var(--text-muted);"></i>`;
+            const userEffectivePerms = this.getUserPermissions(user);
+            const hasEqEntry = user.role === 'admin' || (userEffectivePerms && userEffectivePerms.equipment_entry === true);
+            const eqBadge = hasEqEntry ? `
+                <div style="margin-top: 4px;">
+                    <span class="badge" style="background: rgba(14, 165, 233, 0.15); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.3); font-size: 0.72rem; padding: 2px 7px; border-radius: 6px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;" title="مفعل له صلاحية تسجيل المعدات">
+                        <i class="fas fa-truck-monster"></i> تسجيل معدات
+                    </span>
+                </div>` : '';
             tr.innerHTML = `
                 <td class="user-col-name" style="display:flex; align-items:center;">${userPic} <span>${user.username === 'admin' ? 'Bishoy Mamdouh' : user.username}</span></td>
                 <td class="user-col-pass" data-pass="${user.password}">********</td>
-                <td class="user-col-role"><span class="badge badge-approved" data-role="${user.role}">${auth.getRoleNameAr(user.role)}</span></td>
+                <td class="user-col-role">
+                    <span class="badge badge-approved" data-role="${user.role}">${auth.getRoleNameAr(user.role)}</span>
+                    ${eqBadge}
+                </td>
                 <td class="user-col-actions">
                     <button class="btn-icon text-warning" onclick="app.openUserPermissionsModal('${user.id}')" title="تعديل صلاحيات المستخدم 🛡️"><i class="fas fa-user-shield"></i></button>
                     <button class="btn-icon text-success" onclick="app.copyInviteLink('${user.id}')" title="نسخ رابط الدعوة المباشر"><i class="fas fa-link"></i></button>
@@ -5598,9 +5623,9 @@ document.addEventListener('keydown', (e) => {
         { key: 'manage_notifications', label: 'إدارة وجدولة الإشعارات', desc: 'الدخول لشاشة إدارة الإشعارات وجدولة رسائل التنبيه والبرودكاست', icon: 'fa-bell' },
         { key: 'admin_dashboard', label: 'لوحة الإدارة والمستخدمين', desc: 'إدارة حسابات المستخدمين، النسخ الاحتياطي، وإعدادات النظام', icon: 'fa-users-cog' },
         { key: 'purge_records', label: 'تفريغ وأرشفة السراكي القديمة', desc: 'صلاحية مسح وأرشفة بيانات السراكي القديمة لتخفيض مساحة التخزين', icon: 'fa-trash-alt' },
-        { key: 'equipment_entry', label: 'تسجيل ساعات وتشغيل المعدات', desc: 'إدخال ومتابعة ساعات تشغيل المعدات في الموقع والأعطال وفترات التوقف اليومية', icon: 'fa-truck-monster' },
-        { key: 'equipment_reports', label: 'مستخلصات وحسابات المعدات والمقاولين', desc: 'استخراج وعرض وحساب المستخلص المالي النهائي للمعدات والمقاولين وتصديرها إكسيل وطباعتها', icon: 'fa-file-invoice-dollar' },
-        { key: 'manage_equipment', label: 'إدارة دليل المعدات والأسعار', desc: 'إضافة وتعديل وحذف المعدات وتسعير الساعات واليوميات وربطها بالمقاولين في لوحة الإدارة', icon: 'fa-cogs' }
+        { key: 'equipment_entry', label: '🚜 تسجيل ساعات وتشغيل المعدات (خاص)', desc: 'إظهار شاشة تسجيل يومية المعدات لهذا المستخدم حصراً (محجوبة عن جميع المستخدمين افتراضياً وتمنح بشكل خاص)', icon: 'fa-truck-monster' },
+        { key: 'equipment_reports', label: '📊 مستخلصات وحسابات المعدات والمقاولين', desc: 'استخراج وعرض وحساب المستخلص المالي النهائي للمعدات والمقاولين وتصديرها إكسيل وطباعتها', icon: 'fa-file-invoice-dollar' },
+        { key: 'manage_equipment', label: '⚙️ إدارة دليل المعدات والأسعار', desc: 'إضافة وتعديل وحذف المعدات وتسعير الساعات واليوميات وربطها بالمقاولين في لوحة الإدارة', icon: 'fa-cogs' }
     ];
 
     const DEFAULT_SYSTEM_ROLES = [
@@ -5614,11 +5639,11 @@ document.addEventListener('keydown', (e) => {
 
     const FACTORY_ROLE_PERMISSIONS = {
         admin: { record_entry: true, custom_record_date: true, auto_approve_record: true, approve_records: true, view_reports: true, view_server_status: true, manage_workers: true, manage_notifications: true, admin_dashboard: true, purge_records: true, equipment_entry: true, equipment_reports: true, manage_equipment: true },
-        engineer: { record_entry: true, custom_record_date: true, auto_approve_record: true, approve_records: true, view_reports: true, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: true, equipment_reports: true, manage_equipment: false },
+        engineer: { record_entry: true, custom_record_date: true, auto_approve_record: true, approve_records: true, view_reports: true, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false },
         supervisor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false },
         surveyor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false },
         warehouse_manager: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false },
-        operator_supervisor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: true, equipment_reports: false, manage_equipment: false }
+        operator_supervisor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false }
     };
     window.SYSTEM_PERMISSIONS = SYSTEM_PERMISSIONS;
     window.DEFAULT_SYSTEM_ROLES = DEFAULT_SYSTEM_ROLES;
@@ -6490,6 +6515,16 @@ document.addEventListener('keydown', (e) => {
             document.getElementById('default-profile-icon').style.display = 'block';
         }
         
+        if (auth.currentUser && auth.currentUser.id) {
+            try {
+                const freshUser = await db.getById('users', auth.currentUser.id);
+                if (freshUser) {
+                    auth.currentUser = { ...auth.currentUser, ...freshUser };
+                    localStorage.setItem('labor_app_user', JSON.stringify(auth.currentUser));
+                }
+            } catch(e) {}
+        }
+
         UI.updateNavigation(role);
         try {
             this.startNotificationPoller();
@@ -7056,7 +7091,18 @@ document.addEventListener('keydown', (e) => {
             return { ...allPermsObj, ...(user.permissions || {}) };
         }
         const roleDefaults = this.getRoleDefaultPermissions(user.role);
-        return { ...roleDefaults, ...(user.permissions || {}) };
+        const perms = { ...roleDefaults, ...(user.permissions || {}) };
+
+        // Equipment permissions strict control:
+        // Must be EXPLICITLY set to true in user.permissions for non-admin users.
+        // It is strictly removed from all users by default unless granted individually by Admin.
+        if (user.role !== 'admin' && user.username !== 'admin') {
+            perms.equipment_entry = !!(user.permissions && user.permissions.equipment_entry === true);
+            perms.equipment_reports = !!(user.permissions && user.permissions.equipment_reports === true);
+            perms.manage_equipment = !!(user.permissions && user.permissions.manage_equipment === true);
+        }
+
+        return perms;
     }
 
     // --- Role Defaults Management ---
