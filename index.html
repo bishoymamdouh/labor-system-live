@@ -1561,7 +1561,7 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=6.2').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=6.3').then(reg => {
                 reg.update();
                 console.log('ServiceWorker v6.0 registered cleanly.');
             });
@@ -1883,6 +1883,78 @@ select {
                                 </table>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- إدارة دليل المعدات وأسعار التشغيل والمقاولين -->
+                <div class="card mt-20" style="padding: 20px 22px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 14px; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.3rem; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.35);">
+                                <i class="fas fa-truck-monster"></i>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-main);">دليل المعدات وأسعار التشغيل والمقاولين</h3>
+                                <small style="color: var(--text-muted); font-size: 0.84rem;">تحكم حصري لمدير النظام فقط في إضافة المعدات وتحديد سعر الساعة وساعات اليومية والمقاول التابعة له</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- نموذج إضافة معدة جديدة -->
+                    <form id="add-equipment-form" onsubmit="event.preventDefault(); app.handleAddEquipmentSubmit();" style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; margin-bottom: 18px;">
+                        <h4 style="margin-top: 0; margin-bottom: 12px; color: var(--text-main);"><i class="fas fa-plus-circle text-primary"></i> إضافة معدة جديدة للدليل:</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px;">
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: bold;">اسم المعدة <span style="color:red;">*</span></label>
+                                <input type="text" id="new-eq-name" class="modal-input" placeholder="مثل: لودر كوماتسو 320" required>
+                            </div>
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: bold;">الكود / اللوحة</label>
+                                <input type="text" id="new-eq-code" class="modal-input" placeholder="مثل: L-101">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: bold;">المقاول / الجهة المالكة <span style="color:red;">*</span></label>
+                                <input type="text" id="new-eq-contractor" class="modal-input" placeholder="مثل: شركة الأهرام" required list="eq-admin-contractors-datalist">
+                                <datalist id="eq-admin-contractors-datalist"></datalist>
+                            </div>
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: bold;">سعر الساعة (جنيه) <span style="color:red;">*</span></label>
+                                <input type="number" id="new-eq-hourly-rate" class="modal-input" min="0" step="10" placeholder="مثل: 450" required oninput="app.calcNewEqDaily()">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: bold;">ساعات اليومية المحددة</label>
+                                <input type="number" id="new-eq-daily-hours" class="modal-input" min="1" max="24" value="8" required oninput="app.calcNewEqDaily()">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: bold;">يومية المعدة (جنيه)</label>
+                                <input type="number" id="new-eq-daily-rate" class="modal-input" min="0" placeholder="اليومية">
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <input type="text" id="new-eq-notes" class="modal-input" placeholder="ملاحظات وسعة القادوس أو المواصفات..." style="flex: 1; min-width: 250px;">
+                            <button type="submit" class="btn btn-primary" style="white-space: nowrap; padding: 9px 20px;"><i class="fas fa-plus"></i> إضافة المعدة</button>
+                        </div>
+                    </form>
+
+                    <!-- جدول المعدات المسجلة -->
+                    <div class="table-responsive" style="max-height: 380px; overflow-y: auto;">
+                        <table class="data-table" id="admin-equipment-table" style="font-size: 0.9rem;">
+                            <thead>
+                                <tr>
+                                    <th>اسم المعدة</th>
+                                    <th>الكود</th>
+                                    <th>المقاول</th>
+                                    <th>سعر الساعة</th>
+                                    <th>ساعات اليومية</th>
+                                    <th>اليومية (جنيه)</th>
+                                    <th>ملاحظات</th>
+                                    <th style="width: 100px; text-align: center;">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-equipment-table-body">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -2787,6 +2859,136 @@ select {
                 </div>
             </section>
 
+            <!-- Equipment Entry View: Daily Registration -->
+            <section id="view-equipment-entry" class="view hidden">
+                <header class="view-header">
+                    <h2><i class="fas fa-truck-monster"></i> تسجيل تشغيل وساعات المعدات</h2>
+                    <div class="header-actions">
+                        <span class="date-badge" id="equipment-current-date-badge"><i class="fas fa-calendar-alt"></i> تشغيل يومي مباشر</span>
+                    </div>
+                </header>
+                
+                <div class="card mb-20" style="padding: 22px 24px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);">
+                    <form id="equipment-log-form" novalidate onsubmit="event.preventDefault(); app.submitEquipmentLog();">
+                        <div class="form-row">
+                            <div class="form-group third">
+                                <label for="eq-entry-date"><strong>التاريخ <span style="color:red;">*</span></strong></label>
+                                <input type="date" id="eq-entry-date" class="modal-input" required>
+                            </div>
+                            <div class="form-group third">
+                                <label for="eq-entry-select"><strong>المعدة <span style="color:red;">*</span></strong></label>
+                                <select id="eq-entry-select" class="modal-input" required onchange="app.onEquipmentSelectChange()">
+                                    <option value="" disabled selected>اختر المعدة من القائمة</option>
+                                </select>
+                                <small id="eq-entry-contractor-badge" style="display: none; color: #6366f1; font-weight: bold; margin-top: 4px;"></small>
+                            </div>
+                            <div class="form-group third">
+                                <label for="eq-entry-operator"><strong>اسم السائق / المشغل <span style="color:red;">*</span></strong></label>
+                                <input type="text" id="eq-entry-operator" class="modal-input" placeholder="اسم السائق القائم على المعدة" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label for="eq-entry-location"><strong>مكان العمل <span style="color:red;">*</span></strong></label>
+                                <select id="eq-entry-location" class="modal-input" required onchange="app.onEqWorkLocationChange()">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="form-group half">
+                                <label for="eq-entry-building"><strong>العمارة <span style="color:red;">*</span></strong></label>
+                                <select id="eq-entry-building" class="modal-input" required onchange="this.style.border=''">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row" style="background: rgba(99, 102, 241, 0.04); padding: 14px 16px; border-radius: 10px; border: 1px dashed rgba(99, 102, 241, 0.3); margin-bottom: 15px;">
+                            <div class="form-group quarter">
+                                <label for="eq-entry-start-time"><i class="fas fa-play text-success"></i> <strong>ساعة البداية <span style="color:red;">*</span></strong></label>
+                                <input type="time" id="eq-entry-start-time" class="modal-input" value="08:00" required onchange="app.recalcEquipmentEntryHours()">
+                            </div>
+                            <div class="form-group quarter">
+                                <label for="eq-entry-end-time"><i class="fas fa-stop text-danger"></i> <strong>ساعة الانتهاء <span style="color:red;">*</span></strong></label>
+                                <input type="time" id="eq-entry-end-time" class="modal-input" value="17:00" required onchange="app.recalcEquipmentEntryHours()">
+                            </div>
+                            <div class="form-group quarter">
+                                <label for="eq-entry-break-hours"><i class="fas fa-pause text-warning"></i> <strong>وقت مستقطع (ساعات)</strong></label>
+                                <input type="number" id="eq-entry-break-hours" class="modal-input" min="0" step="0.25" value="0" placeholder="0" oninput="app.recalcEquipmentEntryHours()">
+                            </div>
+                            <div class="form-group quarter">
+                                <label for="eq-entry-break-reason"><strong>سبب الاستقطاع (إن وجد)</strong></label>
+                                <select id="eq-entry-break-reason" class="modal-input">
+                                    <option value="">لا يوجد وقت مستقطع</option>
+                                    <option value="راحة وغداء">راحة وغداء</option>
+                                    <option value="عطل ميكانيكي">عطل ميكانيكي</option>
+                                    <option value="صيانة وتزود بالوقود">صيانة وتزود بالوقود</option>
+                                    <option value="انتظار خامات وموقع">انتظار خامات وموقع</option>
+                                    <option value="ظروف جوية / أمطار">ظروف جوية / أمطار</option>
+                                    <option value="أخرى">أخرى (مذكورة بالملاحظات)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Live Calculation Banner -->
+                        <div id="eq-entry-calc-banner" style="display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 18px; margin-bottom: 15px; flex-wrap: wrap; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                                <div><span style="color: var(--text-muted); font-size: 0.85rem;">إجمالي التواجد:</span> <strong id="eq-calc-span" style="color: var(--text-main); font-size: 1rem;">9.00 ساعة</strong></div>
+                                <div><span style="color: var(--text-muted); font-size: 0.85rem;">الوقت المستقطع:</span> <strong id="eq-calc-break" style="color: #ef4444; font-size: 1rem;">0.00 ساعة</strong></div>
+                                <div style="background: #e0e7ff; color: #4338ca; padding: 4px 12px; border-radius: 8px; font-weight: 800; font-size: 1.05rem;">
+                                    <i class="fas fa-check-circle"></i> صافي ساعات العمل: <span id="eq-calc-net">9.00</span> ساعة
+                                </div>
+                            </div>
+                            <!-- Admin Only Live Rate/Cost -->
+                            <div id="eq-entry-admin-cost-box" style="display: none; align-items: center; gap: 12px; background: #ecfdf5; border: 1px solid #10b981; border-radius: 8px; padding: 4px 14px;">
+                                <span style="color: #065f46; font-size: 0.85rem; font-weight: bold;">سعر الساعة: <span id="eq-calc-rate">0</span> ج.م</span>
+                                <span style="color: #047857; font-size: 1.05rem; font-weight: 800;">التكلفة: <span id="eq-calc-cost">0</span> ج.م</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-15">
+                            <label for="eq-entry-notes"><strong>بيان الأعمال المنفذة والملاحظات</strong></label>
+                            <textarea id="eq-entry-notes" class="modal-input" rows="2" placeholder="اكتب بالتفصيل ما تم إنجازه بواسطة المعدة اليوم..."></textarea>
+                        </div>
+
+                        <button type="submit" id="btn-submit-eq-log" class="btn btn-primary btn-block" style="padding: 12px; font-size: 1.05rem; font-weight: bold;">
+                            <i class="fas fa-check-circle"></i> تسجيل تشغيل المعدة فورياً (معتمد ومقفل)
+                        </button>
+                    </form>
+                </div>
+
+                <div class="card" style="padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-card);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+                        <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-main);"><i class="fas fa-list-check"></i> سجلات تشغيل اليوم للمعدات</h3>
+                        <span style="font-size: 0.82rem; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 3px 10px; border-radius: 8px; font-weight: bold;">
+                            <i class="fas fa-lock"></i> السجلات تعتمد مباشرة وتقفل على المشرف
+                        </span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table" id="today-equipment-table" style="font-size: 0.9rem;">
+                            <thead>
+                                <tr>
+                                    <th>م</th>
+                                    <th>المعدة والكود</th>
+                                    <th>المقاول</th>
+                                    <th>مكان العمل والعمارة</th>
+                                    <th>السائق</th>
+                                    <th>من</th>
+                                    <th>إلى</th>
+                                    <th>المستقطع والسبب</th>
+                                    <th>صافي الساعات</th>
+                                    <th>بيان العمل</th>
+                                    <th>الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody id="today-equipment-table-body">
+                                <tr><td colspan="11" style="text-align: center; color: var(--text-muted); padding: 20px;">لا توجد سجلات مسجلة اليوم حتى الآن</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
             <!-- Engineer View: Approve Records -->
             <section id="view-engineer" class="view hidden">
                 <header class="view-header" style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 14px;">
@@ -3363,6 +3565,160 @@ select {
                     </div>
                 </div>
             </section>
+
+            <!-- Equipment Reports & Contractor Extracts View -->
+            <section id="view-equipment-reports" class="view hidden">
+                <header class="view-header" style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 6px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <div>
+                            <h2 style="margin: 0; font-size: 1.5rem;"><i class="fas fa-file-invoice-dollar text-primary"></i> مستخلصات وحسابات المعدات والمقاولين</h2>
+                            <p style="color: var(--text-muted); margin: 4px 0 0; font-size: 0.88rem;">
+                                إصدار ومتابعة مستخلصات المعدات، وتحديد المقاول وحساب صافي الساعات والتكلفة والطباعة والإكسيل
+                            </p>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="app.printEquipmentExtract()" style="font-weight: 600;">
+                                <i class="fas fa-print"></i> طباعة المستخلص A4
+                            </button>
+                            <button type="button" class="btn btn-sm" onclick="app.exportEquipmentExtractExcel()" style="background: #107c41; color: #fff; font-weight: 600; border: none; padding: 6px 14px; border-radius: 6px;">
+                                <i class="fas fa-file-excel"></i> تصدير إكسيل منسق
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Filter & Controls Card -->
+                <div class="card" style="margin-bottom: 20px; padding: 18px;">
+                    <div style="font-weight: bold; margin-bottom: 14px; font-size: 1rem; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-filter text-primary"></i> معايير المستخلص وتحديد المقاول والمعدات
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 16px;">
+                        <div class="form-group" style="margin: 0;">
+                            <label style="display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.88rem;">
+                                <i class="fas fa-user-tie text-primary"></i> اسم المقاول (اختيار أو كتابة):
+                            </label>
+                            <input type="text" id="extract-contractor-input" list="equipment-contractors-list" placeholder="اختر مقاول أو اكتب اسماً جديداً..." style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-main); font-weight: 600;" onchange="app.onContractorFilterChange()">
+                            <datalist id="equipment-contractors-list">
+                                <!-- Populated dynamically -->
+                            </datalist>
+                        </div>
+
+                        <div class="form-group" style="margin: 0;">
+                            <label style="display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.88rem;">
+                                <i class="fas fa-calendar-alt text-primary"></i> من تاريخ:
+                            </label>
+                            <input type="date" id="extract-date-from" style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-main);" onchange="app.generateEquipmentExtract()">
+                        </div>
+
+                        <div class="form-group" style="margin: 0;">
+                            <label style="display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.88rem;">
+                                <i class="fas fa-calendar-check text-primary"></i> إلى تاريخ:
+                            </label>
+                            <input type="date" id="extract-date-to" style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-main); color: var(--text-main);" onchange="app.generateEquipmentExtract()">
+                        </div>
+
+                        <div class="form-group" style="margin: 0; display: flex; align-items: flex-end; gap: 8px;">
+                            <button type="button" class="btn btn-primary" onclick="app.generateEquipmentExtract()" style="width: 100%; padding: 10px; font-weight: bold;">
+                                <i class="fas fa-sync-alt"></i> استخراج وتحديث المستخلص
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Equipment Checkbox Selector for Contractor -->
+                    <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+                            <span style="font-weight: bold; font-size: 0.88rem; color: var(--text-main);">
+                                <i class="fas fa-truck-monster text-primary"></i> تحديد المعدات التابعة للمقاول لحسابها في المستخلص:
+                            </span>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="app.toggleAllExtractEquipment()" style="padding: 3px 10px; font-size: 0.78rem;">
+                                تحديد / إلغاء تحديد الكل
+                            </button>
+                        </div>
+                        <div id="extract-equipment-checklist" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                            <!-- Populated dynamically with checkboxes -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI / Summary Cards -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px;">
+                    <div class="card" style="padding: 14px; text-align: center; border-right: 4px solid #6366f1;">
+                        <span style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 4px;">عدد السجلات التشغيلية</span>
+                        <span id="extract-stat-days" style="font-size: 1.4rem; font-weight: 800; color: var(--text-main);">0</span>
+                    </div>
+                    <div class="card" style="padding: 14px; text-align: center; border-right: 4px solid #3b82f6;">
+                        <span style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 4px;">إجمالي الساعات</span>
+                        <span id="extract-stat-gross-hours" style="font-size: 1.4rem; font-weight: 800; color: #3b82f6;">0.00</span>
+                    </div>
+                    <div class="card" style="padding: 14px; text-align: center; border-right: 4px solid #ef4444;">
+                        <span style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 4px;">المستقطع (عطل / بريك)</span>
+                        <span id="extract-stat-deductions" style="font-size: 1.4rem; font-weight: 800; color: #ef4444;">0.00</span>
+                    </div>
+                    <div class="card" style="padding: 14px; text-align: center; border-right: 4px solid #10b981;">
+                        <span style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 4px;">صافي ساعات التشغيل</span>
+                        <span id="extract-stat-net-hours" style="font-size: 1.4rem; font-weight: 800; color: #10b981;">0.00</span>
+                    </div>
+                    <div class="card" style="padding: 14px; text-align: center; border-right: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.05);">
+                        <span style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 4px;">إجمالي المستخلص المستحق</span>
+                        <div style="display: flex; align-items: baseline; justify-content: center; gap: 4px;">
+                            <span id="extract-stat-total-cost" style="font-size: 1.5rem; font-weight: 900; color: #d97706;">0.00</span>
+                            <span style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted);">ج.م</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Extract Details Table Card -->
+                <div class="card" style="padding: 18px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+                        <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-main);">
+                            <i class="fas fa-file-invoice text-primary"></i> كشف تشغيل وحساب مستخلص المقاول: <span id="extract-contractor-header-title" style="color: var(--primary);">الكل</span>
+                        </h3>
+                        <span id="extract-period-subtitle" style="font-size: 0.85rem; color: var(--text-muted);">الفترة: غير محددة</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table" id="equipment-extract-table" style="font-size: 0.88rem;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 35px;">م</th>
+                                    <th>التاريخ</th>
+                                    <th>المعدة والكود</th>
+                                    <th>المقاول</th>
+                                    <th>مكان العمل والعمارة</th>
+                                    <th>البند والملاحظات</th>
+                                    <th>من</th>
+                                    <th>إلى</th>
+                                    <th>إجمالي س</th>
+                                    <th>مستقطع س</th>
+                                    <th style="background: rgba(16, 185, 129, 0.08);">صافي س</th>
+                                    <th class="admin-only-cell">سعر س (ج.م)</th>
+                                    <th class="admin-only-cell" style="background: rgba(245, 158, 11, 0.1);">إجمالي (ج.م)</th>
+                                    <th class="admin-only-cell" style="width: 75px;">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="equipment-extract-table-body">
+                                <tr>
+                                    <td colspan="14" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                                        يرجى تحديد المقاول والفترة الزمنية والضغط على "استخراج المستخلص"
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot id="equipment-extract-table-foot" style="font-weight: bold; background: var(--bg-main);">
+                                <tr>
+                                    <td colspan="8" style="text-align: left; padding: 12px 16px;">الإجمالي العام للفترة:</td>
+                                    <td id="extract-foot-gross" style="color: #3b82f6;">0.00</td>
+                                    <td id="extract-foot-ded" style="color: #ef4444;">0.00</td>
+                                    <td id="extract-foot-net" style="color: #10b981; font-size: 1.05rem;">0.00</td>
+                                    <td class="admin-only-cell">-</td>
+                                    <td class="admin-only-cell" id="extract-foot-total-cost" style="color: #d97706; font-size: 1.15rem; background: rgba(245, 158, 11, 0.15);">0.00 ج.م</td>
+                                    <td class="admin-only-cell"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -3789,6 +4145,16 @@ class UI {
                 window.app.loadNotificationsManager();
             }
         }
+        if (viewId === 'view-equipment-entry') {
+            if (window.app && typeof window.app.loadEquipmentEntryData === 'function') {
+                window.app.loadEquipmentEntryData();
+            }
+        }
+        if (viewId === 'view-equipment-reports') {
+            if (window.app && typeof window.app.loadEquipmentReportsData === 'function') {
+                window.app.loadEquipmentReportsData();
+            }
+        }
     }
 
     static formatCairoTime(dateInput) {
@@ -3957,6 +4323,12 @@ class UI {
         }
         if (perms.view_reports) {
             navHtml += `<li><a href="#" data-view="view-reports"><i class="fas fa-chart-bar"></i> التقارير المجمعة</a></li>`;
+        }
+        if (perms.equipment_entry) {
+            navHtml += `<li><a href="#" data-view="view-equipment-entry"><i class="fas fa-truck-monster"></i> تسجيل المعدات</a></li>`;
+        }
+        if (perms.equipment_reports) {
+            navHtml += `<li><a href="#" data-view="view-equipment-reports"><i class="fas fa-file-invoice-dollar"></i> مستخلصات المعدات</a></li>`;
         }
         navLinks.innerHTML = navHtml;
         
@@ -5225,7 +5597,10 @@ document.addEventListener('keydown', (e) => {
         { key: 'manage_workers', label: 'إدارة قاعدة العمال', desc: 'إضافة عمال جدد لدليل العمال وتعديل المسميات واليوميات الافتراضية', icon: 'fa-address-book' },
         { key: 'manage_notifications', label: 'إدارة وجدولة الإشعارات', desc: 'الدخول لشاشة إدارة الإشعارات وجدولة رسائل التنبيه والبرودكاست', icon: 'fa-bell' },
         { key: 'admin_dashboard', label: 'لوحة الإدارة والمستخدمين', desc: 'إدارة حسابات المستخدمين، النسخ الاحتياطي، وإعدادات النظام', icon: 'fa-users-cog' },
-        { key: 'purge_records', label: 'تفريغ وأرشفة السراكي القديمة', desc: 'صلاحية مسح وأرشفة بيانات السراكي القديمة لتخفيض مساحة التخزين', icon: 'fa-trash-alt' }
+        { key: 'purge_records', label: 'تفريغ وأرشفة السراكي القديمة', desc: 'صلاحية مسح وأرشفة بيانات السراكي القديمة لتخفيض مساحة التخزين', icon: 'fa-trash-alt' },
+        { key: 'equipment_entry', label: 'تسجيل ساعات وتشغيل المعدات', desc: 'إدخال ومتابعة ساعات تشغيل المعدات في الموقع والأعطال وفترات التوقف اليومية', icon: 'fa-truck-monster' },
+        { key: 'equipment_reports', label: 'مستخلصات وحسابات المعدات والمقاولين', desc: 'استخراج وعرض وحساب المستخلص المالي النهائي للمعدات والمقاولين وتصديرها إكسيل وطباعتها', icon: 'fa-file-invoice-dollar' },
+        { key: 'manage_equipment', label: 'إدارة دليل المعدات والأسعار', desc: 'إضافة وتعديل وحذف المعدات وتسعير الساعات واليوميات وربطها بالمقاولين في لوحة الإدارة', icon: 'fa-cogs' }
     ];
 
     const DEFAULT_SYSTEM_ROLES = [
@@ -5238,12 +5613,12 @@ document.addEventListener('keydown', (e) => {
     ];
 
     const FACTORY_ROLE_PERMISSIONS = {
-        admin: { record_entry: true, custom_record_date: true, auto_approve_record: true, approve_records: true, view_reports: true, view_server_status: true, manage_workers: true, manage_notifications: true, admin_dashboard: true, purge_records: true },
-        engineer: { record_entry: true, custom_record_date: true, auto_approve_record: true, approve_records: true, view_reports: true, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        supervisor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        surveyor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        warehouse_manager: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false },
-        operator_supervisor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false }
+        admin: { record_entry: true, custom_record_date: true, auto_approve_record: true, approve_records: true, view_reports: true, view_server_status: true, manage_workers: true, manage_notifications: true, admin_dashboard: true, purge_records: true, equipment_entry: true, equipment_reports: true, manage_equipment: true },
+        engineer: { record_entry: true, custom_record_date: true, auto_approve_record: true, approve_records: true, view_reports: true, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: true, equipment_reports: true, manage_equipment: false },
+        supervisor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false },
+        surveyor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false },
+        warehouse_manager: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false },
+        operator_supervisor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: true, equipment_reports: false, manage_equipment: false }
     };
     window.SYSTEM_PERMISSIONS = SYSTEM_PERMISSIONS;
     window.DEFAULT_SYSTEM_ROLES = DEFAULT_SYSTEM_ROLES;
@@ -6129,10 +6504,12 @@ document.addEventListener('keydown', (e) => {
         
         try {
             await this.loadLocationOptions();
+            await this.loadEquipmentList();
             if (role === 'admin') {
                 await this.loadEngineerData();
                 this.loadSupervisorData();
                 this.loadAdminData();
+                this.loadAdminEquipmentTable();
                 this.generateReport();
                 
                 await UI.renderEngineerOptions();
@@ -6192,6 +6569,7 @@ document.addEventListener('keydown', (e) => {
         }
         await this.loadBackupHub();
         await this.loadLocationOptions();
+        await this.loadAdminEquipmentTable();
         this.populateRoleSelectors();
         this.renderRoleDefaultPermissions();
     }
@@ -10522,8 +10900,1303 @@ document.addEventListener('keydown', (e) => {
             }
         }
     }
-}
 
+    // =========================================================================
+    // --- HEAVY EQUIPMENT TRACKING, CONTRACTOR EXTRACTS & ADMIN MANAGEMENT ---
+    // =========================================================================
+
+    async loadEquipmentList() {
+        try {
+            let list = await db.getAll('equipment') || [];
+            if (!Array.isArray(list)) list = [];
+            list.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ar'));
+            this.equipmentList = list;
+            this.populateEquipmentDropdown();
+            this.renderAdminContractorDatalist();
+            return list;
+        } catch (err) {
+            console.error("Error loading equipment list:", err);
+            this.equipmentList = this.equipmentList || [];
+            return [];
+        }
+    }
+
+    populateEquipmentDropdown() {
+        const select = document.getElementById('eq-entry-select');
+        if (select) {
+            let html = '<option value="" disabled selected>اختر المعدة من القائمة</option>';
+            (this.equipmentList || []).forEach(eq => {
+                const codePart = eq.code ? ` (${eq.code})` : '';
+                const contractorPart = eq.contractor ? ` - ${eq.contractor}` : '';
+                html += `<option value="${eq.id}">${eq.name}${codePart}${contractorPart}</option>`;
+            });
+            select.innerHTML = html;
+        }
+
+        // Also update contractors datalist in reports view
+        const datalist = document.getElementById('equipment-contractors-list');
+        if (datalist) {
+            const contractors = new Set();
+            (this.equipmentList || []).forEach(eq => {
+                if (eq.contractor && eq.contractor.trim()) contractors.add(eq.contractor.trim());
+            });
+            datalist.innerHTML = Array.from(contractors).sort().map(c => `<option value="${c}"></option>`).join('');
+        }
+    }
+
+    renderAdminContractorDatalist() {
+        const adminDatalist = document.getElementById('eq-admin-contractors-datalist');
+        if (adminDatalist) {
+            const contractors = new Set();
+            (this.equipmentList || []).forEach(eq => {
+                if (eq.contractor && eq.contractor.trim()) contractors.add(eq.contractor.trim());
+            });
+            adminDatalist.innerHTML = Array.from(contractors).sort().map(c => `<option value="${c}"></option>`).join('');
+        }
+    }
+
+    onEquipmentSelectChange() {
+        const select = document.getElementById('eq-entry-select');
+        const badge = document.getElementById('eq-entry-contractor-badge');
+        const adminCostBox = document.getElementById('eq-entry-admin-cost-box');
+        if (!select) return;
+
+        const eqId = select.value;
+        const eq = (this.equipmentList || []).find(e => String(e.id) === String(eqId));
+        if (eq) {
+            if (badge) {
+                badge.style.display = 'block';
+                badge.innerHTML = `<i class="fas fa-building text-primary"></i> المقاول المالك: <strong>${eq.contractor}</strong> | الساعات المحددة لليومية: <strong>${eq.dailyHours || 8} س</strong>`;
+            }
+            const isAdmin = auth.currentUser && (auth.currentUser.role === 'admin' || auth.currentUser.username === 'admin');
+            if (adminCostBox) {
+                if (isAdmin) {
+                    adminCostBox.style.display = 'flex';
+                    const rateEl = document.getElementById('eq-calc-rate');
+                    if (rateEl) rateEl.innerText = Number(eq.hourlyRate || 0).toLocaleString();
+                } else {
+                    adminCostBox.style.display = 'none';
+                }
+            }
+        } else {
+            if (badge) badge.style.display = 'none';
+            if (adminCostBox) adminCostBox.style.display = 'none';
+        }
+        this.recalcEquipmentEntryHours();
+    }
+
+    onEqWorkLocationChange() {
+        const locSelect = document.getElementById('eq-entry-location');
+        const bldSelect = document.getElementById('eq-entry-building');
+        if (!locSelect || !bldSelect) return;
+        const selectedLocName = locSelect.value;
+        const locObj = (this.workLocations || []).find(l => l.name === selectedLocName);
+        if (locObj && locObj.autoBuilding) {
+            bldSelect.value = locObj.autoBuilding;
+            bldSelect.style.border = '';
+        }
+    }
+
+    recalcEquipmentEntryHours() {
+        const startTimeStr = document.getElementById('eq-entry-start-time')?.value || '08:00';
+        const endTimeStr = document.getElementById('eq-entry-end-time')?.value || '17:00';
+        const breakHoursInput = parseFloat(document.getElementById('eq-entry-break-hours')?.value) || 0;
+
+        const [sh, sm] = startTimeStr.split(':').map(Number);
+        const [eh, em] = endTimeStr.split(':').map(Number);
+
+        let startMinutes = sh * 60 + sm;
+        let endMinutes = eh * 60 + em;
+        if (endMinutes < startMinutes) {
+            endMinutes += 24 * 60; // Crosses midnight
+        }
+
+        const spanHours = Math.max(0, (endMinutes - startMinutes) / 60);
+        const breakHours = Math.min(spanHours, Math.max(0, breakHoursInput));
+        const netHours = Math.max(0, spanHours - breakHours);
+
+        const spanEl = document.getElementById('eq-calc-span');
+        if (spanEl) spanEl.innerText = spanHours.toFixed(2) + ' ساعة';
+
+        const breakEl = document.getElementById('eq-calc-break');
+        if (breakEl) breakEl.innerText = breakHours.toFixed(2) + ' ساعة';
+
+        const netEl = document.getElementById('eq-calc-net');
+        if (netEl) netEl.innerText = netHours.toFixed(2);
+
+        // If admin, calculate live cost
+        const select = document.getElementById('eq-entry-select');
+        const eqId = select ? select.value : null;
+        const eq = (this.equipmentList || []).find(e => String(e.id) === String(eqId));
+        const hourlyRate = eq ? (eq.hourlyRate || 0) : 0;
+        const cost = netHours * hourlyRate;
+
+        const costEl = document.getElementById('eq-calc-cost');
+        if (costEl) costEl.innerText = cost.toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    async submitEquipmentLog() {
+        const dateInput = document.getElementById('eq-entry-date');
+        const select = document.getElementById('eq-entry-select');
+        const operatorInput = document.getElementById('eq-entry-operator');
+        const locSelect = document.getElementById('eq-entry-location');
+        const bldSelect = document.getElementById('eq-entry-building');
+        const startTimeStr = document.getElementById('eq-entry-start-time')?.value;
+        const endTimeStr = document.getElementById('eq-entry-end-time')?.value;
+        const breakHours = parseFloat(document.getElementById('eq-entry-break-hours')?.value) || 0;
+        const breakReason = document.getElementById('eq-entry-break-reason')?.value || '';
+        const notes = document.getElementById('eq-entry-notes')?.value.trim() || '';
+
+        if (!dateInput || !dateInput.value) {
+            alert('يرجى تحديد تاريخ التشغيل.');
+            return;
+        }
+        if (!select || !select.value) {
+            alert('يرجى اختيار المعدة المراد تسجيلها.');
+            select?.focus();
+            return;
+        }
+        if (!operatorInput || !operatorInput.value.trim()) {
+            alert('يرجى كتابة اسم السائق أو مشغل المعدة.');
+            operatorInput?.focus();
+            return;
+        }
+        if (!locSelect || !locSelect.value) {
+            alert('يرجى تحديد مكان العمل.');
+            locSelect?.focus();
+            return;
+        }
+        if (!bldSelect || !bldSelect.value) {
+            alert('يرجى تحديد العمارة.');
+            bldSelect?.focus();
+            return;
+        }
+        if (!startTimeStr || !endTimeStr) {
+            alert('يرجى تحديد ساعات البدء والانتهاء بدقة.');
+            return;
+        }
+
+        const [sh, sm] = startTimeStr.split(':').map(Number);
+        const [eh, em] = endTimeStr.split(':').map(Number);
+        let startMinutes = sh * 60 + sm;
+        let endMinutes = eh * 60 + em;
+        if (endMinutes < startMinutes) endMinutes += 24 * 60;
+        const grossHours = Number(((endMinutes - startMinutes) / 60).toFixed(2));
+        const netHours = Number(Math.max(0, grossHours - breakHours).toFixed(2));
+
+        if (grossHours <= 0) {
+            alert('ساعات العمل غير صحيحة. يجب أن تكون ساعة الانتهاء بعد ساعة البداية.');
+            return;
+        }
+
+        const eq = (this.equipmentList || []).find(e => String(e.id) === String(select.value));
+        const hourlyRate = eq ? Number(eq.hourlyRate || 0) : 0;
+        const totalCost = Number((netHours * hourlyRate).toFixed(2));
+
+        const user = auth.currentUser;
+        const logId = 'eq_log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+
+        const newLog = {
+            id: logId,
+            equipmentId: eq ? eq.id : select.value,
+            equipmentName: eq ? eq.name : 'معدة',
+            equipmentCode: eq ? (eq.code || '') : '',
+            contractor: eq ? (eq.contractor || '') : '',
+            driverName: operatorInput.value.trim(),
+            location: locSelect.value,
+            building: bldSelect.value,
+            date: dateInput.value,
+            startTime: startTimeStr,
+            endTime: endTimeStr,
+            grossHours: grossHours,
+            breakHours: breakHours,
+            breakReason: breakReason,
+            netHours: netHours,
+            hourlyRate: hourlyRate,
+            totalCost: totalCost,
+            notes: notes,
+            createdById: user ? user.id : 'unknown',
+            createdByName: user ? user.name : 'مشرف',
+            createdByRole: user ? user.role : 'supervisor',
+            createdAt: new Date().toISOString(),
+            status: 'approved',
+            locked: true // Strictly locked for supervisor
+        };
+
+        const submitBtn = document.getElementById('btn-submit-eq-log');
+        const origText = submitBtn ? submitBtn.innerHTML : '';
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ والاعتماد...';
+        }
+
+        try {
+            await db.add('equipment_logs', newLog);
+            if (window.showAppNotification) {
+                window.showAppNotification({
+                    title: '🔒 تم تسجيل واعتماد تشغيل المعدة',
+                    message: `تم تسجيل ${newLog.equipmentName} (${netHours} ساعة صافية) بنجاح وقفل السجل.`,
+                    type: 'success'
+                });
+            } else {
+                alert('تم تسجيل تشغيل المعدة واعتمادها بنجاح!');
+            }
+
+            // Clear inputs for next log
+            select.value = '';
+            const badge = document.getElementById('eq-entry-contractor-badge');
+            if (badge) badge.style.display = 'none';
+            operatorInput.value = '';
+            const breakInput = document.getElementById('eq-entry-break-hours');
+            if (breakInput) breakInput.value = '0';
+            const breakReasonSelect = document.getElementById('eq-entry-break-reason');
+            if (breakReasonSelect) breakReasonSelect.value = '';
+            const notesEl = document.getElementById('eq-entry-notes');
+            if (notesEl) notesEl.value = '';
+            this.recalcEquipmentEntryHours();
+            await this.loadEquipmentEntryData();
+        } catch (err) {
+            console.error("Error submitting equipment log:", err);
+            alert('حدث خطأ أثناء حفظ السجل: ' + err.message);
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = origText;
+            }
+        }
+    }
+
+    async loadEquipmentEntryData() {
+        await this.loadEquipmentList();
+        await this.loadLocationOptions();
+
+        const locSelect = document.getElementById('eq-entry-location');
+        if (locSelect && locSelect.options.length <= 1) {
+            locSelect.innerHTML = this.getWorkLocationOptionsHtml();
+        }
+        const bldSelect = document.getElementById('eq-entry-building');
+        if (bldSelect && bldSelect.options.length <= 1) {
+            bldSelect.innerHTML = this.getBuildingOptionsHtml();
+        }
+
+        const dateInput = document.getElementById('eq-entry-date');
+        const today = new Date().toISOString().split('T')[0];
+        if (dateInput && !dateInput.value) {
+            dateInput.value = today;
+        }
+
+        this.recalcEquipmentEntryHours();
+
+        // Render today's equipment logs
+        const tbody = document.getElementById('today-equipment-table-body');
+        if (!tbody) return;
+
+        try {
+            let logs = await db.getAll('equipment_logs') || [];
+            if (!Array.isArray(logs)) logs = [];
+            const currentDate = dateInput ? dateInput.value : today;
+            const todayLogs = logs.filter(l => l.date === currentDate);
+
+            if (todayLogs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--text-muted); padding: 25px;"><i class="fas fa-info-circle"></i> لا توجد سجلات تشغيل معدات مسجلة لهذا اليوم (${currentDate})</td></tr>`;
+                return;
+            }
+
+            todayLogs.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+            let html = '';
+            todayLogs.forEach((l, idx) => {
+                const codeBadge = l.equipmentCode ? `<span style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem; font-weight: bold;">${l.equipmentCode}</span>` : '';
+                const breakText = (l.breakHours > 0) ? `<span style="color: #ef4444; font-weight: bold;">${l.breakHours} س</span> ${l.breakReason ? '(' + l.breakReason + ')' : ''}` : '<span style="color: var(--text-muted);">-</span>';
+                
+                html += `
+                    <tr>
+                        <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+                        <td style="font-weight: bold;">${l.equipmentName} ${codeBadge}</td>
+                        <td>${l.contractor || '-'}</td>
+                        <td><span style="font-weight: 600;">${l.location}</span> / <span style="color: var(--text-muted);">${l.building}</span></td>
+                        <td>${l.driverName || '-'}</td>
+                        <td style="direction: ltr; text-align: center;">${l.startTime}</td>
+                        <td style="direction: ltr; text-align: center;">${l.endTime}</td>
+                        <td>${breakText}</td>
+                        <td style="text-align: center; font-weight: 800; color: #10b981; font-size: 1rem; background: rgba(16, 185, 129, 0.08);">${l.netHours} س</td>
+                        <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${l.notes || ''}">${l.notes || '-'}</td>
+                        <td style="text-align: center;">
+                            <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: bold;">
+                                <i class="fas fa-lock"></i> معتمد ومسجل
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        } catch (err) {
+            console.error("Error loading today equipment logs:", err);
+            tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: red; padding: 15px;">حدث خطأ في تحميل السجلات: ${err.message}</td></tr>`;
+        }
+    }
+
+    // --- Admin Equipment Catalog Management ---
+
+    async handleAddEquipmentSubmit() {
+        const nameInput = document.getElementById('new-eq-name');
+        const codeInput = document.getElementById('new-eq-code');
+        const contractorInput = document.getElementById('new-eq-contractor');
+        const hourlyRateInput = document.getElementById('new-eq-hourly-rate');
+        const dailyHoursInput = document.getElementById('new-eq-daily-hours');
+        const dailyRateInput = document.getElementById('new-eq-daily-rate');
+        const notesInput = document.getElementById('new-eq-notes');
+
+        if (!nameInput || !nameInput.value.trim()) {
+            alert('يرجى إدخال اسم المعدة.');
+            nameInput?.focus();
+            return;
+        }
+        if (!contractorInput || !contractorInput.value.trim()) {
+            alert('يرجى تحديد المقاول أو الجهة المالكة للمعدة.');
+            contractorInput?.focus();
+            return;
+        }
+        const hourlyRate = parseFloat(hourlyRateInput?.value) || 0;
+        if (hourlyRate <= 0) {
+            alert('يرجى تحديد سعر الساعة للمعدة بقيمة أكبر من الصفر.');
+            hourlyRateInput?.focus();
+            return;
+        }
+
+        const dailyHours = parseFloat(dailyHoursInput?.value) || 8;
+        const dailyRate = parseFloat(dailyRateInput?.value) || (hourlyRate * dailyHours);
+
+        const newEq = {
+            id: 'eq_' + Date.now(),
+            name: nameInput.value.trim(),
+            code: codeInput?.value.trim() || '',
+            contractor: contractorInput.value.trim(),
+            hourlyRate: hourlyRate,
+            dailyHours: dailyHours,
+            dailyRate: dailyRate,
+            notes: notesInput?.value.trim() || '',
+            createdAt: new Date().toISOString()
+        };
+
+        try {
+            await db.add('equipment', newEq);
+            if (window.showAppNotification) {
+                window.showAppNotification(`تمت إضافة المعدة (${newEq.name}) لدليل المعدات بنجاح. 🚜`, 'success');
+            } else {
+                alert(`تمت إضافة المعدة (${newEq.name}) بنجاح.`);
+            }
+            document.getElementById('add-equipment-form')?.reset();
+            if (dailyHoursInput) dailyHoursInput.value = '8';
+            await this.loadEquipmentList();
+            await this.loadAdminEquipmentTable();
+        } catch (err) {
+            console.error("Error adding equipment:", err);
+            alert('حدث خطأ أثناء إضافة المعدة: ' + err.message);
+        }
+    }
+
+    calcNewEqDaily() {
+        const hourlyRate = parseFloat(document.getElementById('new-eq-hourly-rate')?.value) || 0;
+        const dailyHours = parseFloat(document.getElementById('new-eq-daily-hours')?.value) || 8;
+        const dailyRateInput = document.getElementById('new-eq-daily-rate');
+        if (dailyRateInput) {
+            dailyRateInput.value = (hourlyRate * dailyHours).toFixed(0);
+        }
+    }
+
+    async loadAdminEquipmentTable() {
+        const tbody = document.getElementById('admin-equipment-table-body');
+        if (!tbody) return;
+
+        try {
+            let list = await db.getAll('equipment') || [];
+            if (!Array.isArray(list)) list = [];
+            list.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ar'));
+
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 20px;">دليل المعدات فارغ، أضف أول معدة الآن أعلاه</td></tr>';
+                return;
+            }
+
+            let html = '';
+            list.forEach(eq => {
+                html += `
+                    <tr>
+                        <td style="font-weight: bold; color: var(--text-main);">${eq.name}</td>
+                        <td style="text-align: center;">${eq.code ? `<span class="badge" style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 3px 8px; border-radius: 6px; font-weight: bold;">${eq.code}</span>` : '-'}</td>
+                        <td style="font-weight: 600; color: var(--primary);">${eq.contractor}</td>
+                        <td style="text-align: center; font-weight: bold; color: #059669;">${Number(eq.hourlyRate).toLocaleString()} ج.م</td>
+                        <td style="text-align: center;">${eq.dailyHours || 8} س</td>
+                        <td style="text-align: center; font-weight: bold; color: #d97706;">${Number(eq.dailyRate || (eq.hourlyRate * (eq.dailyHours || 8))).toLocaleString()} ج.م</td>
+                        <td style="font-size: 0.82rem; color: var(--text-muted);">${eq.notes || '-'}</td>
+                        <td style="text-align: center;">
+                            <div style="display: flex; gap: 4px; justify-content: center;">
+                                <button type="button" class="btn btn-sm btn-icon" onclick="app.editEquipment('${eq.id}')" title="تعديل المعدة والأسعار" style="color: #6366f1; background: rgba(99,102,241,0.1); padding: 5px 8px; border-radius: 6px; border: none; cursor: pointer;">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-icon" onclick="app.deleteEquipment('${eq.id}')" title="حذف المعدة" style="color: #ef4444; background: rgba(239,68,68,0.1); padding: 5px 8px; border-radius: 6px; border: none; cursor: pointer;">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        } catch (err) {
+            console.error("Error loading admin equipment table:", err);
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: red; padding: 15px;">حدث خطأ: ${err.message}</td></tr>`;
+        }
+    }
+
+    async deleteEquipment(id) {
+        if (!confirm('هل أنت متأكد من حذف هذه المعدة من دليل المعدات؟')) return;
+        try {
+            await db.delete('equipment', id);
+            if (window.showAppNotification) window.showAppNotification('تم حذف المعدة من الدليل بنجاح', 'info');
+            await this.loadEquipmentList();
+            await this.loadAdminEquipmentTable();
+        } catch (err) {
+            console.error("Error deleting equipment:", err);
+            alert('حدث خطأ أثناء الحذف: ' + err.message);
+        }
+    }
+
+    async editEquipment(id) {
+        const eq = (this.equipmentList || []).find(e => String(e.id) === String(id));
+        if (!eq) return;
+
+        const newName = prompt('اسم المعدة:', eq.name);
+        if (newName === null) return;
+        const newCode = prompt('كود أو لوحة المعدة:', eq.code || '');
+        if (newCode === null) return;
+        const newContractor = prompt('المقاول / الجهة المالكة:', eq.contractor || '');
+        if (newContractor === null) return;
+        const newRateStr = prompt('سعر الساعة (جنيه):', eq.hourlyRate || 0);
+        if (newRateStr === null) return;
+        const newRate = parseFloat(newRateStr) || 0;
+        const newHoursStr = prompt('ساعات اليومية المحددة:', eq.dailyHours || 8);
+        if (newHoursStr === null) return;
+        const newHours = parseFloat(newHoursStr) || 8;
+
+        const updated = {
+            ...eq,
+            name: newName.trim(),
+            code: newCode.trim(),
+            contractor: newContractor.trim(),
+            hourlyRate: newRate,
+            dailyHours: newHours,
+            dailyRate: newRate * newHours
+        };
+
+        try {
+            await db.update('equipment', id, updated);
+            if (window.showAppNotification) window.showAppNotification('تم تحديث بيانات المعدة بنجاح', 'success');
+            await this.loadEquipmentList();
+            await this.loadAdminEquipmentTable();
+        } catch (err) {
+            console.error("Error updating equipment:", err);
+            alert('حدث خطأ أثناء التحديث: ' + err.message);
+        }
+    }
+
+    // --- Equipment Reports & Contractor Extracts ---
+
+    async loadEquipmentReportsData() {
+        await this.loadEquipmentList();
+        
+        const dateFromInput = document.getElementById('extract-date-from');
+        const dateToInput = document.getElementById('extract-date-to');
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const firstDay = `${year}-${month}-01`;
+        const todayStr = `${year}-${month}-${String(now.getDate()).padStart(2, '0')}`;
+
+        if (dateFromInput && !dateFromInput.value) dateFromInput.value = firstDay;
+        if (dateToInput && !dateToInput.value) dateToInput.value = todayStr;
+
+        this.renderContractorEquipmentChecklist();
+        await this.generateEquipmentExtract();
+    }
+
+    onContractorFilterChange() {
+        const contractor = document.getElementById('extract-contractor-input')?.value.trim();
+        this.renderContractorEquipmentChecklist(contractor);
+        this.generateEquipmentExtract();
+    }
+
+    renderContractorEquipmentChecklist(contractorFilter = '') {
+        const container = document.getElementById('extract-equipment-checklist');
+        if (!container) return;
+
+        let list = this.equipmentList || [];
+        if (contractorFilter) {
+            const filterNorm = contractorFilter.toLowerCase();
+            list = list.filter(eq => (eq.contractor || '').toLowerCase().includes(filterNorm));
+        }
+
+        if (list.length === 0) {
+            container.innerHTML = '<span style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-info-circle"></i> لا توجد معدات مسجلة لهذا المقاول حتى الآن</span>';
+            return;
+        }
+
+        let html = '';
+        list.forEach(eq => {
+            const codeText = eq.code ? ` (${eq.code})` : '';
+            html += `
+                <label style="display: inline-flex; align-items: center; gap: 6px; background: var(--bg-card); border: 1px solid var(--border-color); padding: 5px 12px; border-radius: 20px; font-size: 0.84rem; cursor: pointer; user-select: none;">
+                    <input type="checkbox" class="extract-eq-checkbox" value="${eq.id}" checked onchange="app.generateEquipmentExtract()">
+                    <span style="font-weight: 600;">${eq.name}${codeText}</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">[${eq.contractor}]</span>
+                </label>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    toggleAllExtractEquipment() {
+        const cbs = document.querySelectorAll('.extract-eq-checkbox');
+        if (!cbs.length) return;
+        const allChecked = Array.from(cbs).every(cb => cb.checked);
+        cbs.forEach(cb => { cb.checked = !allChecked; });
+        this.generateEquipmentExtract();
+    }
+
+    async generateEquipmentExtract() {
+        const contractorInput = document.getElementById('extract-contractor-input');
+        const contractor = contractorInput ? contractorInput.value.trim() : '';
+        const dateFrom = document.getElementById('extract-date-from')?.value || '1970-01-01';
+        const dateTo = document.getElementById('extract-date-to')?.value || '2099-12-31';
+
+        // Selected equipment IDs
+        const checkedBoxes = document.querySelectorAll('.extract-eq-checkbox:checked');
+        const selectedEqIds = new Set(Array.from(checkedBoxes).map(cb => String(cb.value)));
+
+        const titleEl = document.getElementById('extract-contractor-header-title');
+        if (titleEl) titleEl.innerText = contractor || 'كافة المقاولين';
+
+        const subtitleEl = document.getElementById('extract-period-subtitle');
+        if (subtitleEl) subtitleEl.innerText = `الفترة من: ${dateFrom} إلى: ${dateTo}`;
+
+        const tbody = document.getElementById('equipment-extract-table-body');
+        if (!tbody) return;
+
+        try {
+            let logs = await db.getAll('equipment_logs') || [];
+            if (!Array.isArray(logs)) logs = [];
+
+            // Filter
+            const filtered = logs.filter(l => {
+                if (l.date < dateFrom || l.date > dateTo) return false;
+                if (contractor && !((l.contractor || '').toLowerCase().includes(contractor.toLowerCase()))) return false;
+                if (checkedBoxes.length > 0 && !selectedEqIds.has(String(l.equipmentId))) return false;
+                return true;
+            });
+
+            // Sort by date ascending
+            filtered.sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.startTime || '').localeCompare(b.startTime || ''));
+
+            let totalGross = 0;
+            let totalDed = 0;
+            let totalNet = 0;
+            let totalCost = 0;
+
+            const isAdmin = auth.currentUser && (auth.currentUser.role === 'admin' || auth.currentUser.username === 'admin');
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="14" style="text-align: center; color: var(--text-muted); padding: 30px;"><i class="fas fa-search"></i> لا توجد سجلات تشغيل تطابق معايير البحث والمقاول المحدد للفترة</td></tr>';
+            } else {
+                let html = '';
+                filtered.forEach((l, idx) => {
+                    const gross = Number(l.grossHours || 0);
+                    const ded = Number(l.breakHours || 0);
+                    const net = Number(l.netHours || 0);
+                    const rate = Number(l.hourlyRate || 0);
+                    const cost = Number(l.totalCost || (net * rate));
+
+                    totalGross += gross;
+                    totalDed += ded;
+                    totalNet += net;
+                    totalCost += cost;
+
+                    const codeBadge = l.equipmentCode ? `<span style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 1px 5px; border-radius: 4px; font-size: 0.76rem; font-weight: bold;">${l.equipmentCode}</span>` : '';
+                    const breakDetail = (ded > 0) ? `<span style="color: #ef4444; font-weight: bold;">${ded} س</span> ${l.breakReason ? '<small style="color:var(--text-muted);">(' + l.breakReason + ')</small>' : ''}` : '-';
+
+                    const adminCells = isAdmin ? `
+                        <td style="text-align: center; font-weight: 600; color: #059669;">${rate.toLocaleString()}</td>
+                        <td style="text-align: center; font-weight: 800; color: #d97706; background: rgba(245, 158, 11, 0.08);">${cost.toLocaleString('ar-EG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td style="text-align: center;">
+                            <div style="display: flex; gap: 4px; justify-content: center;">
+                                <button type="button" class="btn btn-sm btn-icon" onclick="app.editEquipmentLog('${l.id}')" title="تعديل السجل" style="color: #6366f1; background: rgba(99,102,241,0.1); padding: 4px 7px; border-radius: 4px; border: none; cursor: pointer;">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-icon" onclick="app.deleteEquipmentLog('${l.id}')" title="حذف السجل" style="color: #ef4444; background: rgba(239,68,68,0.1); padding: 4px 7px; border-radius: 4px; border: none; cursor: pointer;">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    ` : `
+                        <td class="admin-only-cell">-</td>
+                        <td class="admin-only-cell">-</td>
+                        <td class="admin-only-cell">-</td>
+                    `;
+
+                    html += `
+                        <tr>
+                            <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+                            <td style="white-space: nowrap; font-weight: 600;">${l.date}</td>
+                            <td style="font-weight: bold;">${l.equipmentName} ${codeBadge}</td>
+                            <td>${l.contractor || '-'}</td>
+                            <td><strong>${l.location}</strong> / <small>${l.building}</small></td>
+                            <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${l.notes || ''}">${l.notes || '-'}</td>
+                            <td style="direction: ltr; text-align: center;">${l.startTime}</td>
+                            <td style="direction: ltr; text-align: center;">${l.endTime}</td>
+                            <td style="text-align: center;">${gross.toFixed(2)}</td>
+                            <td style="text-align: center;">${breakDetail}</td>
+                            <td style="text-align: center; font-weight: 800; color: #10b981; background: rgba(16, 185, 129, 0.08); font-size: 0.95rem;">${net.toFixed(2)}</td>
+                            ${adminCells}
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+            }
+
+            // Update KPI cards
+            const statDays = document.getElementById('extract-stat-days');
+            if (statDays) statDays.innerText = filtered.length;
+
+            const statGross = document.getElementById('extract-stat-gross-hours');
+            if (statGross) statGross.innerText = totalGross.toFixed(2);
+
+            const statDed = document.getElementById('extract-stat-deductions');
+            if (statDed) statDed.innerText = totalDed.toFixed(2);
+
+            const statNet = document.getElementById('extract-stat-net-hours');
+            if (statNet) statNet.innerText = totalNet.toFixed(2);
+
+            const statCost = document.getElementById('extract-stat-total-cost');
+            if (statCost) {
+                if (isAdmin) {
+                    statCost.innerText = totalCost.toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                } else {
+                    statCost.innerText = '***';
+                }
+            }
+
+            // Update footer
+            const footGross = document.getElementById('extract-foot-gross');
+            if (footGross) footGross.innerText = totalGross.toFixed(2);
+
+            const footDed = document.getElementById('extract-foot-ded');
+            if (footDed) footDed.innerText = totalDed.toFixed(2);
+
+            const footNet = document.getElementById('extract-foot-net');
+            if (footNet) footNet.innerText = totalNet.toFixed(2);
+
+            const footCost = document.getElementById('extract-foot-total-cost');
+            if (footCost) {
+                if (isAdmin) {
+                    footCost.innerText = totalCost.toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ج.م';
+                } else {
+                    footCost.innerText = '***';
+                }
+            }
+
+            // Cache current extract for export & print
+            this.currentExtractData = {
+                contractor: contractor || 'كافة المقاولين',
+                dateFrom: dateFrom,
+                dateTo: dateTo,
+                logs: filtered,
+                totalGross: totalGross,
+                totalDed: totalDed,
+                totalNet: totalNet,
+                totalCost: totalCost,
+                isAdmin: isAdmin
+            };
+        } catch (err) {
+            console.error("Error generating equipment extract:", err);
+            tbody.innerHTML = `<tr><td colspan="14" style="text-align: center; color: red; padding: 20px;">حدث خطأ: ${err.message}</td></tr>`;
+        }
+    }
+
+    async editEquipmentLog(id) {
+        let logs = await db.getAll('equipment_logs') || [];
+        const log = logs.find(l => String(l.id) === String(id));
+        if (!log) {
+            alert('السجل غير موجود.');
+            return;
+        }
+
+        const newGross = prompt('إجمالي ساعات التواجد:', log.grossHours);
+        if (newGross === null) return;
+        const newBreak = prompt('الوقت المستقطع (عطل / بريك) بالساعات:', log.breakHours);
+        if (newBreak === null) return;
+        const newReason = prompt('سبب الاستقطاع:', log.breakReason || '');
+        if (newReason === null) return;
+        const newRateStr = prompt('سعر الساعة (جنيه):', log.hourlyRate);
+        if (newRateStr === null) return;
+        const newNotes = prompt('بيان الأعمال والملاحظات:', log.notes || '');
+        if (newNotes === null) return;
+
+        const grossH = parseFloat(newGross) || 0;
+        const breakH = parseFloat(newBreak) || 0;
+        const netH = Math.max(0, grossH - breakH);
+        const rate = parseFloat(newRateStr) || 0;
+        const cost = netH * rate;
+
+        const updated = {
+            ...log,
+            grossHours: Number(grossH.toFixed(2)),
+            breakHours: Number(breakH.toFixed(2)),
+            breakReason: newReason.trim(),
+            netHours: Number(netH.toFixed(2)),
+            hourlyRate: rate,
+            totalCost: Number(cost.toFixed(2)),
+            notes: newNotes.trim()
+        };
+
+        try {
+            await db.update('equipment_logs', id, updated);
+            if (window.showAppNotification) window.showAppNotification('تم تعديل سجل تشغيل المعدة بنجاح ✏️', 'success');
+            await this.generateEquipmentExtract();
+        } catch (err) {
+            console.error("Error updating equipment log:", err);
+            alert('حدث خطأ أثناء تعديل السجل: ' + err.message);
+        }
+    }
+
+    async deleteEquipmentLog(id) {
+        if (!confirm('هل أنت متأكد من حذف هذا السجل نهائياً من مستخلص المعدات؟')) return;
+        try {
+            await db.delete('equipment_logs', id);
+            if (window.showAppNotification) window.showAppNotification('تم حذف سجل تشغيل المعدة بنجاح 🗑️', 'info');
+            await this.generateEquipmentExtract();
+            await this.loadEquipmentEntryData();
+        } catch (err) {
+            console.error("Error deleting equipment log:", err);
+            alert('حدث خطأ أثناء الحذف: ' + err.message);
+        }
+    }
+
+    printEquipmentExtract() {
+        const data = this.currentExtractData || {
+            contractor: document.getElementById('extract-contractor-input')?.value.trim() || 'كافة المقاولين',
+            dateFrom: document.getElementById('extract-date-from')?.value || '',
+            dateTo: document.getElementById('extract-date-to')?.value || '',
+            logs: [],
+            totalGross: 0,
+            totalDed: 0,
+            totalNet: 0,
+            totalCost: 0,
+            isAdmin: auth.currentUser && (auth.currentUser.role === 'admin' || auth.currentUser.username === 'admin')
+        };
+
+        const logs = data.logs || [];
+        if (logs.length === 0) {
+            alert('لا توجد سجلات مستخرجة في الكشف الحالي للطباعة.');
+            return;
+        }
+
+        let rowsHtml = '';
+        logs.forEach((l, idx) => {
+            const gross = Number(l.grossHours || 0);
+            const ded = Number(l.breakHours || 0);
+            const net = Number(l.netHours || 0);
+            const rate = data.isAdmin ? Number(l.hourlyRate || 0) : 0;
+            const cost = data.isAdmin ? Number(l.totalCost || (net * rate)) : 0;
+            const codeText = l.equipmentCode ? ` (${l.equipmentCode})` : '';
+
+            rowsHtml += `
+                <tr>
+                    <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+                    <td style="text-align: center; white-space: nowrap;">${l.date}</td>
+                    <td style="font-weight: bold;">${l.equipmentName}${codeText}</td>
+                    <td style="text-align: center;">${l.contractor || '-'}</td>
+                    <td>${l.location} - ${l.building}</td>
+                    <td style="text-align: center;">${l.driverName || '-'}</td>
+                    <td style="direction: ltr; text-align: center;">${l.startTime} - ${l.endTime}</td>
+                    <td style="text-align: center;">${gross.toFixed(2)}</td>
+                    <td style="text-align: center;">${ded > 0 ? ded.toFixed(2) + ' س' : '-'}</td>
+                    <td style="text-align: center; font-weight: bold;">${net.toFixed(2)}</td>
+                    ${data.isAdmin ? `<td style="text-align: center;">${rate.toLocaleString()}</td><td style="text-align: center; font-weight: bold;">${cost.toLocaleString('ar-EG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>` : ''}
+                    <td style="font-size: 8pt;">${l.notes || '-'}</td>
+                </tr>
+            `;
+        });
+
+        const printHtml = `
+            <!DOCTYPE html>
+            <html lang="ar" dir="rtl">
+            <head>
+                <meta charset="UTF-8">
+                <title>مستخلص تشغيل معدات - ${data.contractor}</title>
+                <style>
+                    @page {
+                        size: A4 landscape;
+                        margin: 10mm;
+                    }
+                    body {
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        direction: rtl;
+                        margin: 0;
+                        padding: 0;
+                        color: #111;
+                        background: #fff;
+                    }
+                    .header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-bottom: 2px solid #1e3a8a;
+                        padding-bottom: 8px;
+                        margin-bottom: 12px;
+                    }
+                    .header-title h2 {
+                        margin: 0 0 4px 0;
+                        font-size: 16pt;
+                        color: #1e3a8a;
+                    }
+                    .header-title p {
+                        margin: 0;
+                        font-size: 10pt;
+                        color: #475569;
+                    }
+                    .meta-box {
+                        display: flex;
+                        gap: 15px;
+                        background: #f8fafc;
+                        border: 1px solid #cbd5e1;
+                        border-radius: 6px;
+                        padding: 8px 14px;
+                        margin-bottom: 12px;
+                        font-size: 9.5pt;
+                    }
+                    .meta-box div {
+                        flex: 1;
+                    }
+                    .kpi-row {
+                        display: flex;
+                        gap: 10px;
+                        margin-bottom: 12px;
+                    }
+                    .kpi-card {
+                        flex: 1;
+                        border: 1px solid #cbd5e1;
+                        border-radius: 6px;
+                        padding: 6px 10px;
+                        text-align: center;
+                        background: #f8fafc;
+                    }
+                    .kpi-card .val {
+                        font-size: 12pt;
+                        font-weight: bold;
+                        color: #1e3a8a;
+                    }
+                    .kpi-card .lbl {
+                        font-size: 8pt;
+                        color: #64748b;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 8.5pt;
+                        margin-bottom: 15px;
+                    }
+                    th {
+                        background: #1e3a8a;
+                        color: #fff;
+                        padding: 6px 4px;
+                        border: 1px solid #0f172a;
+                        text-align: center;
+                    }
+                    td {
+                        padding: 4px 5px;
+                        border: 1px solid #cbd5e1;
+                    }
+                    tr:nth-child(even) td {
+                        background: #f8fafc;
+                    }
+                    .tfoot td {
+                        background: #f1f5f9;
+                        font-weight: bold;
+                        border-top: 2px solid #1e3a8a;
+                    }
+                    .signatures {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-top: 20px;
+                        page-break-inside: avoid;
+                    }
+                    .sig-box {
+                        text-align: center;
+                        width: 22%;
+                    }
+                    .sig-box .role {
+                        font-size: 9pt;
+                        font-weight: bold;
+                        margin-bottom: 35px;
+                    }
+                    .sig-box .line {
+                        border-top: 1px dashed #64748b;
+                        width: 80%;
+                        margin: 0 auto;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="header-title">
+                        <h2>كشف بيان تشغيل ومستخلص معدات المقاول</h2>
+                        <p>مشروع إدارة وتتبع سراكى العمالة والمعدات</p>
+                    </div>
+                    <div style="text-align: left; font-size: 9pt; color: #475569;">
+                        <div>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-EG')}</div>
+                        <div>الوقت: ${new Date().toLocaleTimeString('ar-EG')}</div>
+                    </div>
+                </div>
+
+                <div class="meta-box">
+                    <div><strong>اسم المقاول / الجهة:</strong> ${data.contractor}</div>
+                    <div><strong>الفترة الزمنية:</strong> من ${data.dateFrom || 'البداية'} إلى ${data.dateTo || 'اليوم'}</div>
+                    <div><strong>عدد السجلات:</strong> ${logs.length} يومية تشغيل</div>
+                </div>
+
+                <div class="kpi-row">
+                    <div class="kpi-card"><div class="val">${data.totalGross.toFixed(2)}</div><div class="lbl">إجمالي ساعات التواجد</div></div>
+                    <div class="kpi-card"><div class="val" style="color: #ef4444;">${data.totalDed.toFixed(2)}</div><div class="lbl">ساعات التوقف والأعطال</div></div>
+                    <div class="kpi-card"><div class="val" style="color: #10b981;">${data.totalNet.toFixed(2)}</div><div class="lbl">صافي الساعات المعتمدة</div></div>
+                    ${data.isAdmin ? `<div class="kpi-card" style="background:#fffbeb; border-color:#f59e0b;"><div class="val" style="color: #d97706;">${data.totalCost.toLocaleString('ar-EG', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</div><div class="lbl">إجمالي المستخلص المالي المستحق</div></div>` : ''}
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 25px;">م</th>
+                            <th>التاريخ</th>
+                            <th>اسم المعدة والكود</th>
+                            <th>المقاول</th>
+                            <th>مكان العمل والعمارة</th>
+                            <th>السائق</th>
+                            <th>ساعات التشغيل</th>
+                            <th>إجمالي س</th>
+                            <th>مستقطع س</th>
+                            <th>صافي س</th>
+                            ${data.isAdmin ? `<th>سعر س (ج.م)</th><th>الإجمالي (ج.م)</th>` : ''}
+                            <th>الملاحظات وبيان العمل</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                    <tfoot class="tfoot">
+                        <tr>
+                            <td colspan="7" style="text-align: left; font-weight: bold; padding: 6px 10px;">الإجمالي العام:</td>
+                            <td style="text-align: center;">${data.totalGross.toFixed(2)}</td>
+                            <td style="text-align: center;">${data.totalDed.toFixed(2)}</td>
+                            <td style="text-align: center; color: #10b981;">${data.totalNet.toFixed(2)}</td>
+                            ${data.isAdmin ? `<td>-</td><td style="text-align: center; color: #d97706; font-size: 10pt;">${data.totalCost.toLocaleString('ar-EG', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</td>` : ''}
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="signatures">
+                    <div class="sig-box">
+                        <div class="role">مسؤول تشغيل ومتابعة المعدات</div>
+                        <div class="line"></div>
+                    </div>
+                    <div class="sig-box">
+                        <div class="role">مهندس الموقع المعتمد</div>
+                        <div class="line"></div>
+                    </div>
+                    <div class="sig-box">
+                        <div class="role">المحاسب المالي للمشروع</div>
+                        <div class="line"></div>
+                    </div>
+                    <div class="sig-box">
+                        <div class="role">مدير عام المشروع</div>
+                        <div class="line"></div>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = 'none';
+        iframe.srcdoc = printHtml;
+        document.body.appendChild(iframe);
+
+        iframe.onload = () => {
+            setTimeout(() => {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+                setTimeout(() => {
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
+                }, 3000);
+            }, 300);
+        };
+    }
+
+    async exportEquipmentExtractExcel() {
+        const btn = document.querySelector('button[onclick="app.exportEquipmentExtractExcel()"]');
+        const origHtml = btn ? btn.innerHTML : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التصدير...';
+        }
+
+        try {
+            if (typeof ExcelJS === 'undefined') {
+                throw new Error('مكتبة ExcelJS غير متوفرة');
+            }
+
+            const data = this.currentExtractData || {
+                contractor: document.getElementById('extract-contractor-input')?.value.trim() || 'كافة المقاولين',
+                dateFrom: document.getElementById('extract-date-from')?.value || '',
+                dateTo: document.getElementById('extract-date-to')?.value || '',
+                logs: [],
+                totalGross: 0,
+                totalDed: 0,
+                totalNet: 0,
+                totalCost: 0,
+                isAdmin: auth.currentUser && (auth.currentUser.role === 'admin' || auth.currentUser.username === 'admin')
+            };
+
+            const wb = new ExcelJS.Workbook();
+            wb.creator = 'نظام إدارة العمالة والمعدات';
+            wb.created = new Date();
+            const ws = wb.addWorksheet('مستخلص تشغيل المعدات', {
+                views: [{ rightToLeft: true }]
+            });
+
+            // 1. Title Banner
+            ws.mergeCells('A1:N1');
+            const titleCell = ws.getCell('A1');
+            titleCell.value = `كشف بيان تشغيل ومستخلص معدات المقاول: ${data.contractor}`;
+            titleCell.font = { name: 'Segoe UI', size: 16, bold: true, color: { argb: 'FFFFFFFF' } };
+            titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
+            titleCell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FF1E3A8A' } // Deep Navy
+            };
+            ws.getRow(1).height = 40;
+
+            // 2. Subtitle / Metadata
+            ws.mergeCells('A2:N2');
+            const subCell = ws.getCell('A2');
+            subCell.value = `الفترة من: ${data.dateFrom || 'البداية'} إلى: ${data.dateTo || 'اليوم'}  |  تاريخ وتوقيت الاستخراج: ${new Date().toLocaleDateString('ar-EG')} - ${new Date().toLocaleTimeString('ar-EG')}`;
+            subCell.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FF1E293B' } };
+            subCell.alignment = { vertical: 'middle', horizontal: 'center' };
+            subCell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFF1F5F9' }
+            };
+            ws.getRow(2).height = 24;
+
+            // 3. Header Row
+            const headers = [
+                'م',
+                'التاريخ',
+                'اسم المعدة والكود',
+                'المقاول / المالك',
+                'مكان العمل',
+                'العمارة',
+                'السائق / المشغل',
+                'وقت البدء',
+                'وقت الانتهاء',
+                'إجمالي الساعات',
+                'المستقطع (عطل/بريك)',
+                'صافي الساعات',
+                'سعر الساعة (ج.م)',
+                'إجمالي المستخلص (ج.م)'
+            ];
+
+            const headerRow = ws.addRow(headers);
+            headerRow.height = 30;
+            for (let c = 1; c <= 14; c++) {
+                const cell = headerRow.getCell(c);
+                cell.font = { name: 'Segoe UI', bold: true, size: 11, color: { argb: 'FFFFFFFF' } };
+                cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                cell.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FF2563EB' } // Royal blue
+                };
+                cell.border = {
+                    top: { style: 'medium', color: { argb: 'FF1D4ED8' } },
+                    bottom: { style: 'medium', color: { argb: 'FF1D4ED8' } },
+                    left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                    right: { style: 'thin', color: { argb: 'FFCBD5E1' } }
+                };
+            }
+
+            // 4. Data Rows
+            const logs = data.logs || [];
+            logs.forEach((l, idx) => {
+                const codeStr = l.equipmentCode ? ` (${l.equipmentCode})` : '';
+                const eqFullName = `${l.equipmentName}${codeStr}`;
+                const gross = Number(l.grossHours || 0);
+                const ded = Number(l.breakHours || 0);
+                const net = Number(l.netHours || 0);
+                const rate = data.isAdmin ? Number(l.hourlyRate || 0) : 0;
+                const cost = data.isAdmin ? Number(l.totalCost || (net * rate)) : 0;
+
+                const rowValues = [
+                    idx + 1,
+                    l.date,
+                    eqFullName,
+                    l.contractor || '-',
+                    l.location,
+                    l.building,
+                    l.driverName || '-',
+                    l.startTime,
+                    l.endTime,
+                    gross,
+                    ded,
+                    net,
+                    data.isAdmin ? rate : '***',
+                    data.isAdmin ? cost : '***'
+                ];
+
+                const row = ws.addRow(rowValues);
+                row.height = 24;
+
+                const isEven = idx % 2 === 0;
+                const rowBg = isEven ? 'FFFFFFFF' : 'FFF8FAFC';
+
+                for (let c = 1; c <= 14; c++) {
+                    const cell = row.getCell(c);
+                    cell.font = { name: 'Segoe UI', size: 10 };
+                    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: rowBg } };
+                    cell.border = {
+                        top: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+                        bottom: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+                        left: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+                        right: { style: 'thin', color: { argb: 'FFE2E8F0' } }
+                    };
+
+                    // Format numbers
+                    if (c === 10 || c === 11 || c === 12) {
+                        cell.numFmt = '#,##0.00';
+                        if (c === 12) {
+                            cell.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: 'FF059669' } };
+                        }
+                    }
+                    if (c === 13 || c === 14) {
+                        if (data.isAdmin) {
+                            cell.numFmt = '#,##0.00';
+                            if (c === 14) {
+                                cell.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: 'FFD97706' } };
+                                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFBEB' } };
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 5. Totals Row
+            const totalRowValues = [
+                'الإجمالي',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                data.totalGross,
+                data.totalDed,
+                data.totalNet,
+                '-',
+                data.isAdmin ? data.totalCost : '***'
+            ];
+            const totalsRow = ws.addRow(totalRowValues);
+            totalsRow.height = 28;
+            ws.mergeCells(`A${totalsRow.number}:I${totalsRow.number}`);
+            const mergedTotalCell = ws.getCell(`A${totalsRow.number}`);
+            mergedTotalCell.value = 'إجمالي ساعات العمل والمستخلص المالي العام:';
+            mergedTotalCell.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FF1E293B' } };
+            mergedTotalCell.alignment = { vertical: 'middle', horizontal: 'left' };
+
+            for (let c = 1; c <= 14; c++) {
+                const cell = totalsRow.getCell(c);
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } }; // Soft Amber
+                cell.border = {
+                    top: { style: 'medium', color: { argb: 'FFD97706' } },
+                    bottom: { style: 'double', color: { argb: 'FFD97706' } },
+                    left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                    right: { style: 'thin', color: { argb: 'FFCBD5E1' } }
+                };
+                if (c === 10 || c === 11 || c === 12 || (c === 14 && data.isAdmin)) {
+                    cell.numFmt = '#,##0.00';
+                    cell.font = { name: 'Segoe UI', size: 11, bold: true };
+                }
+                if (c === 12) cell.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FF059669' } };
+                if (c === 14 && data.isAdmin) cell.font = { name: 'Segoe UI', size: 12, bold: true, color: { argb: 'FFB45309' } };
+            }
+
+            // Set column widths
+            ws.columns = [
+                { width: 6 },  // م
+                { width: 13 }, // التاريخ
+                { width: 26 }, // المعدة والكود
+                { width: 20 }, // المقاول
+                { width: 18 }, // مكان العمل
+                { width: 14 }, // العمارة
+                { width: 18 }, // السائق
+                { width: 11 }, // البدء
+                { width: 11 }, // الانتهاء
+                { width: 14 }, // إجمالي الساعات
+                { width: 16 }, // المستقطع
+                { width: 14 }, // صافي الساعات
+                { width: 16 }, // سعر الساعة
+                { width: 22 }  // التكلفة
+            ];
+
+            const buffer = await wb.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            const safeContractor = (data.contractor || 'عام').replace(/[\/\?<>\\:\*\|":]/g, '_');
+            link.download = `مستخلص_معدات_${safeContractor}_${data.dateFrom || ''}_${data.dateTo || ''}.xlsx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            if (window.showAppNotification) {
+                window.showAppNotification({
+                    title: '📊 تم تصدير مستخلص المعدات بنجاح',
+                    message: `تم تجهيز وتنزيل ملف الإكسيل للمقاول (${data.contractor}) بإجمالي ${logs.length} سجل.`,
+                    type: 'success'
+                });
+            }
+        } catch (err) {
+            console.error("Error exporting equipment extract to Excel:", err);
+            alert('حدث خطأ أثناء تصدير الإكسيل: ' + (err.message || err));
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = origHtml;
+            }
+        }
+    }
+
+}
 
 // --- Live Server Metrics Modal Functions ---
 window.openServerMetricsModal = function(initialTab = 'metrics') {

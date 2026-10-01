@@ -1,4 +1,4 @@
-// Service Worker v6.2 - Strict Enforcement for Work Location & Building Validation
+// Service Worker v6.3 - Heavy Equipment Tracking & Contractor Extracts - Strict Enforcement for Work Location & Building Validation
 self.addEventListener('install', e => {
   self.skipWaiting();
 });

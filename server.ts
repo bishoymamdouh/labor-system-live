@@ -318,7 +318,7 @@ async function handler(req: Request): Promise<Response> {
 
             if (method === "GET" || url.searchParams.get("download") === "true") {
                 const data: any = {};
-                for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system", "location_options"]) {
+                for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system", "location_options", "equipment", "equipment_logs"]) {
                     data[collection] = [];
                     const entries = kv.list({ prefix: [collection] });
                     for await (const entry of entries) {
@@ -523,7 +523,7 @@ async function handler(req: Request): Promise<Response> {
 
         if (url.pathname === "/api/export" && method === "GET") {
             const data: any = {};
-            for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system", "location_options"]) {
+            for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system", "location_options", "equipment", "equipment_logs"]) {
                 data[collection] = [];
                 const entries = kv.list({ prefix: [collection] });
                 for await (const entry of entries) {
@@ -616,7 +616,7 @@ async function handler(req: Request): Promise<Response> {
 
         if (url.pathname === "/api/import" && method === "POST") {
             const data = await req.json();
-            for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system", "location_options"]) {
+            for (const collection of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system", "location_options", "equipment", "equipment_logs"]) {
                 if (data[collection]) {
                     for (const item of data[collection]) {
                         await kv.set(item.key, item.value);
@@ -632,7 +632,7 @@ async function handler(req: Request): Promise<Response> {
         }
 
         // Ensure collection exists
-        if (!["users", "records", "workers", "worker_directory", "push_subscriptions", "location_options"].includes(collection) && collection !== "recordDetails" && collection !== "allRecordsDetails") {
+        if (!["users", "records", "workers", "worker_directory", "push_subscriptions", "location_options", "equipment", "equipment_logs"].includes(collection) && collection !== "recordDetails" && collection !== "allRecordsDetails") {
             return new Response("Not found", { status: 404 });
         }
 
