@@ -1561,7 +1561,7 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=6.5').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=6.6').then(reg => {
                 reg.update();
                 console.log('ServiceWorker v6.0 registered cleanly.');
             });
@@ -1782,6 +1782,12 @@ select {
                         <div class="form-group">
                             
 <select id="dir-worker-type" required onchange="if(this.value==='أخرى') { document.getElementById('dir-worker-type-other').style.display='block'; document.getElementById('dir-worker-type-other').required=true; } else { document.getElementById('dir-worker-type-other').style.display='none'; document.getElementById('dir-worker-type-other').required=false; document.getElementById('dir-worker-type-other').value=''; }">
+    <option value="عامل" selected>عامل</option>
+    <option value="نحات">نحات</option>
+    <option value="صنايعي">صنايعي</option>
+    <option value="رئيس عمال">رئيس عمال</option>
+    <option value="بوفيه">بوفيه</option>
+    <option value="أخرى">أخرى</option>
 </select>
 <input type="text" id="dir-worker-type-other" placeholder="مسمى النوع الجديد" style="display:none; margin-top: 10px; width: 100%;" class="modal-input">
 
@@ -4111,6 +4117,12 @@ window.showAppNotification = function(firstArg, secondArg, thirdArg, fourthArg) 
 // UI Helpers and Components
 
 class UI {
+    static getUserPermissions(user) {
+        if (window.app && typeof window.app.getUserPermissions === 'function') {
+            return window.app.getUserPermissions(user);
+        }
+        return user?.permissions || {};
+    }
     static notify(...args) {
         return window.showAppNotification(...args);
     }
@@ -4120,6 +4132,11 @@ class UI {
         const view = document.getElementById(viewId);
         if (view) {
             view.classList.remove('hidden');
+        }
+        if (viewId === 'view-admin') {
+            if (window.app && typeof window.app.loadAdminData === 'function') {
+                window.app.loadAdminData();
+            }
         }
         if (viewId === 'view-engineer') {
             if (window.app && typeof window.app.loadEngineerData === 'function') {
@@ -4392,7 +4409,7 @@ class UI {
             const tr = document.createElement('tr');
             tr.id = `user-row-${user.id}`;
             const userPic = user.profilePic ? `<img src="${user.profilePic}" style="width:30px; height:30px; border-radius:50%; object-fit:cover; margin-left:10px; vertical-align:middle; border:1px solid var(--primary-color);">` : `<i class="fas fa-user-circle" style="font-size:30px; margin-left:10px; vertical-align:middle; color:var(--text-muted);"></i>`;
-            const userEffectivePerms = this.getUserPermissions(user);
+            const userEffectivePerms = UI.getUserPermissions(user);
             const hasEqEntry = user.role === 'admin' || (userEffectivePerms && userEffectivePerms.equipment_entry === true);
             const eqBadge = hasEqEntry ? `
                 <div style="margin-top: 4px;">
@@ -5671,7 +5688,7 @@ document.addEventListener('keydown', (e) => {
         }
         
         uniqueTypes.forEach(type => {
-            const isSelected = type === selectedValue ? 'selected' : '';
+            const isSelected = (type === selectedValue || (!selectedValue && !includePlaceholder && type === 'عامل')) ? 'selected' : '';
             htmlStr += `<option value="${type}" ${isSelected}>${type}</option>`;
         });
         
@@ -6600,7 +6617,8 @@ document.addEventListener('keydown', (e) => {
         const dirSelect = document.getElementById('dir-worker-type');
         if (dirSelect) {
             this.directoryWorkers = dirWorkers;
-            dirSelect.innerHTML = app.getWorkerTypeOptionsHtml(null, false);
+            const currentVal = dirSelect.value || 'عامل';
+            dirSelect.innerHTML = this.getWorkerTypeOptionsHtml(currentVal, false);
         }
         await this.loadBackupHub();
         await this.loadLocationOptions();

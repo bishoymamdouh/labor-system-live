@@ -1,4 +1,4 @@
-// Service Worker v6.5 - Approval Notifications Strictly Routed to Assigned Engineer Only
+// Service Worker v6.6 - Fix Worker Directory Type Select Dropdown & Admin Table Initialization
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
