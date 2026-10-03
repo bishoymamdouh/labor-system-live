@@ -1,4 +1,4 @@
-// Service Worker v6.6 - Fix Worker Directory Type Select Dropdown & Admin Table Initialization
+// Service Worker v6.7 - Show Total Pending in Nav Badge for Admin while Preserving Private Notifications
 self.addEventListener('install', e => {
   self.skipWaiting();
 });

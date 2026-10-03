@@ -1561,7 +1561,7 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=6.6').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=6.7').then(reg => {
                 reg.update();
                 console.log('ServiceWorker v6.0 registered cleanly.');
             });
@@ -3846,7 +3846,10 @@ class Database {
             const url = engineerId ? `/api/pendingCount?engineerId=${encodeURIComponent(engineerId)}` : '/api/pendingCount';
             const res = await this.request(url);
             const data = await res.json();
-            return typeof data.count === 'number' ? data.count : 0;
+            return {
+                count: typeof data.count === 'number' ? data.count : 0,
+                totalCount: typeof data.totalCount === 'number' ? data.totalCount : (typeof data.count === 'number' ? data.count : 0)
+            };
         } catch (e) {
             console.error('getPendingCount error:', e);
             return null;
@@ -9008,9 +9011,11 @@ document.addEventListener('keydown', (e) => {
         // Update nav badge
         const navBadge = document.getElementById('nav-badge-engineer');
         if (navBadge) {
+            const allPending = allRawRecords.filter(r => r.status === 'pending');
             const myPending = allRawRecords.filter(r => r.status === 'pending' && String(r.engineerId) === String(currentUserId));
-            if (myPending.length > 0) {
-                navBadge.innerText = myPending.length;
+            const badgeCount = (role === 'admin') ? allPending.length : myPending.length;
+            if (badgeCount > 0) {
+                navBadge.innerText = badgeCount;
                 navBadge.style.display = 'inline-block';
             } else {
                 navBadge.style.display = 'none';
@@ -9628,27 +9633,31 @@ document.addEventListener('keydown', (e) => {
             return;
         }
         
-        this.lastPendingCount = -1;
+        this.lastMyPendingCount = -1;
 
         const check = async () => {
             try {
                 const engineerId = auth.currentUser ? auth.currentUser.id : null;
-                const currentCount = await db.getPendingCount(engineerId);
-                if (currentCount === null) return;
+                const result = await db.getPendingCount(engineerId);
+                if (result === null) return;
+                
+                const myCount = typeof result === 'object' ? result.count : result;
+                const totalCount = typeof result === 'object' ? result.totalCount : result;
+                const badgeCount = (role === 'admin') ? totalCount : myCount;
                 
                 const badges = document.querySelectorAll('#nav-badge-engineer');
                 badges.forEach(badge => {
-                    if (currentCount > 0) {
+                    if (badgeCount > 0) {
                         badge.style.display = 'inline-block';
-                        badge.innerText = currentCount;
+                        badge.innerText = badgeCount;
                     } else {
                         badge.style.display = 'none';
                     }
                 });
 
                 if ('setAppBadge' in navigator) {
-                    if (currentCount > 0) {
-                        navigator.setAppBadge(currentCount).catch(console.error);
+                    if (badgeCount > 0) {
+                        navigator.setAppBadge(badgeCount).catch(console.error);
                     } else {
                         if ('clearAppBadge' in navigator) {
                             navigator.clearAppBadge().catch(console.error);
@@ -9656,11 +9665,13 @@ document.addEventListener('keydown', (e) => {
                     }
                 }
                 
-                if (currentCount !== this.lastPendingCount && this.lastPendingCount !== -1) {
-                    if (currentCount > this.lastPendingCount && window.showAppNotification) {
+                // Notifications (Popup & Sound): strictly private to my assigned records!
+                // Admin will NEVER be alerted when records for other engineers arrive!
+                if (myCount !== this.lastMyPendingCount && this.lastMyPendingCount !== -1) {
+                    if (myCount > this.lastMyPendingCount && window.showAppNotification) {
                         window.showAppNotification({
                             title: '📋 سركية جديدة بانتظار الاعتماد',
-                            message: `يوجد الآن ${currentCount} سركية بانتظار مراجعتك واعتمادك. اضغط هنا للمراجعة.`,
+                            message: `يوجد الآن ${myCount} سركية بانتظار مراجعتك واعتمادك. اضغط هنا للمراجعة.`,
                             type: 'info',
                             action: () => UI.showView('view-engineer')
                         });
@@ -9671,7 +9682,7 @@ document.addEventListener('keydown', (e) => {
                     }
                 }
                 
-                this.lastPendingCount = currentCount;
+                this.lastMyPendingCount = myCount;
             } catch (e) {
                 console.error("Polling error", e);
             }

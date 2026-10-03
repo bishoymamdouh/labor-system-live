@@ -1082,14 +1082,16 @@ export async function onRequest(context: any): Promise<Response> {
             const engineerId = url.searchParams.get("engineerId");
             const records = await store.list("records");
             let count = 0;
+            let totalCount = 0;
             for (const r of records) {
                 if (r.value && r.value.status === "pending") {
+                    totalCount++;
                     if (!engineerId || engineerId === "all" || String(r.value.engineerId) === String(engineerId)) {
                         count++;
                     }
                 }
             }
-            return jsonResponse({ count });
+            return jsonResponse({ count, totalCount });
         }
 
         if (resource === "pendingStatus" && method === "GET") {

@@ -383,13 +383,15 @@ async function handler(req: Request): Promise<Response> {
             const engineerId = url.searchParams.get("engineerId");
             const index = await getPendingIndex(kv);
             let count = 0;
+            let totalCount = 0;
             for (const rId in index) {
                 const item = parsePendingEntry(index[rId]);
+                totalCount++;
                 if (!engineerId || item.engineerId === String(engineerId)) {
                     count++;
                 }
             }
-            return new Response(JSON.stringify({ count }), { 
+            return new Response(JSON.stringify({ count, totalCount }), { 
                 status: 200, 
                 headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } 
             });
