@@ -371,27 +371,28 @@ async function dispatchInstantAlerts(store: D1Store, triggerEvent: string, conte
 
         const statusLabel = context.status === "approved" ? "اعتماد" : (context.status === "rejected" ? "رفض" : (context.status || ""));
 
-        let pendingCount = 0;
-        if (triggerEvent === "new_record" || triggerEvent === "record_resubmit") {
-            const recordsList = await store.list("records");
-            pendingCount = recordsList.filter(r => r.value?.status === "pending" || !r.value?.status).length;
-        }
+        const recordsList = await store.list("records");
 
         for (const alert of matching) {
             const targetIds = new Set<string>();
             const role = alert.targetRole || (alert.trigger === "new_record" || alert.trigger === "record_resubmit" ? "record_engineer" : "record_supervisor");
 
             if (role === "record_engineer") {
-                if (context.engineerId) targetIds.add(String(context.engineerId));
-                users.filter(u => u.role === "admin").forEach(u => targetIds.add(u.id));
-                if (!context.engineerId) {
+                // Strictly target ONLY the responsible engineer assigned to this record.
+                // Do NOT include admin unless admin was specifically chosen as the responsible engineer!
+                if (context.engineerId) {
+                    targetIds.add(String(context.engineerId));
+                } else {
                     users.filter(u => u.role === "engineer").forEach(u => targetIds.add(u.id));
                 }
             } else if (role === "record_supervisor") {
                 if (context.supervisorId) targetIds.add(String(context.supervisorId));
             } else if (role === "engineer") {
-                if (context.engineerId) targetIds.add(String(context.engineerId));
-                users.filter(u => u.role === "engineer" || u.role === "admin").forEach(u => targetIds.add(u.id));
+                if (context.engineerId) {
+                    targetIds.add(String(context.engineerId));
+                } else {
+                    users.filter(u => u.role === "engineer").forEach(u => targetIds.add(u.id));
+                }
             } else if (role === "supervisor") {
                 if (context.supervisorId) targetIds.add(String(context.supervisorId));
                 users.filter(u => u.role === "supervisor").forEach(u => targetIds.add(u.id));
@@ -406,21 +407,30 @@ async function dispatchInstantAlerts(store: D1Store, triggerEvent: string, conte
                 .replace(/\{supervisor\}/g, supervisorName || "")
                 .replace(/\{date\}/g, context.date || "");
 
-            const bodyText = (alert.text || "")
-                .replace(/\{supervisor\}/g, supervisorName || "")
-                .replace(/\{count\}/g, String(pendingCount))
-                .replace(/\{status\}/g, statusLabel)
-                .replace(/\{date\}/g, context.date || "")
-                .replace(/\{worker\}/g, context.workerName || "");
-
-            const payloadStr = JSON.stringify({
-                title: titleText,
-                body: bodyText,
-                url: context.recordId ? "/?view_record=" + context.recordId : "/",
-                badgeCount: pendingCount
-            });
-
             for (const targetId of targetIds) {
+                // Count pending records specifically assigned to this target engineer
+                let userPendingCount = 0;
+                for (const r of recordsList) {
+                    const isPending = r.value?.status === "pending" || !r.value?.status;
+                    if (isPending && String(r.value?.engineerId) === String(targetId)) {
+                        userPendingCount++;
+                    }
+                }
+
+                const bodyText = (alert.text || "")
+                    .replace(/\{supervisor\}/g, supervisorName || "")
+                    .replace(/\{count\}/g, String(userPendingCount))
+                    .replace(/\{status\}/g, statusLabel)
+                    .replace(/\{date\}/g, context.date || "")
+                    .replace(/\{worker\}/g, context.workerName || "");
+
+                const payloadStr = JSON.stringify({
+                    title: titleText,
+                    body: bodyText,
+                    url: context.recordId ? "/?view_record=" + context.recordId : "/",
+                    badgeCount: userPendingCount
+                });
+
                 const subEntries = await store.getSubscriptionsForUser(targetId);
                 for (const subItem of subEntries) {
                     const sub = subItem.value?.endpoint ? subItem.value : subItem.value?.subscription;

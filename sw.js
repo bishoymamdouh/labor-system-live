@@ -1,4 +1,4 @@
-// Service Worker v6.4 - Equipment Permissions Granular Control - Strict Enforcement for Work Location & Building Validation
+// Service Worker v6.5 - Approval Notifications Strictly Routed to Assigned Engineer Only
 self.addEventListener('install', e => {
   self.skipWaiting();
 });

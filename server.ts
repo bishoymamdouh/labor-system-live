@@ -903,10 +903,11 @@ async function handler(req: Request): Promise<Response> {
     if (url.pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|webp|mp3|wav|ogg|woff|woff2|ttf|eot|webmanifest)$/i)) {
         res.headers.set("Cache-Control", "public, max-age=86400");
     } else {
-        // For HTML, JS, CSS: use "no-cache"
-        // "no-cache" allows browsers to revalidate using ETags (returning 304 Not Modified with 0 bytes transferred if unchanged)
-        // while still ensuring any new code changes are immediately downloaded.
-        res.headers.set("Cache-Control", "no-cache");
+        // For HTML, JS, CSS: use "no-store, no-cache, must-revalidate"
+        // This ensures the browser always fetches the latest index.html and code immediately.
+        res.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        res.headers.set("Pragma", "no-cache");
+        res.headers.set("Expires", "0");
     }
 
     return res;

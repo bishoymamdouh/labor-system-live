@@ -1561,7 +1561,7 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=6.4').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=6.5').then(reg => {
                 reg.update();
                 console.log('ServiceWorker v6.0 registered cleanly.');
             });
@@ -8990,7 +8990,7 @@ document.addEventListener('keydown', (e) => {
         // Update nav badge
         const navBadge = document.getElementById('nav-badge-engineer');
         if (navBadge) {
-            const myPending = allRawRecords.filter(r => r.status === 'pending' && (role === 'admin' || String(r.engineerId) === currentUserId));
+            const myPending = allRawRecords.filter(r => r.status === 'pending' && String(r.engineerId) === String(currentUserId));
             if (myPending.length > 0) {
                 navBadge.innerText = myPending.length;
                 navBadge.style.display = 'inline-block';
@@ -9614,7 +9614,7 @@ document.addEventListener('keydown', (e) => {
 
         const check = async () => {
             try {
-                const engineerId = role === 'admin' ? null : auth.currentUser?.id;
+                const engineerId = auth.currentUser ? auth.currentUser.id : null;
                 const currentCount = await db.getPendingCount(engineerId);
                 if (currentCount === null) return;
                 
