@@ -1561,7 +1561,7 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=6.9').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=7.0').then(reg => {
                 reg.update();
                 console.log('ServiceWorker v6.0 registered cleanly.');
             });
@@ -1704,7 +1704,7 @@ select {
                                 <option value="surveyor">مساح</option>
                                 <option value="warehouse_manager">مدير مخزن</option>
                                 <option value="operator_supervisor">مشرف مشغل</option>
-                                <option value="accountant">محاسب (عرض وطباعة فقط - View Only)</option>
+                                <option value="accountant">محاسب</option>
                                 <option value="engineer">مهندس</option>
                                 <option value="admin">مدير</option>
                             </select>
@@ -1746,7 +1746,7 @@ select {
                                     <option value="surveyor">مساح</option>
                                     <option value="warehouse_manager">مدير مخزن</option>
                                     <option value="operator_supervisor">مشرف مشغل</option>
-                                    <option value="accountant">محاسب (عرض وطباعة فقط)</option>
+                                    <option value="accountant">محاسب</option>
                                     <option value="engineer">مهندس</option>
                                     <option value="admin">مدير</option>
                                 </select>
@@ -6699,14 +6699,14 @@ document.addEventListener('keydown', (e) => {
         if (newRoleSelect) {
             const currentVal = newRoleSelect.value;
             newRoleSelect.innerHTML = `<option value="" disabled ${!currentVal ? 'selected' : ''}>اختر الوظيفة / الصلاحية</option>` +
-                roles.map(r => `<option value="${r.id}" ${currentVal === r.id ? 'selected' : ''}>${r.id === 'accountant' ? 'محاسب (عرض وطباعة فقط - View Only)' : r.nameAr}</option>`).join('');
+                roles.map(r => `<option value="${r.id}" ${currentVal === r.id ? 'selected' : ''}>${r.nameAr}</option>`).join('');
         }
 
         // 2. Update #role-default-selector in Role Defaults card
         const roleDefaultSelect = document.getElementById('role-default-selector');
         if (roleDefaultSelect) {
             const currentVal = roleDefaultSelect.value || 'supervisor';
-            roleDefaultSelect.innerHTML = roles.map(r => `<option value="${r.id}" ${currentVal === r.id ? 'selected' : ''}>${r.id === 'accountant' ? 'محاسب (عرض وطباعة فقط)' : r.nameAr}</option>`).join('');
+            roleDefaultSelect.innerHTML = roles.map(r => `<option value="${r.id}" ${currentVal === r.id ? 'selected' : ''}>${r.nameAr}</option>`).join('');
         }
     }
 
@@ -7379,7 +7379,7 @@ document.addEventListener('keydown', (e) => {
         const roles = this.getAllRoles();
         roleCell.innerHTML = `
             <select id="edit-user-role-${id}" style="min-width: max-content; width: 100%; padding: 5px;">
-                ${roles.map(r => `<option value="${r.id}" ${currentRole === r.id ? 'selected' : ''}>${r.id === 'accountant' ? 'محاسب (عرض وطباعة فقط - View Only)' : r.nameAr}</option>`).join('')}
+                ${roles.map(r => `<option value="${r.id}" ${currentRole === r.id ? 'selected' : ''}>${r.nameAr}</option>`).join('')}
             </select>
         `;
         
@@ -10100,7 +10100,7 @@ document.addEventListener('keydown', (e) => {
         const labels = {
             'record_engineer': 'المهندس المختص بالسركي المعني',
             'engineer': 'مهندس موقع (جميع المهندسين)',
-            'accountant': 'محاسب (عرض وطباعة فقط)',
+            'accountant': 'محاسب',
             'record_supervisor': 'المشرف صاحب ومقدم السركي',
             'supervisor': 'مشرف موقع (جميع المشرفين)',
             'admin': 'مدير النظام (جميع المديرين)',

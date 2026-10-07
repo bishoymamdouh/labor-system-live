@@ -1,4 +1,4 @@
-// Service Worker v6.9 - Add Accountant Role with View & Print Only Permissions for Aggregated Reports
+// Service Worker v7.0 - Name Accountant Role Cleanly as محاسب
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
