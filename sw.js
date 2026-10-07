@@ -1,4 +1,4 @@
-// Service Worker v6.7 - Show Total Pending in Nav Badge for Admin while Preserving Private Notifications
+// Service Worker v6.8 - Clean Role Column in Users Table & Reorganize Equipment Permissions in Modal
 self.addEventListener('install', e => {
   self.skipWaiting();
 });

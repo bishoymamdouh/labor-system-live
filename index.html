@@ -1561,7 +1561,7 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=6.7').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=6.8').then(reg => {
                 reg.update();
                 console.log('ServiceWorker v6.0 registered cleanly.');
             });
@@ -4412,20 +4412,11 @@ class UI {
             const tr = document.createElement('tr');
             tr.id = `user-row-${user.id}`;
             const userPic = user.profilePic ? `<img src="${user.profilePic}" style="width:30px; height:30px; border-radius:50%; object-fit:cover; margin-left:10px; vertical-align:middle; border:1px solid var(--primary-color);">` : `<i class="fas fa-user-circle" style="font-size:30px; margin-left:10px; vertical-align:middle; color:var(--text-muted);"></i>`;
-            const userEffectivePerms = UI.getUserPermissions(user);
-            const hasEqEntry = user.role === 'admin' || (userEffectivePerms && userEffectivePerms.equipment_entry === true);
-            const eqBadge = hasEqEntry ? `
-                <div style="margin-top: 4px;">
-                    <span class="badge" style="background: rgba(14, 165, 233, 0.15); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.3); font-size: 0.72rem; padding: 2px 7px; border-radius: 6px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;" title="مفعل له صلاحية تسجيل المعدات">
-                        <i class="fas fa-truck-monster"></i> تسجيل معدات
-                    </span>
-                </div>` : '';
             tr.innerHTML = `
                 <td class="user-col-name" style="display:flex; align-items:center;">${userPic} <span>${user.username === 'admin' ? 'Bishoy Mamdouh' : user.username}</span></td>
                 <td class="user-col-pass" data-pass="${user.password}">********</td>
                 <td class="user-col-role">
                     <span class="badge badge-approved" data-role="${user.role}">${auth.getRoleNameAr(user.role)}</span>
-                    ${eqBadge}
                 </td>
                 <td class="user-col-actions">
                     <button class="btn-icon text-warning" onclick="app.openUserPermissionsModal('${user.id}')" title="تعديل صلاحيات المستخدم 🛡️"><i class="fas fa-user-shield"></i></button>
@@ -5633,19 +5624,19 @@ document.addEventListener('keydown', (e) => {
     }
 
     const SYSTEM_PERMISSIONS = [
-        { key: 'record_entry', label: 'تسجيل السراكي اليومية', desc: 'إمكانية إدخال وتسجيل سركي يومية جديدة للعمال والمعدات', icon: 'fa-file-signature' },
+        { key: 'record_entry', label: 'تسجيل السراكي اليومية', desc: 'إمكانية إدخال وتسجيل سركي يومية جديدة للعمال', icon: 'fa-file-signature' },
+        { key: 'equipment_entry', label: 'تسجيل وتشغيل المعدات', desc: 'إظهار شاشة تسجيل يومية وساعات تشغيل المعدات لهذا المستخدم (محجوبة افتراضياً وتمنح بشكل خاص)', icon: 'fa-truck-monster' },
         { key: 'custom_record_date', label: 'تحديد تاريخ السركي بحرية', desc: 'السماح باختيار وتعديل تاريخ طلب اعتماد السركي لأي يوم ماضي أو مخصص بدلاً من إجباره على تاريخ اليوم فقط', icon: 'fa-calendar-alt' },
         { key: 'auto_approve_record', label: 'الاعتماد التلقائي لطلب السركي', desc: 'عند إرسال سركي يتم اعتماده بشكل تلقائي وفوري دون تمريره على مرحلة قيد الانتظار', icon: 'fa-check-circle' },
         { key: 'approve_records', label: 'مراجعة واعتماد السراكي', desc: 'صلاحية المهندس لاعتماد أو رفض وتعديل يوميات وسراكي المشرفين', icon: 'fa-check-double' },
         { key: 'view_reports', label: 'عرض التقارير وتصدير إكسيل', desc: 'الاطلاع على تقارير السراكي، الفلاتر، وتصدير شيتات Excel و PDF', icon: 'fa-chart-bar' },
-        { key: 'view_server_status', label: 'متابعة سيرفر Cloudflare والاستهلاك', desc: 'عرض شريط خادم Cloudflare وحصة الـ 100 ألف طلب يومياً ومعدل الاستهلاك اللحظي للسيرفر', icon: 'fa-server' },
+        { key: 'equipment_reports', label: 'مستخلصات وحسابات المعدات', desc: 'استخراج وعرض وحساب المستخلص المالي النهائي للمعدات والمقاولين وتصديرها إكسيل وطباعتها', icon: 'fa-file-invoice-dollar' },
         { key: 'manage_workers', label: 'إدارة قاعدة العمال', desc: 'إضافة عمال جدد لدليل العمال وتعديل المسميات واليوميات الافتراضية', icon: 'fa-address-book' },
+        { key: 'manage_equipment', label: 'إدارة دليل المعدات والأسعار', desc: 'إضافة وتعديل وحذف المعدات وتسعير الساعات واليوميات وربطها بالمقاولين في لوحة الإدارة', icon: 'fa-cogs' },
+        { key: 'view_server_status', label: 'متابعة سيرفر Cloudflare والاستهلاك', desc: 'عرض شريط خادم Cloudflare وحصة الـ 100 ألف طلب يومياً ومعدل الاستهلاك اللحظي للسيرفر', icon: 'fa-server' },
         { key: 'manage_notifications', label: 'إدارة وجدولة الإشعارات', desc: 'الدخول لشاشة إدارة الإشعارات وجدولة رسائل التنبيه والبرودكاست', icon: 'fa-bell' },
         { key: 'admin_dashboard', label: 'لوحة الإدارة والمستخدمين', desc: 'إدارة حسابات المستخدمين، النسخ الاحتياطي، وإعدادات النظام', icon: 'fa-users-cog' },
-        { key: 'purge_records', label: 'تفريغ وأرشفة السراكي القديمة', desc: 'صلاحية مسح وأرشفة بيانات السراكي القديمة لتخفيض مساحة التخزين', icon: 'fa-trash-alt' },
-        { key: 'equipment_entry', label: '🚜 تسجيل ساعات وتشغيل المعدات (خاص)', desc: 'إظهار شاشة تسجيل يومية المعدات لهذا المستخدم حصراً (محجوبة عن جميع المستخدمين افتراضياً وتمنح بشكل خاص)', icon: 'fa-truck-monster' },
-        { key: 'equipment_reports', label: '📊 مستخلصات وحسابات المعدات والمقاولين', desc: 'استخراج وعرض وحساب المستخلص المالي النهائي للمعدات والمقاولين وتصديرها إكسيل وطباعتها', icon: 'fa-file-invoice-dollar' },
-        { key: 'manage_equipment', label: '⚙️ إدارة دليل المعدات والأسعار', desc: 'إضافة وتعديل وحذف المعدات وتسعير الساعات واليوميات وربطها بالمقاولين في لوحة الإدارة', icon: 'fa-cogs' }
+        { key: 'purge_records', label: 'تفريغ وأرشفة السراكي القديمة', desc: 'صلاحية مسح وأرشفة بيانات السراكي القديمة لتخفيض مساحة التخزين', icon: 'fa-trash-alt' }
     ];
 
     const DEFAULT_SYSTEM_ROLES = [
