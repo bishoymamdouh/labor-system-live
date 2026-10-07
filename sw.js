@@ -1,4 +1,4 @@
-// Service Worker v6.8 - Clean Role Column in Users Table & Reorganize Equipment Permissions in Modal
+// Service Worker v6.9 - Add Accountant Role with View & Print Only Permissions for Aggregated Reports
 self.addEventListener('install', e => {
   self.skipWaiting();
 });

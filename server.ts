@@ -961,7 +961,8 @@ async function generateExcelBackup(folderPath: string, dateStr: string) {
             'supervisor': 'مشرف موقع',
             'surveyor': 'مساح',
             'warehouse_manager': 'مدير مخزن',
-            'operator_supervisor': 'مشرف مشغل'
+            'operator_supervisor': 'مشرف مشغل',
+            'accountant': 'محاسب'
         };
 
         const wb = new ExcelJS.Workbook();

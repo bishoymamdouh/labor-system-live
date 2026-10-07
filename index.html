@@ -1561,7 +1561,7 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=6.8').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=6.9').then(reg => {
                 reg.update();
                 console.log('ServiceWorker v6.0 registered cleanly.');
             });
@@ -1704,6 +1704,7 @@ select {
                                 <option value="surveyor">مساح</option>
                                 <option value="warehouse_manager">مدير مخزن</option>
                                 <option value="operator_supervisor">مشرف مشغل</option>
+                                <option value="accountant">محاسب (عرض وطباعة فقط - View Only)</option>
                                 <option value="engineer">مهندس</option>
                                 <option value="admin">مدير</option>
                             </select>
@@ -1745,6 +1746,7 @@ select {
                                     <option value="surveyor">مساح</option>
                                     <option value="warehouse_manager">مدير مخزن</option>
                                     <option value="operator_supervisor">مشرف مشغل</option>
+                                    <option value="accountant">محاسب (عرض وطباعة فقط)</option>
                                     <option value="engineer">مهندس</option>
                                     <option value="admin">مدير</option>
                                 </select>
@@ -2547,6 +2549,7 @@ select {
                         <optgroup label="صلاحيات وفئات المستخدمين في النظام:">
                             <option value="admin">مدير النظام (جميع المستخدمين بصلاحية مدير)</option>
                             <option value="engineer">مهندس موقع (جميع المستخدمين بصلاحية مهندس)</option>
+                            <option value="accountant">محاسب (جميع المستخدمين بصلاحية محاسب)</option>
                             <option value="supervisor">مشرف موقع (جميع المستخدمين بصلاحية مشرف)</option>
                             <option value="surveyor">مساح (جميع المستخدمين بصلاحية مساح)</option>
                             <option value="warehouse_manager">مدير مخزن / أمين مخزن (جميع المستخدمين بصلاحية مدير مخزن)</option>
@@ -3941,7 +3944,8 @@ class Auth {
             'surveyor': 'مساح',
             'warehouse_manager': 'مدير مخزن',
             'operator_supervisor': 'مشرف مشغل',
-            'engineer': 'مهندس'
+            'engineer': 'مهندس',
+            'accountant': 'محاسب'
         };
         return roles[role] || role || 'غير محدد';
     }
@@ -4137,16 +4141,37 @@ class UI {
             view.classList.remove('hidden');
         }
         if (viewId === 'view-admin') {
+            const currentUser = (auth && auth.currentUser) || (auth && typeof auth.getUser === 'function' ? auth.getUser() : null);
+            const perms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(currentUser) : {};
+            if (!perms.admin_dashboard) {
+                if (window.showAppNotification) window.showAppNotification('عفواً، ليس لديك صلاحية لوحة الإدارة', 'error');
+                UI.showView(perms.view_reports ? 'view-reports' : (perms.record_entry ? 'view-supervisor' : 'view-login'));
+                return;
+            }
             if (window.app && typeof window.app.loadAdminData === 'function') {
                 window.app.loadAdminData();
             }
         }
         if (viewId === 'view-engineer') {
+            const currentUser = (auth && auth.currentUser) || (auth && typeof auth.getUser === 'function' ? auth.getUser() : null);
+            const perms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(currentUser) : {};
+            if (!perms.approve_records) {
+                if (window.showAppNotification) window.showAppNotification('عفواً، ليس لديك صلاحية اعتماد السراكي', 'error');
+                UI.showView(perms.view_reports ? 'view-reports' : (perms.record_entry ? 'view-supervisor' : 'view-login'));
+                return;
+            }
             if (window.app && typeof window.app.loadEngineerData === 'function') {
                 window.app.loadEngineerData();
             }
         }
         if (viewId === 'view-supervisor') {
+            const currentUser = (auth && auth.currentUser) || (auth && typeof auth.getUser === 'function' ? auth.getUser() : null);
+            const perms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(currentUser) : {};
+            if (!perms.record_entry) {
+                if (window.showAppNotification) window.showAppNotification('عفواً، ليس لديك صلاحية تسجيل السراكي', 'error');
+                UI.showView(perms.view_reports ? 'view-reports' : (perms.approve_records ? 'view-engineer' : 'view-login'));
+                return;
+            }
             if (window.app && typeof window.app.updateRecordDateAccess === 'function') {
                 window.app.updateRecordDateAccess();
             }
@@ -4161,6 +4186,13 @@ class UI {
             }
         }
         if (viewId === 'view-notifications') {
+            const currentUser = (auth && auth.currentUser) || (auth && typeof auth.getUser === 'function' ? auth.getUser() : null);
+            const perms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(currentUser) : {};
+            if (!perms.manage_notifications) {
+                if (window.showAppNotification) window.showAppNotification('عفواً، ليس لديك صلاحية إدارة الإشعارات', 'error');
+                UI.showView(perms.view_reports ? 'view-reports' : (perms.record_entry ? 'view-supervisor' : 'view-login'));
+                return;
+            }
             if (window.app && typeof window.app.loadNotificationsManager === 'function') {
                 window.app.loadNotificationsManager();
             }
@@ -4338,8 +4370,8 @@ class UI {
             admin_dashboard: role === 'admin',
             manage_notifications: role === 'admin',
             approve_records: role === 'admin' || role === 'engineer',
-            record_entry: true,
-            view_reports: role === 'admin' || role === 'engineer'
+            record_entry: role !== 'accountant',
+            view_reports: role === 'admin' || role === 'engineer' || role === 'accountant'
         };
 
         let navHtml = '';
@@ -5392,7 +5424,7 @@ document.addEventListener('keydown', (e) => {
         }
 
         getSelectedRoles() {
-            const roles = ['admin', 'engineer', 'supervisor', 'warehouse_manager', 'surveyor', 'operator_supervisor'];
+            const roles = ['admin', 'engineer', 'supervisor', 'warehouse_manager', 'surveyor', 'operator_supervisor', 'accountant'];
             const fullySelectedRoles = [];
             roles.forEach(r => {
                 const roleUsers = this.users.filter(u => u.role === r);
@@ -5441,7 +5473,8 @@ document.addEventListener('keydown', (e) => {
                 'supervisor': { label: 'المشرفين', icon: 'fas fa-user-tie', class: 'chip-supervisor' },
                 'warehouse_manager': { label: 'مديري المخازن', icon: 'fas fa-warehouse', class: 'chip-warehouse' },
                 'surveyor': { label: 'المساحين', icon: 'fas fa-drafting-compass', class: 'chip-surveyor' },
-                'operator_supervisor': { label: 'مشرفي المشغلين', icon: 'fas fa-cogs', class: 'chip-operator' }
+                'operator_supervisor': { label: 'مشرفي المشغلين', icon: 'fas fa-cogs', class: 'chip-operator' },
+                'accountant': { label: 'المحاسبين', icon: 'fas fa-calculator', class: 'chip-accountant' }
             };
 
             let chipsHtml = '';
@@ -5547,7 +5580,8 @@ document.addEventListener('keydown', (e) => {
                 'supervisor': { label: 'مشرف موقع', icon: 'fas fa-user-tie', color: '#059669', bg: 'rgba(5, 150, 105, 0.15)' },
                 'warehouse_manager': { label: 'مدير مخزن', icon: 'fas fa-warehouse', color: '#d97706', bg: 'rgba(217, 119, 6, 0.15)' },
                 'surveyor': { label: 'مساح', icon: 'fas fa-drafting-compass', color: '#db2777', bg: 'rgba(219, 39, 119, 0.15)' },
-                'operator_supervisor': { label: 'مشرف مشغلين', icon: 'fas fa-cogs', color: '#7c3aed', bg: 'rgba(124, 58, 237, 0.15)' }
+                'operator_supervisor': { label: 'مشرف مشغلين', icon: 'fas fa-cogs', color: '#7c3aed', bg: 'rgba(124, 58, 237, 0.15)' },
+                'accountant': { label: 'محاسب', icon: 'fas fa-calculator', color: '#0d9488', bg: 'rgba(13, 148, 136, 0.15)' }
             };
 
             filtered.forEach(user => {
@@ -5629,7 +5663,7 @@ document.addEventListener('keydown', (e) => {
         { key: 'custom_record_date', label: 'تحديد تاريخ السركي بحرية', desc: 'السماح باختيار وتعديل تاريخ طلب اعتماد السركي لأي يوم ماضي أو مخصص بدلاً من إجباره على تاريخ اليوم فقط', icon: 'fa-calendar-alt' },
         { key: 'auto_approve_record', label: 'الاعتماد التلقائي لطلب السركي', desc: 'عند إرسال سركي يتم اعتماده بشكل تلقائي وفوري دون تمريره على مرحلة قيد الانتظار', icon: 'fa-check-circle' },
         { key: 'approve_records', label: 'مراجعة واعتماد السراكي', desc: 'صلاحية المهندس لاعتماد أو رفض وتعديل يوميات وسراكي المشرفين', icon: 'fa-check-double' },
-        { key: 'view_reports', label: 'عرض التقارير وتصدير إكسيل', desc: 'الاطلاع على تقارير السراكي، الفلاتر، وتصدير شيتات Excel و PDF', icon: 'fa-chart-bar' },
+        { key: 'view_reports', label: 'عرض التقارير والطباعة فقط (View Only)', desc: 'الاطلاع على صفحة التقارير المجمعة، الفلاتر، وتصدير أو طباعة الكشوفات (بدون أي صلاحيات تعديل أو إضافة)', icon: 'fa-chart-bar' },
         { key: 'equipment_reports', label: 'مستخلصات وحسابات المعدات', desc: 'استخراج وعرض وحساب المستخلص المالي النهائي للمعدات والمقاولين وتصديرها إكسيل وطباعتها', icon: 'fa-file-invoice-dollar' },
         { key: 'manage_workers', label: 'إدارة قاعدة العمال', desc: 'إضافة عمال جدد لدليل العمال وتعديل المسميات واليوميات الافتراضية', icon: 'fa-address-book' },
         { key: 'manage_equipment', label: 'إدارة دليل المعدات والأسعار', desc: 'إضافة وتعديل وحذف المعدات وتسعير الساعات واليوميات وربطها بالمقاولين في لوحة الإدارة', icon: 'fa-cogs' },
@@ -5645,7 +5679,8 @@ document.addEventListener('keydown', (e) => {
         { id: 'supervisor', nameAr: 'مشرف', isSystem: true, icon: 'fa-user-tie' },
         { id: 'surveyor', nameAr: 'مساح', isSystem: true, icon: 'fa-drafting-compass' },
         { id: 'warehouse_manager', nameAr: 'مدير مخزن', isSystem: true, icon: 'fa-warehouse' },
-        { id: 'operator_supervisor', nameAr: 'مشرف مشغل', isSystem: true, icon: 'fa-truck-loading' }
+        { id: 'operator_supervisor', nameAr: 'مشرف مشغل', isSystem: true, icon: 'fa-truck-loading' },
+        { id: 'accountant', nameAr: 'محاسب', isSystem: true, icon: 'fa-calculator' }
     ];
 
     const FACTORY_ROLE_PERMISSIONS = {
@@ -5654,7 +5689,8 @@ document.addEventListener('keydown', (e) => {
         supervisor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false },
         surveyor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false },
         warehouse_manager: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false },
-        operator_supervisor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false }
+        operator_supervisor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false },
+        accountant: { record_entry: false, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: true, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false }
     };
     window.SYSTEM_PERMISSIONS = SYSTEM_PERMISSIONS;
     window.DEFAULT_SYSTEM_ROLES = DEFAULT_SYSTEM_ROLES;
@@ -6566,6 +6602,8 @@ document.addEventListener('keydown', (e) => {
                 document.getElementById('workers-list').innerHTML = '';
                 this.addWorkerRow();
                 this.updateTotals();
+            } else if (role === 'accountant') {
+                this.generateReport();
             } else if (role === 'engineer') {
                 this.loadEngineerData();
                 this.generateReport();
@@ -6661,14 +6699,14 @@ document.addEventListener('keydown', (e) => {
         if (newRoleSelect) {
             const currentVal = newRoleSelect.value;
             newRoleSelect.innerHTML = `<option value="" disabled ${!currentVal ? 'selected' : ''}>اختر الوظيفة / الصلاحية</option>` +
-                roles.map(r => `<option value="${r.id}" ${currentVal === r.id ? 'selected' : ''}>${r.nameAr}</option>`).join('');
+                roles.map(r => `<option value="${r.id}" ${currentVal === r.id ? 'selected' : ''}>${r.id === 'accountant' ? 'محاسب (عرض وطباعة فقط - View Only)' : r.nameAr}</option>`).join('');
         }
 
         // 2. Update #role-default-selector in Role Defaults card
         const roleDefaultSelect = document.getElementById('role-default-selector');
         if (roleDefaultSelect) {
             const currentVal = roleDefaultSelect.value || 'supervisor';
-            roleDefaultSelect.innerHTML = roles.map(r => `<option value="${r.id}" ${currentVal === r.id ? 'selected' : ''}>${r.nameAr}</option>`).join('');
+            roleDefaultSelect.innerHTML = roles.map(r => `<option value="${r.id}" ${currentVal === r.id ? 'selected' : ''}>${r.id === 'accountant' ? 'محاسب (عرض وطباعة فقط)' : r.nameAr}</option>`).join('');
         }
     }
 
@@ -7341,7 +7379,7 @@ document.addEventListener('keydown', (e) => {
         const roles = this.getAllRoles();
         roleCell.innerHTML = `
             <select id="edit-user-role-${id}" style="min-width: max-content; width: 100%; padding: 5px;">
-                ${roles.map(r => `<option value="${r.id}" ${currentRole === r.id ? 'selected' : ''}>${r.nameAr}</option>`).join('')}
+                ${roles.map(r => `<option value="${r.id}" ${currentRole === r.id ? 'selected' : ''}>${r.id === 'accountant' ? 'محاسب (عرض وطباعة فقط - View Only)' : r.nameAr}</option>`).join('')}
             </select>
         `;
         
@@ -7873,7 +7911,8 @@ document.addEventListener('keydown', (e) => {
                 'supervisor': 'مشرف موقع',
                 'surveyor': 'مساح',
                 'warehouse_manager': 'مدير مخزن',
-                'operator_supervisor': 'مشرف مشغل'
+                'operator_supervisor': 'مشرف مشغل',
+                'accountant': 'محاسب'
             };
 
             // 3. Create ExcelJS Workbook
@@ -10061,6 +10100,7 @@ document.addEventListener('keydown', (e) => {
         const labels = {
             'record_engineer': 'المهندس المختص بالسركي المعني',
             'engineer': 'مهندس موقع (جميع المهندسين)',
+            'accountant': 'محاسب (عرض وطباعة فقط)',
             'record_supervisor': 'المشرف صاحب ومقدم السركي',
             'supervisor': 'مشرف موقع (جميع المشرفين)',
             'admin': 'مدير النظام (جميع المديرين)',
@@ -10611,7 +10651,8 @@ document.addEventListener('keydown', (e) => {
             'supervisor': 'المشرفين',
             'warehouse_manager': 'مديري المخازن',
             'surveyor': 'المساحين',
-            'operator_supervisor': 'مشرفي المشغلين'
+            'operator_supervisor': 'مشرفي المشغلين',
+            'accountant': 'المحاسبين'
         };
 
         scheduledItems.forEach(item => {
