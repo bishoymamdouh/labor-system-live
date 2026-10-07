@@ -1,4 +1,4 @@
-// Service Worker v7.0 - Name Accountant Role Cleanly as محاسب
+// Service Worker v7.1 - Ensure worker directory & engineer dropdown populated for all permitted roles
 self.addEventListener('install', e => {
   self.skipWaiting();
 });

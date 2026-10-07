@@ -1561,9 +1561,9 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=7.0').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=7.1').then(reg => {
                 reg.update();
-                console.log('ServiceWorker v6.0 registered cleanly.');
+                console.log('ServiceWorker v7.1 registered cleanly.');
             });
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -4175,7 +4175,9 @@ class UI {
             if (window.app && typeof window.app.updateRecordDateAccess === 'function') {
                 window.app.updateRecordDateAccess();
             }
-            if (window.app && typeof window.app.loadSupervisorData === 'function') {
+            if (window.app && typeof window.app.ensureSupervisorDataLoaded === 'function') {
+                window.app.ensureSupervisorDataLoaded();
+            } else if (window.app && typeof window.app.loadSupervisorData === 'function') {
                 window.app.loadSupervisorData();
             }
         }
@@ -4564,11 +4566,17 @@ class UI {
         const engineers = users.filter(u => u.role === 'engineer' || u.role === 'admin');
         const select = document.getElementById('record-engineer');
         if (select) {
+            const previousVal = select.value;
             select.innerHTML = '<option value="" disabled selected>اختر المهندس</option>';
             engineers.forEach(eng => {
                 let displayName = eng.username === 'admin' ? 'Bishoy Mamdouh' : eng.username;
-                let isCurrent = (eng.id === auth.currentUser.id);
-                let selected = ((role === 'engineer' || role === 'admin') && isCurrent) ? 'selected' : '';
+                let isCurrent = (auth.currentUser && eng.id === auth.currentUser.id);
+                let selected = '';
+                if (previousVal && String(previousVal) === String(eng.id)) {
+                    selected = 'selected';
+                } else if (!previousVal && (role === 'engineer' || role === 'admin') && isCurrent) {
+                    selected = 'selected';
+                }
                 select.innerHTML += `<option value="${eng.id}" ${selected}>${displayName}</option>`;
             });
             if (role === 'engineer') {
@@ -6604,6 +6612,10 @@ document.addEventListener('keydown', (e) => {
                 this.updateTotals();
             } else if (role === 'accountant') {
                 this.generateReport();
+                const perms = this.getUserPermissions(auth.currentUser);
+                if (perms.record_entry) {
+                    await this.ensureSupervisorDataLoaded();
+                }
             } else if (role === 'engineer') {
                 this.loadEngineerData();
                 this.generateReport();
@@ -8448,6 +8460,34 @@ document.addEventListener('keydown', (e) => {
     }
 
     // --- Supervisor Functions ---
+    async ensureSupervisorDataLoaded(forceReload = false) {
+        try {
+            if (forceReload || !this.directoryWorkers || this.directoryWorkers.length === 0) {
+                let dirWorkers = await db.getAll('worker_directory');
+                if (Array.isArray(dirWorkers)) {
+                    dirWorkers.sort((a, b) => customSort(a, b, false));
+                    this.directoryWorkers = dirWorkers;
+                } else {
+                    this.directoryWorkers = [];
+                }
+            }
+            await UI.renderEngineerOptions();
+            await this.loadSupervisorData();
+            
+            const list = document.getElementById('workers-list');
+            const hasValidOptions = list && list.querySelector('select[id^="worker-name-"] option:not([disabled])');
+            if (!hasValidOptions || !list || list.children.length === 0) {
+                this.currentWorkers = [];
+                if (list) list.innerHTML = '';
+                this.addWorkerRow();
+                this.updateTotals();
+            }
+            this.updateRecordDateAccess();
+        } catch (err) {
+            console.error("ensureSupervisorDataLoaded error:", err);
+        }
+    }
+
     async loadSupervisorData() {
         const records = await db.getRecordsWithDetails(null, auth.currentUser.id, null, null);
         UI.renderSupervisorRecords(records);
