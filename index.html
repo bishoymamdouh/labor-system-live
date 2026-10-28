@@ -1561,7 +1561,7 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=7.3').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=7.4').then(reg => {
                 reg.update();
                 console.log('ServiceWorker v7.1 registered cleanly.');
             });
@@ -14399,8 +14399,8 @@ document.addEventListener('click', (e) => {
 
         // Dynamic row height for summary data: when few contractors, give generous row height
         const isFewSumContractors = sortedContractors.length <= 5;
-        const sumDataRowHeight = isFewSumContractors ? 38 : (sortedContractors.length <= 12 ? 30 : 25);
-        const sumDataFontSize = isFewSumContractors ? 13 : (sortedContractors.length <= 12 ? 11.5 : 10.5);
+        const sumDataRowHeight = isFewSumContractors ? 44 : (sortedContractors.length <= 12 ? 34 : 26);
+        const sumDataFontSize = isFewSumContractors ? 14 : (sortedContractors.length <= 12 ? 12 : 11);
 
         let sumRowIdx = 6;
         sortedContractors.forEach((k, idx) => {
@@ -14842,20 +14842,20 @@ document.addEventListener('click', (e) => {
         // ----------------------------------------------------
         if (sortedContractors.length > 1) {
             const sumCount = sortedContractors.length;
-            let sumRowH = 55;
-            let sumFont = 16;
-            let sumPadV = 14;
-            let sumTheadH = 48;
-            let sumTheadFont = 15;
+            let sumRowH = 65;
+            let sumFont = 16.5;
+            let sumPadV = 18;
+            let sumTheadH = 52;
+            let sumTheadFont = 16;
 
-            if (sumCount <= 3) {
-                sumRowH = 58; sumFont = 16.5; sumPadV = 15; sumTheadH = 50; sumTheadFont = 15.5;
-            } else if (sumCount <= 6) {
-                sumRowH = 46; sumFont = 14.5; sumPadV = 10; sumTheadH = 44; sumTheadFont = 14;
+            if (sumCount <= 4) {
+                sumRowH = 68; sumFont = 17; sumPadV = 18; sumTheadH = 54; sumTheadFont = 16;
+            } else if (sumCount <= 7) {
+                sumRowH = 54; sumFont = 15; sumPadV = 13; sumTheadH = 46; sumTheadFont = 14.5;
             } else if (sumCount <= 12) {
-                sumRowH = 35; sumFont = 12.5; sumPadV = 6; sumTheadH = 36; sumTheadFont = 12;
+                sumRowH = 40; sumFont = 13; sumPadV = 8; sumTheadH = 38; sumTheadFont = 12.5;
             } else {
-                sumRowH = 26; sumFont = 11; sumPadV = 3; sumTheadH = 30; sumTheadFont = 11;
+                sumRowH = 28; sumFont = 11; sumPadV = 4; sumTheadH = 32; sumTheadFont = 11;
             }
 
             let summaryTableRows = '';
@@ -14889,7 +14889,7 @@ document.addEventListener('click', (e) => {
             `;
 
             pagesHtml += `
-            <div class="contractor-page">
+            <div class="contractor-page summary-page">
                 <div class="header">
                     <img src="/logo.png?v=2" class="logo-img" alt="Logo" onerror="if(window.CORNERSTONE_LOGO_BASE64)this.src='data:image/png;base64,'+window.CORNERSTONE_LOGO_BASE64;else this.style.display='none';">
                     <div class="project-title-box">Cornerstone Development - Project: The Curve</div>
@@ -15282,10 +15282,15 @@ document.addEventListener('click', (e) => {
                 if (doc) {
                     const pages = doc.querySelectorAll('.contractor-page');
                     pages.forEach(page => {
-                        let attempts = 0;
+                        // Summary page NEVER needs shrinking - its heights are tailored to fit
+                        if (page.classList.contains('summary-page')) return;
+                        
                         const tbl = page.querySelector('table');
-                        // Only perform shrink adjustment if page truly exceeds clientHeight AND clientHeight is measured properly
-                        if (tbl && page.clientHeight > 300) {
+                        const rowCount = tbl ? tbl.querySelectorAll('tbody tr').length : 0;
+                        
+                        // Only perform shrink adjustment if contractor has many records (> 16) and truly overflows
+                        if (tbl && rowCount > 16 && page.clientHeight > 300) {
+                            let attempts = 0;
                             while (page.scrollHeight > (page.clientHeight + 4) && attempts < 12) {
                                 attempts++;
                                 const curSize = parseFloat(window.getComputedStyle(tbl).fontSize) || 12;

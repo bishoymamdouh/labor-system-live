@@ -1,4 +1,4 @@
-// Service Worker v7.3 - Spacious layout and row sizing for contractor deductions report (PDF & Excel)
+// Service Worker v7.4 - Spacious layout and row sizing for contractor deductions report (PDF & Excel)
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
