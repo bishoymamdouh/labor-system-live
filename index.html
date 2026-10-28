@@ -1561,7 +1561,7 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=7.2').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=7.3').then(reg => {
                 reg.update();
                 console.log('ServiceWorker v7.1 registered cleanly.');
             });
@@ -14209,7 +14209,7 @@ document.addEventListener('click', (e) => {
         }
     };
 
-    // --- New Feature: Contractor Deductions Excel Export (Per-Contractor Sheets + Fit-to-Page) ---
+    // --- New Feature: Contractor Deductions Excel Export (Per-Contractor Sheets + Fit-to-Page + Spacious Layout) ---
     window.exportContractorDeductionsExcel = async function() {
         let rows = Array.from(document.querySelectorAll('#report-results-list tr'));
         let visibleRows = rows.filter(r => r.style.display !== 'none' && r.cells.length > 5);
@@ -14317,27 +14317,28 @@ document.addEventListener('click', (e) => {
                 orientation: 'landscape',
                 fitToPage: true,
                 fitToWidth: 1,
-                fitToHeight: 1, // Fit exactly to 1 page!
+                fitToHeight: 1,
                 margins: { left: 0.25, right: 0.25, top: 0.25, bottom: 0.25, header: 0, footer: 0 }
             }
         });
 
+        // Wide, spacious columns
         wsSummary.columns = [
-            { width: 8 },  // A: م
-            { width: 34 }, // B: اسم المقاول
-            { width: 24 }, // C: عدد اليوميات المخصومة
-            { width: 28 }, // D: إجمالي مبلغ الخصم (ج.م)
-            { width: 22 }, // E: نسبة الخصم من الإجمالي
-            { width: 26 }  // F: ملاحظات
+            { width: 10 }, // A: م
+            { width: 40 }, // B: اسم المقاول
+            { width: 28 }, // C: عدد اليوميات المخصومة
+            { width: 32 }, // D: إجمالي مبلغ الخصم (ج.م)
+            { width: 26 }, // E: نسبة الخصم من الإجمالي
+            { width: 32 }  // F: ملاحظات
         ];
 
         // Row 1: Project box in center (C1:E1)
         wsSummary.mergeCells('C1:E1');
         const sumPBox = wsSummary.getCell('C1');
         sumPBox.value = 'Cornerstone Development - Project: The Curve';
-        sumPBox.font = { name: 'Cairo', size: 13, bold: true, color: { argb: 'FF003366' } };
+        sumPBox.font = { name: 'Cairo', size: 14, bold: true, color: { argb: 'FF003366' } };
         sumPBox.alignment = { vertical: 'middle', horizontal: 'center' };
-        wsSummary.getRow(1).height = 28;
+        wsSummary.getRow(1).height = 30;
         ['C', 'D', 'E'].forEach(col => {
             const c = wsSummary.getCell(col + '1');
             c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEEF5FB' } };
@@ -14352,7 +14353,7 @@ document.addEventListener('click', (e) => {
         if (logoId !== null) {
             wsSummary.addImage(logoId, {
                 tl: { col: 0.1, row: 0.1 },
-                ext: { width: 180, height: 57 }
+                ext: { width: 185, height: 60 }
             });
         }
 
@@ -14360,17 +14361,17 @@ document.addEventListener('click', (e) => {
         wsSummary.mergeCells('A2:F2');
         const sumTitle = wsSummary.getCell('A2');
         sumTitle.value = 'تقرير مجمع لخصومات العمالة على المقاولين';
-        sumTitle.font = { name: 'Cairo', size: 20, bold: true, color: { argb: 'FF4A148C' } };
+        sumTitle.font = { name: 'Cairo', size: 22, bold: true, color: { argb: 'FF4A148C' } };
         sumTitle.alignment = { vertical: 'middle', horizontal: 'center' };
-        wsSummary.getRow(2).height = 36;
+        wsSummary.getRow(2).height = 40;
 
         // Row 3: Date range
         wsSummary.mergeCells('A3:F3');
         const sumDate = wsSummary.getCell('A3');
         sumDate.value = dateRange;
-        sumDate.font = { name: 'Cairo', size: 12, bold: true, color: { argb: 'FF333333' } };
+        sumDate.font = { name: 'Cairo', size: 13, bold: true, color: { argb: 'FF333333' } };
         sumDate.alignment = { vertical: 'middle', horizontal: 'center' };
-        wsSummary.getRow(3).height = 22;
+        wsSummary.getRow(3).height = 24;
 
         // Row 4: Separator line
         wsSummary.getRow(4).height = 8;
@@ -14380,12 +14381,12 @@ document.addEventListener('click', (e) => {
 
         // Row 5: Summary Headers
         const sumHeaderRow = wsSummary.getRow(5);
-        sumHeaderRow.height = 30;
+        sumHeaderRow.height = 34;
         const sumHeaders = ['م', 'اسم المقاول', 'عدد اليوميات المخصومة', 'إجمالي مبلغ الخصم (ج.م)', 'نسبة الخصم من الإجمالي', 'ملاحظات'];
         sumHeaders.forEach((h, idx) => {
             const cell = sumHeaderRow.getCell(idx + 1);
             cell.value = h;
-            cell.font = { name: 'Cairo', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
+            cell.font = { name: 'Cairo', size: 12, bold: true, color: { argb: 'FFFFFFFF' } };
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4A148C' } };
             cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
             cell.border = {
@@ -14396,118 +14397,140 @@ document.addEventListener('click', (e) => {
             };
         });
 
+        // Dynamic row height for summary data: when few contractors, give generous row height
+        const isFewSumContractors = sortedContractors.length <= 5;
+        const sumDataRowHeight = isFewSumContractors ? 38 : (sortedContractors.length <= 12 ? 30 : 25);
+        const sumDataFontSize = isFewSumContractors ? 13 : (sortedContractors.length <= 12 ? 11.5 : 10.5);
+
         let sumRowIdx = 6;
         sortedContractors.forEach((k, idx) => {
             const grp = contractorGroups[k];
-            const row = wsSummary.getRow(sumRowIdx);
-            row.height = 26;
-
-            row.getCell(1).value = idx + 1;
-            row.getCell(2).value = k;
-            row.getCell(3).value = grp.totalCount;
-            row.getCell(3).numFmt = '#,##0';
-            row.getCell(4).value = grp.totalAmount;
-            row.getCell(4).numFmt = '#,##0';
             const pct = grandTotalAmount > 0 ? (grp.totalAmount / grandTotalAmount) : 0;
-            row.getCell(5).value = pct;
-            row.getCell(5).numFmt = '0.0%';
-            row.getCell(6).value = '';
+            const r = wsSummary.getRow(sumRowIdx);
+            r.height = sumDataRowHeight;
+
+            r.getCell(1).value = idx + 1;
+            r.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' };
+            r.getCell(1).font = { name: 'Cairo', size: sumDataFontSize, bold: true };
+
+            r.getCell(2).value = k;
+            r.getCell(2).alignment = { vertical: 'middle', horizontal: 'right' };
+            r.getCell(2).font = { name: 'Cairo', size: sumDataFontSize + 0.5, bold: true, color: { argb: 'FF4A148C' } };
+
+            r.getCell(3).value = grp.totalCount;
+            r.getCell(3).alignment = { vertical: 'middle', horizontal: 'center' };
+            r.getCell(3).numFmt = '#,##0" يومية"';
+            r.getCell(3).font = { name: 'Cairo', size: sumDataFontSize, bold: true };
+
+            r.getCell(4).value = grp.totalAmount;
+            r.getCell(4).alignment = { vertical: 'middle', horizontal: 'center' };
+            r.getCell(4).numFmt = '#,##0.00" ج.م"';
+            r.getCell(4).font = { name: 'Cairo', size: sumDataFontSize + 0.5, bold: true, color: { argb: 'FF1B5E20' } };
+
+            r.getCell(5).value = pct;
+            r.getCell(5).alignment = { vertical: 'middle', horizontal: 'center' };
+            r.getCell(5).numFmt = '0.0%';
+            r.getCell(5).font = { name: 'Cairo', size: sumDataFontSize, bold: true };
+
+            r.getCell(6).value = '';
+            r.getCell(6).alignment = { vertical: 'middle', horizontal: 'center' };
 
             for (let c = 1; c <= 6; c++) {
-                const cell = row.getCell(c);
-                cell.font = { name: 'Cairo', size: 11, bold: c === 2 || c === 4 };
-                if (c === 2) cell.font = { name: 'Cairo', size: 11, bold: true, color: { argb: 'FF4A148C' } };
-                cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                const cell = r.getCell(c);
                 cell.border = {
-                    top: { style: 'thin', color: { argb: 'FFCCCCCC' } },
-                    bottom: { style: 'thin', color: { argb: 'FFCCCCCC' } },
-                    left: { style: 'thin', color: { argb: 'FFCCCCCC' } },
-                    right: { style: 'thin', color: { argb: 'FFCCCCCC' } }
+                    top: { style: 'thin', color: { argb: 'FFBDBDBD' } },
+                    bottom: { style: 'thin', color: { argb: 'FFBDBDBD' } },
+                    left: { style: 'thin', color: { argb: 'FF000000' } },
+                    right: { style: 'thin', color: { argb: 'FF000000' } }
                 };
+                if (idx % 2 === 1) {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF9F9F9' } };
+                }
             }
             sumRowIdx++;
         });
 
-        // Grand Total Row in Summary
-        const sumGrandRow = wsSummary.getRow(sumRowIdx);
-        sumGrandRow.height = 32;
+        // Grand Total row
+        const grandRow = wsSummary.getRow(sumRowIdx);
+        grandRow.height = sumDataRowHeight + 4;
         wsSummary.mergeCells(`A${sumRowIdx}:B${sumRowIdx}`);
-        const gTitleCell = wsSummary.getCell(`A${sumRowIdx}`);
+        const gTitleCell = grandRow.getCell(1);
         gTitleCell.value = 'الإجمالي العام لجميع المقاولين (' + sortedContractors.length + ' مقاول):';
-        gTitleCell.font = { name: 'Cairo', size: 12, bold: true, color: { argb: 'FFB71C1C' } };
-        gTitleCell.alignment = { vertical: 'middle', horizontal: 'right', indent: 1 };
-        gTitleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFEBEE' } };
+        gTitleCell.font = { name: 'Cairo', size: sumDataFontSize + 1.5, bold: true, color: { argb: 'FF4A148C' } };
+        gTitleCell.alignment = { vertical: 'middle', horizontal: 'right' };
 
-        const gDaysCell = sumGrandRow.getCell(3);
+        const gDaysCell = grandRow.getCell(3);
         gDaysCell.value = grandTotalDays;
-        gDaysCell.numFmt = '#,##0';
-        gDaysCell.font = { name: 'Cairo', size: 13, bold: true, color: { argb: 'FFB71C1C' } };
         gDaysCell.alignment = { vertical: 'middle', horizontal: 'center' };
-        gDaysCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFEBEE' } };
+        gDaysCell.numFmt = '#,##0" يومية"';
+        gDaysCell.font = { name: 'Cairo', size: sumDataFontSize + 1.5, bold: true, color: { argb: 'FF4A148C' } };
 
-        const gAmtCell = sumGrandRow.getCell(4);
-        gAmtCell.value = grandTotalAmount;
-        gAmtCell.numFmt = '#,##0';
-        gAmtCell.font = { name: 'Cairo', size: 14, bold: true, color: { argb: 'FFB71C1C' } };
-        gAmtCell.alignment = { vertical: 'middle', horizontal: 'center' };
-        gAmtCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFEBEE' } };
+        const gAmountCell = grandRow.getCell(4);
+        gAmountCell.value = grandTotalAmount;
+        gAmountCell.alignment = { vertical: 'middle', horizontal: 'center' };
+        gAmountCell.numFmt = '#,##0.00" ج.م"';
+        gAmountCell.font = { name: 'Cairo', size: sumDataFontSize + 2, bold: true, color: { argb: 'FF4A148C' } };
 
-        const gPctCell = sumGrandRow.getCell(5);
+        const gPctCell = grandRow.getCell(5);
         gPctCell.value = 1.0;
-        gPctCell.numFmt = '0.0%';
-        gPctCell.font = { name: 'Cairo', size: 12, bold: true, color: { argb: 'FFB71C1C' } };
         gPctCell.alignment = { vertical: 'middle', horizontal: 'center' };
-        gPctCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFEBEE' } };
+        gPctCell.numFmt = '0.0%';
+        gPctCell.font = { name: 'Cairo', size: sumDataFontSize + 1, bold: true, color: { argb: 'FF4A148C' } };
 
-        sumGrandRow.getCell(6).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFEBEE' } };
+        grandRow.getCell(6).value = '';
 
         for (let c = 1; c <= 6; c++) {
-            sumGrandRow.getCell(c).border = {
-                top: { style: 'medium', color: { argb: 'FFC62828' } },
-                bottom: { style: 'double', color: { argb: 'FFC62828' } },
-                left: c === 6 ? { style: 'medium', color: { argb: 'FFC62828' } } : undefined,
-                right: c === 1 ? { style: 'medium', color: { argb: 'FFC62828' } } : undefined
+            const cell = grandRow.getCell(c);
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEDE7F6' } };
+            cell.border = {
+                top: { style: 'medium', color: { argb: 'FF4A148C' } },
+                bottom: { style: 'double', color: { argb: 'FF4A148C' } },
+                left: { style: 'thin', color: { argb: 'FF000000' } },
+                right: { style: 'thin', color: { argb: 'FF000000' } }
             };
         }
 
         // Summary Signatures
-        sumRowIdx += 2;
-        const sumSigTitleRow = wsSummary.getRow(sumRowIdx);
-        sumSigTitleRow.height = 20;
-        const sumSigLineRow = wsSummary.getRow(sumRowIdx + 1);
-        sumSigLineRow.height = 22;
-        const sumSigTitles = [
-            { col: 'A', title: 'مشرف البند' },
-            { col: 'B', title: 'مهندس الموقع' },
-            { col: 'C', title: 'محاسب المشروع' },
-            { col: 'D', title: 'مدير المشروع' },
-            { col: 'E', title: 'المدير المالي' }
-        ];
-        sumSigTitles.forEach(sc => {
-            const tc = sumSigTitleRow.getCell(sc.col);
-            tc.value = sc.title;
-            tc.font = { name: 'Cairo', size: 10, bold: true, color: { argb: 'FF333333' } };
-            tc.alignment = { vertical: 'middle', horizontal: 'center' };
+        const sumSigRowIdx = sumRowIdx + 2;
+        const sumSigTitles = ['مشرف البند', 'مهندس الموقع', 'محاسب المشروع', 'مدير المشروع', 'المدير المالي'];
+        const sumSigRow = wsSummary.getRow(sumSigRowIdx);
+        sumSigRow.height = 24;
+        const sumSigLineRow = wsSummary.getRow(sumSigRowIdx + 1);
+        sumSigLineRow.height = 32;
 
-            const lc = sumSigLineRow.getCell(sc.col);
-            lc.border = { bottom: { style: 'thin', color: { argb: 'FF000000' } } };
+        sumSigTitles.forEach((t, i) => {
+            const colLetter = String.fromCharCode(65 + i); // A, B, C, D, E
+            const c1 = sumSigRow.getCell(colLetter);
+            c1.value = t;
+            c1.font = { name: 'Cairo', size: 12, bold: true };
+            c1.alignment = { vertical: 'middle', horizontal: 'center' };
+
+            const c2 = sumSigLineRow.getCell(colLetter);
+            c2.value = '......................';
+            c2.font = { name: 'Cairo', size: 11, bold: true };
+            c2.alignment = { vertical: 'bottom', horizontal: 'center' };
         });
 
         // ----------------------------------------------------
-        // Sheets 2..N: Individual Dedicated Sheet for EACH Contractor
+        // Sheets 2..N: Dedicated Sheet for EACH Contractor
         // ----------------------------------------------------
+        const usedSheetNames = new Set(['إجمالي خصومات المقاولين']);
+
         sortedContractors.forEach((contractorKey) => {
             const group = contractorGroups[contractorKey];
             group.records.sort((a, b) => a.date.localeCompare(b.date));
 
-            let safeName = contractorKey.replace(/[\*\?\:\[\]\\\/]/g, '').trim().substring(0, 31);
-            let baseSheetName = safeName || "مقاول";
-            let sheetName = baseSheetName;
+            // Sanitize sheet name: max 31 chars, remove forbidden characters [ ] * ? : / \
+            let rawName = contractorKey.replace(/[\[\]\*\?:\/\\]/g, '_').trim();
+            if (rawName.length > 28) rawName = rawName.substring(0, 28);
+            if (!rawName) rawName = 'مقاول';
+            let sheetName = rawName;
             let counter = 1;
-            while (workbook.getWorksheet(sheetName)) {
-                sheetName = baseSheetName.substring(0, 27) + '(' + counter + ')';
+            while (usedSheetNames.has(sheetName)) {
+                sheetName = rawName.substring(0, 26) + ' (' + counter + ')';
                 counter++;
             }
+            usedSheetNames.add(sheetName);
 
             const ws = workbook.addWorksheet(sheetName, {
                 views: [{ rightToLeft: true }],
@@ -14516,81 +14539,79 @@ document.addEventListener('click', (e) => {
                     orientation: 'landscape',
                     fitToPage: true,
                     fitToWidth: 1,
-                    fitToHeight: 1, // Fit exactly to 1 page!
+                    fitToHeight: 1, // Strictly 1 page
                     margins: { left: 0.25, right: 0.25, top: 0.25, bottom: 0.25, header: 0, footer: 0 }
                 }
             });
 
+            // Generous column widths
             ws.columns = [
-                { width: 6 },  // A: م
-                { width: 20 }, // B: المشرف (مسجل السركي)
-                { width: 14 }, // C: التاريخ
-                { width: 22 }, // D: اسم العامل
-                { width: 16 }, // E: المهنة
-                { width: 20 }, // F: مكان العمل
-                { width: 26 }, // G: بند العمل (بالتفصيل)
-                { width: 18 }, // H: يومية العامل (المخصوم)
-                { width: 22 }  // I: ملاحظات
+                { width: 8 },  // A: م
+                { width: 24 }, // B: المشرف
+                { width: 16 }, // C: التاريخ
+                { width: 30 }, // D: اسم العامل
+                { width: 18 }, // E: المهنة
+                { width: 22 }, // F: مكان العمل
+                { width: 36 }, // G: بند العمل
+                { width: 20 }, // H: قيمة الخصم (ج.م)
+                { width: 28 }  // I: ملاحظات
             ];
 
-            // Row 1: Project box in center (D1:G1)
-            ws.mergeCells('D1:G1');
-            const pBox = ws.getCell('D1');
-            pBox.value = 'Cornerstone Development - Project: The Curve';
-            pBox.font = { name: 'Cairo', size: 13, bold: true, color: { argb: 'FF003366' } };
-            pBox.alignment = { vertical: 'middle', horizontal: 'center' };
-            ws.getRow(1).height = 28;
-            ['D', 'E', 'F', 'G'].forEach(col => {
+            // Row 1: Project box in center (D1:F1)
+            ws.mergeCells('D1:F1');
+            const pbox = ws.getCell('D1');
+            pbox.value = 'Cornerstone Development - Project: The Curve';
+            pbox.font = { name: 'Cairo', size: 14, bold: true, color: { argb: 'FF003366' } };
+            pbox.alignment = { vertical: 'middle', horizontal: 'center' };
+            ws.getRow(1).height = 30;
+            ['D', 'E', 'F'].forEach(col => {
                 const c = ws.getCell(col + '1');
                 c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEEF5FB' } };
                 c.border = {
                     top: { style: 'thin', color: { argb: 'FFB8D4F0' } },
                     bottom: { style: 'thin', color: { argb: 'FFB8D4F0' } },
                     right: col === 'D' ? { style: 'thin', color: { argb: 'FFB8D4F0' } } : undefined,
-                    left: col === 'G' ? { style: 'thin', color: { argb: 'FFB8D4F0' } } : undefined
+                    left: col === 'F' ? { style: 'thin', color: { argb: 'FFB8D4F0' } } : undefined
                 };
             });
 
             if (logoId !== null) {
                 ws.addImage(logoId, {
                     tl: { col: 0.1, row: 0.1 },
-                    ext: { width: 180, height: 57 }
+                    ext: { width: 185, height: 60 }
                 });
             }
 
-            // Row 2: Title with contractor name
+            // Row 2: Title
             ws.mergeCells('A2:I2');
             const titleCell = ws.getCell('A2');
-            titleCell.value = 'كشف خصومات العمالة - مقاول: ' + contractorKey;
-            titleCell.font = { name: 'Cairo', size: 18, bold: true, color: { argb: 'FF4A148C' } };
+            titleCell.value = 'كشف خصومات العمالة على المقاول: ' + contractorKey;
+            titleCell.font = { name: 'Cairo', size: 21, bold: true, color: { argb: 'FF4A148C' } };
             titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
-            ws.getRow(2).height = 34;
+            ws.getRow(2).height = 40;
 
-            // Row 3: Subtitle with date range
+            // Row 3: Subtitle Info (Date Range & Total)
             ws.mergeCells('A3:I3');
-            const dateCell = ws.getCell('A3');
-            dateCell.value = (dateRange ? dateRange + '   |   ' : '') + 'المقاول: ' + contractorKey + '   |   عدد اليوميات: ' + group.totalCount + ' يومية';
-            dateCell.font = { name: 'Cairo', size: 12, bold: true, color: { argb: 'FF333333' } };
-            dateCell.alignment = { vertical: 'middle', horizontal: 'center' };
-            ws.getRow(3).height = 22;
+            const subTitle = ws.getCell('A3');
+            subTitle.value = 'الفترة: ' + dateRange + '  |  إجمالي عدد اليوميات: ' + group.totalCount + ' يومية  |  إجمالي الخصم: ' + group.totalAmount.toLocaleString('en-US') + ' ج.م';
+            subTitle.font = { name: 'Cairo', size: 12.5, bold: true, color: { argb: 'FF333333' } };
+            subTitle.alignment = { vertical: 'middle', horizontal: 'center' };
+            ws.getRow(3).height = 24;
 
-            // Row 4: Separator line
-            ws.getRow(4).height = 6;
+            // Row 4: Separator
+            ws.getRow(4).height = 8;
             ['A','B','C','D','E','F','G','H','I'].forEach(col => {
                 ws.getCell(col + '4').border = { bottom: { style: 'medium', color: { argb: 'FF000000' } } };
             });
 
-            // Row 5: Table headers
+            // Row 5: Table Headers
             const headerRow = ws.getRow(5);
-            headerRow.height = 28;
-            const headers = [
-                'م', 'المشرف (مسجل السركي)', 'التاريخ', 'اسم العامل',
-                'المهنة', 'مكان العمل', 'بند العمل (بالتفصيل)', 'يومية العامل (المخصوم)', 'ملاحظات'
-            ];
+            headerRow.height = 34;
+            const headers = ['م', 'المشرف (مسجل السركي)', 'التاريخ', 'اسم العامل', 'المهنة', 'مكان العمل', 'بند العمل (بالتفصيل)', 'قيمة الخصم (ج.م)', 'ملاحظات'];
             headers.forEach((h, idx) => {
                 const cell = headerRow.getCell(idx + 1);
                 cell.value = h;
-                cell.font = { name: 'Cairo', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
+                cell.font = { name: 'Cairo', size: 11.5, bold: true, color: { argb: 'FFFFFFFF' } };
                 cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4A148C' } };
                 cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
                 cell.border = {
@@ -14601,129 +14622,137 @@ document.addEventListener('click', (e) => {
                 };
             });
 
-            let curRow = 6;
-            group.records.forEach((r, idx) => {
-                const row = ws.getRow(curRow);
-                row.height = 24;
+            // Dynamic row height for contractor records: when few records, give spacious height
+            const isFewRecords = group.records.length <= 6;
+            const cDataRowHeight = isFewRecords ? 36 : (group.records.length <= 14 ? 29 : 24);
+            const cDataFontSize = isFewRecords ? 12.5 : (group.records.length <= 14 ? 11 : 10);
 
-                row.getCell(1).value = idx + 1;
-                row.getCell(2).value = r.supervisor;
-                row.getCell(3).value = UI.formatDisplayDate(r.date);
-                row.getCell(4).value = r.workerName;
-                row.getCell(5).value = r.type;
-                row.getCell(6).value = r.location;
-                row.getCell(7).value = r.task;
-                row.getCell(8).value = r.amount;
-                row.getCell(8).numFmt = '#,##0';
-                row.getCell(9).value = r.notes;
+            let rowIdx = 6;
+            group.records.forEach((rec, idx) => {
+                const r = ws.getRow(rowIdx);
+                r.height = cDataRowHeight;
+
+                r.getCell(1).value = idx + 1;
+                r.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' };
+                r.getCell(1).font = { name: 'Cairo', size: cDataFontSize, bold: true };
+
+                r.getCell(2).value = rec.supervisor;
+                r.getCell(2).alignment = { vertical: 'middle', horizontal: 'center' };
+                r.getCell(2).font = { name: 'Cairo', size: cDataFontSize };
+
+                r.getCell(3).value = rec.date;
+                r.getCell(3).alignment = { vertical: 'middle', horizontal: 'center' };
+                r.getCell(3).font = { name: 'Cairo', size: cDataFontSize };
+
+                r.getCell(4).value = rec.workerName;
+                r.getCell(4).alignment = { vertical: 'middle', horizontal: 'right' };
+                r.getCell(4).font = { name: 'Cairo', size: cDataFontSize + 0.5, bold: true };
+
+                r.getCell(5).value = rec.type;
+                r.getCell(5).alignment = { vertical: 'middle', horizontal: 'center' };
+                r.getCell(5).font = { name: 'Cairo', size: cDataFontSize };
+
+                r.getCell(6).value = rec.location || '-';
+                r.getCell(6).alignment = { vertical: 'middle', horizontal: 'center' };
+                r.getCell(6).font = { name: 'Cairo', size: cDataFontSize };
+
+                r.getCell(7).value = rec.task || '-';
+                r.getCell(7).alignment = { vertical: 'middle', horizontal: 'right' };
+                r.getCell(7).font = { name: 'Cairo', size: cDataFontSize };
+
+                r.getCell(8).value = rec.amount;
+                r.getCell(8).alignment = { vertical: 'middle', horizontal: 'center' };
+                r.getCell(8).numFmt = '#,##0.00';
+                r.getCell(8).font = { name: 'Cairo', size: cDataFontSize + 0.5, bold: true, color: { argb: 'FF1B5E20' } };
+
+                r.getCell(9).value = rec.notes || '';
+                r.getCell(9).alignment = { vertical: 'middle', horizontal: 'right' };
+                r.getCell(9).font = { name: 'Cairo', size: cDataFontSize };
 
                 for (let c = 1; c <= 9; c++) {
-                    const cell = row.getCell(c);
-                    cell.font = { name: 'Cairo', size: 11, bold: c === 4 || c === 8 };
-                    cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                    const cell = r.getCell(c);
                     cell.border = {
-                        top: { style: 'thin', color: { argb: 'FFCCCCCC' } },
-                        bottom: { style: 'thin', color: { argb: 'FFCCCCCC' } },
-                        left: { style: 'thin', color: { argb: 'FFCCCCCC' } },
-                        right: { style: 'thin', color: { argb: 'FFCCCCCC' } }
+                        top: { style: 'thin', color: { argb: 'FFBDBDBD' } },
+                        bottom: { style: 'thin', color: { argb: 'FFBDBDBD' } },
+                        left: { style: 'thin', color: { argb: 'FF000000' } },
+                        right: { style: 'thin', color: { argb: 'FF000000' } }
                     };
+                    if (idx % 2 === 1) {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF9F9F9' } };
+                    }
                 }
-                curRow++;
+                rowIdx++;
             });
 
-            // Contractor Subtotal Row
-            const totalRow = ws.getRow(curRow);
-            totalRow.height = 28;
-            ws.mergeCells(`A${curRow}:G${curRow}`);
-            const tLabel = ws.getCell(`A${curRow}`);
-            tLabel.value = 'إجمالي خصم المقاول (' + contractorKey + ') - عدد ' + group.totalCount + ' يومية:';
-            tLabel.font = { name: 'Cairo', size: 12, bold: true, color: { argb: 'FF1B5E20' } };
-            tLabel.alignment = { vertical: 'middle', horizontal: 'right', indent: 1 };
-            tLabel.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE8F5E9' } };
+            // Contractor Subtotal row
+            const subRow = ws.getRow(rowIdx);
+            subRow.height = cDataRowHeight + 4;
+            ws.mergeCells(`A${rowIdx}:G${rowIdx}`);
+            const subTitleCell = subRow.getCell(1);
+            subTitleCell.value = 'إجمالي خصومات المقاول (' + group.totalCount + ' يومية):';
+            subTitleCell.font = { name: 'Cairo', size: cDataFontSize + 1.5, bold: true, color: { argb: 'FF4A148C' } };
+            subTitleCell.alignment = { vertical: 'middle', horizontal: 'right' };
 
-            const tAmt = totalRow.getCell(8);
-            tAmt.value = group.totalAmount;
-            tAmt.numFmt = '#,##0';
-            tAmt.font = { name: 'Cairo', size: 13, bold: true, color: { argb: 'FF1B5E20' } };
-            tAmt.alignment = { vertical: 'middle', horizontal: 'center' };
-            tAmt.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE8F5E9' } };
+            const subAmountCell = subRow.getCell(8);
+            subAmountCell.value = group.totalAmount;
+            subAmountCell.alignment = { vertical: 'middle', horizontal: 'center' };
+            subAmountCell.numFmt = '#,##0.00" ج.م"';
+            subAmountCell.font = { name: 'Cairo', size: cDataFontSize + 2, bold: true, color: { argb: 'FF4A148C' } };
 
-            totalRow.getCell(9).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE8F5E9' } };
+            subRow.getCell(9).value = '';
 
             for (let c = 1; c <= 9; c++) {
-                totalRow.getCell(c).border = {
-                    top: { style: 'thin', color: { argb: 'FF81C784' } },
-                    bottom: { style: 'medium', color: { argb: 'FF2E7D32' } },
-                    left: c === 9 ? { style: 'medium', color: { argb: 'FF2E7D32' } } : undefined,
-                    right: c === 1 ? { style: 'medium', color: { argb: 'FF2E7D32' } } : undefined
+                const cell = subRow.getCell(c);
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEDE7F6' } };
+                cell.border = {
+                    top: { style: 'medium', color: { argb: 'FF4A148C' } },
+                    bottom: { style: 'double', color: { argb: 'FF4A148C' } },
+                    left: { style: 'thin', color: { argb: 'FF000000' } },
+                    right: { style: 'thin', color: { argb: 'FF000000' } }
                 };
             }
 
-            // Signatures block below the table
-            curRow += 2;
-            const sigTitleRow = ws.getRow(curRow);
-            sigTitleRow.height = 20;
-            const sigLineRow = ws.getRow(curRow + 1);
-            sigLineRow.height = 22;
+            // Signatures block
+            const sigRowIdx = rowIdx + 2;
+            const sigTitles = ['مشرف البند', 'مهندس الموقع', 'محاسب المشروع', 'مدير المشروع', 'المدير المالي'];
+            const sigRow = ws.getRow(sigRowIdx);
+            sigRow.height = 24;
+            const sigLineRow = ws.getRow(sigRowIdx + 1);
+            sigLineRow.height = 32;
 
-            const sigCols = [
-                { start: 'A', end: 'B', title: 'مشرف البند' },
-                { start: 'C', end: 'D', title: 'مهندس الموقع' },
-                { start: 'E', end: 'F', title: 'محاسب المشروع' },
-                { start: 'G', end: 'G', title: 'مدير المشروع' },
-                { start: 'H', end: 'I', title: 'المدير المالي' }
-            ];
-            sigCols.forEach(sc => {
-                if (sc.start === sc.end) {
-                    const c = sigTitleRow.getCell(sc.start);
-                    c.value = sc.title;
-                    c.font = { name: 'Cairo', size: 10, bold: true, color: { argb: 'FF333333' } };
-                    c.alignment = { vertical: 'middle', horizontal: 'center' };
+            // Map across columns B, C, E, G, H
+            const sigCols = ['B', 'C', 'E', 'G', 'I'];
+            sigTitles.forEach((t, i) => {
+                const colLetter = sigCols[i];
+                const c1 = sigRow.getCell(colLetter);
+                c1.value = t;
+                c1.font = { name: 'Cairo', size: 12, bold: true };
+                c1.alignment = { vertical: 'middle', horizontal: 'center' };
 
-                    const lc = sigLineRow.getCell(sc.start);
-                    lc.border = { bottom: { style: 'thin', color: { argb: 'FF000000' } } };
-                } else {
-                    ws.mergeCells(`${sc.start}${curRow}:${sc.end}${curRow}`);
-                    const c = ws.getCell(`${sc.start}${curRow}`);
-                    c.value = sc.title;
-                    c.font = { name: 'Cairo', size: 10, bold: true, color: { argb: 'FF333333' } };
-                    c.alignment = { vertical: 'middle', horizontal: 'center' };
-
-                    ws.mergeCells(`${sc.start}${curRow + 1}:${sc.end}${curRow + 1}`);
-                    const lc = ws.getCell(`${sc.start}${curRow + 1}`);
-                    lc.border = { bottom: { style: 'thin', color: { argb: 'FF000000' } } };
-                }
+                const c2 = sigLineRow.getCell(colLetter);
+                c2.value = '......................';
+                c2.font = { name: 'Cairo', size: 11, bold: true };
+                c2.alignment = { vertical: 'bottom', horizontal: 'center' };
             });
         });
 
-        // Download workbook file
+        // Generate and download Excel
+        const dateStr = new Date().toISOString().split('T')[0];
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const today = new Date().toISOString().split('T')[0];
-        const filename = `تقرير_خصومات_المقاولين_${today}.xlsx`;
-
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-            window.navigator.msSaveOrOpenBlob(blob, filename);
-        } else {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => {
-                if (a.parentNode) document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            }, 60000);
-        }
-
-        if (window.UI && typeof window.UI.notify === 'function') {
-            window.UI.notify('تم تصدير تقرير خصومات المقاولين Excel (شيت مخصص لكل مقاول) بنجاح', 'success');
-        }
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `تقرير_خصومات_المقاولين_${dateStr}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 300);
     };
 
-    // --- New Feature: Contractor Deductions PDF Export/Print (1 Page Per Contractor + Auto Fit) ---
+    // --- Contractor Deductions PDF Print (Single-Page Fit with Generous Spacious Rows) ---
     window.printContractorDeductionsPDF = async function() {
         let rows = Array.from(document.querySelectorAll('#report-results-list tr'));
         let visibleRows = rows.filter(r => r.style.display !== 'none' && r.cells.length > 5);
@@ -14812,30 +14841,47 @@ document.addEventListener('click', (e) => {
         // Page 1 (Only if multiple contractors): Master Summary Page
         // ----------------------------------------------------
         if (sortedContractors.length > 1) {
+            const sumCount = sortedContractors.length;
+            let sumRowH = 55;
+            let sumFont = 16;
+            let sumPadV = 14;
+            let sumTheadH = 48;
+            let sumTheadFont = 15;
+
+            if (sumCount <= 3) {
+                sumRowH = 58; sumFont = 16.5; sumPadV = 15; sumTheadH = 50; sumTheadFont = 15.5;
+            } else if (sumCount <= 6) {
+                sumRowH = 46; sumFont = 14.5; sumPadV = 10; sumTheadH = 44; sumTheadFont = 14;
+            } else if (sumCount <= 12) {
+                sumRowH = 35; sumFont = 12.5; sumPadV = 6; sumTheadH = 36; sumTheadFont = 12;
+            } else {
+                sumRowH = 26; sumFont = 11; sumPadV = 3; sumTheadH = 30; sumTheadFont = 11;
+            }
+
             let summaryTableRows = '';
             sortedContractors.forEach((k, idx) => {
                 const grp = contractorGroups[k];
                 const pct = grandTotalAmount > 0 ? ((grp.totalAmount / grandTotalAmount) * 100).toFixed(1) + '%' : '0%';
                 summaryTableRows += `
-                    <tr style="height: 28px;">
-                        <td style="width: 5%; font-weight: bold;">${idx + 1}</td>
-                        <td style="width: 35%; font-weight: bold; color: #4a148c; text-align: right; padding-right: 12px;">${k}</td>
-                        <td style="width: 18%; font-weight: bold; font-variant-numeric: tabular-nums;">${grp.totalCount.toLocaleString()} يومية</td>
-                        <td style="width: 22%; font-weight: bold; color: #1b5e20; font-variant-numeric: tabular-nums;">${grp.totalAmount.toLocaleString()} ج.م</td>
-                        <td style="width: 20%; font-weight: bold;">${pct}</td>
+                    <tr style="height: ${sumRowH}px;">
+                        <td style="width: 6%; font-weight: bold; font-size: ${sumFont}px; padding: ${sumPadV}px 4px;">${idx + 1}</td>
+                        <td style="width: 34%; font-weight: bold; color: #4a148c; font-size: ${sumFont + 0.5}px; text-align: right; padding-right: 16px; padding-top: ${sumPadV}px; padding-bottom: ${sumPadV}px;">${k}</td>
+                        <td style="width: 20%; font-weight: bold; font-size: ${sumFont}px; font-variant-numeric: tabular-nums; padding: ${sumPadV}px 4px;">${grp.totalCount.toLocaleString()} يومية</td>
+                        <td style="width: 22%; font-weight: bold; color: #1b5e20; font-size: ${sumFont + 0.5}px; font-variant-numeric: tabular-nums; padding: ${sumPadV}px 4px;">${grp.totalAmount.toLocaleString()} ج.م</td>
+                        <td style="width: 18%; font-weight: bold; font-size: ${sumFont}px; padding: ${sumPadV}px 4px;">${pct}</td>
                     </tr>
                 `;
             });
 
             summaryTableRows += `
-                <tr style="height: 32px; background-color: #ede7f6; font-weight: 800; font-size: 13px; border-top: 2px solid #4a148c;">
-                    <td colspan="2" style="text-align: right; padding-right: 12px; color: #4a148c;">
+                <tr style="height: ${sumRowH + 6}px; background-color: #ede7f6; font-weight: 800; font-size: ${sumFont + 1}px; border-top: 2.5px solid #4a148c;">
+                    <td colspan="2" style="text-align: right; padding-right: 16px; color: #4a148c;">
                         الإجمالي العام لجميع المقاولين (${sortedContractors.length} مقاول):
                     </td>
                     <td style="color: #4a148c; font-variant-numeric: tabular-nums;">
                         ${grandTotalDays.toLocaleString()} يومية
                     </td>
-                    <td style="color: #4a148c; font-size: 14px; font-variant-numeric: tabular-nums;">
+                    <td style="color: #4a148c; font-size: ${sumFont + 1.5}px; font-variant-numeric: tabular-nums;">
                         ${grandTotalAmount.toLocaleString()} ج.م
                     </td>
                     <td style="color: #4a148c;">100%</td>
@@ -14843,7 +14889,7 @@ document.addEventListener('click', (e) => {
             `;
 
             pagesHtml += `
-            <div class="contractor-page density-normal">
+            <div class="contractor-page">
                 <div class="header">
                     <img src="/logo.png?v=2" class="logo-img" alt="Logo" onerror="if(window.CORNERSTONE_LOGO_BASE64)this.src='data:image/png;base64,'+window.CORNERSTONE_LOGO_BASE64;else this.style.display='none';">
                     <div class="project-title-box">Cornerstone Development - Project: The Curve</div>
@@ -14858,14 +14904,14 @@ document.addEventListener('click', (e) => {
                 </div>
 
                 <div class="table-container">
-                    <table style="font-size: 12px;">
+                    <table style="font-size: ${sumFont}px;">
                         <thead>
-                            <tr style="height: 34px;">
-                                <th style="width: 5%;">م</th>
-                                <th style="width: 35%;">اسم المقاول</th>
-                                <th style="width: 18%;">عدد اليوميات المخصومة</th>
-                                <th style="width: 22%;">إجمالي مبلغ الخصم</th>
-                                <th style="width: 20%;">نسبة الخصم من الإجمالي</th>
+                            <tr style="height: ${sumTheadH}px;">
+                                <th style="width: 6%; font-size: ${sumTheadFont}px;">م</th>
+                                <th style="width: 34%; font-size: ${sumTheadFont}px;">اسم المقاول</th>
+                                <th style="width: 20%; font-size: ${sumTheadFont}px;">عدد اليوميات المخصومة</th>
+                                <th style="width: 22%; font-size: ${sumTheadFont}px;">إجمالي مبلغ الخصم</th>
+                                <th style="width: 18%; font-size: ${sumTheadFont}px;">نسبة الخصم من الإجمالي</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -14886,7 +14932,7 @@ document.addEventListener('click', (e) => {
         }
 
         // ----------------------------------------------------
-        // Dedicated Page for EACH Contractor (Fit to Exactly 1 Page)
+        // Dedicated Page for EACH Contractor (Spacious & Fitted)
         // ----------------------------------------------------
         sortedContractors.forEach((contractorKey) => {
             const group = contractorGroups[contractorKey];
@@ -14894,47 +14940,87 @@ document.addEventListener('click', (e) => {
 
             const rowCount = group.records.length;
 
-            // Target body height for landscape A4 is ~480-500px inside container
-            const targetBodyHeight = 485;
-            const calcRowHeight = Math.floor(targetBodyHeight / Math.max(1, rowCount));
-            const rowHeight = Math.max(16, Math.min(65, calcRowHeight));
-
-            let fontSize = 14.5;
-            let thFontSize = 13.5;
-            let paddingV = 5;
+            // Target body height for landscape A4 is ~460px inside container
+            let rowHeight = 44;
+            let fontSize = 14;
+            let thFontSize = 13;
+            let paddingV = 8;
             let theadHeight = 42;
-            let lineHeight = 1.25;
+            let lineHeight = 1.3;
 
-            if (rowHeight >= 50) {
-                fontSize = 14.5; thFontSize = 13.5; paddingV = 5; theadHeight = 42;
-            } else if (rowHeight >= 38) {
-                fontSize = 13.0; thFontSize = 12.0; paddingV = 4; theadHeight = 36;
-            } else if (rowHeight >= 28) {
-                fontSize = 11.8; thFontSize = 11.0; paddingV = 3; theadHeight = 32;
-            } else if (rowHeight >= 22) {
-                fontSize = 10.8; thFontSize = 10.0; paddingV = 2; theadHeight = 28;
-            } else if (rowHeight >= 18) {
-                fontSize = 9.8; thFontSize = 9.0; paddingV = 1.5; theadHeight = 26;
+            if (rowCount <= 3) {
+                rowHeight = 56;
+                fontSize = 16;
+                thFontSize = 15;
+                paddingV = 14;
+                theadHeight = 48;
+                lineHeight = 1.35;
+            } else if (rowCount <= 6) {
+                rowHeight = 46;
+                fontSize = 14.5;
+                thFontSize = 13.5;
+                paddingV = 10;
+                theadHeight = 44;
+                lineHeight = 1.3;
+            } else if (rowCount <= 10) {
+                rowHeight = 38;
+                fontSize = 13.0;
+                thFontSize = 12.0;
+                paddingV = 7;
+                theadHeight = 38;
+                lineHeight = 1.25;
+            } else if (rowCount <= 16) {
+                rowHeight = 28;
+                fontSize = 11.5;
+                thFontSize = 11.0;
+                paddingV = 4;
+                theadHeight = 32;
+                lineHeight = 1.2;
+            } else if (rowCount <= 22) {
+                rowHeight = 21;
+                fontSize = 10.0;
+                thFontSize = 9.5;
+                paddingV = 2;
+                theadHeight = 26;
+                lineHeight = 1.15;
             } else {
-                fontSize = 8.8; thFontSize = 8.2; paddingV = 1; theadHeight = 24; lineHeight = 1.15;
+                rowHeight = Math.max(16, Math.floor(400 / rowCount));
+                fontSize = 9.0;
+                thFontSize = 8.5;
+                paddingV = 1;
+                theadHeight = 24;
+                lineHeight = 1.1;
             }
 
             let recordsHtml = '';
             group.records.forEach((r, idx) => {
                 recordsHtml += `
                     <tr style="height: ${rowHeight}px;">
-                        <td style="padding: ${paddingV}px 2px; font-weight: bold;">${idx + 1}</td>
-                        <td style="padding: ${paddingV}px 2px;">${r.supervisor}</td>
-                        <td style="padding: ${paddingV}px 2px; white-space: nowrap;"><span dir="ltr">${UI.formatDisplayDate(r.date)}</span></td>
-                        <td style="padding: ${paddingV}px 2px; font-weight: bold;">${r.workerName}</td>
-                        <td style="padding: ${paddingV}px 2px;">${r.type}</td>
-                        <td style="padding: ${paddingV}px 2px;">${r.location || '-'}</td>
-                        <td style="padding: ${paddingV}px 2px; text-align: right; padding-right: 6px;">${r.task || '-'}</td>
-                        <td style="padding: ${paddingV}px 2px; font-weight: bold; color: #1b5e20; font-variant-numeric: tabular-nums;">${r.amount.toLocaleString()}</td>
-                        <td style="padding: ${paddingV}px 2px;">${r.notes || ''}</td>
+                        <td style="padding: ${paddingV}px 4px; font-weight: bold;">${idx + 1}</td>
+                        <td style="padding: ${paddingV}px 4px;">${r.supervisor}</td>
+                        <td style="padding: ${paddingV}px 4px; white-space: nowrap;"><span dir="ltr">${UI.formatDisplayDate(r.date)}</span></td>
+                        <td style="padding: ${paddingV}px 6px; font-weight: bold; text-align: right;">${r.workerName}</td>
+                        <td style="padding: ${paddingV}px 4px;">${r.type}</td>
+                        <td style="padding: ${paddingV}px 4px;">${r.location || '-'}</td>
+                        <td style="padding: ${paddingV}px 6px; text-align: right;">${r.task || '-'}</td>
+                        <td style="padding: ${paddingV}px 4px; font-weight: bold; color: #1b5e20; font-variant-numeric: tabular-nums;">${r.amount.toLocaleString()}</td>
+                        <td style="padding: ${paddingV}px 4px;">${r.notes || ''}</td>
                     </tr>
                 `;
             });
+
+            // Add Subtotal Row at bottom of table
+            recordsHtml += `
+                <tr style="height: ${rowHeight + 4}px; background-color: #ede7f6; font-weight: 800; font-size: ${fontSize + 1}px; border-top: 2.5px solid #4a148c;">
+                    <td colspan="7" style="text-align: right; padding-right: 14px; color: #4a148c;">
+                        إجمالي خصومات المقاول (${group.totalCount} يومية):
+                    </td>
+                    <td style="color: #4a148c; font-size: ${fontSize + 1.5}px; font-variant-numeric: tabular-nums;">
+                        ${group.totalAmount.toLocaleString()} ج.م
+                    </td>
+                    <td></td>
+                </tr>
+            `;
 
             pagesHtml += `
             <div class="contractor-page">
@@ -14955,15 +15041,15 @@ document.addEventListener('click', (e) => {
                     <table style="font-size: ${fontSize}px; line-height: ${lineHeight};">
                         <thead>
                             <tr style="height: ${theadHeight}px;">
-                                <th style="width: 3.5%; font-size: ${thFontSize}px;">م</th>
-                                <th style="width: 14%; font-size: ${thFontSize}px;">المشرف (مسجل السركي)</th>
-                                <th style="width: 11%; font-size: ${thFontSize}px;">التاريخ</th>
+                                <th style="width: 4%; font-size: ${thFontSize}px;">م</th>
+                                <th style="width: 13%; font-size: ${thFontSize}px;">المشرف (مسجل السركي)</th>
+                                <th style="width: 10%; font-size: ${thFontSize}px;">التاريخ</th>
                                 <th style="width: 16%; font-size: ${thFontSize}px;">اسم العامل</th>
                                 <th style="width: 10%; font-size: ${thFontSize}px;">المهنة</th>
-                                <th style="width: 13%; font-size: ${thFontSize}px;">مكان العمل</th>
+                                <th style="width: 12%; font-size: ${thFontSize}px;">مكان العمل</th>
                                 <th style="width: 17%; font-size: ${thFontSize}px;">بند العمل (بالتفصيل)</th>
                                 <th style="width: 10%; font-size: ${thFontSize}px;">يومية العامل (المخصوم)</th>
-                                <th style="width: 10%; font-size: ${thFontSize}px;">ملاحظات</th>
+                                <th style="width: 8%; font-size: ${thFontSize}px;">ملاحظات</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -14995,7 +15081,7 @@ document.addEventListener('click', (e) => {
                 @media print {
                     @page { 
                         size: A4 landscape; 
-                        margin: 0.35cm 1.2cm; 
+                        margin: 0.35cm 1.0cm; 
                     }
                     html, body {
                         margin: 0 !important;
@@ -15033,8 +15119,9 @@ document.addEventListener('click', (e) => {
                 .contractor-page { 
                     width: 100%; 
                     height: 100%;
-                    max-height: 198mm;
-                    padding: 0.15cm 0.4cm; 
+                    min-height: 190mm;
+                    max-height: 200mm;
+                    padding: 0.2cm 0.4cm; 
                     box-sizing: border-box; 
                     display: flex; 
                     flex-direction: column; 
@@ -15048,26 +15135,26 @@ document.addEventListener('click', (e) => {
                 .header { 
                     position: relative; 
                     text-align: center; 
-                    margin-bottom: 4px; 
-                    border-bottom: 2px solid #4a148c; 
-                    padding-bottom: 4px; 
+                    margin-bottom: 5px; 
+                    border-bottom: 2.5px solid #4a148c; 
+                    padding-bottom: 5px; 
                     page-break-inside: avoid;
                     break-inside: avoid;
                     flex-shrink: 0;
                 }
                 .header h1 { 
-                    margin: 1px 0; 
-                    font-size: 19px; 
+                    margin: 2px 0; 
+                    font-size: 21px; 
                     font-weight: 800; 
                     color: #4a148c;
                 }
                 .project-title-box {
                     background-color: #eef5fb;
                     color: #003366;
-                    padding: 2.5px 16px;
+                    padding: 3px 18px;
                     border-radius: 6px;
                     display: inline-block;
-                    font-size: 13px;
+                    font-size: 13.5px;
                     font-weight: bold;
                     margin: 0;
                     border: 1px solid #b8d4f0;
@@ -15075,8 +15162,8 @@ document.addEventListener('click', (e) => {
                     print-color-adjust: exact;
                 }
                 .header p { 
-                    margin: 1.5px 0 0 0; 
-                    font-size: 12px; 
+                    margin: 2px 0 0 0; 
+                    font-size: 13px; 
                     color: #333;
                     font-weight: 600;
                 }
@@ -15085,7 +15172,7 @@ document.addEventListener('click', (e) => {
                     right: 0; 
                     top: 50%; 
                     transform: translateY(-50%); 
-                    max-height: 54px; 
+                    max-height: 56px; 
                     width: auto;
                     object-fit: contain;
                 }
@@ -15093,7 +15180,7 @@ document.addEventListener('click', (e) => {
                 /* TABLE WRAPPER */
                 .table-container {
                     width: 100%;
-                    margin-bottom: 6px;
+                    margin-bottom: 8px;
                     page-break-inside: avoid;
                     break-inside: avoid;
                     overflow: visible;
@@ -15106,7 +15193,7 @@ document.addEventListener('click', (e) => {
                     margin: 0;
                     page-break-inside: avoid;
                     break-inside: avoid;
-                    border: 1.5px solid #4a148c;
+                    border: 2px solid #4a148c;
                 }
                 th, td { 
                     border: 1px solid #777; 
@@ -15127,14 +15214,14 @@ document.addEventListener('click', (e) => {
                     display: flex; 
                     justify-content: space-between; 
                     align-items: center; 
-                    font-size: 12px; 
+                    font-size: 13.5px; 
                     margin-top: 0;
-                    margin-bottom: 6px; 
+                    margin-bottom: 8px; 
                     font-weight: bold; 
-                    border: 1px solid #4a148c; 
-                    padding: 4px 14px; 
+                    border: 1.5px solid #4a148c; 
+                    padding: 6px 18px; 
                     background: #f3e5f5 !important; 
-                    border-radius: 5px;
+                    border-radius: 6px;
                     page-break-inside: avoid !important; 
                     break-inside: avoid !important; 
                     flex-shrink: 0; 
@@ -15143,6 +15230,7 @@ document.addEventListener('click', (e) => {
                 }
                 .summary span {
                     color: #4a148c;
+                    font-size: 15px;
                 }
 
                 /* SIGNATURES */
@@ -15150,7 +15238,7 @@ document.addEventListener('click', (e) => {
                     display: flex; 
                     justify-content: space-between; 
                     margin-top: auto; 
-                    padding-top: 4px; 
+                    padding-top: 6px; 
                     page-break-inside: avoid !important; 
                     break-inside: avoid !important; 
                     flex-shrink: 0; 
@@ -15158,15 +15246,15 @@ document.addEventListener('click', (e) => {
                 .sig-box { 
                     text-align: center; 
                     width: 16%; 
-                    font-size: 11px; 
+                    font-size: 12px; 
                     font-weight: bold; 
                     color: #222;
                     page-break-inside: avoid !important; 
                     break-inside: avoid !important; 
                 }
                 .sig-line { 
-                    border-bottom: 1px solid #000; 
-                    margin-top: 22px; 
+                    border-bottom: 1.5px solid #000; 
+                    margin-top: 28px; 
                 }
             </style>
         </head>
@@ -15176,10 +15264,13 @@ document.addEventListener('click', (e) => {
         </html>
         `;
 
+        // Render iframe with explicit A4 landscape dimensions to prevent false shrink
         const iframe = document.createElement('iframe');
-        iframe.style.position = 'absolute';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
+        iframe.style.position = 'fixed';
+        iframe.style.right = '-9999px';
+        iframe.style.bottom = '-9999px';
+        iframe.style.width = '297mm';
+        iframe.style.height = '210mm';
         iframe.style.border = 'none';
         iframe.style.visibility = 'hidden';
         iframe.srcdoc = printHtml;
@@ -15193,19 +15284,22 @@ document.addEventListener('click', (e) => {
                     pages.forEach(page => {
                         let attempts = 0;
                         const tbl = page.querySelector('table');
-                        if (tbl) {
-                            while (page.scrollHeight > page.clientHeight && attempts < 15) {
+                        // Only perform shrink adjustment if page truly exceeds clientHeight AND clientHeight is measured properly
+                        if (tbl && page.clientHeight > 300) {
+                            while (page.scrollHeight > (page.clientHeight + 4) && attempts < 12) {
                                 attempts++;
-                                const curSize = parseFloat(window.getComputedStyle(tbl).fontSize) || 10;
-                                tbl.style.fontSize = (curSize - 0.4) + 'px';
+                                const curSize = parseFloat(window.getComputedStyle(tbl).fontSize) || 12;
+                                tbl.style.fontSize = Math.max(8.5, curSize - 0.5) + 'px';
                                 tbl.querySelectorAll('tr').forEach(r => {
-                                    const h = parseFloat(r.style.height) || 20;
-                                    if (h > 14) r.style.height = (h - 2) + 'px';
+                                    const h = parseFloat(r.style.height) || 24;
+                                    if (h > 16) r.style.height = (h - 2) + 'px';
                                 });
                                 tbl.querySelectorAll('th, td').forEach(c => {
-                                    c.style.paddingTop = '1px';
-                                    c.style.paddingBottom = '1px';
-                                    c.style.lineHeight = '1.1';
+                                    const curPad = parseFloat(window.getComputedStyle(c).paddingTop) || 4;
+                                    if (curPad > 2) {
+                                        c.style.paddingTop = (curPad - 1) + 'px';
+                                        c.style.paddingBottom = (curPad - 1) + 'px';
+                                    }
                                 });
                             }
                         }

@@ -1,4 +1,4 @@
-// Service Worker v7.2 - Fit contractor deductions report to single page per contractor (PDF & Excel)
+// Service Worker v7.3 - Spacious layout and row sizing for contractor deductions report (PDF & Excel)
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
