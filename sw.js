@@ -1,4 +1,4 @@
-// Service Worker v7.1 - Ensure worker directory & engineer dropdown populated for all permitted roles
+// Service Worker v7.2 - Fit contractor deductions report to single page per contractor (PDF & Excel)
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
