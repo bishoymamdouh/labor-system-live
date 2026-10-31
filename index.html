@@ -1561,9 +1561,9 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=7.4').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=7.5').then(reg => {
                 reg.update();
-                console.log('ServiceWorker v7.1 registered cleanly.');
+                console.log('ServiceWorker v7.5 registered cleanly.');
             });
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -1795,7 +1795,7 @@ select {
 
                         </div>
                         <div class="form-group">
-                            <input type="number" id="dir-worker-amount" required min="0" placeholder="اليومية الافتراضية">
+                            <input type="number" id="dir-worker-amount" required min="0" step="any" placeholder="اليومية الافتراضية">
                         </div>
                         <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> إضافة لقاعدة العمال</button>
                     </form>
@@ -1926,16 +1926,16 @@ select {
                                 <datalist id="eq-admin-contractors-datalist"></datalist>
                             </div>
                             <div>
+                                <label style="font-size: 0.82rem; font-weight: bold;">يومية المعدة (جنيه) <span style="color:red;">*</span></label>
+                                <input type="number" id="new-eq-daily-rate" class="modal-input" min="0" step="any" placeholder="مثل: 3600" oninput="app.calcNewEqHourlyRate()">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: bold;">ساعات اليومية المحددة <span style="color:red;">*</span></label>
+                                <input type="number" id="new-eq-daily-hours" class="modal-input" min="0.1" max="24" step="any" value="8" required oninput="app.onNewEqHoursChange()">
+                            </div>
+                            <div>
                                 <label style="font-size: 0.82rem; font-weight: bold;">سعر الساعة (جنيه) <span style="color:red;">*</span></label>
-                                <input type="number" id="new-eq-hourly-rate" class="modal-input" min="0" step="10" placeholder="مثل: 450" required oninput="app.calcNewEqDaily()">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.82rem; font-weight: bold;">ساعات اليومية المحددة</label>
-                                <input type="number" id="new-eq-daily-hours" class="modal-input" min="1" max="24" value="8" required oninput="app.calcNewEqDaily()">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.82rem; font-weight: bold;">يومية المعدة (جنيه)</label>
-                                <input type="number" id="new-eq-daily-rate" class="modal-input" min="0" placeholder="اليومية">
+                                <input type="number" id="new-eq-hourly-rate" class="modal-input" min="0" step="any" placeholder="يُحسب تلقائياً أو أدخله" required oninput="app.calcNewEqDaily()">
                             </div>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
@@ -2923,7 +2923,7 @@ select {
                             </div>
                             <div class="form-group quarter">
                                 <label for="eq-entry-break-hours"><i class="fas fa-pause text-warning"></i> <strong>وقت مستقطع (ساعات)</strong></label>
-                                <input type="number" id="eq-entry-break-hours" class="modal-input" min="0" step="0.25" value="0" placeholder="0" oninput="app.recalcEquipmentEntryHours()">
+                                <input type="number" id="eq-entry-break-hours" class="modal-input" min="0" step="any" value="0" placeholder="0" oninput="app.recalcEquipmentEntryHours()">
                             </div>
                             <div class="form-group quarter">
                                 <label for="eq-entry-break-reason"><strong>سبب الاستقطاع (إن وجد)</strong></label>
@@ -4643,7 +4643,7 @@ class UI {
                                 ${app.getWorkerTypeOptionsHtml(w.type, false)}
                             </select>
                         </td>
-                        <td class="wage-col"><input type="number" id="${view}-card-amount-${w.id}" value="${w.amount}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
+                        <td class="wage-col"><input type="number" step="any" id="${view}-card-amount-${w.id}" value="${w.amount}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
                         <td>
                             <div style="display: flex; flex-direction: column; gap: 4px; min-width: 120px;">
                                 <select id="${view}-card-location-${w.id}" class="modal-input" onchange="app.onCardWorkLocationChange('${w.id}', '${view}-card')" title="مكان العمل">
@@ -4656,7 +4656,7 @@ class UI {
                         </td>
                         <td><textarea id="${view}-card-task-${w.id}" class="modal-input" style="min-width: 120px; width: 100%; resize: vertical;" rows="2" placeholder="بند العمل">${w.task || ''}</textarea></td>
                         <td><input type="text" id="${view}-card-contractor-${w.id}" value="${w.contractor || ''}" class="modal-input" style="min-width: 100px; width: 100%;" placeholder="اسم المقاول"></td>
-                        <td><input type="number" id="${view}-card-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
+                        <td><input type="number" step="any" id="${view}-card-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
                         <td><textarea id="${view}-card-notes-${w.id}" class="modal-input" style="min-width: 140px; width: 100%; resize: vertical;" rows="2">${w.notes || ''}</textarea></td>
                         <td>
                             <button type="button" class="btn-icon text-danger" onclick="app.removeWorkerFromRecord('${r.id}', '${w.id}')" title="حذف العامل"><i class="fas fa-trash"></i></button>
@@ -4853,7 +4853,7 @@ class UI {
                                 ${app.getWorkerTypeOptionsHtml(w.type, false)}
                             </select>
                         </td>
-                        <td><input type="number" id="modal-amount-${w.id}" value="${w.amount}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
+                        <td><input type="number" step="any" id="modal-amount-${w.id}" value="${w.amount}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
                         <td>
                             <div style="display: flex; flex-direction: column; gap: 4px; min-width: 120px;">
                                 <select id="modal-location-${w.id}" class="modal-input" onchange="app.onCardWorkLocationChange('${w.id}', 'modal')" title="مكان العمل">
@@ -4866,7 +4866,7 @@ class UI {
                         </td>
                         <td><textarea id="modal-task-${w.id}" class="modal-input" style="min-width: 120px; width: 100%; resize: vertical;" rows="2" placeholder="بند العمل">${w.task || ''}</textarea></td>
                         <td><input type="text" id="modal-contractor-${w.id}" value="${w.contractor || ''}" class="modal-input" style="min-width: 100px; width: 100%;" placeholder="اسم المقاول"></td>
-                        <td><input type="number" id="modal-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
+                        <td><input type="number" step="any" id="modal-deduction-${w.id}" value="${w.deduction || 0}" class="modal-input" style="min-width: 50px; width: 100%;"></td>
                         <td><textarea id="modal-notes-${w.id}" class="modal-input" style="min-width: 140px; width: 100%; resize: vertical;" rows="2">${w.notes || ''}</textarea></td>
                     </tr>
                 `;
@@ -5072,9 +5072,9 @@ class UI {
                             <td><span class="cell-type-text" title="${w.type || ''}">${w.type || ''}</span></td>
                             <td data-role="${supervisorRole}">${supervisorName}</td>
                             <td style="white-space: nowrap;"><span dir="ltr">${UI.formatDisplayDate(record.date || '')}</span></td>
-                            <td>${amount}</td>
-                            <td>${deduction}</td>
-                            <td><strong>${netAmount}</strong></td>
+                            <td>${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                            <td>${deduction.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                            <td><strong>${netAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></td>
                             <td><span class="badge-glow badge-glow-supervisor" style="font-size: 0.7em; padding: 2px 4px; font-weight: normal;"><i class="fas fa-hard-hat"></i> ${engineerName}</span></td>
                             <td>${w.location || ''}</td>
                             <td>${w.task || ''}</td>
@@ -5088,14 +5088,14 @@ class UI {
         }
         
         document.getElementById('report-total-days').innerText = totalDays;
-        document.getElementById('report-total-amount').innerText = totalAmount.toLocaleString();
+        document.getElementById('report-total-amount').innerText = totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         
         const footerTotal = document.getElementById('report-footer-total-amount');
         const footerDeduction = document.getElementById('report-footer-total-deduction');
         const footerNet = document.getElementById('report-footer-net-amount');
-        if (footerTotal) footerTotal.innerText = totalGross.toLocaleString();
-        if (footerDeduction) footerDeduction.innerText = totalDeduction.toLocaleString();
-        if (footerNet) footerNet.innerText = totalAmount.toLocaleString();
+        if (footerTotal) footerTotal.innerText = totalGross.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (footerDeduction) footerDeduction.innerText = totalDeduction.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (footerNet) footerNet.innerText = totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
         // Reset any existing column filters on new search and update display
         UI.activeColumnFilters = {};
@@ -5354,10 +5354,10 @@ class UI {
         const footerNet = document.getElementById('report-footer-net-amount');
 
         if (totalDaysEl) totalDaysEl.innerText = visibleCount;
-        if (totalAmountEl) totalAmountEl.innerText = visibleNet.toLocaleString();
-        if (footerTotal) footerTotal.innerText = visibleGross.toLocaleString();
-        if (footerDeduction) footerDeduction.innerText = visibleDeduction.toLocaleString();
-        if (footerNet) footerNet.innerText = visibleNet.toLocaleString();
+        if (totalAmountEl) totalAmountEl.innerText = visibleNet.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (footerTotal) footerTotal.innerText = visibleGross.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (footerDeduction) footerDeduction.innerText = visibleDeduction.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (footerNet) footerNet.innerText = visibleNet.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 }
 
@@ -7453,7 +7453,7 @@ document.addEventListener('keydown', (e) => {
                 ${app.getWorkerTypeOptionsHtml(currentType, false)}
             </select>
         `;
-        amountCell.innerHTML = `<input type="number" id="edit-dir-amount-${id}" value="${currentAmount}" style="min-width: 50px; width: 100%; padding: 5px;">`;
+        amountCell.innerHTML = `<input type="number" step="any" id="edit-dir-amount-${id}" value="${currentAmount}" style="min-width: 50px; width: 100%; padding: 5px;">`;
         
         actionsCell.innerHTML = `
             <button class="btn-icon text-success" onclick="app.saveDirWorker('${id}')" title="حفظ"><i class="fas fa-save"></i></button>
@@ -8519,7 +8519,7 @@ document.addEventListener('keydown', (e) => {
                 </select>
             </td>
             <td>
-                <input type="number" id="worker-amount-${workerId}" class="modal-input" style="min-width: 50px; width: 100%;" required min="0" ${auth.getRole() === "admin" || auth.getRole() === "engineer" ? "" : "readonly"} placeholder="اليومية" oninput="app.updateTotals()">
+                <input type="number" step="any" id="worker-amount-${workerId}" class="modal-input" style="min-width: 50px; width: 100%;" required min="0" ${auth.getRole() === "admin" || auth.getRole() === "engineer" ? "" : "readonly"} placeholder="اليومية" oninput="app.updateTotals()">
             </td>
             <td>
                 <select id="worker-location-${workerId}" class="modal-input" style="min-width: 130px; width: 100%;" required onchange="app.onWorkLocationChange(${workerId})">
@@ -11113,14 +11113,14 @@ document.addEventListener('keydown', (e) => {
         if (eq) {
             if (badge) {
                 badge.style.display = 'block';
-                badge.innerHTML = `<i class="fas fa-building text-primary"></i> المقاول المالك: <strong>${eq.contractor}</strong> | الساعات المحددة لليومية: <strong>${eq.dailyHours || 8} س</strong>`;
+                badge.innerHTML = `<i class="fas fa-building text-primary"></i> المقاول المالك: <strong>${eq.contractor}</strong> | الساعات المحددة لليومية: <strong>${Number(eq.dailyHours || 8).toFixed(2)} س</strong>`;
             }
             const isAdmin = auth.currentUser && (auth.currentUser.role === 'admin' || auth.currentUser.username === 'admin');
             if (adminCostBox) {
                 if (isAdmin) {
                     adminCostBox.style.display = 'flex';
                     const rateEl = document.getElementById('eq-calc-rate');
-                    if (rateEl) rateEl.innerText = Number(eq.hourlyRate || 0).toLocaleString();
+                    if (rateEl) rateEl.innerText = Number(eq.hourlyRate || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 } else {
                     adminCostBox.style.display = 'none';
                 }
@@ -11179,7 +11179,7 @@ document.addEventListener('keydown', (e) => {
         const cost = netHours * hourlyRate;
 
         const costEl = document.getElementById('eq-calc-cost');
-        if (costEl) costEl.innerText = cost.toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (costEl) costEl.innerText = cost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     async submitEquipmentLog() {
@@ -11354,7 +11354,7 @@ document.addEventListener('keydown', (e) => {
             let html = '';
             todayLogs.forEach((l, idx) => {
                 const codeBadge = l.equipmentCode ? `<span style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem; font-weight: bold;">${l.equipmentCode}</span>` : '';
-                const breakText = (l.breakHours > 0) ? `<span style="color: #ef4444; font-weight: bold;">${l.breakHours} س</span> ${l.breakReason ? '(' + l.breakReason + ')' : ''}` : '<span style="color: var(--text-muted);">-</span>';
+                const breakText = (l.breakHours > 0) ? `<span style="color: #ef4444; font-weight: bold;">${Number(l.breakHours).toFixed(2)} س</span> ${l.breakReason ? '(' + l.breakReason + ')' : ''}` : '<span style="color: var(--text-muted);">-</span>';
                 
                 html += `
                     <tr>
@@ -11366,7 +11366,7 @@ document.addEventListener('keydown', (e) => {
                         <td style="direction: ltr; text-align: center;">${l.startTime}</td>
                         <td style="direction: ltr; text-align: center;">${l.endTime}</td>
                         <td>${breakText}</td>
-                        <td style="text-align: center; font-weight: 800; color: #10b981; font-size: 1rem; background: rgba(16, 185, 129, 0.08);">${l.netHours} س</td>
+                        <td style="text-align: center; font-weight: 800; color: #10b981; font-size: 1rem; background: rgba(16, 185, 129, 0.08);">${Number(l.netHours || 0).toFixed(2)} س</td>
                         <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${l.notes || ''}">${l.notes || '-'}</td>
                         <td style="text-align: center;">
                             <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: bold;">
@@ -11404,15 +11404,25 @@ document.addEventListener('keydown', (e) => {
             contractorInput?.focus();
             return;
         }
-        const hourlyRate = parseFloat(hourlyRateInput?.value) || 0;
-        if (hourlyRate <= 0) {
-            alert('يرجى تحديد سعر الساعة للمعدة بقيمة أكبر من الصفر.');
-            hourlyRateInput?.focus();
-            return;
+        let hourlyRate = parseFloat(hourlyRateInput?.value) || 0;
+        const dailyHours = parseFloat(dailyHoursInput?.value) || 8;
+        let dailyRate = parseFloat(dailyRateInput?.value) || 0;
+
+        if (hourlyRate <= 0 && dailyRate > 0 && dailyHours > 0) {
+            hourlyRate = Number((dailyRate / dailyHours).toFixed(2));
+            if (hourlyRateInput) hourlyRateInput.value = hourlyRate;
         }
 
-        const dailyHours = parseFloat(dailyHoursInput?.value) || 8;
-        const dailyRate = parseFloat(dailyRateInput?.value) || (hourlyRate * dailyHours);
+        if (dailyRate <= 0 && hourlyRate > 0 && dailyHours > 0) {
+            dailyRate = Number((hourlyRate * dailyHours).toFixed(2));
+            if (dailyRateInput) dailyRateInput.value = dailyRate;
+        }
+
+        if (hourlyRate <= 0) {
+            alert('يرجى تحديد يومية المعدة أو سعر الساعة بقيمة أكبر من الصفر.');
+            (dailyRateInput || hourlyRateInput)?.focus();
+            return;
+        }
 
         const newEq = {
             id: 'eq_' + Date.now(),
@@ -11443,12 +11453,42 @@ document.addEventListener('keydown', (e) => {
         }
     }
 
+    calcNewEqHourlyRate() {
+        const dailyRate = parseFloat(document.getElementById('new-eq-daily-rate')?.value) || 0;
+        const dailyHours = parseFloat(document.getElementById('new-eq-daily-hours')?.value) || 8;
+        const hourlyRateInput = document.getElementById('new-eq-hourly-rate');
+        if (hourlyRateInput && dailyHours > 0) {
+            if (dailyRate > 0) {
+                hourlyRateInput.value = Number((dailyRate / dailyHours).toFixed(2));
+            } else if (dailyRate === 0) {
+                hourlyRateInput.value = '';
+            }
+        }
+    }
+
     calcNewEqDaily() {
         const hourlyRate = parseFloat(document.getElementById('new-eq-hourly-rate')?.value) || 0;
         const dailyHours = parseFloat(document.getElementById('new-eq-daily-hours')?.value) || 8;
         const dailyRateInput = document.getElementById('new-eq-daily-rate');
-        if (dailyRateInput) {
-            dailyRateInput.value = (hourlyRate * dailyHours).toFixed(0);
+        if (dailyRateInput && dailyHours > 0) {
+            if (hourlyRate > 0) {
+                dailyRateInput.value = Number((hourlyRate * dailyHours).toFixed(2));
+            }
+        }
+    }
+
+    onNewEqHoursChange() {
+        const dailyRate = parseFloat(document.getElementById('new-eq-daily-rate')?.value) || 0;
+        const hourlyRate = parseFloat(document.getElementById('new-eq-hourly-rate')?.value) || 0;
+        const dailyHours = parseFloat(document.getElementById('new-eq-daily-hours')?.value) || 8;
+        if (dailyHours <= 0) return;
+
+        if (dailyRate > 0) {
+            const hourlyRateInput = document.getElementById('new-eq-hourly-rate');
+            if (hourlyRateInput) hourlyRateInput.value = Number((dailyRate / dailyHours).toFixed(2));
+        } else if (hourlyRate > 0) {
+            const dailyRateInput = document.getElementById('new-eq-daily-rate');
+            if (dailyRateInput) dailyRateInput.value = Number((hourlyRate * dailyHours).toFixed(2));
         }
     }
 
@@ -11473,9 +11513,9 @@ document.addEventListener('keydown', (e) => {
                         <td style="font-weight: bold; color: var(--text-main);">${eq.name}</td>
                         <td style="text-align: center;">${eq.code ? `<span class="badge" style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 3px 8px; border-radius: 6px; font-weight: bold;">${eq.code}</span>` : '-'}</td>
                         <td style="font-weight: 600; color: var(--primary);">${eq.contractor}</td>
-                        <td style="text-align: center; font-weight: bold; color: #059669;">${Number(eq.hourlyRate).toLocaleString()} ج.م</td>
-                        <td style="text-align: center;">${eq.dailyHours || 8} س</td>
-                        <td style="text-align: center; font-weight: bold; color: #d97706;">${Number(eq.dailyRate || (eq.hourlyRate * (eq.dailyHours || 8))).toLocaleString()} ج.م</td>
+                        <td style="text-align: center; font-weight: bold; color: #059669;">${Number(eq.hourlyRate || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م</td>
+                        <td style="text-align: center;">${Number(eq.dailyHours || 8).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} س</td>
+                        <td style="text-align: center; font-weight: bold; color: #d97706;">${Number(eq.dailyRate || (eq.hourlyRate * (eq.dailyHours || 8))).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م</td>
                         <td style="font-size: 0.82rem; color: var(--text-muted);">${eq.notes || '-'}</td>
                         <td style="text-align: center;">
                             <div style="display: flex; gap: 4px; justify-content: center;">
@@ -11520,12 +11560,25 @@ document.addEventListener('keydown', (e) => {
         if (newCode === null) return;
         const newContractor = prompt('المقاول / الجهة المالكة:', eq.contractor || '');
         if (newContractor === null) return;
-        const newRateStr = prompt('سعر الساعة (جنيه):', eq.hourlyRate || 0);
-        if (newRateStr === null) return;
-        const newRate = parseFloat(newRateStr) || 0;
-        const newHoursStr = prompt('ساعات اليومية المحددة:', eq.dailyHours || 8);
+
+        const currentDaily = eq.dailyRate || ((eq.hourlyRate || 0) * (eq.dailyHours || 8));
+        const newDailyStr = prompt('يومية المعدة (جنيه) [أدخل اليومية ليتم حساب سعر الساعة تلقائياً]:', Number(currentDaily || 0).toFixed(2));
+        if (newDailyStr === null) return;
+
+        const newHoursStr = prompt('ساعات اليومية المحددة:', Number(eq.dailyHours || 8).toFixed(2));
         if (newHoursStr === null) return;
         const newHours = parseFloat(newHoursStr) || 8;
+
+        let autoHourly = 0;
+        const newDaily = parseFloat(newDailyStr) || 0;
+        if (newDaily > 0 && newHours > 0) {
+            autoHourly = Number((newDaily / newHours).toFixed(2));
+        }
+
+        const newRateStr = prompt('سعر الساعة (جنيه) [المحسوب تلقائياً من اليومية]:', autoHourly > 0 ? autoHourly.toFixed(2) : Number(eq.hourlyRate || 0).toFixed(2));
+        if (newRateStr === null) return;
+        const newRate = parseFloat(newRateStr) || autoHourly;
+        const finalDaily = newDaily > 0 ? newDaily : Number((newRate * newHours).toFixed(2));
 
         const updated = {
             ...eq,
@@ -11534,7 +11587,7 @@ document.addEventListener('keydown', (e) => {
             contractor: newContractor.trim(),
             hourlyRate: newRate,
             dailyHours: newHours,
-            dailyRate: newRate * newHours
+            dailyRate: finalDaily
         };
 
         try {
@@ -11669,11 +11722,11 @@ document.addEventListener('keydown', (e) => {
                     totalCost += cost;
 
                     const codeBadge = l.equipmentCode ? `<span style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 1px 5px; border-radius: 4px; font-size: 0.76rem; font-weight: bold;">${l.equipmentCode}</span>` : '';
-                    const breakDetail = (ded > 0) ? `<span style="color: #ef4444; font-weight: bold;">${ded} س</span> ${l.breakReason ? '<small style="color:var(--text-muted);">(' + l.breakReason + ')</small>' : ''}` : '-';
+                    const breakDetail = (ded > 0) ? `<span style="color: #ef4444; font-weight: bold;">${ded.toFixed(2)} س</span> ${l.breakReason ? '<small style="color:var(--text-muted);">(' + l.breakReason + ')</small>' : ''}` : '-';
 
                     const adminCells = isAdmin ? `
-                        <td style="text-align: center; font-weight: 600; color: #059669;">${rate.toLocaleString()}</td>
-                        <td style="text-align: center; font-weight: 800; color: #d97706; background: rgba(245, 158, 11, 0.08);">${cost.toLocaleString('ar-EG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td style="text-align: center; font-weight: 600; color: #059669;">${rate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        <td style="text-align: center; font-weight: 800; color: #d97706; background: rgba(245, 158, 11, 0.08);">${cost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                         <td style="text-align: center;">
                             <div style="display: flex; gap: 4px; justify-content: center;">
                                 <button type="button" class="btn btn-sm btn-icon" onclick="app.editEquipmentLog('${l.id}')" title="تعديل السجل" style="color: #6366f1; background: rgba(99,102,241,0.1); padding: 4px 7px; border-radius: 4px; border: none; cursor: pointer;">
@@ -11726,7 +11779,7 @@ document.addEventListener('keydown', (e) => {
             const statCost = document.getElementById('extract-stat-total-cost');
             if (statCost) {
                 if (isAdmin) {
-                    statCost.innerText = totalCost.toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    statCost.innerText = totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 } else {
                     statCost.innerText = '***';
                 }
@@ -11745,7 +11798,7 @@ document.addEventListener('keydown', (e) => {
             const footCost = document.getElementById('extract-foot-total-cost');
             if (footCost) {
                 if (isAdmin) {
-                    footCost.innerText = totalCost.toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ج.م';
+                    footCost.innerText = totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ج.م';
                 } else {
                     footCost.innerText = '***';
                 }
@@ -11777,13 +11830,13 @@ document.addEventListener('keydown', (e) => {
             return;
         }
 
-        const newGross = prompt('إجمالي ساعات التواجد:', log.grossHours);
+        const newGross = prompt('إجمالي ساعات التواجد:', Number(log.grossHours || 0).toFixed(2));
         if (newGross === null) return;
-        const newBreak = prompt('الوقت المستقطع (عطل / بريك) بالساعات:', log.breakHours);
+        const newBreak = prompt('الوقت المستقطع (عطل / بريك) بالساعات:', Number(log.breakHours || 0).toFixed(2));
         if (newBreak === null) return;
         const newReason = prompt('سبب الاستقطاع:', log.breakReason || '');
         if (newReason === null) return;
-        const newRateStr = prompt('سعر الساعة (جنيه):', log.hourlyRate);
+        const newRateStr = prompt('سعر الساعة (جنيه):', Number(log.hourlyRate || 0).toFixed(2));
         if (newRateStr === null) return;
         const newNotes = prompt('بيان الأعمال والملاحظات:', log.notes || '');
         if (newNotes === null) return;
@@ -11868,7 +11921,7 @@ document.addEventListener('keydown', (e) => {
                     <td style="text-align: center;">${gross.toFixed(2)}</td>
                     <td style="text-align: center;">${ded > 0 ? ded.toFixed(2) + ' س' : '-'}</td>
                     <td style="text-align: center; font-weight: bold;">${net.toFixed(2)}</td>
-                    ${data.isAdmin ? `<td style="text-align: center;">${rate.toLocaleString()}</td><td style="text-align: center; font-weight: bold;">${cost.toLocaleString('ar-EG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>` : ''}
+                    ${data.isAdmin ? `<td style="text-align: center;">${rate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td><td style="text-align: center; font-weight: bold;">${cost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>` : ''}
                     <td style="font-size: 8pt;">${l.notes || '-'}</td>
                 </tr>
             `;
@@ -12015,7 +12068,7 @@ document.addEventListener('keydown', (e) => {
                     <div class="kpi-card"><div class="val">${data.totalGross.toFixed(2)}</div><div class="lbl">إجمالي ساعات التواجد</div></div>
                     <div class="kpi-card"><div class="val" style="color: #ef4444;">${data.totalDed.toFixed(2)}</div><div class="lbl">ساعات التوقف والأعطال</div></div>
                     <div class="kpi-card"><div class="val" style="color: #10b981;">${data.totalNet.toFixed(2)}</div><div class="lbl">صافي الساعات المعتمدة</div></div>
-                    ${data.isAdmin ? `<div class="kpi-card" style="background:#fffbeb; border-color:#f59e0b;"><div class="val" style="color: #d97706;">${data.totalCost.toLocaleString('ar-EG', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</div><div class="lbl">إجمالي المستخلص المالي المستحق</div></div>` : ''}
+                    ${data.isAdmin ? `<div class="kpi-card" style="background:#fffbeb; border-color:#f59e0b;"><div class="val" style="color: #d97706;">${data.totalCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</div><div class="lbl">إجمالي المستخلص المالي المستحق</div></div>` : ''}
                 </div>
 
                 <table>
@@ -12044,7 +12097,7 @@ document.addEventListener('keydown', (e) => {
                             <td style="text-align: center;">${data.totalGross.toFixed(2)}</td>
                             <td style="text-align: center;">${data.totalDed.toFixed(2)}</td>
                             <td style="text-align: center; color: #10b981;">${data.totalNet.toFixed(2)}</td>
-                            ${data.isAdmin ? `<td>-</td><td style="text-align: center; color: #d97706; font-size: 10pt;">${data.totalCost.toLocaleString('ar-EG', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</td>` : ''}
+                            ${data.isAdmin ? `<td>-</td><td style="text-align: center; color: #d97706; font-size: 10pt;">${data.totalCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</td>` : ''}
                             <td></td>
                         </tr>
                     </tfoot>
@@ -14020,10 +14073,10 @@ document.addEventListener('click', (e) => {
                     row.getCell(10).numFmt = '0.00';
                     row.getCell(11).value = 8;
                     row.getCell(11).numFmt = '0';
-                    row.getCell(12).value = r.deduction;
-                    row.getCell(12).numFmt = '#,##0';
-                    row.getCell(13).value = r.net;
-                    row.getCell(13).numFmt = '#,##0';
+                    row.getCell(12).value = Number(r.deduction || 0);
+                    row.getCell(12).numFmt = '#,##0.00';
+                    row.getCell(13).value = Number(r.net || 0);
+                    row.getCell(13).numFmt = '#,##0.00';
 
                     for (let c = 1; c <= 13; c++) {
                         const cell = row.getCell(c);
@@ -14107,7 +14160,7 @@ document.addEventListener('click', (e) => {
 
                 const amountVal = ws.getCell(`M${sumRow}`);
                 amountVal.value = stats.totalNet;
-                amountVal.numFmt = '#,##0';
+                amountVal.numFmt = '#,##0.00';
                 amountVal.font = { name: 'Cairo', size: 13, bold: true, color: { argb: 'FF000000' } };
                 amountVal.alignment = { vertical: 'middle', horizontal: 'center' };
                 amountVal.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
@@ -14593,7 +14646,7 @@ document.addEventListener('click', (e) => {
             // Row 3: Subtitle Info (Date Range & Total)
             ws.mergeCells('A3:I3');
             const subTitle = ws.getCell('A3');
-            subTitle.value = 'الفترة: ' + dateRange + '  |  إجمالي عدد اليوميات: ' + group.totalCount + ' يومية  |  إجمالي الخصم: ' + group.totalAmount.toLocaleString('en-US') + ' ج.م';
+            subTitle.value = 'الفترة: ' + dateRange + '  |  إجمالي عدد اليوميات: ' + group.totalCount + ' يومية  |  إجمالي الخصم: ' + Number(group.totalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ج.م';
             subTitle.font = { name: 'Cairo', size: 12.5, bold: true, color: { argb: 'FF333333' } };
             subTitle.alignment = { vertical: 'middle', horizontal: 'center' };
             ws.getRow(3).height = 24;
@@ -14867,7 +14920,7 @@ document.addEventListener('click', (e) => {
                         <td style="width: 6%; font-weight: bold; font-size: ${sumFont}px; padding: ${sumPadV}px 4px;">${idx + 1}</td>
                         <td style="width: 34%; font-weight: bold; color: #4a148c; font-size: ${sumFont + 0.5}px; text-align: right; padding-right: 16px; padding-top: ${sumPadV}px; padding-bottom: ${sumPadV}px;">${k}</td>
                         <td style="width: 20%; font-weight: bold; font-size: ${sumFont}px; font-variant-numeric: tabular-nums; padding: ${sumPadV}px 4px;">${grp.totalCount.toLocaleString()} يومية</td>
-                        <td style="width: 22%; font-weight: bold; color: #1b5e20; font-size: ${sumFont + 0.5}px; font-variant-numeric: tabular-nums; padding: ${sumPadV}px 4px;">${grp.totalAmount.toLocaleString()} ج.م</td>
+                        <td style="width: 22%; font-weight: bold; color: #1b5e20; font-size: ${sumFont + 0.5}px; font-variant-numeric: tabular-nums; padding: ${sumPadV}px 4px;">${Number(grp.totalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م</td>
                         <td style="width: 18%; font-weight: bold; font-size: ${sumFont}px; padding: ${sumPadV}px 4px;">${pct}</td>
                     </tr>
                 `;
@@ -14882,7 +14935,7 @@ document.addEventListener('click', (e) => {
                         ${grandTotalDays.toLocaleString()} يومية
                     </td>
                     <td style="color: #4a148c; font-size: ${sumFont + 1.5}px; font-variant-numeric: tabular-nums;">
-                        ${grandTotalAmount.toLocaleString()} ج.م
+                        ${Number(grandTotalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م
                     </td>
                     <td style="color: #4a148c;">100%</td>
                 </tr>
@@ -14900,7 +14953,7 @@ document.addEventListener('click', (e) => {
                 <div class="summary">
                     <div>إجمالي عدد المقاولين: <span>${sortedContractors.length} مقاول</span></div>
                     <div>إجمالي عدد يوميات الخصم: <span>${grandTotalDays.toLocaleString()} يومية</span></div>
-                    <div>إجمالي مبالغ الخصومات: <span>${grandTotalAmount.toLocaleString()} ج.م</span></div>
+                    <div>إجمالي مبالغ الخصومات: <span>${Number(grandTotalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م</span></div>
                 </div>
 
                 <div class="table-container">
@@ -15003,7 +15056,7 @@ document.addEventListener('click', (e) => {
                         <td style="padding: ${paddingV}px 4px;">${r.type}</td>
                         <td style="padding: ${paddingV}px 4px;">${r.location || '-'}</td>
                         <td style="padding: ${paddingV}px 6px; text-align: right;">${r.task || '-'}</td>
-                        <td style="padding: ${paddingV}px 4px; font-weight: bold; color: #1b5e20; font-variant-numeric: tabular-nums;">${r.amount.toLocaleString()}</td>
+                        <td style="padding: ${paddingV}px 4px; font-weight: bold; color: #1b5e20; font-variant-numeric: tabular-nums;">${Number(r.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                         <td style="padding: ${paddingV}px 4px;">${r.notes || ''}</td>
                     </tr>
                 `;
@@ -15016,7 +15069,7 @@ document.addEventListener('click', (e) => {
                         إجمالي خصومات المقاول (${group.totalCount} يومية):
                     </td>
                     <td style="color: #4a148c; font-size: ${fontSize + 1.5}px; font-variant-numeric: tabular-nums;">
-                        ${group.totalAmount.toLocaleString()} ج.م
+                        ${Number(group.totalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م
                     </td>
                     <td></td>
                 </tr>
@@ -15034,7 +15087,7 @@ document.addEventListener('click', (e) => {
                 <div class="summary">
                     <div>المقاول: <span>${contractorKey}</span></div>
                     <div>إجمالي عدد اليوميات: <span>${group.totalCount} يومية</span></div>
-                    <div>إجمالي مبلغ الخصم: <span>${group.totalAmount.toLocaleString()} جنيه مصري</span></div>
+                    <div>إجمالي مبلغ الخصم: <span>${Number(group.totalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} جنيه مصري</span></div>
                 </div>
 
                 <div class="table-container">
@@ -15796,13 +15849,13 @@ document.addEventListener('click', (e) => {
                 recordsHtml += `<td style="padding: ${paddingV}px 2px;">${hourlyRate}</td>`;
                 
                 // Working Hours
-                recordsHtml += `<td style="padding: ${paddingV}px 2px;">8</td>`;
+                recordsHtml += `<td style="padding: ${paddingV}px 2px;">8.00</td>`;
                 
                 // Deduction
-                recordsHtml += `<td style="padding: ${paddingV}px 2px;">${r.deduction}</td>`;
+                recordsHtml += `<td style="padding: ${paddingV}px 2px;">${Number(r.deduction || 0).toFixed(2)}</td>`;
                 
                 // Net Amount
-                recordsHtml += `<td style="padding: ${paddingV}px 2px;">${r.net}</td>`;
+                recordsHtml += `<td style="padding: ${paddingV}px 2px;">${Number(r.net || 0).toFixed(2)}</td>`;
                 
                 recordsHtml += '</tr>';
             });
@@ -15834,7 +15887,7 @@ document.addEventListener('click', (e) => {
                 <div class="summary">
                     ${chosenSupervisor ? `<div>المشرف المسؤول: <span>${chosenSupervisor}</span></div>` : ''}
                     <div>إجمالي عدد اليوميات: ${stats.days} يوم</div>
-                    <div>إجمالي المبلغ المستحق: ${stats.totalNet.toLocaleString()} جنيه</div>
+                    <div>إجمالي المبلغ المستحق: ${Number(stats.totalNet || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} جنيه</div>
                 </div>
                 
                 <div class="signatures">

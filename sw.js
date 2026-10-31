@@ -1,4 +1,4 @@
-// Service Worker v7.4 - Spacious layout and row sizing for contractor deductions report (PDF & Excel)
+// Service Worker v7.5 - Auto hourly rate calculation from daily rate & hours, decimal support, and 2 decimal places in reports & extracts
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
