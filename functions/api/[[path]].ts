@@ -1081,6 +1081,7 @@ export async function onRequest(context: any): Promise<Response> {
         if (resource === "pendingCount" && method === "GET") {
             const engineerId = url.searchParams.get("engineerId");
             const records = await store.list("records");
+            const eqLogs = await store.list("equipment_logs");
             let count = 0;
             let totalCount = 0;
             for (const r of records) {
@@ -1091,21 +1092,44 @@ export async function onRequest(context: any): Promise<Response> {
                     }
                 }
             }
+            for (const el of eqLogs) {
+                if (el.value && el.value.status === "pending") {
+                    totalCount++;
+                    if (!engineerId || engineerId === "all" || String(el.value.engineerId) === String(engineerId)) {
+                        count++;
+                    }
+                }
+            }
             return jsonResponse({ count, totalCount });
         }
 
         if (resource === "pendingStatus" && method === "GET") {
             const engineerId = url.searchParams.get("engineerId");
             const records = await store.list("records");
+            const eqLogs = await store.list("equipment_logs");
             const pendingList: any[] = [];
             for (const r of records) {
                 if (r.value && r.value.status === "pending") {
                     if (!engineerId || String(r.value.engineerId) === String(engineerId)) {
                         pendingList.push({
                             id: r.id,
+                            type: 'labor',
                             engineerId: r.value.engineerId,
                             date: r.value.date,
                             createdAt: r.value.createdAt
+                        });
+                    }
+                }
+            }
+            for (const el of eqLogs) {
+                if (el.value && el.value.status === "pending") {
+                    if (!engineerId || String(el.value.engineerId) === String(engineerId)) {
+                        pendingList.push({
+                            id: el.id,
+                            type: 'equipment',
+                            engineerId: el.value.engineerId,
+                            date: el.value.date,
+                            createdAt: el.value.createdAt
                         });
                     }
                 }

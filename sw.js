@@ -1,4 +1,4 @@
-// Service Worker v7.6 - Instant permission synchronization and role defaults for equipment and users
+// Service Worker v7.7 - Equipment approval workflow, free location input, and date restrictions
 self.addEventListener('install', e => {
   self.skipWaiting();
 });

@@ -1561,9 +1561,9 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=7.6').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=7.7').then(reg => {
                 reg.update();
-                console.log('ServiceWorker v7.6 registered cleanly.');
+                console.log('ServiceWorker v7.7 registered cleanly.');
             });
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -2900,14 +2900,12 @@ select {
                         <div class="form-row">
                             <div class="form-group half">
                                 <label for="eq-entry-location"><strong>مكان العمل <span style="color:red;">*</span></strong></label>
-                                <select id="eq-entry-location" class="modal-input" required onchange="app.onEqWorkLocationChange()">
-                                    <!-- Populated dynamically -->
-                                </select>
+                                <input type="text" id="eq-entry-location" class="modal-input" placeholder="اكتب مكان العمل بالتفصيل (مثل: الخزان الأرضي / القطاع الجنوبي)..." required>
                             </div>
                             <div class="form-group half">
-                                <label for="eq-entry-building"><strong>العمارة <span style="color:red;">*</span></strong></label>
-                                <select id="eq-entry-building" class="modal-input" required onchange="this.style.border=''">
-                                    <!-- Populated dynamically -->
+                                <label for="eq-entry-engineer"><strong>المهندس المسؤول للاعتماد <span style="color:red;">*</span></strong></label>
+                                <select id="eq-entry-engineer" class="modal-input" required>
+                                    <option value="" disabled selected>اختر المهندس المسؤول للاعتماد</option>
                                 </select>
                             </div>
                         </div>
@@ -2961,7 +2959,7 @@ select {
                         </div>
 
                         <button type="submit" id="btn-submit-eq-log" class="btn btn-primary btn-block" style="padding: 12px; font-size: 1.05rem; font-weight: bold;">
-                            <i class="fas fa-check-circle"></i> تسجيل تشغيل المعدة فورياً (معتمد ومقفل)
+                            <i class="fas fa-paper-plane"></i> إرسال طلب تشغيل المعدة للاعتماد
                         </button>
                     </form>
                 </div>
@@ -2969,8 +2967,8 @@ select {
                 <div class="card" style="padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-card);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
                         <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-main);"><i class="fas fa-list-check"></i> سجلات تشغيل اليوم للمعدات</h3>
-                        <span style="font-size: 0.82rem; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 3px 10px; border-radius: 8px; font-weight: bold;">
-                            <i class="fas fa-lock"></i> السجلات تعتمد مباشرة وتقفل على المشرف
+                        <span style="font-size: 0.82rem; color: #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 3px 10px; border-radius: 8px; font-weight: bold;">
+                            <i class="fas fa-hourglass-half"></i> السجلات تُرسل للمهندس المسؤول للمراجعة والاعتماد
                         </span>
                     </div>
                     <div class="table-responsive">
@@ -2980,7 +2978,8 @@ select {
                                     <th>م</th>
                                     <th>المعدة والكود</th>
                                     <th>المقاول</th>
-                                    <th>مكان العمل والعمارة</th>
+                                    <th>مكان العمل</th>
+                                    <th>المهندس</th>
                                     <th>السائق</th>
                                     <th>من</th>
                                     <th>إلى</th>
@@ -2988,6 +2987,7 @@ select {
                                     <th>صافي الساعات</th>
                                     <th>بيان العمل</th>
                                     <th>الحالة</th>
+                                    <th>الإجراء</th>
                                 </tr>
                             </thead>
                             <tbody id="today-equipment-table-body">
@@ -3019,6 +3019,19 @@ select {
                         </div>
                     </div>
 
+                    <!-- Navigation Tabs for Engineer (Labor vs Equipment) -->
+                    <div class="engineer-tabs-nav" style="display: flex; gap: 10px; margin-top: 6px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px;">
+                        <button type="button" id="tab-btn-eng-labor" class="btn btn-primary" onclick="app.switchEngineerTab('labor')" style="font-weight: 700; border-radius: 8px; padding: 7px 16px;">
+                            <i class="fas fa-users"></i> سراكي العمالة
+                            <span id="tab-badge-eng-labor" class="badge" style="background: rgba(255,255,255,0.25); margin-right: 6px; padding: 2px 7px; border-radius: 10px;">0</span>
+                        </button>
+                        <button type="button" id="tab-btn-eng-equipment" class="btn btn-secondary" onclick="app.switchEngineerTab('equipment')" style="font-weight: 700; border-radius: 8px; padding: 7px 16px;">
+                            <i class="fas fa-truck-monster"></i> تشغيل المعدات
+                            <span id="tab-badge-eng-equipment" class="badge" style="background: #f59e0b; color: #fff; margin-right: 6px; padding: 2px 7px; border-radius: 10px;">0</span>
+                        </button>
+                    </div>
+
+                    <div id="engineer-labor-tab-pane">
                     <!-- Enhanced Filter Toolbar -->
                     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: var(--surface-color); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-color);">
                         <!-- 1. Status Filter -->
@@ -3062,6 +3075,29 @@ select {
                 </header>
                 <div id="engineer-records-container" class="records-container">
                     <!-- Records populated dynamically -->
+                </div>
+                </div><!-- End engineer-labor-tab-pane -->
+
+                <!-- Engineer Equipment Tab Pane -->
+                <div id="engineer-equipment-tab-pane" class="hidden" style="margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; background: var(--bg-card); padding: 12px 18px; border-radius: 10px; border: 1px solid var(--border-color);">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-main);"><i class="fas fa-truck-monster text-primary"></i> طلبات تشغيل وساعات المعدات الموجهة للاعتماد</h3>
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">مراجعة واعتماد أو رفض ساعات تشغيل المعدات اليومية</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <label style="font-size: 0.85rem; font-weight: bold; color: var(--text-color); margin: 0;">الحالة:</label>
+                            <select id="eng-eq-status-filter" class="modal-input" style="width: auto; margin: 0; padding: 4px 10px;" onchange="app.renderEngineerEquipmentList()">
+                                <option value="pending" selected>قيد الانتظار</option>
+                                <option value="all">الكل</option>
+                                <option value="approved">معتمد</option>
+                                <option value="rejected">مرفوض</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="engineer-equipment-records-container" class="records-container">
+                        <!-- Populated dynamically -->
+                    </div>
                 </div>
                 
                 <!-- Record Details Modal -->
@@ -9117,18 +9153,35 @@ document.addEventListener('keydown', (e) => {
             }
         }
 
-        // Update nav badge
+        // Update nav badge & tab badges
+        let allEqLogs = [];
+        try {
+            allEqLogs = await db.getAll('equipment_logs') || [];
+            if (!Array.isArray(allEqLogs)) allEqLogs = [];
+        } catch(e) {}
+
+        const allPendingEq = allEqLogs.filter(l => l.status === 'pending');
+        const myPendingEq = allEqLogs.filter(l => l.status === 'pending' && (String(l.engineerId) === String(currentUserId) || !l.engineerId));
+        const eqBadgeCount = (role === 'admin') ? allPendingEq.length : myPendingEq.length;
+        const laborBadgeCount = (role === 'admin') ? allPending.length : myPending.length;
+        const totalBadgeCount = laborBadgeCount + eqBadgeCount;
+
+        const labTabBadge = document.getElementById('tab-badge-eng-labor');
+        if (labTabBadge) labTabBadge.innerText = laborBadgeCount;
+        const eqTabBadge = document.getElementById('tab-badge-eng-equipment');
+        if (eqTabBadge) eqTabBadge.innerText = eqBadgeCount;
+
         const navBadge = document.getElementById('nav-badge-engineer');
         if (navBadge) {
-            const allPending = allRawRecords.filter(r => r.status === 'pending');
-            const myPending = allRawRecords.filter(r => r.status === 'pending' && String(r.engineerId) === String(currentUserId));
-            const badgeCount = (role === 'admin') ? allPending.length : myPending.length;
-            if (badgeCount > 0) {
-                navBadge.innerText = badgeCount;
+            if (totalBadgeCount > 0) {
+                navBadge.innerText = totalBadgeCount;
                 navBadge.style.display = 'inline-block';
             } else {
                 navBadge.style.display = 'none';
             }
+        }
+        if (this.currentEngineerTab === 'equipment') {
+            this.renderEngineerEquipmentList();
         }
 
         // 5. Read filters for displayed records
@@ -11225,8 +11278,8 @@ document.addEventListener('keydown', (e) => {
         const dateInput = document.getElementById('eq-entry-date');
         const select = document.getElementById('eq-entry-select');
         const operatorInput = document.getElementById('eq-entry-operator');
-        const locSelect = document.getElementById('eq-entry-location');
-        const bldSelect = document.getElementById('eq-entry-building');
+        const locInput = document.getElementById('eq-entry-location');
+        const engSelect = document.getElementById('eq-entry-engineer');
         const startTimeStr = document.getElementById('eq-entry-start-time')?.value;
         const endTimeStr = document.getElementById('eq-entry-end-time')?.value;
         const breakHours = parseFloat(document.getElementById('eq-entry-break-hours')?.value) || 0;
@@ -11235,8 +11288,25 @@ document.addEventListener('keydown', (e) => {
 
         if (!dateInput || !dateInput.value) {
             alert('يرجى تحديد تاريخ التشغيل.');
+            dateInput?.focus();
             return;
         }
+
+        // Date limitation: Only today, yesterday, or up to 2 days ago (strictly forbidden if > 2 days)
+        const today = new Date().toISOString().split('T')[0];
+        const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const selectedDate = dateInput.value;
+        if (selectedDate > today) {
+            alert('غير مسموح بتسجيل تشغيل المعدة بتاريخ مستقبلي.');
+            dateInput.value = today;
+            return;
+        }
+        if (selectedDate < twoDaysAgo) {
+            alert('غير مسموح بتسجيل تشغيل المعدة بعد فوات أكثر من يومين (المسموح فقط تسجيل تشغيل نفس اليوم أو اليوم السابق).');
+            dateInput.value = today;
+            return;
+        }
+
         if (!select || !select.value) {
             alert('يرجى اختيار المعدة المراد تسجيلها.');
             select?.focus();
@@ -11247,16 +11317,20 @@ document.addEventListener('keydown', (e) => {
             operatorInput?.focus();
             return;
         }
-        if (!locSelect || !locSelect.value) {
-            alert('يرجى تحديد مكان العمل.');
-            locSelect?.focus();
+        const locationVal = locInput ? locInput.value.trim() : '';
+        if (!locationVal) {
+            alert('يرجى كتابة مكان العمل بالتفصيل.');
+            locInput?.focus();
             return;
         }
-        if (!bldSelect || !bldSelect.value) {
-            alert('يرجى تحديد العمارة.');
-            bldSelect?.focus();
+        const engineerId = engSelect ? engSelect.value : '';
+        if (!engineerId) {
+            alert('يرجى اختيار المهندس المسؤول للاعتماد.');
+            engSelect?.focus();
             return;
         }
+        const engineerName = engSelect.options[engSelect.selectedIndex]?.text || 'المهندس';
+
         if (!startTimeStr || !endTimeStr) {
             alert('يرجى تحديد ساعات البدء والانتهاء بدقة.');
             return;
@@ -11289,9 +11363,11 @@ document.addEventListener('keydown', (e) => {
             equipmentCode: eq ? (eq.code || '') : '',
             contractor: eq ? (eq.contractor || '') : '',
             driverName: operatorInput.value.trim(),
-            location: locSelect.value,
-            building: bldSelect.value,
-            date: dateInput.value,
+            location: locationVal,
+            building: '',
+            engineerId: engineerId,
+            engineerName: engineerName,
+            date: selectedDate,
             startTime: startTimeStr,
             endTime: endTimeStr,
             grossHours: grossHours,
@@ -11302,30 +11378,49 @@ document.addEventListener('keydown', (e) => {
             totalCost: totalCost,
             notes: notes,
             createdById: user ? user.id : 'unknown',
-            createdByName: user ? user.name : 'مشرف',
+            createdByName: (user && user.username === 'admin') ? 'Bishoy Mamdouh' : (user ? (user.username || user.name) : 'مشرف'),
             createdByRole: user ? user.role : 'supervisor',
             createdAt: new Date().toISOString(),
-            status: 'approved',
-            locked: true // Strictly locked for supervisor
+            status: 'pending',
+            approvedById: null,
+            approvedByName: null,
+            approvedAt: null,
+            locked: false
         };
 
         const submitBtn = document.getElementById('btn-submit-eq-log');
         const origText = submitBtn ? submitBtn.innerHTML : '';
         if (submitBtn) {
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ والاعتماد...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إرسال الطلب للمهندس...';
         }
 
         try {
             await db.add('equipment_logs', newLog);
+
+            // Broadcast push notification to the chosen engineer
+            if (engineerId) {
+                try {
+                    await fetch('/api/broadcast', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            title: '🚜 طلب اعتماد تشغيل معدة جديد',
+                            message: `قام ${newLog.createdByName} بإرسال طلب تشغيل معدة (${newLog.equipmentName}) في (${newLog.location}) للاعتماد.`,
+                            target: [String(engineerId)]
+                        })
+                    });
+                } catch(e) {}
+            }
+
             if (window.showAppNotification) {
                 window.showAppNotification({
-                    title: '🔒 تم تسجيل واعتماد تشغيل المعدة',
-                    message: `تم تسجيل ${newLog.equipmentName} (${netHours} ساعة صافية) بنجاح وقفل السجل.`,
-                    type: 'success'
+                    title: '⏳ تم إرسال طلب تسجيل المعدة للاعتماد',
+                    message: `تم إرسال طلب تسجيل ${newLog.equipmentName} (${netHours} ساعة) إلى المهندس (${engineerName}) بنجاح.`,
+                    type: 'info'
                 });
             } else {
-                alert('تم تسجيل تشغيل المعدة واعتمادها بنجاح!');
+                alert('تم إرسال طلب تشغيل المعدة إلى المهندس للاعتماد بنجاح!');
             }
 
             // Clear inputs for next log
@@ -11333,6 +11428,7 @@ document.addEventListener('keydown', (e) => {
             const badge = document.getElementById('eq-entry-contractor-badge');
             if (badge) badge.style.display = 'none';
             operatorInput.value = '';
+            if (locInput) locInput.value = '';
             const breakInput = document.getElementById('eq-entry-break-hours');
             if (breakInput) breakInput.value = '0';
             const breakReasonSelect = document.getElementById('eq-entry-break-reason');
@@ -11341,6 +11437,9 @@ document.addEventListener('keydown', (e) => {
             if (notesEl) notesEl.value = '';
             this.recalcEquipmentEntryHours();
             await this.loadEquipmentEntryData();
+            if (typeof this.loadEngineerData === 'function') {
+                this.loadEngineerData();
+            }
         } catch (err) {
             console.error("Error submitting equipment log:", err);
             alert('حدث خطأ أثناء حفظ السجل: ' + err.message);
@@ -11354,21 +11453,54 @@ document.addEventListener('keydown', (e) => {
 
     async loadEquipmentEntryData() {
         await this.loadEquipmentList();
-        await this.loadLocationOptions();
-
-        const locSelect = document.getElementById('eq-entry-location');
-        if (locSelect && locSelect.options.length <= 1) {
-            locSelect.innerHTML = this.getWorkLocationOptionsHtml();
-        }
-        const bldSelect = document.getElementById('eq-entry-building');
-        if (bldSelect && bldSelect.options.length <= 1) {
-            bldSelect.innerHTML = this.getBuildingOptionsHtml();
-        }
 
         const dateInput = document.getElementById('eq-entry-date');
         const today = new Date().toISOString().split('T')[0];
-        if (dateInput && !dateInput.value) {
-            dateInput.value = today;
+        const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+        if (dateInput) {
+            dateInput.max = today;
+            dateInput.min = twoDaysAgo;
+            if (!dateInput.value || dateInput.value < twoDaysAgo || dateInput.value > today) {
+                dateInput.value = today;
+            }
+            dateInput.onchange = () => {
+                if (dateInput.value > today) {
+                    alert('غير مسموح باختيار تاريخ مستقبلي.');
+                    dateInput.value = today;
+                } else if (dateInput.value < twoDaysAgo) {
+                    alert('غير مسموح بتسجيل تشغيل المعدة بعد فوات أكثر من يومين.');
+                    dateInput.value = today;
+                }
+                this.loadEquipmentEntryData();
+            };
+        }
+
+        // Setup Engineer Dropdown
+        const engSelect = document.getElementById('eq-entry-engineer');
+        if (engSelect) {
+            let users = [];
+            try {
+                users = await db.getAll('users') || [];
+            } catch(e) {}
+            const engineers = users.filter(u => u.role === 'engineer' || u.role === 'admin');
+            engineers.sort((a, b) => (a.username || a.name || '').localeCompare(b.username || b.name || '', 'ar'));
+
+            const prevVal = engSelect.value;
+            let opts = '<option value="" disabled selected>اختر المهندس المسؤول للاعتماد</option>';
+            engineers.forEach(u => {
+                const dName = (u.username === 'admin') ? 'Bishoy Mamdouh (Admin)' : (u.username || u.name);
+                opts += `<option value="${u.id}">${dName}</option>`;
+            });
+            engSelect.innerHTML = opts;
+
+            const currentUserId = auth.currentUser ? String(auth.currentUser.id) : '';
+            const currentRole = auth.getRole();
+            if (prevVal && engineers.some(e => String(e.id) === String(prevVal))) {
+                engSelect.value = prevVal;
+            } else if ((currentRole === 'engineer' || currentRole === 'admin') && engineers.some(e => String(e.id) === currentUserId)) {
+                engSelect.value = currentUserId;
+            }
         }
 
         this.recalcEquipmentEntryHours();
@@ -11384,41 +11516,335 @@ document.addEventListener('keydown', (e) => {
             const todayLogs = logs.filter(l => l.date === currentDate);
 
             if (todayLogs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--text-muted); padding: 25px;"><i class="fas fa-info-circle"></i> لا توجد سجلات تشغيل معدات مسجلة لهذا اليوم (${currentDate})</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="13" style="text-align: center; color: var(--text-muted); padding: 25px;"><i class="fas fa-info-circle"></i> لا توجد سجلات تشغيل معدات مسجلة لهذا التاريخ (${currentDate})</td></tr>`;
                 return;
             }
 
             todayLogs.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+            const currentRole = auth.getRole();
+            const currentUserId = auth.currentUser ? String(auth.currentUser.id) : '';
+            const canApprove = (currentRole === 'admin' || currentRole === 'engineer');
 
             let html = '';
             todayLogs.forEach((l, idx) => {
                 const codeBadge = l.equipmentCode ? `<span style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem; font-weight: bold;">${l.equipmentCode}</span>` : '';
                 const breakText = (l.breakHours > 0) ? `<span style="color: #ef4444; font-weight: bold;">${Number(l.breakHours).toFixed(2)} س</span> ${l.breakReason ? '(' + l.breakReason + ')' : ''}` : '<span style="color: var(--text-muted);">-</span>';
                 
+                let statusBadge = '';
+                if (l.status === 'pending') {
+                    statusBadge = `<span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #b45309; border: 1px solid #f59e0b; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: bold;"><i class="fas fa-hourglass-half"></i> قيد المراجعة</span>`;
+                } else if (l.status === 'approved') {
+                    const approver = l.approvedByName || 'المهندس';
+                    statusBadge = `<span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: bold;" title="اعتمد بواسطة ${approver}"><i class="fas fa-check-circle"></i> معتمد (${approver})</span>`;
+                } else if (l.status === 'rejected') {
+                    statusBadge = `<span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: bold;" title="${l.rejectReason || ''}"><i class="fas fa-times-circle"></i> مرفوض</span>`;
+                } else {
+                    statusBadge = `<span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: bold;"><i class="fas fa-check"></i> معتمد</span>`;
+                }
+
+                let actionHtml = '-';
+                if (canApprove) {
+                    if (l.status === 'pending') {
+                        actionHtml = `
+                            <div style="display: flex; gap: 4px; justify-content: center;">
+                                <button type="button" class="btn btn-sm btn-success" style="padding: 3px 8px; font-size: 0.78rem;" onclick="app.approveEquipmentLog('${l.id}')" title="اعتماد تشغيل المعدة"><i class="fas fa-check"></i> اعتماد</button>
+                                <button type="button" class="btn btn-sm btn-danger" style="padding: 3px 8px; font-size: 0.78rem;" onclick="app.rejectEquipmentLog('${l.id}')" title="رفض الطلب"><i class="fas fa-times"></i> رفض</button>
+                            </div>
+                        `;
+                    } else if (l.status === 'approved') {
+                        actionHtml = `<span style="color: #10b981; font-weight: bold; font-size: 0.8rem;"><i class="fas fa-check-double"></i> تم</span>`;
+                    } else if (l.status === 'rejected') {
+                        actionHtml = `<span style="color: #ef4444; font-weight: bold; font-size: 0.8rem;"><i class="fas fa-times-circle"></i> مرفوض</span>`;
+                    }
+                } else {
+                    if (l.status === 'pending' && (String(l.createdById) === currentUserId || currentRole === 'admin')) {
+                        actionHtml = `<button type="button" class="btn btn-sm btn-danger" style="padding: 2px 6px; font-size: 0.75rem;" onclick="app.deleteEquipmentLog('${l.id}')" title="حذف الطلب المعلق"><i class="fas fa-trash"></i></button>`;
+                    }
+                }
+
                 html += `
                     <tr>
                         <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
                         <td style="font-weight: bold;">${l.equipmentName} ${codeBadge}</td>
                         <td>${l.contractor || '-'}</td>
-                        <td><span style="font-weight: 600;">${l.location}</span> / <span style="color: var(--text-muted);">${l.building}</span></td>
+                        <td><span style="font-weight: 600;">${l.location || '-'}</span></td>
+                        <td><span style="color: #6366f1; font-weight: 600;">${l.engineerName || '-'}</span></td>
                         <td>${l.driverName || '-'}</td>
                         <td style="direction: ltr; text-align: center;">${l.startTime}</td>
                         <td style="direction: ltr; text-align: center;">${l.endTime}</td>
                         <td>${breakText}</td>
                         <td style="text-align: center; font-weight: 800; color: #10b981; font-size: 1rem; background: rgba(16, 185, 129, 0.08);">${Number(l.netHours || 0).toFixed(2)} س</td>
                         <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${l.notes || ''}">${l.notes || '-'}</td>
-                        <td style="text-align: center;">
-                            <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: bold;">
-                                <i class="fas fa-lock"></i> معتمد ومسجل
-                            </span>
-                        </td>
+                        <td style="text-align: center;">${statusBadge}</td>
+                        <td style="text-align: center;">${actionHtml}</td>
                     </tr>
                 `;
             });
             tbody.innerHTML = html;
         } catch (err) {
             console.error("Error loading today equipment logs:", err);
-            tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: red; padding: 15px;">حدث خطأ في تحميل السجلات: ${err.message}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="13" style="text-align: center; color: red; padding: 15px;">حدث خطأ في تحميل السجلات: ${err.message}</td></tr>`;
+        }
+    }
+
+    // Engineer Equipment Tabs & Approval Functions
+
+    switchEngineerTab(tab) {
+        this.currentEngineerTab = tab;
+        const laborBtn = document.getElementById('tab-btn-eng-labor');
+        const equipBtn = document.getElementById('tab-btn-eng-equipment');
+        const laborPane = document.getElementById('engineer-labor-tab-pane');
+        const equipPane = document.getElementById('engineer-equipment-tab-pane');
+
+        if (tab === 'labor') {
+            if (laborBtn) laborBtn.className = 'btn btn-primary';
+            if (equipBtn) equipBtn.className = 'btn btn-secondary';
+            if (laborPane) laborPane.classList.remove('hidden');
+            if (equipPane) equipPane.classList.add('hidden');
+        } else {
+            if (laborBtn) laborBtn.className = 'btn btn-secondary';
+            if (equipBtn) equipBtn.className = 'btn btn-primary';
+            if (laborPane) laborPane.classList.add('hidden');
+            if (equipPane) equipPane.classList.remove('hidden');
+            this.renderEngineerEquipmentList();
+        }
+    }
+
+    async renderEngineerEquipmentList() {
+        const container = document.getElementById('engineer-equipment-records-container');
+        if (!container) return;
+
+        const role = auth.getRole();
+        const currentUserId = auth.currentUser ? String(auth.currentUser.id) : '';
+        const filterStatus = document.getElementById('eng-eq-status-filter')?.value || 'pending';
+
+        try {
+            let logs = await db.getAll('equipment_logs') || [];
+            if (!Array.isArray(logs)) logs = [];
+
+            // Filter for engineer
+            let filtered = logs.filter(l => {
+                if (filterStatus !== 'all') {
+                    const st = l.status || 'approved';
+                    if (st !== filterStatus) return false;
+                }
+                if (role !== 'admin') {
+                    if (l.engineerId && String(l.engineerId) !== currentUserId) return false;
+                }
+                return true;
+            });
+
+            filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="card text-center p-20" style="color: var(--text-muted); padding: 30px;"><i class="fas fa-check-circle" style="font-size: 2rem; color: #10b981; margin-bottom: 10px; display: block;"></i> لا توجد طلبات تشغيل معدات ${filterStatus === 'pending' ? 'قيد الانتظار حالياً' : 'تطابق هذا الفلتر'}</div>`;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(l => {
+                const codeBadge = l.equipmentCode ? `<span style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem; font-weight: bold;">${l.equipmentCode}</span>` : '';
+                const breakText = (l.breakHours > 0) ? `${Number(l.breakHours).toFixed(2)} س (${l.breakReason || 'استقطاع'})` : 'لا يوجد';
+                
+                let badgeHtml = '';
+                if (l.status === 'pending') {
+                    badgeHtml = `<span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #f59e0b;"><i class="fas fa-hourglass-half"></i> قيد المراجعة</span>`;
+                } else if (l.status === 'approved') {
+                    badgeHtml = `<span class="badge" style="background: #ecfdf5; color: #047857; border: 1px solid #10b981;"><i class="fas fa-check-circle"></i> معتمد بواسطة ${l.approvedByName || 'المهندس'}</span>`;
+                } else if (l.status === 'rejected') {
+                    badgeHtml = `<span class="badge" style="background: #fef2f2; color: #b91c1c; border: 1px solid #ef4444;"><i class="fas fa-times-circle"></i> مرفوض</span>`;
+                }
+
+                let actionsHtml = '';
+                if (l.status === 'pending') {
+                    actionsHtml = `
+                        <div style="display: flex; gap: 10px; margin-top: 14px; border-top: 1px solid var(--border-color); padding-top: 12px;">
+                            <button type="button" class="btn btn-success" style="flex: 1; font-weight: bold; padding: 10px;" onclick="app.approveEquipmentLog('${l.id}')">
+                                <i class="fas fa-check-circle"></i> اعتماد تشغيل المعدة
+                            </button>
+                            <button type="button" class="btn btn-danger" style="flex: 1; font-weight: bold; padding: 10px;" onclick="app.rejectEquipmentLog('${l.id}')">
+                                <i class="fas fa-times-circle"></i> رفض الطلب
+                            </button>
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div class="card mb-15" style="padding: 18px 20px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                            <div>
+                                <h4 style="margin: 0; font-size: 1.15rem; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-truck-monster text-primary"></i> ${l.equipmentName} ${codeBadge}
+                                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: normal;">[المقاول: ${l.contractor || '-'}]</span>
+                                </h4>
+                                <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
+                                    <i class="far fa-user"></i> الراسل: <strong>${l.createdByName || 'مشرف'}</strong> | <i class="far fa-clock"></i> تم الإرسال: ${UI.formatCairoDateTime(l.createdAt)}
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 4px 10px; border-radius: 8px; font-weight: bold; font-size: 0.85rem;">
+                                    <i class="far fa-calendar-alt"></i> تاريخ التشغيل: ${UI.formatDisplayDate(l.date)}
+                                </span>
+                                ${badgeHtml}
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 10px; font-size: 0.9rem;">
+                            <div><strong>مكان العمل:</strong> <span style="color: #6366f1; font-weight: bold;">${l.location || '-'}</span></div>
+                            <div><strong>اسم السائق / المشغل:</strong> ${l.driverName || '-'}</div>
+                            <div><strong>ساعات العمل:</strong> من <span dir="ltr">${l.startTime}</span> إلى <span dir="ltr">${l.endTime}</span> (${Number(l.grossHours || 0).toFixed(2)} س)</div>
+                            <div><strong>المستقطع:</strong> ${breakText}</div>
+                        </div>
+
+                        <div style="background: rgba(16,185,129,0.06); border: 1px dashed rgba(16,185,129,0.3); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <span style="font-size: 0.85rem; color: var(--text-muted);">صافي ساعات التشغيل الفعلية:</span>
+                                <strong style="color: #10b981; font-size: 1.15rem; margin-right: 6px;">${Number(l.netHours || 0).toFixed(2)} ساعة</strong>
+                            </div>
+                            ${role === 'admin' ? `<div><span style="font-size: 0.85rem; color: var(--text-muted);">التكلفة التقديرية:</span> <strong style="color: #047857; font-size: 1.1rem;">${Number(l.totalCost || 0).toLocaleString()} ج.م</strong></div>` : ''}
+                        </div>
+
+                        ${l.notes ? `<div style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted); background: var(--surface-color); padding: 8px 12px; border-radius: 6px;"><strong>بيان الأعمال والملاحظات:</strong> ${l.notes}</div>` : ''}
+                        ${l.rejectReason ? `<div style="margin-top: 10px; font-size: 0.85rem; color: #b91c1c; background: #fef2f2; border: 1px solid #ef4444; padding: 8px 12px; border-radius: 6px;"><strong>سبب الرفض:</strong> ${l.rejectReason}</div>` : ''}
+
+                        ${actionsHtml}
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        } catch (err) {
+            console.error("Error rendering engineer equipment list:", err);
+            container.innerHTML = `<div class="card text-center p-20" style="color: red;">حدث خطأ في تحميل طلبات المعدات: ${err.message}</div>`;
+        }
+    }
+
+    async approveEquipmentLog(id) {
+        const user = auth.currentUser;
+        const approverName = (user && user.username === 'admin') ? 'Bishoy Mamdouh' : (user ? (user.username || user.name) : 'المهندس');
+
+        let logs = await db.getAll('equipment_logs') || [];
+        const log = logs.find(l => String(l.id) === String(id));
+        if (!log) {
+            alert('تعذر العثور على سجل المعدة.');
+            return;
+        }
+
+        if (!confirm(`هل أنت متأكد من اعتماد تشغيل معدة (${log.equipmentName}) بصافي (${Number(log.netHours || 0).toFixed(2)} ساعة)؟`)) {
+            return;
+        }
+
+        const updated = {
+            ...log,
+            status: 'approved',
+            approvedById: user ? user.id : 'unknown',
+            approvedByName: approverName,
+            approvedAt: new Date().toISOString(),
+            locked: true
+        };
+
+        try {
+            await db.update('equipment_logs', id, updated);
+
+            // Broadcast notification to creator
+            if (log.createdById && log.createdById !== user?.id) {
+                try {
+                    await fetch('/api/broadcast', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            title: '✅ تم اعتماد تشغيل المعدة',
+                            message: `تم اعتماد تشغيل معدة (${log.equipmentName}) في (${log.location}) بتاريخ (${log.date}) بواسطة المهندس (${approverName}).`,
+                            target: [String(log.createdById)]
+                        })
+                    });
+                } catch(e) {}
+            }
+
+            if (window.showAppNotification) {
+                window.showAppNotification(`تم اعتماد تشغيل معدة (${log.equipmentName}) بنجاح! 🚜✅`, 'success');
+            } else {
+                alert('تم اعتماد تشغيل المعدة بنجاح!');
+            }
+
+            if (typeof this.loadEquipmentEntryData === 'function') {
+                await this.loadEquipmentEntryData();
+            }
+            if (typeof this.loadEngineerData === 'function') {
+                await this.loadEngineerData();
+            }
+            if (this.currentEngineerTab === 'equipment') {
+                await this.renderEngineerEquipmentList();
+            }
+            if (typeof this.generateEquipmentExtract === 'function') {
+                await this.generateEquipmentExtract();
+            }
+        } catch(err) {
+            console.error("Error approving equipment log:", err);
+            alert('حدث خطأ أثناء اعتماد السجل: ' + err.message);
+        }
+    }
+
+    async rejectEquipmentLog(id) {
+        const user = auth.currentUser;
+        const approverName = (user && user.username === 'admin') ? 'Bishoy Mamdouh' : (user ? (user.username || user.name) : 'المهندس');
+
+        let logs = await db.getAll('equipment_logs') || [];
+        const log = logs.find(l => String(l.id) === String(id));
+        if (!log) {
+            alert('تعذر العثور على سجل المعدة.');
+            return;
+        }
+
+        const reason = prompt(`يرجى كتابة سبب رفض طلب تشغيل معدة (${log.equipmentName}) (اختياري):`, '');
+        if (reason === null) return;
+
+        const updated = {
+            ...log,
+            status: 'rejected',
+            rejectReason: reason.trim(),
+            rejectedById: user ? user.id : 'unknown',
+            rejectedByName: approverName,
+            rejectedAt: new Date().toISOString(),
+            locked: false
+        };
+
+        try {
+            await db.update('equipment_logs', id, updated);
+
+            // Broadcast notification to creator
+            if (log.createdById && log.createdById !== user?.id) {
+                try {
+                    await fetch('/api/broadcast', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            title: '❌ تم رفض طلب تشغيل المعدة',
+                            message: `تم رفض تشغيل معدة (${log.equipmentName}) بواسطة المهندس (${approverName})${reason ? ': ' + reason : ''}`,
+                            target: [String(log.createdById)]
+                        })
+                    });
+                } catch(e) {}
+            }
+
+            if (window.showAppNotification) {
+                window.showAppNotification(`تم رفض طلب تشغيل المعدة (${log.equipmentName}) ❌`, 'warning');
+            } else {
+                alert('تم رفض طلب تشغيل المعدة.');
+            }
+
+            if (typeof this.loadEquipmentEntryData === 'function') {
+                await this.loadEquipmentEntryData();
+            }
+            if (typeof this.loadEngineerData === 'function') {
+                await this.loadEngineerData();
+            }
+            if (this.currentEngineerTab === 'equipment') {
+                await this.renderEngineerEquipmentList();
+            }
+        } catch(err) {
+            console.error("Error rejecting equipment log:", err);
+            alert('حدث خطأ أثناء رفض السجل: ' + err.message);
         }
     }
 
@@ -11731,6 +12157,7 @@ document.addEventListener('keydown', (e) => {
                 if (l.date < dateFrom || l.date > dateTo) return false;
                 if (contractor && !((l.contractor || '').toLowerCase().includes(contractor.toLowerCase()))) return false;
                 if (checkedBoxes.length > 0 && !selectedEqIds.has(String(l.equipmentId))) return false;
+                if (l.status && l.status !== 'approved') return false; // Only approved logs in extract calculations
                 return true;
             });
 
