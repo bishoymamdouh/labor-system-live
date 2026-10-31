@@ -1,4 +1,4 @@
-// Service Worker v7.5 - Auto hourly rate calculation from daily rate & hours, decimal support, and 2 decimal places in reports & extracts
+// Service Worker v7.6 - Instant permission synchronization and role defaults for equipment and users
 self.addEventListener('install', e => {
   self.skipWaiting();
 });

@@ -1204,7 +1204,7 @@ export async function onRequest(context: any): Promise<Response> {
 
             if (method === "GET" || url.searchParams.get("download") === "true") {
                 const data: Record<string, any[]> = {};
-                for (const col of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system", "location_options", "equipment", "equipment_logs"]) {
+                for (const col of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system", "location_options", "equipment", "equipment_logs", "system_settings"]) {
                     data[col] = await store.list(col);
                 }
                 const dateStr = nowIso.split("T")[0];
@@ -1259,7 +1259,7 @@ export async function onRequest(context: any): Promise<Response> {
 
         if (resource === "export" && method === "GET") {
             const data: Record<string, any[]> = {};
-            for (const col of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system", "location_options", "equipment", "equipment_logs"]) {
+            for (const col of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system", "location_options", "equipment", "equipment_logs", "system_settings"]) {
                 data[col] = await store.list(col);
             }
             return jsonResponse(data);
@@ -1269,7 +1269,7 @@ export async function onRequest(context: any): Promise<Response> {
         if (resource === "import" && method === "POST") {
             const data = await request.json();
             const statements: any[] = [];
-            for (const col of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system", "location_options", "equipment", "equipment_logs"]) {
+            for (const col of ["users", "records", "workers", "worker_directory", "push_subscriptions", "system", "location_options", "equipment", "equipment_logs", "system_settings"]) {
                 if (Array.isArray(data[col])) {
                     for (const item of data[col]) {
                         const keyStr = Array.isArray(item.key) ? (item.key[1] || item.key[0]) : (item.id || item.key);
@@ -1489,8 +1489,8 @@ export async function onRequest(context: any): Promise<Response> {
             });
         }
 
-        // 10. CRUD Collections: users, records, workers, worker_directory, push_subscriptions, location_options, equipment, equipment_logs
-        const validCollections = ["users", "records", "workers", "worker_directory", "push_subscriptions", "location_options", "equipment", "equipment_logs"];
+        // 10. CRUD Collections: users, records, workers, worker_directory, push_subscriptions, location_options, equipment, equipment_logs, system_settings
+        const validCollections = ["users", "records", "workers", "worker_directory", "push_subscriptions", "location_options", "equipment", "equipment_logs", "system_settings"];
         if (validCollections.includes(resource)) {
             // GET single item (by /api/:col/:id OR /api/:col?id=...)
             if (method === "GET" && resourceId) {

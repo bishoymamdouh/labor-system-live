@@ -1561,9 +1561,9 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=7.5').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=7.6').then(reg => {
                 reg.update();
-                console.log('ServiceWorker v7.5 registered cleanly.');
+                console.log('ServiceWorker v7.6 registered cleanly.');
             });
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -6138,6 +6138,21 @@ document.addEventListener('keydown', (e) => {
             console.log("Network came online. Attempting offline sync...");
             this.syncOfflineRecords();
         });
+        window.addEventListener('focus', async () => {
+            if (auth && auth.isLoggedIn() && auth.currentUser && auth.currentUser.id) {
+                try {
+                    const freshUser = await db.getById('users', auth.currentUser.id);
+                    if (freshUser) {
+                        auth.currentUser = { ...auth.currentUser, ...freshUser };
+                        localStorage.setItem('labor_app_user', JSON.stringify(auth.currentUser));
+                        UI.updateNavigation(auth.getRole(), auth.currentUser);
+                    }
+                    if (typeof this.loadRoleDefaultsFromCloud === 'function') {
+                        await this.loadRoleDefaultsFromCloud();
+                    }
+                } catch(e) {}
+            }
+        });
         // Try on load just in case
         setTimeout(() => this.syncOfflineRecords(), 3000);
         
@@ -6570,6 +6585,8 @@ document.addEventListener('keydown', (e) => {
             document.getElementById('default-profile-icon').style.display = 'block';
         }
         
+        await this.loadRoleDefaultsFromCloud();
+
         if (auth.currentUser && auth.currentUser.id) {
             try {
                 const freshUser = await db.getById('users', auth.currentUser.id);
@@ -6580,7 +6597,7 @@ document.addEventListener('keydown', (e) => {
             } catch(e) {}
         }
 
-        UI.updateNavigation(role);
+        UI.updateNavigation(role, auth.currentUser);
         try {
             this.startNotificationPoller();
         } catch(e) {
@@ -7129,8 +7146,13 @@ document.addEventListener('keydown', (e) => {
     }
 
     getCustomRoleDefaults() {
+        if (this.customRoleDefaults && typeof this.customRoleDefaults === 'object') {
+            return this.customRoleDefaults;
+        }
         try {
-            return JSON.parse(localStorage.getItem('labor_custom_role_permissions') || '{}');
+            const cached = JSON.parse(localStorage.getItem('labor_custom_role_permissions') || '{}');
+            this.customRoleDefaults = cached;
+            return cached;
         } catch(e) {
             return {};
         }
@@ -7144,6 +7166,21 @@ document.addEventListener('keydown', (e) => {
         return { ...(FACTORY_ROLE_PERMISSIONS[roleKey] || FACTORY_ROLE_PERMISSIONS.supervisor) };
     }
 
+    async loadRoleDefaultsFromCloud() {
+        try {
+            const doc = await db.getById('system_settings', 'role_permissions');
+            if (doc && doc.permissions) {
+                this.customRoleDefaults = doc.permissions;
+                localStorage.setItem('labor_custom_role_permissions', JSON.stringify(doc.permissions));
+                if (auth.currentUser) {
+                    UI.updateNavigation(auth.getRole(), auth.currentUser);
+                }
+            }
+        } catch(e) {
+            console.warn("Could not load role defaults from cloud DB:", e);
+        }
+    }
+
     getUserPermissions(user) {
         if (!user) return {};
         // Bishoy / admin default fallback has all permissions
@@ -7154,16 +7191,6 @@ document.addEventListener('keydown', (e) => {
         }
         const roleDefaults = this.getRoleDefaultPermissions(user.role);
         const perms = { ...roleDefaults, ...(user.permissions || {}) };
-
-        // Equipment permissions strict control:
-        // Must be EXPLICITLY set to true in user.permissions for non-admin users.
-        // It is strictly removed from all users by default unless granted individually by Admin.
-        if (user.role !== 'admin' && user.username !== 'admin') {
-            perms.equipment_entry = !!(user.permissions && user.permissions.equipment_entry === true);
-            perms.equipment_reports = !!(user.permissions && user.permissions.equipment_reports === true);
-            perms.manage_equipment = !!(user.permissions && user.permissions.manage_equipment === true);
-        }
-
         return perms;
     }
 
@@ -7201,7 +7228,7 @@ document.addEventListener('keydown', (e) => {
         }).join('');
     }
 
-    saveRoleDefaultPermissions() {
+    async saveRoleDefaultPermissions() {
         const select = document.getElementById('role-default-selector');
         const role = select ? select.value : 'supervisor';
         const custom = this.getCustomRoleDefaults();
@@ -7211,24 +7238,36 @@ document.addEventListener('keydown', (e) => {
             const cb = document.getElementById(`role-perm-${p.key}`);
             custom[role][p.key] = cb ? cb.checked : false;
         });
+        this.customRoleDefaults = custom;
         localStorage.setItem('labor_custom_role_permissions', JSON.stringify(custom));
+
+        try {
+            await db.setWithId('system_settings', 'role_permissions', { permissions: custom });
+        } catch(e) {
+            console.warn("Could not sync role defaults to cloud DB:", e);
+        }
+
         if (window.showAppNotification) {
             window.showAppNotification(`تم حفظ الصلاحيات الافتراضية لوظيفة (${auth.getRoleNameAr(role)}) بنجاح! 🛡️`, 'success');
         } else {
             alert('تم حفظ الصلاحيات الافتراضية بنجاح!');
         }
-        UI.updateNavigation(auth.getRole());
+        UI.updateNavigation(auth.getRole(), auth.currentUser);
     }
 
-    resetRoleDefaultToFactory() {
+    async resetRoleDefaultToFactory() {
         const select = document.getElementById('role-default-selector');
         const role = select ? select.value : 'supervisor';
         if (confirm(`هل أنت متأكد من استعادة الصلاحيات الأصلية لوظيفة (${auth.getRoleNameAr(role)})؟`)) {
             const custom = this.getCustomRoleDefaults();
             delete custom[role];
+            this.customRoleDefaults = custom;
             localStorage.setItem('labor_custom_role_permissions', JSON.stringify(custom));
+            try {
+                await db.setWithId('system_settings', 'role_permissions', { permissions: custom });
+            } catch(e) {}
             this.renderRoleDefaultPermissions(role);
-            UI.updateNavigation(auth.getRole());
+            UI.updateNavigation(auth.getRole(), auth.currentUser);
             if (window.showAppNotification) {
                 window.showAppNotification(`تمت استعادة الصلاحيات الأصلية لوظيفة (${auth.getRoleNameAr(role)})`, 'info');
             }
