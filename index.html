@@ -1561,7 +1561,7 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=8.2').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=8.3').then(reg => {
                 reg.update();
                 console.log('ServiceWorker v8.1 registered cleanly.');
             });
@@ -2937,8 +2937,8 @@ select {
                                 </select>
                             </div>
                             <div class="form-group" style="margin: 0;">
-                                <label for="eq-entry-deduction-hours"><i class="fas fa-minus-circle text-danger"></i> <strong>الخصم (ساعات)</strong></label>
-                                <input type="number" id="eq-entry-deduction-hours" class="modal-input" min="0" step="any" value="0" placeholder="0" style="color: #dc2626; font-weight: bold;" oninput="app.recalcEquipmentEntryHours()">
+                                <label for="eq-entry-deduction-amount"><i class="fas fa-money-bill-wave text-danger"></i> <strong>الخصم (جنيه)</strong></label>
+                                <input type="number" id="eq-entry-deduction-amount" class="modal-input" min="0" step="any" value="0" placeholder="0" style="color: #dc2626; font-weight: bold;" oninput="app.recalcEquipmentEntryHours()">
                             </div>
                         </div>
 
@@ -2947,15 +2947,15 @@ select {
                             <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                                 <div><span style="color: var(--text-muted); font-size: 0.85rem;">إجمالي التواجد:</span> <strong id="eq-calc-span" style="color: var(--text-main); font-size: 1rem;">8.00 ساعة</strong></div>
                                 <div><span style="color: var(--text-muted); font-size: 0.85rem;">الوقت المستقطع:</span> <strong id="eq-calc-break" style="color: #f59e0b; font-size: 1rem;">1.00 ساعة</strong></div>
-                                <div><span style="color: var(--text-muted); font-size: 0.85rem;">الخصم:</span> <strong id="eq-calc-deduction" style="color: #ef4444; font-size: 1rem;">0.00 ساعة</strong></div>
                                 <div style="background: #e0e7ff; color: #4338ca; padding: 4px 12px; border-radius: 8px; font-weight: 800; font-size: 1.05rem;">
                                     <i class="fas fa-check-circle"></i> صافي ساعات العمل: <span id="eq-calc-net">7.00</span> ساعة
                                 </div>
+                                <div><span style="color: var(--text-muted); font-size: 0.85rem;">مبلغ الخصم:</span> <strong id="eq-calc-deduction" style="color: #ef4444; font-size: 1rem;">0.00 ج.م</strong></div>
                             </div>
                             <!-- Admin Only Live Rate/Cost -->
                             <div id="eq-entry-admin-cost-box" style="display: none; align-items: center; gap: 12px; background: #ecfdf5; border: 1px solid #10b981; border-radius: 8px; padding: 4px 14px;">
                                 <span style="color: #065f46; font-size: 0.85rem; font-weight: bold;">سعر الساعة: <span id="eq-calc-rate">0</span> ج.م</span>
-                                <span style="color: #047857; font-size: 1.05rem; font-weight: 800;">التكلفة: <span id="eq-calc-cost">0</span> ج.م</span>
+                                <span style="color: #047857; font-size: 1.05rem; font-weight: 800;">صافي المستحق: <span id="eq-calc-cost">0</span> ج.م</span>
                             </div>
                         </div>
 
@@ -3009,8 +3009,8 @@ select {
                                     <th>من</th>
                                     <th>إلى</th>
                                     <th>المستقطع والسبب</th>
-                                    <th>الخصم (س)</th>
                                     <th>صافي الساعات</th>
+                                    <th>الخصم (ج.م)</th>
                                     <th>الحالة وملاحظات الاعتماد</th>
                                     <th>ملاحظات وبيان العمل</th>
                                     <th>الإجراء</th>
@@ -3714,7 +3714,7 @@ select {
                 </div>
 
                 <!-- KPI / Summary Cards -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 20px;">
                     <div class="card" style="padding: 14px; text-align: center; border-right: 4px solid #6366f1;">
                         <span style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 4px;">عدد السجلات التشغيلية</span>
                         <span id="extract-stat-days" style="font-size: 1.4rem; font-weight: 800; color: var(--text-main);">0</span>
@@ -3723,18 +3723,25 @@ select {
                         <span style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 4px;">إجمالي الساعات</span>
                         <span id="extract-stat-gross-hours" style="font-size: 1.4rem; font-weight: 800; color: #3b82f6;">0.00</span>
                     </div>
-                    <div class="card" style="padding: 14px; text-align: center; border-right: 4px solid #ef4444;">
+                    <div class="card" style="padding: 14px; text-align: center; border-right: 4px solid #f59e0b;">
                         <span style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 4px;">المستقطع (عطل / بريك)</span>
-                        <span id="extract-stat-deductions" style="font-size: 1.4rem; font-weight: 800; color: #ef4444;">0.00</span>
+                        <span id="extract-stat-deductions" style="font-size: 1.4rem; font-weight: 800; color: #f59e0b;">0.00</span>
                     </div>
                     <div class="card" style="padding: 14px; text-align: center; border-right: 4px solid #10b981;">
                         <span style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 4px;">صافي ساعات التشغيل</span>
                         <span id="extract-stat-net-hours" style="font-size: 1.4rem; font-weight: 800; color: #10b981;">0.00</span>
                     </div>
-                    <div class="card" style="padding: 14px; text-align: center; border-right: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.05);">
-                        <span style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 4px;">إجمالي المستخلص المستحق</span>
+                    <div class="card" style="padding: 14px; text-align: center; border-right: 4px solid #ef4444; background: rgba(239, 68, 68, 0.04);">
+                        <span style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 4px;">إجمالي الخصومات المالية</span>
                         <div style="display: flex; align-items: baseline; justify-content: center; gap: 4px;">
-                            <span id="extract-stat-total-cost" style="font-size: 1.5rem; font-weight: 900; color: #d97706;">0.00</span>
+                            <span id="extract-stat-deduction-amount" style="font-size: 1.4rem; font-weight: 800; color: #dc2626;">0.00</span>
+                            <span style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted);">ج.م</span>
+                        </div>
+                    </div>
+                    <div class="card" style="padding: 14px; text-align: center; border-right: 4px solid #059669; background: rgba(16, 185, 129, 0.05);">
+                        <span style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 4px;">صافي المستخلص المستحق</span>
+                        <div style="display: flex; align-items: baseline; justify-content: center; gap: 4px;">
+                            <span id="extract-stat-total-cost" style="font-size: 1.5rem; font-weight: 900; color: #047857;">0.00</span>
                             <span style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted);">ج.م</span>
                         </div>
                     </div>
@@ -3762,10 +3769,10 @@ select {
                                     <th>إلى</th>
                                     <th>إجمالي س</th>
                                     <th>مستقطع س</th>
-                                    <th>خصم س</th>
                                     <th style="background: rgba(16, 185, 129, 0.08);">صافي س</th>
                                     <th class="admin-only-cell">سعر س (ج.م)</th>
-                                    <th class="admin-only-cell" style="background: rgba(245, 158, 11, 0.1);">إجمالي (ج.م)</th>
+                                    <th class="admin-only-cell">الخصم (ج.م)</th>
+                                    <th class="admin-only-cell" style="background: rgba(245, 158, 11, 0.1);">صافي المستخلص (ج.م)</th>
                                     <th>بيان العمل والملاحظات</th>
                                     <th class="admin-only-cell" style="width: 75px;">إجراءات</th>
                                 </tr>
@@ -3782,9 +3789,9 @@ select {
                                     <td colspan="7" style="text-align: left; padding: 12px 16px;">الإجمالي العام للفترة:</td>
                                     <td id="extract-foot-gross" style="color: #3b82f6;">0.00</td>
                                     <td id="extract-foot-ded" style="color: #f59e0b;">0.00</td>
-                                    <td id="extract-foot-deduction-hours" style="color: #ef4444;">0.00</td>
                                     <td id="extract-foot-net" style="color: #10b981; font-size: 1.05rem;">0.00</td>
                                     <td class="admin-only-cell">-</td>
+                                    <td class="admin-only-cell" id="extract-foot-deduction-money" style="color: #dc2626; font-size: 1.05rem; font-weight: bold;">0.00 ج.م</td>
                                     <td class="admin-only-cell" id="extract-foot-total-cost" style="color: #d97706; font-size: 1.15rem; background: rgba(245, 158, 11, 0.15);">0.00 ج.م</td>
                                     <td></td>
                                     <td class="admin-only-cell"></td>
@@ -3856,7 +3863,7 @@ select {
                     <h4 style="margin: 0 0 10px 0; font-size: 0.95rem; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
                         <i class="far fa-clock text-primary"></i> أوقات وساعات التشغيل
                     </h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 10px;">
                         <div>
                             <label for="edit-eq-start-time" style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">ساعة البدء</label>
                             <input type="time" id="edit-eq-start-time" class="modal-input" style="width: 100%; direction: ltr;" onchange="app.recalcEditEquipmentHours()">
@@ -3873,10 +3880,6 @@ select {
                             <label for="edit-eq-break-hours" style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px;">المستقطع/عطل (س)</label>
                             <input type="number" step="any" min="0" id="edit-eq-break-hours" class="modal-input" style="width: 100%;" onchange="app.recalcEditEquipmentNetHours()">
                         </div>
-                        <div>
-                            <label for="edit-eq-deduction-hours" style="font-size: 0.85rem; font-weight: bold; display: block; margin-bottom: 4px; color: #dc2626;">الخصم (س)</label>
-                            <input type="number" step="any" min="0" id="edit-eq-deduction-hours" class="modal-input" style="width: 100%; color: #dc2626; font-weight: bold;" value="0" oninput="app.recalcEditEquipmentNetHours()">
-                        </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 8px;">
@@ -3890,13 +3893,17 @@ select {
                         </div>
                     </div>
 
-                    <div id="edit-eq-financial-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 8px; border-top: 1px dashed var(--border-color);">
+                    <div id="edit-eq-financial-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding-top: 8px; border-top: 1px dashed var(--border-color);">
                         <div>
                             <label for="edit-eq-hourly-rate" style="font-size: 0.85rem; display: block; margin-bottom: 4px;">سعر الساعة (جنيه)</label>
                             <input type="number" step="0.01" min="0" id="edit-eq-hourly-rate" class="modal-input" style="width: 100%;" onchange="app.recalcEditEquipmentCost()">
                         </div>
                         <div>
-                            <label for="edit-eq-total-cost" style="font-size: 0.85rem; display: block; margin-bottom: 4px; color: #d97706;">التكلفة الإجمالية (جنيه)</label>
+                            <label for="edit-eq-deduction-amount" style="font-size: 0.85rem; display: block; margin-bottom: 4px; color: #dc2626; font-weight: bold;">الخصم المالي (جنيه)</label>
+                            <input type="number" step="any" min="0" id="edit-eq-deduction-amount" class="modal-input" style="width: 100%; color: #dc2626; font-weight: bold;" value="0" placeholder="0" oninput="app.recalcEditEquipmentCost()">
+                        </div>
+                        <div>
+                            <label for="edit-eq-total-cost" style="font-size: 0.85rem; display: block; margin-bottom: 4px; color: #d97706; font-weight: bold;">صافي المستخلص (جنيه)</label>
                             <input type="number" step="0.01" min="0" id="edit-eq-total-cost" class="modal-input" style="width: 100%; font-weight: bold; color: #d97706;" readonly>
                         </div>
                     </div>
@@ -11392,7 +11399,7 @@ document.addEventListener('keydown', (e) => {
             if (endInput) endInput.value = '16:00';
             if (breakInput) breakInput.value = '1';
             if (reasonSelect) reasonSelect.value = 'راحة وغداء';
-            const dedInput = document.getElementById('eq-entry-deduction-hours');
+            const dedInput = document.getElementById('eq-entry-deduction-amount');
             if (dedInput) dedInput.value = '0';
 
             const isAdmin = auth.currentUser && (auth.currentUser.role === 'admin' || auth.currentUser.username === 'admin');
@@ -11429,8 +11436,8 @@ document.addEventListener('keydown', (e) => {
         const endTimeStr = document.getElementById('eq-entry-end-time')?.value || '16:00';
         const rawBreak = parseFloat(document.getElementById('eq-entry-break-hours')?.value);
         const breakHoursInput = isNaN(rawBreak) ? 0 : rawBreak;
-        const rawDed = parseFloat(document.getElementById('eq-entry-deduction-hours')?.value);
-        const deductionHoursInput = isNaN(rawDed) ? 0 : rawDed;
+        const rawDed = parseFloat(document.getElementById('eq-entry-deduction-amount')?.value);
+        const deductionAmount = isNaN(rawDed) ? 0 : Math.max(0, rawDed);
 
         const [sh, sm] = startTimeStr.split(':').map(Number);
         const [eh, em] = endTimeStr.split(':').map(Number);
@@ -11443,8 +11450,8 @@ document.addEventListener('keydown', (e) => {
 
         const spanHours = Math.max(0, (endMinutes - startMinutes) / 60);
         const breakHours = Math.min(spanHours, Math.max(0, breakHoursInput));
-        const deductionHours = Math.max(0, deductionHoursInput);
-        const netHours = Math.max(0, spanHours - breakHours - deductionHours);
+        // Operating hours are NOT reduced by financial money deduction
+        const netHours = Math.max(0, spanHours - breakHours);
 
         const spanEl = document.getElementById('eq-calc-span');
         if (spanEl) spanEl.innerText = spanHours.toFixed(2) + ' ساعة';
@@ -11453,20 +11460,21 @@ document.addEventListener('keydown', (e) => {
         if (breakEl) breakEl.innerText = breakHours.toFixed(2) + ' ساعة';
 
         const dedEl = document.getElementById('eq-calc-deduction');
-        if (dedEl) dedEl.innerText = deductionHours.toFixed(2) + ' ساعة';
+        if (dedEl) dedEl.innerText = deductionAmount.toFixed(2) + ' ج.م';
 
         const netEl = document.getElementById('eq-calc-net');
         if (netEl) netEl.innerText = netHours.toFixed(2);
 
-        // If admin, calculate live cost
+        // Calculate live extract cost after subtracting financial deduction
         const select = document.getElementById('eq-entry-select');
         const eqId = select ? select.value : null;
         const eq = (this.equipmentList || []).find(e => String(e.id) === String(eqId));
         const hourlyRate = eq ? (eq.hourlyRate || 0) : 0;
-        const cost = netHours * hourlyRate;
+        const grossCost = netHours * hourlyRate;
+        const finalCost = Math.max(0, grossCost - deductionAmount);
 
         const costEl = document.getElementById('eq-calc-cost');
-        if (costEl) costEl.innerText = cost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (costEl) costEl.innerText = finalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     async submitEquipmentLog() {
@@ -11479,7 +11487,7 @@ document.addEventListener('keydown', (e) => {
         const endTimeStr = document.getElementById('eq-entry-end-time')?.value;
         const breakHours = parseFloat(document.getElementById('eq-entry-break-hours')?.value) || 0;
         const breakReason = document.getElementById('eq-entry-break-reason')?.value || '';
-        const deductionHours = parseFloat(document.getElementById('eq-entry-deduction-hours')?.value) || 0;
+        const deductionAmount = parseFloat(document.getElementById('eq-entry-deduction-amount')?.value) || 0;
         const notes = document.getElementById('eq-entry-notes')?.value.trim() || '';
 
         if (!dateInput || !dateInput.value) {
@@ -11546,7 +11554,7 @@ document.addEventListener('keydown', (e) => {
         let endMinutes = eh * 60 + em;
         if (endMinutes < startMinutes) endMinutes += 24 * 60;
         const grossHours = Number(((endMinutes - startMinutes) / 60).toFixed(2));
-        const netHours = Number(Math.max(0, grossHours - breakHours - deductionHours).toFixed(2));
+        const netHours = Number(Math.max(0, grossHours - breakHours).toFixed(2));
 
         if (grossHours <= 0) {
             alert('ساعات العمل غير صحيحة. يجب أن تكون ساعة الانتهاء بعد ساعة البداية.');
@@ -11555,7 +11563,8 @@ document.addEventListener('keydown', (e) => {
 
         const eq = (this.equipmentList || []).find(e => String(e.id) === String(select.value));
         const hourlyRate = eq ? Number(eq.hourlyRate || 0) : 0;
-        const totalCost = Number((netHours * hourlyRate).toFixed(2));
+        const grossCost = Number((netHours * hourlyRate).toFixed(2));
+        const totalCost = Number(Math.max(0, grossCost - deductionAmount).toFixed(2));
 
         const user = auth.currentUser;
         const logId = 'eq_log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
@@ -11577,9 +11586,11 @@ document.addEventListener('keydown', (e) => {
             grossHours: grossHours,
             breakHours: breakHours,
             breakReason: breakReason,
-            deductionHours: deductionHours,
+            deductionAmount: deductionAmount,
+            deduction: deductionAmount,
             netHours: netHours,
             hourlyRate: hourlyRate,
+            grossCost: grossCost,
             totalCost: totalCost,
             notes: notes,
             createdById: user ? user.id : 'unknown',
@@ -11642,7 +11653,7 @@ document.addEventListener('keydown', (e) => {
             if (breakInput) breakInput.value = '1';
             const breakReasonSelect = document.getElementById('eq-entry-break-reason');
             if (breakReasonSelect) breakReasonSelect.value = 'راحة وغداء';
-            const dedInput = document.getElementById('eq-entry-deduction-hours');
+            const dedInput = document.getElementById('eq-entry-deduction-amount');
             if (dedInput) dedInput.value = '0';
             const notesEl = document.getElementById('eq-entry-notes');
             if (notesEl) notesEl.value = '';
@@ -11704,7 +11715,7 @@ document.addEventListener('keydown', (e) => {
         if (endInput && (!endInput.value || endInput.value === '17:00')) endInput.value = '16:00';
         if (breakInput && (!breakInput.value || breakInput.value === '0')) breakInput.value = '1';
         if (reasonSelect && (!reasonSelect.value || reasonSelect.value === '')) reasonSelect.value = 'راحة وغداء';
-        const dedInput = document.getElementById('eq-entry-deduction-hours');
+        const dedInput = document.getElementById('eq-entry-deduction-amount');
         if (dedInput && !dedInput.value) dedInput.value = '0';
 
         // Setup Engineer Dropdown
@@ -11795,7 +11806,8 @@ document.addEventListener('keydown', (e) => {
         filtered.forEach((l, idx) => {
             const codeBadge = l.equipmentCode ? `<span style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem; font-weight: bold;">${l.equipmentCode}</span>` : '';
             const breakText = (Number(l.breakHours || 0) > 0) ? `<span style="color: #f59e0b; font-weight: bold;">${Number(l.breakHours).toFixed(2)} س</span> ${l.breakReason ? '(' + l.breakReason + ')' : ''}` : '<span style="color: var(--text-muted);">-</span>';
-            const dedBadge = (Number(l.deductionHours || 0) > 0) ? `<span style="background: rgba(239, 68, 68, 0.1); color: #dc2626; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85rem;">-${Number(l.deductionHours).toFixed(2)} س</span>` : '<span style="color: var(--text-muted);">-</span>';
+            const dedMoney = Number(l.deductionAmount !== undefined ? l.deductionAmount : (l.deduction || 0));
+            const dedBadge = (dedMoney > 0) ? `<span style="background: rgba(239, 68, 68, 0.1); color: #dc2626; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85rem;">-${dedMoney.toFixed(2)} ج.م</span>` : '<span style="color: var(--text-muted);">-</span>';
             
             let statusBadge = '';
             if (l.status === 'pending') {
@@ -11883,8 +11895,8 @@ document.addEventListener('keydown', (e) => {
                     <td style="direction: ltr; text-align: center;">${l.startTime}</td>
                     <td style="direction: ltr; text-align: center;">${l.endTime}</td>
                     <td>${breakText}</td>
-                    <td style="text-align: center;">${dedBadge}</td>
                     <td style="text-align: center; font-weight: 800; color: #10b981; font-size: 1rem; background: rgba(16, 185, 129, 0.08);">${Number(l.netHours || 0).toFixed(2)} س</td>
+                    <td style="text-align: center;">${dedBadge}</td>
                     <td style="text-align: center;">${statusBadge}</td>
                     <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${l.notes || ''}">${l.notes || '-'}</td>
                     <td style="text-align: center;">${actionHtml}</td>
@@ -12035,7 +12047,7 @@ document.addEventListener('keydown', (e) => {
                             <div><strong>اسم السائق / المشغل:</strong> ${l.driverName || '-'}</div>
                             <div><strong>ساعات العمل:</strong> من <span dir="ltr">${l.startTime}</span> إلى <span dir="ltr">${l.endTime}</span> (${Number(l.grossHours || 0).toFixed(2)} س)</div>
                             <div><strong>المستقطع:</strong> ${breakText}</div>
-                            ${Number(l.deductionHours || 0) > 0 ? `<div><strong>الخصم:</strong> <span style="color: #ef4444; font-weight: bold;">-${Number(l.deductionHours).toFixed(2)} س</span></div>` : ''}
+                            ${Number(l.deductionAmount !== undefined ? l.deductionAmount : (l.deduction || 0)) > 0 ? `<div><strong>الخصم المالي:</strong> <span style="color: #ef4444; font-weight: bold;">-${Number(l.deductionAmount !== undefined ? l.deductionAmount : l.deduction).toFixed(2)} ج.م</span></div>` : ''}
                         </div>
 
                         <div style="background: rgba(16,185,129,0.06); border: 1px dashed rgba(16,185,129,0.3); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
@@ -12507,8 +12519,8 @@ document.addEventListener('keydown', (e) => {
 
             let totalGross = 0;
             let totalDed = 0;
-            let totalDeductionHours = 0;
             let totalNet = 0;
+            let totalDeductionsMoney = 0;
             let totalCost = 0;
 
             const isAdmin = auth.currentUser && (auth.currentUser.role === 'admin' || auth.currentUser.username === 'admin');
@@ -12520,25 +12532,28 @@ document.addEventListener('keydown', (e) => {
                 filtered.forEach((l, idx) => {
                     const gross = Number(l.grossHours || 0);
                     const ded = Number(l.breakHours || 0);
-                    const deductionHours = Number(l.deductionHours || 0);
                     const net = Number(l.netHours || 0);
                     const rate = Number(l.hourlyRate || 0);
-                    const cost = Number(l.totalCost || (net * rate));
+                    const dedMoney = Number(l.deductionAmount !== undefined ? l.deductionAmount : (l.deduction || 0));
+                    const grossCost = Number((net * rate).toFixed(2));
+                    const cost = Number(l.totalCost !== undefined && l.totalCost !== null ? l.totalCost : Math.max(0, grossCost - dedMoney));
 
                     totalGross += gross;
                     totalDed += ded;
-                    totalDeductionHours += deductionHours;
                     totalNet += net;
+                    totalDeductionsMoney += dedMoney;
                     totalCost += cost;
 
                     const codeBadge = l.equipmentCode ? `<span style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 1px 5px; border-radius: 4px; font-size: 0.76rem; font-weight: bold;">${l.equipmentCode}</span>` : '';
                     const breakDetail = (ded > 0) ? `<span style="color: #f59e0b; font-weight: bold;">${ded.toFixed(2)} س</span> ${l.breakReason ? '<small style="color:var(--text-muted);">(' + l.breakReason + ')</small>' : ''}` : '-';
-                    const deductionDetail = (deductionHours > 0) ? `<span style="color: #ef4444; font-weight: bold;">-${deductionHours.toFixed(2)} س</span>` : '-';
+                    const deductionDetail = (dedMoney > 0) ? `<span style="color: #ef4444; font-weight: bold;">-${dedMoney.toFixed(2)} ج.م</span>` : '-';
 
                     const adminCells = isAdmin ? `
                         <td style="text-align: center; font-weight: 600; color: #059669;">${rate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        <td style="text-align: center; font-weight: bold; color: #dc2626;">${deductionDetail}</td>
                         <td style="text-align: center; font-weight: 800; color: #d97706; background: rgba(245, 158, 11, 0.08);">${cost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     ` : `
+                        <td class="admin-only-cell">-</td>
                         <td class="admin-only-cell">-</td>
                         <td class="admin-only-cell">-</td>
                     `;
@@ -12567,7 +12582,6 @@ document.addEventListener('keydown', (e) => {
                             <td style="direction: ltr; text-align: center;">${l.endTime}</td>
                             <td style="text-align: center;">${gross.toFixed(2)}</td>
                             <td style="text-align: center;">${breakDetail}</td>
-                            <td style="text-align: center;">${deductionDetail}</td>
                             <td style="text-align: center; font-weight: 800; color: #10b981; background: rgba(16, 185, 129, 0.08); font-size: 0.95rem;">${net.toFixed(2)}</td>
                             ${adminCells}
                             <td style="max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${l.notes || ''}">${l.notes || '-'}</td>
@@ -12591,6 +12605,9 @@ document.addEventListener('keydown', (e) => {
             const statNet = document.getElementById('extract-stat-net-hours');
             if (statNet) statNet.innerText = totalNet.toFixed(2);
 
+            const statDedMoney = document.getElementById('extract-stat-deduction-amount');
+            if (statDedMoney) statDedMoney.innerText = totalDeductionsMoney.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
             const statCost = document.getElementById('extract-stat-total-cost');
             if (statCost) {
                 if (isAdmin) {
@@ -12607,8 +12624,8 @@ document.addEventListener('keydown', (e) => {
             const footDed = document.getElementById('extract-foot-ded');
             if (footDed) footDed.innerText = totalDed.toFixed(2);
 
-            const footDeductionHours = document.getElementById('extract-foot-deduction-hours');
-            if (footDeductionHours) footDeductionHours.innerText = totalDeductionHours.toFixed(2);
+            const footDedMoney = document.getElementById('extract-foot-deduction-money');
+            if (footDedMoney) footDedMoney.innerText = totalDeductionsMoney.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ج.م';
 
             const footNet = document.getElementById('extract-foot-net');
             if (footNet) footNet.innerText = totalNet.toFixed(2);
@@ -12630,8 +12647,8 @@ document.addEventListener('keydown', (e) => {
                 logs: filtered,
                 totalGross: totalGross,
                 totalDed: totalDed,
-                totalDeductionHours: totalDeductionHours,
                 totalNet: totalNet,
+                totalDeductions: totalDeductionsMoney,
                 totalCost: totalCost,
                 isAdmin: isAdmin
             };
@@ -12705,7 +12722,7 @@ document.addEventListener('keydown', (e) => {
         const grossInput = document.getElementById('edit-eq-gross-hours');
         const breakInput = document.getElementById('edit-eq-break-hours');
         const reasonInput = document.getElementById('edit-eq-break-reason');
-        const dedInput = document.getElementById('edit-eq-deduction-hours');
+        const dedInput = document.getElementById('edit-eq-deduction-amount');
         const netInput = document.getElementById('edit-eq-net-hours');
         const rateInput = document.getElementById('edit-eq-hourly-rate');
         const costInput = document.getElementById('edit-eq-total-cost');
@@ -12721,7 +12738,8 @@ document.addEventListener('keydown', (e) => {
         if (grossInput) grossInput.value = Number(log.grossHours || 0).toFixed(2);
         if (breakInput) breakInput.value = Number(log.breakHours || 0).toFixed(2);
         if (reasonInput) reasonInput.value = log.breakReason || '';
-        if (dedInput) dedInput.value = Number(log.deductionHours || 0).toFixed(2);
+        const dedVal = Number(log.deductionAmount !== undefined ? log.deductionAmount : (log.deduction || 0));
+        if (dedInput) dedInput.value = dedVal.toFixed(2);
         if (netInput) netInput.value = Number(log.netHours || 0).toFixed(2);
         if (rateInput) rateInput.value = Number(log.hourlyRate || 0).toFixed(2);
         if (costInput) costInput.value = Number(log.totalCost || 0).toFixed(2);
@@ -12761,8 +12779,7 @@ document.addEventListener('keydown', (e) => {
     recalcEditEquipmentNetHours() {
         const gross = parseFloat(document.getElementById('edit-eq-gross-hours')?.value) || 0;
         const breakH = parseFloat(document.getElementById('edit-eq-break-hours')?.value) || 0;
-        const dedH = parseFloat(document.getElementById('edit-eq-deduction-hours')?.value) || 0;
-        const net = Math.max(0, gross - breakH - dedH);
+        const net = Math.max(0, gross - breakH);
         const netInput = document.getElementById('edit-eq-net-hours');
         if (netInput) netInput.value = Number(net.toFixed(2));
         this.recalcEditEquipmentCost();
@@ -12771,7 +12788,8 @@ document.addEventListener('keydown', (e) => {
     recalcEditEquipmentCost() {
         const net = parseFloat(document.getElementById('edit-eq-net-hours')?.value) || 0;
         const rate = parseFloat(document.getElementById('edit-eq-hourly-rate')?.value) || 0;
-        const cost = net * rate;
+        const ded = parseFloat(document.getElementById('edit-eq-deduction-amount')?.value) || 0;
+        const cost = Math.max(0, (net * rate) - ded);
         const costInput = document.getElementById('edit-eq-total-cost');
         if (costInput) costInput.value = Number(cost.toFixed(2));
     }
@@ -12812,10 +12830,11 @@ document.addEventListener('keydown', (e) => {
         const grossHours = parseFloat(document.getElementById('edit-eq-gross-hours')?.value) || 0;
         const breakHours = parseFloat(document.getElementById('edit-eq-break-hours')?.value) || 0;
         const breakReason = document.getElementById('edit-eq-break-reason')?.value || '';
-        const deductionHours = parseFloat(document.getElementById('edit-eq-deduction-hours')?.value) || 0;
+        const deductionAmount = parseFloat(document.getElementById('edit-eq-deduction-amount')?.value) || 0;
         const netHours = parseFloat(document.getElementById('edit-eq-net-hours')?.value) || 0;
         const hourlyRate = parseFloat(document.getElementById('edit-eq-hourly-rate')?.value) || 0;
-        const totalCost = parseFloat(document.getElementById('edit-eq-total-cost')?.value) || Number((netHours * hourlyRate).toFixed(2));
+        const grossCost = Number((netHours * hourlyRate).toFixed(2));
+        const totalCost = parseFloat(document.getElementById('edit-eq-total-cost')?.value) || Number(Math.max(0, grossCost - deductionAmount).toFixed(2));
         const notes = document.getElementById('edit-eq-notes')?.value || '';
 
         if (!dateInput || !dateInput.value) {
@@ -12869,8 +12888,10 @@ document.addEventListener('keydown', (e) => {
             grossHours: Number(grossHours.toFixed(2)),
             breakHours: Number(breakHours.toFixed(2)),
             breakReason: breakReason.trim(),
-            deductionHours: Number(deductionHours.toFixed(2)),
+            deductionAmount: Number(deductionAmount.toFixed(2)),
+            deduction: Number(deductionAmount.toFixed(2)),
             netHours: Number(netHours.toFixed(2)),
+            grossCost: grossCost,
             hourlyRate: Number(hourlyRate.toFixed(2)),
             totalCost: Number(totalCost.toFixed(2)),
             status: statusVal,
@@ -13032,9 +13053,8 @@ document.addEventListener('keydown', (e) => {
                     <td style="direction: ltr; text-align: center;">${l.startTime} - ${l.endTime}</td>
                     <td style="text-align: center;">${gross.toFixed(2)}</td>
                     <td style="text-align: center;">${ded > 0 ? ded.toFixed(2) + ' س' : '-'}</td>
-                    <td style="text-align: center; color: #ef4444;">${Number(l.deductionHours || 0) > 0 ? '-' + Number(l.deductionHours).toFixed(2) + ' س' : '-'}</td>
                     <td style="text-align: center; font-weight: bold; color: #10b981;">${net.toFixed(2)}</td>
-                    ${data.isAdmin ? `<td style="text-align: center;">${rate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td><td style="text-align: center; font-weight: bold;">${cost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>` : ''}
+                    ${data.isAdmin ? `<td style="text-align: center;">${rate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td><td style="text-align: center; color: #ef4444; font-weight: bold;">${Number(l.deductionAmount !== undefined ? l.deductionAmount : (l.deduction || 0)) > 0 ? '-' + Number(l.deductionAmount !== undefined ? l.deductionAmount : l.deduction).toFixed(2) + ' ج.م' : '-'}</td><td style="text-align: center; font-weight: bold; color: #047857;">${cost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>` : ''}
                     <td style="font-size: 8pt;">${l.notes || '-'}</td>
                 </tr>
             `;
@@ -13196,9 +13216,8 @@ document.addEventListener('keydown', (e) => {
                             <th>ساعات التشغيل</th>
                             <th>إجمالي س</th>
                             <th>مستقطع س</th>
-                            <th>الخصم س</th>
                             <th>صافي س</th>
-                            ${data.isAdmin ? `<th>سعر س (ج.م)</th><th>الإجمالي (ج.م)</th>` : ''}
+                            ${data.isAdmin ? `<th>سعر س (ج.م)</th><th>الخصم (ج.م)</th><th>صافي المستحق (ج.م)</th>` : ''}
                             <th>الملاحظات وبيان العمل</th>
                         </tr>
                     </thead>
@@ -13210,8 +13229,8 @@ document.addEventListener('keydown', (e) => {
                             <td colspan="7" style="text-align: left; font-weight: bold; padding: 6px 10px;">الإجمالي العام:</td>
                             <td style="text-align: center;">${data.totalGross.toFixed(2)}</td>
                             <td style="text-align: center;">${data.totalDed.toFixed(2)}</td>
-                            <td style="text-align: center; color: #ef4444;">${(data.totalDeductionHours || 0).toFixed(2)}</td>
                             <td style="text-align: center; color: #10b981;">${data.totalNet.toFixed(2)}</td>
+                            ${data.isAdmin ? `<td>-</td><td style="text-align: center; color: #ef4444; font-weight: bold;">-${(data.totalDeductions || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</td><td style="text-align: center; color: #047857; font-weight: 800; font-size: 10pt;">${data.totalCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</td>` : ''}
                             ${data.isAdmin ? `<td>-</td><td style="text-align: center; color: #d97706; font-size: 10pt;">${data.totalCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</td>` : ''}
                             <td></td>
                         </tr>
@@ -13334,10 +13353,10 @@ document.addEventListener('keydown', (e) => {
                 'وقت الانتهاء',
                 'إجمالي الساعات',
                 'المستقطع (عطل/بريك)',
-                'الخصم (ساعات)',
                 'صافي الساعات',
                 'سعر الساعة (ج.م)',
-                'إجمالي المستخلص (ج.م)',
+                'الخصم المالي (ج.م)',
+                'صافي المستخلص المستحق (ج.م)',
                 'بيان الأعمال والملاحظات'
             ];
 
@@ -13367,10 +13386,10 @@ document.addEventListener('keydown', (e) => {
                 const eqFullName = `${l.equipmentName}${codeStr}`;
                 const gross = Number(l.grossHours || 0);
                 const ded = Number(l.breakHours || 0);
-                const deductionHours = Number(l.deductionHours || 0);
                 const net = Number(l.netHours || 0);
                 const rate = data.isAdmin ? Number(l.hourlyRate || 0) : 0;
-                const cost = data.isAdmin ? Number(l.totalCost || (net * rate)) : 0;
+                const dedMoney = Number(l.deductionAmount !== undefined ? l.deductionAmount : (l.deduction || 0));
+                const cost = data.isAdmin ? Number(l.totalCost !== undefined ? l.totalCost : Math.max(0, (net * rate) - dedMoney)) : 0;
 
                 const rowValues = [
                     idx + 1,
@@ -13384,9 +13403,9 @@ document.addEventListener('keydown', (e) => {
                     l.endTime,
                     gross,
                     ded,
-                    deductionHours,
                     net,
                     data.isAdmin ? rate : '***',
+                    dedMoney,
                     data.isAdmin ? cost : '***',
                     l.notes || ''
                 ];
@@ -13410,15 +13429,18 @@ document.addEventListener('keydown', (e) => {
                     };
 
                     // Format numbers
-                    if (c === 10 || c === 11 || c === 12 || c === 13) {
+                    if (c === 10 || c === 11 || c === 12) {
                         cell.numFmt = '#,##0.00';
-                        if (c === 13) {
+                        if (c === 12) {
                             cell.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: 'FF059669' } };
                         }
                     }
-                    if (c === 14 || c === 15) {
+                    if (c === 13 || c === 14 || c === 15) {
                         if (data.isAdmin) {
                             cell.numFmt = '#,##0.00';
+                            if (c === 14) {
+                                cell.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: 'FFDC2626' } };
+                            }
                             if (c === 15) {
                                 cell.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: 'FFD97706' } };
                                 cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFBEB' } };
@@ -13441,9 +13463,9 @@ document.addEventListener('keydown', (e) => {
                 '',
                 data.totalGross,
                 data.totalDed,
-                data.totalDeductionHours || 0,
                 data.totalNet,
                 '-',
+                data.totalDeductions || 0,
                 data.isAdmin ? data.totalCost : '***',
                 ''
             ];
@@ -13464,11 +13486,12 @@ document.addEventListener('keydown', (e) => {
                     left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
                     right: { style: 'thin', color: { argb: 'FFCBD5E1' } }
                 };
-                if (c === 10 || c === 11 || c === 12 || c === 13 || (c === 15 && data.isAdmin)) {
+                if (c === 10 || c === 11 || c === 12 || c === 14 || (c === 15 && data.isAdmin)) {
                     cell.numFmt = '#,##0.00';
                     cell.font = { name: 'Segoe UI', size: 11, bold: true };
                 }
-                if (c === 13) cell.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FF059669' } };
+                if (c === 12) cell.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FF059669' } };
+                if (c === 14) cell.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FFDC2626' } };
                 if (c === 15 && data.isAdmin) cell.font = { name: 'Segoe UI', size: 12, bold: true, color: { argb: 'FFB45309' } };
             }
 
@@ -13485,10 +13508,10 @@ document.addEventListener('keydown', (e) => {
                 { width: 11 }, // الانتهاء
                 { width: 14 }, // إجمالي الساعات
                 { width: 16 }, // المستقطع
-                { width: 14 }, // الخصم
                 { width: 14 }, // صافي الساعات
                 { width: 16 }, // سعر الساعة
-                { width: 22 }, // التكلفة
+                { width: 16 }, // الخصم المالي
+                { width: 22 }, // صافي المستخلص
                 { width: 30 }  // بيان الأعمال والملاحظات
             ];
 

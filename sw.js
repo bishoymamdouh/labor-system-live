@@ -1,4 +1,4 @@
-// Service Worker v8.2 - Add deduction field subtracting from daily total and notes at the end for equipment and labor logs
+// Service Worker v8.3 - Equipment deduction is money amount deducted from contractor extract
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
