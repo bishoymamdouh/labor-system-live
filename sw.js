@@ -1,4 +1,4 @@
-// Service Worker v7.9 - Restrict equipment entry dates to today and yesterday only
+// Service Worker v8.0 - Edit and delete equipment operation requests and hours anytime (pending or approved)
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
