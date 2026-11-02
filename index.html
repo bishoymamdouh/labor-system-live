@@ -1561,9 +1561,9 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=8.0').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=8.1').then(reg => {
                 reg.update();
-                console.log('ServiceWorker v8.0 registered cleanly.');
+                console.log('ServiceWorker v8.1 registered cleanly.');
             });
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -2917,17 +2917,17 @@ select {
                             </div>
                             <div class="form-group quarter">
                                 <label for="eq-entry-end-time"><i class="fas fa-stop text-danger"></i> <strong>ساعة الانتهاء <span style="color:red;">*</span></strong></label>
-                                <input type="time" id="eq-entry-end-time" class="modal-input" value="17:00" required onchange="app.recalcEquipmentEntryHours()">
+                                <input type="time" id="eq-entry-end-time" class="modal-input" value="16:00" required onchange="app.recalcEquipmentEntryHours()">
                             </div>
                             <div class="form-group quarter">
                                 <label for="eq-entry-break-hours"><i class="fas fa-pause text-warning"></i> <strong>وقت مستقطع (ساعات)</strong></label>
-                                <input type="number" id="eq-entry-break-hours" class="modal-input" min="0" step="any" value="0" placeholder="0" oninput="app.recalcEquipmentEntryHours()">
+                                <input type="number" id="eq-entry-break-hours" class="modal-input" min="0" step="any" value="1" placeholder="1" oninput="app.recalcEquipmentEntryHours()">
                             </div>
                             <div class="form-group quarter">
                                 <label for="eq-entry-break-reason"><strong>سبب الاستقطاع (إن وجد)</strong></label>
-                                <select id="eq-entry-break-reason" class="modal-input">
+                                <select id="eq-entry-break-reason" class="modal-input" onchange="app.recalcEquipmentEntryHours()">
+                                    <option value="راحة وغداء" selected>راحة وغداء</option>
                                     <option value="">لا يوجد وقت مستقطع</option>
-                                    <option value="راحة وغداء">راحة وغداء</option>
                                     <option value="عطل ميكانيكي">عطل ميكانيكي</option>
                                     <option value="صيانة وتزود بالوقود">صيانة وتزود بالوقود</option>
                                     <option value="انتظار خامات وموقع">انتظار خامات وموقع</option>
@@ -2940,10 +2940,10 @@ select {
                         <!-- Live Calculation Banner -->
                         <div id="eq-entry-calc-banner" style="display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 18px; margin-bottom: 15px; flex-wrap: wrap; gap: 12px;">
                             <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                                <div><span style="color: var(--text-muted); font-size: 0.85rem;">إجمالي التواجد:</span> <strong id="eq-calc-span" style="color: var(--text-main); font-size: 1rem;">9.00 ساعة</strong></div>
-                                <div><span style="color: var(--text-muted); font-size: 0.85rem;">الوقت المستقطع:</span> <strong id="eq-calc-break" style="color: #ef4444; font-size: 1rem;">0.00 ساعة</strong></div>
+                                <div><span style="color: var(--text-muted); font-size: 0.85rem;">إجمالي التواجد:</span> <strong id="eq-calc-span" style="color: var(--text-main); font-size: 1rem;">8.00 ساعة</strong></div>
+                                <div><span style="color: var(--text-muted); font-size: 0.85rem;">الوقت المستقطع:</span> <strong id="eq-calc-break" style="color: #ef4444; font-size: 1rem;">1.00 ساعة</strong></div>
                                 <div style="background: #e0e7ff; color: #4338ca; padding: 4px 12px; border-radius: 8px; font-weight: 800; font-size: 1.05rem;">
-                                    <i class="fas fa-check-circle"></i> صافي ساعات العمل: <span id="eq-calc-net">9.00</span> ساعة
+                                    <i class="fas fa-check-circle"></i> صافي ساعات العمل: <span id="eq-calc-net">7.00</span> ساعة
                                 </div>
                             </div>
                             <!-- Admin Only Live Rate/Cost -->
@@ -2966,16 +2966,35 @@ select {
 
                 <div class="card" style="padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-card);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
-                        <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-main);"><i class="fas fa-list-check"></i> سجلات تشغيل اليوم للمعدات</h3>
-                        <span style="font-size: 0.82rem; color: #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 3px 10px; border-radius: 8px; font-weight: bold;">
-                            <i class="fas fa-hourglass-half"></i> السجلات تُرسل للمهندس المسؤول للمراجعة والاعتماد
-                        </span>
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-main);"><i class="fas fa-list-check"></i> سجلات تشغيل المعدات المسجلة</h3>
+                            <span style="font-size: 0.82rem; color: var(--text-muted);">عرض كافة السجلات المسجلة (الحالية والسابقة) وحالة اعتمادها مع بيان ملاحظات الرفض</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <label style="font-size: 0.85rem; font-weight: bold; margin: 0;">الحالة:</label>
+                                <select id="eq-entry-table-status-filter" class="modal-input" style="width: auto; margin: 0; padding: 4px 10px; font-size: 0.85rem;" onchange="app.renderEquipmentEntryTable()">
+                                    <option value="all" selected>كافة الحالات (الكل)</option>
+                                    <option value="pending">قيد الانتظار</option>
+                                    <option value="approved">معتمد</option>
+                                    <option value="rejected">مرفوض</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <label style="font-size: 0.85rem; font-weight: bold; margin: 0;">الفترة:</label>
+                                <select id="eq-entry-table-date-filter" class="modal-input" style="width: auto; margin: 0; padding: 4px 10px; font-size: 0.85rem;" onchange="app.renderEquipmentEntryTable()">
+                                    <option value="all" selected>كل التسجيلات القديمة والحديثة</option>
+                                    <option value="today">سجلات اليوم وأمس فقط</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="table-responsive">
                         <table class="data-table" id="today-equipment-table" style="font-size: 0.9rem;">
                             <thead>
                                 <tr>
                                     <th>م</th>
+                                    <th>التاريخ</th>
                                     <th>المعدة والكود</th>
                                     <th>المقاول</th>
                                     <th>مكان العمل</th>
@@ -2986,12 +3005,12 @@ select {
                                     <th>المستقطع والسبب</th>
                                     <th>صافي الساعات</th>
                                     <th>بيان العمل</th>
-                                    <th>الحالة</th>
+                                    <th>الحالة وملاحظات الاعتماد</th>
                                     <th>الإجراء</th>
                                 </tr>
                             </thead>
                             <tbody id="today-equipment-table-body">
-                                <tr><td colspan="11" style="text-align: center; color: var(--text-muted); padding: 20px;">لا توجد سجلات مسجلة اليوم حتى الآن</td></tr>
+                                <tr><td colspan="14" style="text-align: center; color: var(--text-muted); padding: 20px;">جاري تحميل سجلات تشغيل المعدات...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -11335,6 +11354,22 @@ document.addEventListener('keydown', (e) => {
                 badge.style.display = 'block';
                 badge.innerHTML = `<i class="fas fa-building text-primary"></i> المقاول المالك: <strong>${eq.contractor}</strong> | الساعات المحددة لليومية: <strong>${Number(eq.dailyHours || 8).toFixed(2)} س</strong>`;
             }
+
+            // Set user's requested defaults:
+            // ساعة البداية: 08:00 AM (08:00)
+            // ساعة الانتهاء: 04:00 PM (16:00)
+            // وقت مستقطع (ساعات): 1
+            // سبب الاستقطاع: راحة وغداء
+            const startInput = document.getElementById('eq-entry-start-time');
+            const endInput = document.getElementById('eq-entry-end-time');
+            const breakInput = document.getElementById('eq-entry-break-hours');
+            const reasonSelect = document.getElementById('eq-entry-break-reason');
+
+            if (startInput) startInput.value = '08:00';
+            if (endInput) endInput.value = '16:00';
+            if (breakInput) breakInput.value = '1';
+            if (reasonSelect) reasonSelect.value = 'راحة وغداء';
+
             const isAdmin = auth.currentUser && (auth.currentUser.role === 'admin' || auth.currentUser.username === 'admin');
             if (adminCostBox) {
                 if (isAdmin) {
@@ -11366,8 +11401,9 @@ document.addEventListener('keydown', (e) => {
 
     recalcEquipmentEntryHours() {
         const startTimeStr = document.getElementById('eq-entry-start-time')?.value || '08:00';
-        const endTimeStr = document.getElementById('eq-entry-end-time')?.value || '17:00';
-        const breakHoursInput = parseFloat(document.getElementById('eq-entry-break-hours')?.value) || 0;
+        const endTimeStr = document.getElementById('eq-entry-end-time')?.value || '16:00';
+        const rawBreak = parseFloat(document.getElementById('eq-entry-break-hours')?.value);
+        const breakHoursInput = isNaN(rawBreak) ? 0 : rawBreak;
 
         const [sh, sm] = startTimeStr.split(':').map(Number);
         const [eh, em] = endTimeStr.split(':').map(Number);
@@ -11565,10 +11601,14 @@ document.addEventListener('keydown', (e) => {
             if (badge) badge.style.display = 'none';
             operatorInput.value = '';
             if (locInput) locInput.value = '';
+            const startInput = document.getElementById('eq-entry-start-time');
+            if (startInput) startInput.value = '08:00';
+            const endInput = document.getElementById('eq-entry-end-time');
+            if (endInput) endInput.value = '16:00';
             const breakInput = document.getElementById('eq-entry-break-hours');
-            if (breakInput) breakInput.value = '0';
+            if (breakInput) breakInput.value = '1';
             const breakReasonSelect = document.getElementById('eq-entry-break-reason');
-            if (breakReasonSelect) breakReasonSelect.value = '';
+            if (breakReasonSelect) breakReasonSelect.value = 'راحة وغداء';
             const notesEl = document.getElementById('eq-entry-notes');
             if (notesEl) notesEl.value = '';
             this.recalcEquipmentEntryHours();
@@ -11620,6 +11660,16 @@ document.addEventListener('keydown', (e) => {
             };
         }
 
+        // Setup default input values for operation hours
+        const startInput = document.getElementById('eq-entry-start-time');
+        const endInput = document.getElementById('eq-entry-end-time');
+        const breakInput = document.getElementById('eq-entry-break-hours');
+        const reasonSelect = document.getElementById('eq-entry-break-reason');
+        if (startInput && !startInput.value) startInput.value = '08:00';
+        if (endInput && (!endInput.value || endInput.value === '17:00')) endInput.value = '16:00';
+        if (breakInput && (!breakInput.value || breakInput.value === '0')) breakInput.value = '1';
+        if (reasonSelect && (!reasonSelect.value || reasonSelect.value === '')) reasonSelect.value = 'راحة وغداء';
+
         // Setup Engineer Dropdown
         const engSelect = document.getElementById('eq-entry-engineer');
         if (engSelect) {
@@ -11649,105 +11699,160 @@ document.addEventListener('keydown', (e) => {
 
         this.recalcEquipmentEntryHours();
 
-        // Render today's equipment logs
-        const tbody = document.getElementById('today-equipment-table-body');
-        if (!tbody) return;
-
+        // Render equipment logs (all records, current and old)
         try {
             let logs = await db.getAll('equipment_logs') || [];
             if (!Array.isArray(logs)) logs = [];
-            const currentDate = dateInput ? dateInput.value : today;
-            const todayLogs = logs.filter(l => l.date === currentDate);
+            this.allEquipmentLogs = logs;
+            this.renderEquipmentEntryTable();
+        } catch (err) {
+            console.error("Error loading equipment logs:", err);
+            const tbody = document.getElementById('today-equipment-table-body');
+            if (tbody) tbody.innerHTML = `<tr><td colspan="14" style="text-align: center; color: red; padding: 15px;">حدث خطأ في تحميل السجلات: ${err.message}</td></tr>`;
+        }
+    }
 
-            if (todayLogs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="13" style="text-align: center; color: var(--text-muted); padding: 25px;"><i class="fas fa-info-circle"></i> لا توجد سجلات تشغيل معدات مسجلة لهذا التاريخ (${currentDate})</td></tr>`;
-                return;
+    renderEquipmentEntryTable() {
+        const tbody = document.getElementById('today-equipment-table-body');
+        if (!tbody) return;
+
+        let logs = this.allEquipmentLogs || [];
+        const statusFilter = document.getElementById('eq-entry-table-status-filter')?.value || 'all';
+        const dateFilter = document.getElementById('eq-entry-table-date-filter')?.value || 'all';
+
+        const now = new Date();
+        const today = (function() {
+            try { return now.toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }); }
+            catch(e) { return now.toISOString().split('T')[0]; }
+        })();
+        const yesterdayObj = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const yesterday = (function() {
+            try { return yesterdayObj.toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }); }
+            catch(e) { return yesterdayObj.toISOString().split('T')[0]; }
+        })();
+
+        let filtered = logs.filter(l => {
+            if (statusFilter !== 'all') {
+                const st = l.status || 'approved';
+                if (st !== statusFilter) return false;
+            }
+            if (dateFilter === 'today') {
+                if (l.date !== today && l.date !== yesterday) return false;
+            }
+            return true;
+        });
+
+        // Sort descending by date and creation time
+        filtered.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (new Date(b.createdAt || 0) - new Date(a.createdAt || 0)));
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="14" style="text-align: center; color: var(--text-muted); padding: 25px;"><i class="fas fa-info-circle"></i> لا توجد سجلات تشغيل معدات مسجلة تطابق الفلتر المحدد</td></tr>`;
+            return;
+        }
+
+        const currentRole = auth.getRole();
+        const currentUserId = auth.currentUser ? String(auth.currentUser.id) : '';
+        const canApprove = (currentRole === 'admin' || currentRole === 'engineer');
+
+        let html = '';
+        filtered.forEach((l, idx) => {
+            const codeBadge = l.equipmentCode ? `<span style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem; font-weight: bold;">${l.equipmentCode}</span>` : '';
+            const breakText = (Number(l.breakHours || 0) > 0) ? `<span style="color: #ef4444; font-weight: bold;">${Number(l.breakHours).toFixed(2)} س</span> ${l.breakReason ? '(' + l.breakReason + ')' : ''}` : '<span style="color: var(--text-muted);">-</span>';
+            
+            let statusBadge = '';
+            if (l.status === 'pending') {
+                statusBadge = `
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                        <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #b45309; border: 1px solid #f59e0b; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: bold;">
+                            <i class="fas fa-hourglass-half"></i> قيد الانتظار
+                        </span>
+                    </div>
+                `;
+            } else if (l.status === 'approved') {
+                const approver = l.approvedByName || 'المهندس';
+                statusBadge = `
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                        <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: bold;" title="اعتمد بواسطة ${approver}">
+                            <i class="fas fa-check-circle"></i> معتمد
+                        </span>
+                        <small style="color: #047857; font-size: 0.72rem; font-weight: 600;">(${approver})</small>
+                    </div>
+                `;
+            } else if (l.status === 'rejected') {
+                statusBadge = `
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: bold;">
+                            <i class="fas fa-times-circle"></i> مرفوض
+                        </span>
+                        ${l.rejectReason ? `
+                            <div style="background: #fef2f2; color: #b91c1c; border: 1px dashed #ef4444; padding: 3px 6px; border-radius: 4px; font-size: 0.74rem; font-weight: 600; text-align: center; max-width: 160px; word-break: break-word;" title="${l.rejectReason}">
+                                <i class="fas fa-comment-dots"></i> ${l.rejectReason}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                statusBadge = `<span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: bold;"><i class="fas fa-check"></i> معتمد</span>`;
             }
 
-            todayLogs.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-
-            const currentRole = auth.getRole();
-            const currentUserId = auth.currentUser ? String(auth.currentUser.id) : '';
-            const canApprove = (currentRole === 'admin' || currentRole === 'engineer');
-
-            let html = '';
-            todayLogs.forEach((l, idx) => {
-                const codeBadge = l.equipmentCode ? `<span style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem; font-weight: bold;">${l.equipmentCode}</span>` : '';
-                const breakText = (l.breakHours > 0) ? `<span style="color: #ef4444; font-weight: bold;">${Number(l.breakHours).toFixed(2)} س</span> ${l.breakReason ? '(' + l.breakReason + ')' : ''}` : '<span style="color: var(--text-muted);">-</span>';
-                
-                let statusBadge = '';
+            let actionHtml = '-';
+            if (canApprove) {
                 if (l.status === 'pending') {
-                    statusBadge = `<span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #b45309; border: 1px solid #f59e0b; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: bold;"><i class="fas fa-hourglass-half"></i> قيد المراجعة</span>`;
+                    actionHtml = `
+                        <div style="display: flex; gap: 4px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-sm btn-success" style="padding: 2px 6px; font-size: 0.75rem;" onclick="app.approveEquipmentLog('${l.id}')" title="اعتماد تشغيل المعدة"><i class="fas fa-check"></i></button>
+                            <button type="button" class="btn btn-sm btn-secondary" style="padding: 2px 6px; font-size: 0.75rem; background: rgba(99,102,241,0.1); color: #6366f1; border-color: #6366f1;" onclick="app.openEditEquipmentLogModal('${l.id}')" title="تعديل الساعات والبيانات"><i class="fas fa-edit"></i></button>
+                            <button type="button" class="btn btn-sm btn-warning" style="padding: 2px 6px; font-size: 0.75rem;" onclick="app.rejectEquipmentLog('${l.id}')" title="رفض الطلب"><i class="fas fa-times"></i></button>
+                            <button type="button" class="btn btn-sm btn-danger" style="padding: 2px 6px; font-size: 0.75rem;" onclick="app.deleteEquipmentLog('${l.id}')" title="مسح من النظام"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    `;
                 } else if (l.status === 'approved') {
-                    const approver = l.approvedByName || 'المهندس';
-                    statusBadge = `<span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: bold;" title="اعتمد بواسطة ${approver}"><i class="fas fa-check-circle"></i> معتمد (${approver})</span>`;
+                    actionHtml = `
+                        <div style="display: flex; gap: 4px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-sm btn-secondary" style="padding: 2px 6px; font-size: 0.75rem; background: rgba(99,102,241,0.1); color: #6366f1; border-color: #6366f1;" onclick="app.openEditEquipmentLogModal('${l.id}')" title="تعديل الساعات والبيانات حتى بعد الاعتماد"><i class="fas fa-edit"></i> تعديل</button>
+                            <button type="button" class="btn btn-sm btn-danger" style="padding: 2px 6px; font-size: 0.75rem;" onclick="app.deleteEquipmentLog('${l.id}')" title="مسح السجل المعتمد نهائياً من النظام"><i class="fas fa-trash-alt"></i> مسح</button>
+                        </div>
+                    `;
                 } else if (l.status === 'rejected') {
-                    statusBadge = `<span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: bold;" title="${l.rejectReason || ''}"><i class="fas fa-times-circle"></i> مرفوض</span>`;
-                } else {
-                    statusBadge = `<span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: bold;"><i class="fas fa-check"></i> معتمد</span>`;
+                    actionHtml = `
+                        <div style="display: flex; gap: 4px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-sm btn-success" style="padding: 2px 6px; font-size: 0.75rem;" onclick="app.approveEquipmentLog('${l.id}')" title="اعتماد"><i class="fas fa-check"></i></button>
+                            <button type="button" class="btn btn-sm btn-secondary" style="padding: 2px 6px; font-size: 0.75rem; background: rgba(99,102,241,0.1); color: #6366f1; border-color: #6366f1;" onclick="app.openEditEquipmentLogModal('${l.id}')" title="تعديل"><i class="fas fa-edit"></i></button>
+                            <button type="button" class="btn btn-sm btn-danger" style="padding: 2px 6px; font-size: 0.75rem;" onclick="app.deleteEquipmentLog('${l.id}')" title="مسح من النظام"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    `;
                 }
-
-                let actionHtml = '-';
-                if (canApprove) {
-                    if (l.status === 'pending') {
-                        actionHtml = `
-                            <div style="display: flex; gap: 4px; justify-content: center; align-items: center; flex-wrap: wrap;">
-                                <button type="button" class="btn btn-sm btn-success" style="padding: 2px 6px; font-size: 0.75rem;" onclick="app.approveEquipmentLog('${l.id}')" title="اعتماد تشغيل المعدة"><i class="fas fa-check"></i></button>
-                                <button type="button" class="btn btn-sm btn-secondary" style="padding: 2px 6px; font-size: 0.75rem; background: rgba(99,102,241,0.1); color: #6366f1; border-color: #6366f1;" onclick="app.openEditEquipmentLogModal('${l.id}')" title="تعديل الساعات والبيانات"><i class="fas fa-edit"></i></button>
-                                <button type="button" class="btn btn-sm btn-warning" style="padding: 2px 6px; font-size: 0.75rem;" onclick="app.rejectEquipmentLog('${l.id}')" title="رفض الطلب"><i class="fas fa-times"></i></button>
-                                <button type="button" class="btn btn-sm btn-danger" style="padding: 2px 6px; font-size: 0.75rem;" onclick="app.deleteEquipmentLog('${l.id}')" title="مسح من النظام"><i class="fas fa-trash-alt"></i></button>
-                            </div>
-                        `;
-                    } else if (l.status === 'approved') {
-                        actionHtml = `
-                            <div style="display: flex; gap: 4px; justify-content: center; align-items: center; flex-wrap: wrap;">
-                                <button type="button" class="btn btn-sm btn-secondary" style="padding: 2px 6px; font-size: 0.75rem; background: rgba(99,102,241,0.1); color: #6366f1; border-color: #6366f1;" onclick="app.openEditEquipmentLogModal('${l.id}')" title="تعديل الساعات والبيانات حتى بعد الاعتماد"><i class="fas fa-edit"></i> تعديل</button>
-                                <button type="button" class="btn btn-sm btn-danger" style="padding: 2px 6px; font-size: 0.75rem;" onclick="app.deleteEquipmentLog('${l.id}')" title="مسح السجل المعتمد نهائياً من النظام"><i class="fas fa-trash-alt"></i> مسح</button>
-                            </div>
-                        `;
-                    } else if (l.status === 'rejected') {
-                        actionHtml = `
-                            <div style="display: flex; gap: 4px; justify-content: center; align-items: center; flex-wrap: wrap;">
-                                <button type="button" class="btn btn-sm btn-success" style="padding: 2px 6px; font-size: 0.75rem;" onclick="app.approveEquipmentLog('${l.id}')" title="اعتماد"><i class="fas fa-check"></i></button>
-                                <button type="button" class="btn btn-sm btn-secondary" style="padding: 2px 6px; font-size: 0.75rem; background: rgba(99,102,241,0.1); color: #6366f1; border-color: #6366f1;" onclick="app.openEditEquipmentLogModal('${l.id}')" title="تعديل"><i class="fas fa-edit"></i></button>
-                                <button type="button" class="btn btn-sm btn-danger" style="padding: 2px 6px; font-size: 0.75rem;" onclick="app.deleteEquipmentLog('${l.id}')" title="مسح من النظام"><i class="fas fa-trash-alt"></i></button>
-                            </div>
-                        `;
-                    }
-                } else {
-                    if (String(l.createdById) === currentUserId || currentRole === 'admin') {
-                        actionHtml = `
-                            <div style="display: flex; gap: 4px; justify-content: center; align-items: center;">
-                                <button type="button" class="btn btn-sm btn-secondary" style="padding: 2px 6px; font-size: 0.75rem; background: rgba(99,102,241,0.1); color: #6366f1; border-color: #6366f1;" onclick="app.openEditEquipmentLogModal('${l.id}')" title="تعديل بيانات السجل"><i class="fas fa-edit"></i></button>
-                                <button type="button" class="btn btn-sm btn-danger" style="padding: 2px 6px; font-size: 0.75rem;" onclick="app.deleteEquipmentLog('${l.id}')" title="مسح السجل من النظام"><i class="fas fa-trash-alt"></i></button>
-                            </div>
-                        `;
-                    }
+            } else {
+                if (String(l.createdById) === currentUserId || currentRole === 'admin') {
+                    actionHtml = `
+                        <div style="display: flex; gap: 4px; justify-content: center; align-items: center;">
+                            <button type="button" class="btn btn-sm btn-secondary" style="padding: 2px 6px; font-size: 0.75rem; background: rgba(99,102,241,0.1); color: #6366f1; border-color: #6366f1;" onclick="app.openEditEquipmentLogModal('${l.id}')" title="تعديل بيانات السجل"><i class="fas fa-edit"></i></button>
+                            <button type="button" class="btn btn-sm btn-danger" style="padding: 2px 6px; font-size: 0.75rem;" onclick="app.deleteEquipmentLog('${l.id}')" title="مسح السجل من النظام"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    `;
                 }
+            }
 
-                html += `
-                    <tr>
-                        <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
-                        <td style="font-weight: bold;">${l.equipmentName} ${codeBadge}</td>
-                        <td>${l.contractor || '-'}</td>
-                        <td><span style="font-weight: 600;">${l.location || '-'}</span></td>
-                        <td><span style="color: #6366f1; font-weight: 600;">${l.engineerName || '-'}</span></td>
-                        <td>${l.driverName || '-'}</td>
-                        <td style="direction: ltr; text-align: center;">${l.startTime}</td>
-                        <td style="direction: ltr; text-align: center;">${l.endTime}</td>
-                        <td>${breakText}</td>
-                        <td style="text-align: center; font-weight: 800; color: #10b981; font-size: 1rem; background: rgba(16, 185, 129, 0.08);">${Number(l.netHours || 0).toFixed(2)} س</td>
-                        <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${l.notes || ''}">${l.notes || '-'}</td>
-                        <td style="text-align: center;">${statusBadge}</td>
-                        <td style="text-align: center;">${actionHtml}</td>
-                    </tr>
-                `;
-            });
-            tbody.innerHTML = html;
-        } catch (err) {
-            console.error("Error loading today equipment logs:", err);
-            tbody.innerHTML = `<tr><td colspan="13" style="text-align: center; color: red; padding: 15px;">حدث خطأ في تحميل السجلات: ${err.message}</td></tr>`;
-        }
+            html += `
+                <tr>
+                    <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+                    <td style="white-space: nowrap; font-weight: bold; color: #6366f1; text-align: center;"><i class="far fa-calendar-alt"></i> ${UI.formatDisplayDate(l.date)}</td>
+                    <td style="font-weight: bold;">${l.equipmentName} ${codeBadge}</td>
+                    <td>${l.contractor || '-'}</td>
+                    <td><span style="font-weight: 600;">${l.location || '-'}</span></td>
+                    <td><span style="color: #6366f1; font-weight: 600;">${l.engineerName || '-'}</span></td>
+                    <td>${l.driverName || '-'}</td>
+                    <td style="direction: ltr; text-align: center;">${l.startTime}</td>
+                    <td style="direction: ltr; text-align: center;">${l.endTime}</td>
+                    <td>${breakText}</td>
+                    <td style="text-align: center; font-weight: 800; color: #10b981; font-size: 1rem; background: rgba(16, 185, 129, 0.08);">${Number(l.netHours || 0).toFixed(2)} س</td>
+                    <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${l.notes || ''}">${l.notes || '-'}</td>
+                    <td style="text-align: center;">${statusBadge}</td>
+                    <td style="text-align: center;">${actionHtml}</td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
     }
 
     // Engineer Equipment Tabs & Approval Functions

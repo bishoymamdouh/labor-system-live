@@ -1,4 +1,4 @@
-// Service Worker v8.0 - Edit and delete equipment operation requests and hours anytime (pending or approved)
+// Service Worker v8.1 - Default equipment hours 08:00-16:00 break 1h lunch and show all past equipment records with clear rejection status
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
