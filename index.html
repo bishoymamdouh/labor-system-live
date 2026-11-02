@@ -1561,9 +1561,9 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=7.8').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=7.9').then(reg => {
                 reg.update();
-                console.log('ServiceWorker v7.8 registered cleanly.');
+                console.log('ServiceWorker v7.9 registered cleanly.');
             });
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -11297,17 +11297,25 @@ document.addEventListener('keydown', (e) => {
             return;
         }
 
-        // Date limitation: Only today, yesterday, or up to 2 days ago (strictly forbidden if > 2 days)
-        const today = new Date().toISOString().split('T')[0];
-        const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        // Date limitation: Only today or yesterday (strictly forbidden if older than yesterday, total 2 days)
+        const now = new Date();
+        const today = (function() {
+            try { return now.toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }); }
+            catch(e) { return now.toISOString().split('T')[0]; }
+        })();
+        const yesterdayObj = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const yesterday = (function() {
+            try { return yesterdayObj.toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }); }
+            catch(e) { return yesterdayObj.toISOString().split('T')[0]; }
+        })();
         const selectedDate = dateInput.value;
         if (selectedDate > today) {
             alert('غير مسموح بتسجيل تشغيل المعدة بتاريخ مستقبلي.');
             dateInput.value = today;
             return;
         }
-        if (selectedDate < twoDaysAgo) {
-            alert('غير مسموح بتسجيل تشغيل المعدة بعد فوات أكثر من يومين (المسموح فقط تسجيل تشغيل نفس اليوم أو اليوم السابق).');
+        if (selectedDate < yesterday) {
+            alert('غير مسموح بتسجيل تشغيل المعدة بعد فوات أكثر من يوم واحد (المسموح فقط تسجيل تشغيل نفس اليوم أو أمس).');
             dateInput.value = today;
             return;
         }
@@ -11460,21 +11468,29 @@ document.addEventListener('keydown', (e) => {
         await this.loadEquipmentList();
 
         const dateInput = document.getElementById('eq-entry-date');
-        const today = new Date().toISOString().split('T')[0];
-        const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const now = new Date();
+        const today = (function() {
+            try { return now.toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }); }
+            catch(e) { return now.toISOString().split('T')[0]; }
+        })();
+        const yesterdayObj = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const yesterday = (function() {
+            try { return yesterdayObj.toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }); }
+            catch(e) { return yesterdayObj.toISOString().split('T')[0]; }
+        })();
 
         if (dateInput) {
             dateInput.max = today;
-            dateInput.min = twoDaysAgo;
-            if (!dateInput.value || dateInput.value < twoDaysAgo || dateInput.value > today) {
+            dateInput.min = yesterday;
+            if (!dateInput.value || dateInput.value < yesterday || dateInput.value > today) {
                 dateInput.value = today;
             }
             dateInput.onchange = () => {
                 if (dateInput.value > today) {
                     alert('غير مسموح باختيار تاريخ مستقبلي.');
                     dateInput.value = today;
-                } else if (dateInput.value < twoDaysAgo) {
-                    alert('غير مسموح بتسجيل تشغيل المعدة بعد فوات أكثر من يومين.');
+                } else if (dateInput.value < yesterday) {
+                    alert('غير مسموح بتسجيل تشغيل المعدة بعد فوات أكثر من يوم واحد (المسموح فقط اليوم وأمس).');
                     dateInput.value = today;
                 }
                 this.loadEquipmentEntryData();

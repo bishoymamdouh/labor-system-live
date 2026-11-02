@@ -1,4 +1,4 @@
-// Service Worker v7.8 - Fix engineer pending badge variables and reports initialization
+// Service Worker v7.9 - Restrict equipment entry dates to today and yesterday only
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
