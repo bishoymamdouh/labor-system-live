@@ -1,4 +1,4 @@
-// Service Worker v7.7 - Equipment approval workflow, free location input, and date restrictions
+// Service Worker v7.8 - Fix engineer pending badge variables and reports initialization
 self.addEventListener('install', e => {
   self.skipWaiting();
 });

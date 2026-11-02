@@ -1561,9 +1561,9 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=7.7').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=7.8').then(reg => {
                 reg.update();
-                console.log('ServiceWorker v7.7 registered cleanly.');
+                console.log('ServiceWorker v7.8 registered cleanly.');
             });
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -3030,10 +3030,11 @@ select {
                             <span id="tab-badge-eng-equipment" class="badge" style="background: #f59e0b; color: #fff; margin-right: 6px; padding: 2px 7px; border-radius: 10px;">0</span>
                         </button>
                     </div>
+                </header>
 
-                    <div id="engineer-labor-tab-pane">
+                <div id="engineer-labor-tab-pane">
                     <!-- Enhanced Filter Toolbar -->
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: var(--surface-color); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: var(--surface-color); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px;">
                         <!-- 1. Status Filter -->
                         <div style="display: flex; align-items: center; gap: 6px;">
                             <label style="font-size: 0.84rem; font-weight: 700; color: var(--text-color); margin: 0; white-space: nowrap;"><i class="fas fa-filter"></i> الحالة:</label>
@@ -3072,10 +3073,10 @@ select {
                             <i class="fas fa-undo"></i> إعادة ضبط
                         </button>
                     </div>
-                </header>
-                <div id="engineer-records-container" class="records-container">
-                    <!-- Records populated dynamically -->
-                </div>
+
+                    <div id="engineer-records-container" class="records-container">
+                        <!-- Records populated dynamically -->
+                    </div>
                 </div><!-- End engineer-labor-tab-pane -->
 
                 <!-- Engineer Equipment Tab Pane -->
@@ -6649,11 +6650,11 @@ document.addEventListener('keydown', (e) => {
             await this.loadLocationOptions();
             await this.loadEquipmentList();
             if (role === 'admin') {
-                await this.loadEngineerData();
-                this.loadSupervisorData();
-                this.loadAdminData();
-                this.loadAdminEquipmentTable();
-                this.generateReport();
+                try { await this.loadEngineerData(); } catch(e) { console.error("loadEngineerData error:", e); }
+                try { this.loadSupervisorData(); } catch(e) { console.error("loadSupervisorData error:", e); }
+                try { this.loadAdminData(); } catch(e) { console.error("loadAdminData error:", e); }
+                try { this.loadAdminEquipmentTable(); } catch(e) { console.error("loadAdminEquipmentTable error:", e); }
+                try { this.generateReport(); } catch(e) { console.error("generateReport error:", e); }
                 
                 await UI.renderEngineerOptions();
                 let dirWorkers = await db.getAll('worker_directory');
@@ -6670,8 +6671,8 @@ document.addEventListener('keydown', (e) => {
                     await this.ensureSupervisorDataLoaded();
                 }
             } else if (role === 'engineer') {
-                this.loadEngineerData();
-                this.generateReport();
+                try { await this.loadEngineerData(); } catch(e) { console.error("loadEngineerData error:", e); }
+                try { this.generateReport(); } catch(e) { console.error("generateReport error:", e); }
                 
                 await UI.renderEngineerOptions();
                 let dirWorkers = await db.getAll('worker_directory');
@@ -9160,10 +9161,14 @@ document.addEventListener('keydown', (e) => {
             if (!Array.isArray(allEqLogs)) allEqLogs = [];
         } catch(e) {}
 
-        const allPendingEq = allEqLogs.filter(l => l.status === 'pending');
-        const myPendingEq = allEqLogs.filter(l => l.status === 'pending' && (String(l.engineerId) === String(currentUserId) || !l.engineerId));
+        const allPendingLabor = allRawRecords.filter(r => r && r.status === 'pending');
+        const myPendingLabor = allRawRecords.filter(r => r && r.status === 'pending' && String(r.engineerId) === String(currentUserId));
+        const laborBadgeCount = (role === 'admin') ? allPendingLabor.length : myPendingLabor.length;
+
+        const allPendingEq = allEqLogs.filter(l => l && l.status === 'pending');
+        const myPendingEq = allEqLogs.filter(l => l && l.status === 'pending' && (String(l.engineerId) === String(currentUserId) || !l.engineerId));
         const eqBadgeCount = (role === 'admin') ? allPendingEq.length : myPendingEq.length;
-        const laborBadgeCount = (role === 'admin') ? allPending.length : myPending.length;
+
         const totalBadgeCount = laborBadgeCount + eqBadgeCount;
 
         const labTabBadge = document.getElementById('tab-badge-eng-labor');
