@@ -1,4 +1,4 @@
-// Service Worker v8.1 - Default equipment hours 08:00-16:00 break 1h lunch and show all past equipment records with clear rejection status
+// Service Worker v8.2 - Add deduction field subtracting from daily total and notes at the end for equipment and labor logs
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
