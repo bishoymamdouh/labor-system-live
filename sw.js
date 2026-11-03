@@ -1,4 +1,4 @@
-// Service Worker v8.4 - Reorder sidebar navigation menu
+// Service Worker v8.5 - Keep sidebar menu item in single line with nowrap and adjusted sidebar width
 self.addEventListener('install', e => {
   self.skipWaiting();
 });

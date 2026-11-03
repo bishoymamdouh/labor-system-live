@@ -134,10 +134,10 @@ h1, h2, h3, h4 {
 }
 
 .sidebar {
-    flex: 0 0 260px;
-    width: 260px;
-    min-width: 260px;
-    max-width: 260px;
+    flex: 0 0 280px;
+    width: 280px;
+    min-width: 280px;
+    max-width: 280px;
     background-color: var(--bg-card);
     border-left: 1px solid var(--border-color);
     display: flex;
@@ -178,20 +178,21 @@ h1, h2, h3, h4 {
 }
 
 .nav-links li {
-    padding: 0 12px;
-    margin-bottom: 4px;
+    padding: 0 8px;
+    margin-bottom: 3px;
 }
 
 .nav-links a {
     display: flex;
     align-items: center;
-    gap: 9px;
-    padding: 9px 12px;
+    gap: 8px;
+    padding: 8px 10px;
     color: var(--text-muted);
     text-decoration: none;
     border-radius: var(--radius-md);
     font-weight: 600;
-    font-size: 0.88rem;
+    font-size: 0.86rem;
+    white-space: nowrap;
     transition: var(--transition);
 }
 
@@ -1561,7 +1562,7 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=8.4').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=8.5').then(reg => {
                 reg.update();
                 console.log('ServiceWorker v8.1 registered cleanly.');
             });
@@ -4590,7 +4591,7 @@ class UI {
             navHtml += `<li><a href="#" data-view="view-equipment-entry"><i class="fas fa-truck-monster"></i> تسجيل المعدات</a></li>`;
         }
         if (perms.approve_records) {
-            navHtml += `<li><a href="#" data-view="view-engineer"><i class="fas fa-check-double"></i> اعتماد السراكي و المعدات <span id="nav-badge-engineer" class="badge-glow" style="background: red; border-radius: 5px; padding: 2px 6px; font-size: 0.8em; margin-right: 5px; display: none;">0</span></a></li>`;
+            navHtml += `<li><a href="#" data-view="view-engineer"><i class="fas fa-check-double"></i> <span style="white-space: nowrap;">اعتماد السراكي و المعدات</span> <span id="nav-badge-engineer" class="badge-glow" style="background: red; border-radius: 5px; padding: 2px 6px; font-size: 0.78em; margin-inline-start: auto; display: none;">0</span></a></li>`;
         }
         if (perms.equipment_reports) {
             navHtml += `<li><a href="#" data-view="view-equipment-reports"><i class="fas fa-file-invoice-dollar"></i> مستخلصات المعدات</a></li>`;
