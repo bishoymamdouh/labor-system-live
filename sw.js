@@ -1,4 +1,4 @@
-// Service Worker v8.3 - Equipment deduction is money amount deducted from contractor extract
+// Service Worker v8.4 - Reorder sidebar navigation menu
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
