@@ -1,4 +1,4 @@
-// Service Worker v8.6 - Open past dates and auto-approval for engineer & admin in equipment entry
+// Service Worker v8.7 - Auto-adjust row heights and max 2 pages per contractor for deductions print
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
