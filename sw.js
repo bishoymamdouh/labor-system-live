@@ -1,4 +1,4 @@
-// Service Worker v8.5 - Keep sidebar menu item in single line with nowrap and adjusted sidebar width
+// Service Worker v8.6 - Open past dates and auto-approval for engineer & admin in equipment entry
 self.addEventListener('install', e => {
   self.skipWaiting();
 });

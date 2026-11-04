@@ -1562,7 +1562,7 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=8.5').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=8.6').then(reg => {
                 reg.update();
                 console.log('ServiceWorker v8.1 registered cleanly.');
             });
@@ -2883,7 +2883,10 @@ select {
                     <form id="equipment-log-form" novalidate onsubmit="event.preventDefault(); app.submitEquipmentLog();">
                         <div class="form-row">
                             <div class="form-group third">
-                                <label for="eq-entry-date"><strong>التاريخ <span style="color:red;">*</span></strong></label>
+                                <label for="eq-entry-date" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                                    <strong>التاريخ <span style="color:red;">*</span></strong>
+                                    <span id="eq-date-badge" style="font-size: 0.76rem; font-weight: normal;"></span>
+                                </label>
                                 <input type="date" id="eq-entry-date" class="modal-input" required>
                             </div>
                             <div class="form-group third">
@@ -4403,7 +4406,8 @@ class UI {
         if (viewId === 'view-equipment-entry') {
             const currentUser = (auth && auth.currentUser) || (auth && typeof auth.getUser === 'function' ? auth.getUser() : null);
             const perms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(currentUser) : {};
-            if (!perms.equipment_entry) {
+            const hasAccess = perms.equipment_entry || (currentUser && (currentUser.role === 'admin' || currentUser.role === 'engineer' || currentUser.username === 'admin'));
+            if (!hasAccess) {
                 if (window.showAppNotification) window.showAppNotification('عفواً، ليس لديك صلاحية تسجيل المعدات', 'error');
                 UI.showView('view-supervisor');
                 return;
@@ -4415,7 +4419,8 @@ class UI {
         if (viewId === 'view-equipment-reports') {
             const currentUser = (auth && auth.currentUser) || (auth && typeof auth.getUser === 'function' ? auth.getUser() : null);
             const perms = (window.app && window.app.getUserPermissions) ? window.app.getUserPermissions(currentUser) : {};
-            if (!perms.equipment_reports) {
+            const hasAccess = perms.equipment_reports || (currentUser && (currentUser.role === 'admin' || currentUser.role === 'engineer' || currentUser.username === 'admin'));
+            if (!hasAccess) {
                 if (window.showAppNotification) window.showAppNotification('عفواً، ليس لديك صلاحية مستخلصات المعدات', 'error');
                 UI.showView('view-supervisor');
                 return;
@@ -4574,7 +4579,9 @@ class UI {
             manage_notifications: role === 'admin',
             approve_records: role === 'admin' || role === 'engineer',
             record_entry: role !== 'accountant',
-            view_reports: role === 'admin' || role === 'engineer' || role === 'accountant'
+            view_reports: role === 'admin' || role === 'engineer' || role === 'accountant',
+            equipment_entry: role === 'admin' || role === 'engineer',
+            equipment_reports: role === 'admin' || role === 'engineer'
         };
 
         let navHtml = '';
@@ -4587,13 +4594,13 @@ class UI {
         if (perms.record_entry) {
             navHtml += `<li><a href="#" data-view="view-supervisor"><i class="fas fa-file-signature"></i> تسجيل سركي</a></li>`;
         }
-        if (perms.equipment_entry) {
+        if (perms.equipment_entry || role === 'admin' || role === 'engineer') {
             navHtml += `<li><a href="#" data-view="view-equipment-entry"><i class="fas fa-truck-monster"></i> تسجيل المعدات</a></li>`;
         }
         if (perms.approve_records) {
             navHtml += `<li><a href="#" data-view="view-engineer"><i class="fas fa-check-double"></i> <span style="white-space: nowrap;">اعتماد السراكي و المعدات</span> <span id="nav-badge-engineer" class="badge-glow" style="background: red; border-radius: 5px; padding: 2px 6px; font-size: 0.78em; margin-inline-start: auto; display: none;">0</span></a></li>`;
         }
-        if (perms.equipment_reports) {
+        if (perms.equipment_reports || role === 'admin' || role === 'engineer') {
             navHtml += `<li><a href="#" data-view="view-equipment-reports"><i class="fas fa-file-invoice-dollar"></i> مستخلصات المعدات</a></li>`;
         }
         if (perms.view_reports) {
@@ -5894,7 +5901,7 @@ document.addEventListener('keydown', (e) => {
 
     const FACTORY_ROLE_PERMISSIONS = {
         admin: { record_entry: true, custom_record_date: true, auto_approve_record: true, approve_records: true, view_reports: true, view_server_status: true, manage_workers: true, manage_notifications: true, admin_dashboard: true, purge_records: true, equipment_entry: true, equipment_reports: true, manage_equipment: true },
-        engineer: { record_entry: true, custom_record_date: true, auto_approve_record: true, approve_records: true, view_reports: true, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false },
+        engineer: { record_entry: true, custom_record_date: true, auto_approve_record: true, approve_records: true, view_reports: true, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: true, equipment_reports: true, manage_equipment: false },
         supervisor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false },
         surveyor: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false },
         warehouse_manager: { record_entry: true, custom_record_date: false, auto_approve_record: false, approve_records: false, view_reports: false, view_server_status: false, manage_workers: false, manage_notifications: false, admin_dashboard: false, purge_records: false, equipment_entry: false, equipment_reports: false, manage_equipment: false },
@@ -11497,7 +11504,7 @@ document.addEventListener('keydown', (e) => {
             return;
         }
 
-        // Date limitation: Only today or yesterday (strictly forbidden if older than yesterday, total 2 days)
+        // Date limitation: Admin & Engineer can pick any past date; others strictly limited to today & yesterday (total 2 days)
         const now = new Date();
         const today = (function() {
             try { return now.toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }); }
@@ -11509,13 +11516,21 @@ document.addEventListener('keydown', (e) => {
             catch(e) { return yesterdayObj.toISOString().split('T')[0]; }
         })();
         const selectedDate = dateInput.value;
+        const user = auth.currentUser;
+        const userPerms = (this.getUserPermissions && user) ? this.getUserPermissions(user) : {};
+        const canPickAnyDate = !!(
+            (user && (user.role === 'admin' || user.role === 'engineer' || user.username === 'admin')) ||
+            (user && user.permissions && user.permissions.custom_record_date === true) ||
+            userPerms.custom_record_date === true
+        );
+
         if (selectedDate > today) {
             alert('غير مسموح بتسجيل تشغيل المعدة بتاريخ مستقبلي.');
             dateInput.value = today;
             return;
         }
-        if (selectedDate < yesterday) {
-            alert('غير مسموح بتسجيل تشغيل المعدة بعد فوات أكثر من يوم واحد (المسموح فقط تسجيل تشغيل نفس اليوم أو أمس).');
+        if (!canPickAnyDate && selectedDate < yesterday) {
+            alert('غير مسموح بتسجيل تشغيل المعدة بعد فوات أكثر من يوم واحد (المسموح للمشرف فقط تسجيل تشغيل نفس اليوم أو أمس).');
             dateInput.value = today;
             return;
         }
@@ -11536,13 +11551,27 @@ document.addEventListener('keydown', (e) => {
             locInput?.focus();
             return;
         }
-        const engineerId = engSelect ? engSelect.value : '';
+
+        // Auto-approval check (same as labor records)
+        const isAutoApprove = this.canAutoApprove(user);
+        const recordStatus = isAutoApprove ? 'approved' : 'pending';
+        const curApproverName = (user && user.username === 'admin') ? 'Bishoy Mamdouh' : (user ? (user.username || user.name) : 'مهندس');
+
+        let engineerId = engSelect ? engSelect.value : '';
+        if (!engineerId && isAutoApprove) {
+            engineerId = user ? user.id : '';
+        }
         if (!engineerId) {
             alert('يرجى اختيار المهندس المسؤول للاعتماد.');
             engSelect?.focus();
             return;
         }
-        const engineerName = engSelect.options[engSelect.selectedIndex]?.text || 'المهندس';
+        let engineerName = (engSelect && engSelect.selectedIndex >= 0 && engSelect.options[engSelect.selectedIndex]?.value)
+            ? engSelect.options[engSelect.selectedIndex].text
+            : curApproverName;
+        if (!engineerName || engineerName === 'اختر المهندس المسؤول للاعتماد') {
+            engineerName = curApproverName;
+        }
 
         if (!startTimeStr || !endTimeStr) {
             alert('يرجى تحديد ساعات البدء والانتهاء بدقة.');
@@ -11567,7 +11596,6 @@ document.addEventListener('keydown', (e) => {
         const grossCost = Number((netHours * hourlyRate).toFixed(2));
         const totalCost = Number(Math.max(0, grossCost - deductionAmount).toFixed(2));
 
-        const user = auth.currentUser;
         const logId = 'eq_log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
 
         const newLog = {
@@ -11598,10 +11626,10 @@ document.addEventListener('keydown', (e) => {
             createdByName: (user && user.username === 'admin') ? 'Bishoy Mamdouh' : (user ? (user.username || user.name) : 'مشرف'),
             createdByRole: user ? user.role : 'supervisor',
             createdAt: new Date().toISOString(),
-            status: 'pending',
-            approvedById: null,
-            approvedByName: null,
-            approvedAt: null,
+            status: recordStatus,
+            approvedById: isAutoApprove ? (user ? user.id : null) : null,
+            approvedByName: isAutoApprove ? curApproverName : null,
+            approvedAt: isAutoApprove ? new Date().toISOString() : null,
             locked: false
         };
 
@@ -11609,35 +11637,49 @@ document.addEventListener('keydown', (e) => {
         const origText = submitBtn ? submitBtn.innerHTML : '';
         if (submitBtn) {
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إرسال الطلب للمهندس...';
+            submitBtn.innerHTML = isAutoApprove 
+                ? '<i class="fas fa-spinner fa-spin"></i> جاري حفظ واعتماد تشغيل المعدة...' 
+                : '<i class="fas fa-spinner fa-spin"></i> جاري إرسال الطلب للمهندس...';
         }
 
         try {
             await db.add('equipment_logs', newLog);
 
-            // Broadcast push notification to the chosen engineer
-            if (engineerId) {
-                try {
-                    await fetch('/api/broadcast', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            title: '🚜 طلب اعتماد تشغيل معدة جديد',
-                            message: `قام ${newLog.createdByName} بإرسال طلب تشغيل معدة (${newLog.equipmentName}) في (${newLog.location}) للاعتماد.`,
-                            target: [String(engineerId)]
-                        })
+            if (recordStatus === 'approved') {
+                if (window.showAppNotification) {
+                    window.showAppNotification({
+                        title: 'تم التسجيل والاعتماد الفوري ✅',
+                        message: `تم تسجيل تشغيل معدة ${newLog.equipmentName} (${netHours} ساعة) واعتمادها تلقائياً بنجاح.`,
+                        type: 'success'
                     });
-                } catch(e) {}
-            }
-
-            if (window.showAppNotification) {
-                window.showAppNotification({
-                    title: '⏳ تم إرسال طلب تسجيل المعدة للاعتماد',
-                    message: `تم إرسال طلب تسجيل ${newLog.equipmentName} (${netHours} ساعة) إلى المهندس (${engineerName}) بنجاح.`,
-                    type: 'info'
-                });
+                } else {
+                    alert('تم تسجيل تشغيل المعدة واعتمادها تلقائياً بنجاح!');
+                }
             } else {
-                alert('تم إرسال طلب تشغيل المعدة إلى المهندس للاعتماد بنجاح!');
+                // Broadcast push notification to the chosen engineer
+                if (engineerId) {
+                    try {
+                        await fetch('/api/broadcast', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                title: '🚜 طلب اعتماد تشغيل معدة جديد',
+                                message: `قام ${newLog.createdByName} بإرسال طلب تشغيل معدة (${newLog.equipmentName}) في (${newLog.location}) للاعتماد.`,
+                                target: [String(engineerId)]
+                            })
+                        });
+                    } catch(e) {}
+                }
+
+                if (window.showAppNotification) {
+                    window.showAppNotification({
+                        title: '⏳ تم إرسال طلب تسجيل المعدة للاعتماد',
+                        message: `تم إرسال طلب تسجيل ${newLog.equipmentName} (${netHours} ساعة) إلى المهندس (${engineerName}) بنجاح.`,
+                        type: 'info'
+                    });
+                } else {
+                    alert('تم إرسال طلب تشغيل المعدة إلى المهندس للاعتماد بنجاح!');
+                }
             }
 
             // Clear inputs for next log
@@ -11689,22 +11731,65 @@ document.addEventListener('keydown', (e) => {
             catch(e) { return yesterdayObj.toISOString().split('T')[0]; }
         })();
 
+        const currentUser = (auth && auth.currentUser) || null;
+        const userPerms = (this.getUserPermissions && currentUser) ? this.getUserPermissions(currentUser) : {};
+        const canPickAnyDate = !!(
+            (currentUser && (currentUser.role === 'admin' || currentUser.role === 'engineer' || currentUser.username === 'admin')) ||
+            (currentUser && currentUser.permissions && currentUser.permissions.custom_record_date === true) ||
+            userPerms.custom_record_date === true
+        );
+
+        const eqDateBadge = document.getElementById('eq-date-badge');
+        if (eqDateBadge) {
+            if (canPickAnyDate) {
+                eqDateBadge.innerHTML = '<span style="color: #059669; font-weight: bold;"><i class="fas fa-calendar-check"></i> مفتوح لأي تاريخ سابق</span>';
+            } else {
+                eqDateBadge.innerHTML = '<span style="color: #d97706; font-weight: 600;"><i class="fas fa-lock"></i> مسموح اليوم وأمس فقط</span>';
+            }
+        }
+
         if (dateInput) {
             dateInput.max = today;
-            dateInput.min = yesterday;
-            if (!dateInput.value || dateInput.value < yesterday || dateInput.value > today) {
-                dateInput.value = today;
+            if (canPickAnyDate) {
+                dateInput.removeAttribute('min');
+                if (!dateInput.value || dateInput.value > today) {
+                    dateInput.value = today;
+                }
+                dateInput.title = 'متاح لك اختيار أي تاريخ سابق لتسجيل تشغيل المعدة 📅';
+            } else {
+                dateInput.min = yesterday;
+                if (!dateInput.value || dateInput.value < yesterday || dateInput.value > today) {
+                    dateInput.value = today;
+                }
+                dateInput.title = 'مسموح بتسجيل تاريخ اليوم أو أمس فقط 🔒';
             }
             dateInput.onchange = () => {
                 if (dateInput.value > today) {
                     alert('غير مسموح باختيار تاريخ مستقبلي.');
                     dateInput.value = today;
-                } else if (dateInput.value < yesterday) {
+                } else if (!canPickAnyDate && dateInput.value < yesterday) {
                     alert('غير مسموح بتسجيل تشغيل المعدة بعد فوات أكثر من يوم واحد (المسموح فقط اليوم وأمس).');
                     dateInput.value = today;
                 }
                 this.loadEquipmentEntryData();
             };
+        }
+
+        // Setup Submit Button appearance based on auto-approval
+        const eqSubmitBtn = document.getElementById('btn-submit-eq-log');
+        if (eqSubmitBtn) {
+            const isAuto = this.canAutoApprove(currentUser);
+            if (isAuto) {
+                eqSubmitBtn.innerHTML = '<i class="fas fa-check-circle" style="margin-left: 6px;"></i> حفظ واعتماد تشغيل المعدة مباشرة (معتمد فوراً)';
+                eqSubmitBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                eqSubmitBtn.style.borderColor = '#10b981';
+                eqSubmitBtn.title = 'سيتم اعتماد تشغيل المعدة تلقائياً فور الحفظ ✅';
+            } else {
+                eqSubmitBtn.innerHTML = '<i class="fas fa-paper-plane" style="margin-left: 6px;"></i> إرسال طلب تشغيل المعدة للاعتماد';
+                eqSubmitBtn.style.background = '';
+                eqSubmitBtn.style.borderColor = '';
+                eqSubmitBtn.title = 'سيتم إرسال الطلب إلى المهندس المسؤول للاعتماد ⏳';
+            }
         }
 
         // Setup default input values for operation hours
