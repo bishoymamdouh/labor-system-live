@@ -1,4 +1,4 @@
-// Service Worker v8.7 - Auto-adjust row heights and max 2 pages per contractor for deductions print
+// Service Worker v8.8 - Fixed contractor deduction report print layout & clean page breaks
 self.addEventListener('install', e => {
   self.skipWaiting();
 });

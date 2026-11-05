@@ -1562,9 +1562,9 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=8.7').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=8.8').then(reg => {
                 reg.update();
-                console.log('ServiceWorker v8.7 registered cleanly.');
+                console.log('ServiceWorker v8.8 registered cleanly.');
             });
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -16128,20 +16128,20 @@ document.addEventListener('click', (e) => {
         // ----------------------------------------------------
         if (sortedContractors.length > 1) {
             const sumCount = sortedContractors.length;
-            let sumRowH = 65;
-            let sumFont = 16.5;
-            let sumPadV = 18;
-            let sumTheadH = 52;
-            let sumTheadFont = 16;
+            let sumRowH = 40;
+            let sumFont = 13;
+            let sumPadV = 6;
+            let sumTheadH = 34;
+            let sumTheadFont = 12.5;
 
             if (sumCount <= 4) {
-                sumRowH = 68; sumFont = 17; sumPadV = 18; sumTheadH = 54; sumTheadFont = 16;
+                sumRowH = 48; sumFont = 14; sumPadV = 9; sumTheadH = 38; sumTheadFont = 13.5;
             } else if (sumCount <= 7) {
-                sumRowH = 54; sumFont = 15; sumPadV = 13; sumTheadH = 46; sumTheadFont = 14.5;
+                sumRowH = 38; sumFont = 12.5; sumPadV = 6; sumTheadH = 34; sumTheadFont = 12;
             } else if (sumCount <= 12) {
-                sumRowH = 40; sumFont = 13; sumPadV = 8; sumTheadH = 38; sumTheadFont = 12.5;
+                sumRowH = 30; sumFont = 11.5; sumPadV = 4; sumTheadH = 30; sumTheadFont = 11;
             } else {
-                sumRowH = 28; sumFont = 11; sumPadV = 4; sumTheadH = 32; sumTheadFont = 11;
+                sumRowH = 22; sumFont = 10; sumPadV = 2.5; sumTheadH = 26; sumTheadFont = 9.5;
             }
 
             let summaryTableRows = '';
@@ -16160,7 +16160,7 @@ document.addEventListener('click', (e) => {
             });
 
             summaryTableRows += `
-                <tr style="height: ${sumRowH + 6}px; background-color: #ede7f6; font-weight: 800; font-size: ${sumFont + 1}px; border-top: 2.5px solid #4a148c;">
+                <tr style="height: ${sumRowH + 4}px; background-color: #ede7f6; font-weight: 800; font-size: ${sumFont + 1}px; border-top: 2.5px solid #4a148c;">
                     <td colspan="2" style="text-align: right; padding-right: 16px; color: #4a148c;">
                         الإجمالي العام لجميع المقاولين (${sortedContractors.length} مقاول):
                     </td>
@@ -16230,77 +16230,67 @@ document.addEventListener('click', (e) => {
             const renderContractorSinglePage = (pageRecords, pageNum, totalPages, startIdx) => {
                 const count = pageRecords.length;
 
-                // Adaptive row, cell & font sizing
-                let rowHeight = 44;
-                let fontSize = 14;
-                let thFontSize = 13;
-                let paddingV = 8;
-                let paddingH = 4;
-                let theadHeight = 40;
-                let lineHeight = 1.3;
-                let sigMarginTop = 24;
-                let sigLineMargin = 26;
+                // Controlled safe sizing: generous for few rows, compact and guaranteed to fit for many rows
+                let rowHeight = 22;
+                let fontSize = 10.5;
+                let thFontSize = 10.0;
+                let paddingV = 2;
+                let paddingH = 3;
+                let theadHeight = 26;
+                let sigMarginTop = 10;
+                let sigLineMargin = 16;
+                let lineHeight = 1.15;
 
                 if (count <= 3) {
-                    rowHeight = 62;
-                    fontSize = 15.5;
-                    thFontSize = 14.5;
-                    paddingV = 14;
-                    paddingH = 6;
-                    theadHeight = 48;
-                    lineHeight = 1.35;
-                    sigMarginTop = 40;
-                    sigLineMargin = 36;
-                } else if (count <= 6) {
-                    rowHeight = 48;
+                    rowHeight = 46;
                     fontSize = 14.0;
                     thFontSize = 13.5;
-                    paddingV = 10;
-                    paddingH = 5;
-                    theadHeight = 42;
+                    paddingV = 8;
+                    paddingH = 6;
+                    theadHeight = 40;
+                    sigMarginTop = 26;
+                    sigLineMargin = 28;
                     lineHeight = 1.3;
-                    sigMarginTop = 32;
-                    sigLineMargin = 30;
-                } else if (count <= 10) {
-                    rowHeight = 38;
+                } else if (count <= 6) {
+                    rowHeight = 36;
                     fontSize = 13.0;
-                    thFontSize = 12.0;
-                    paddingV = 7;
-                    paddingH = 4;
-                    theadHeight = 38;
+                    thFontSize = 12.5;
+                    paddingV = 5;
+                    paddingH = 5;
+                    theadHeight = 36;
+                    sigMarginTop = 20;
+                    sigLineMargin = 24;
                     lineHeight = 1.25;
-                    sigMarginTop = 24;
-                    sigLineMargin = 26;
-                } else if (count <= 15) {
+                } else if (count <= 10) {
                     rowHeight = 28;
-                    fontSize = 11.5;
-                    thFontSize = 11.0;
-                    paddingV = 4;
-                    paddingH = 3;
+                    fontSize = 12.0;
+                    thFontSize = 11.5;
+                    paddingV = 3.5;
+                    paddingH = 4;
                     theadHeight = 32;
-                    lineHeight = 1.2;
                     sigMarginTop = 16;
-                    sigLineMargin = 22;
-                } else if (count <= 20) {
-                    rowHeight = 22;
+                    sigLineMargin = 20;
+                    lineHeight = 1.2;
+                } else if (count <= 16) {
+                    rowHeight = 19;
                     fontSize = 10.0;
                     thFontSize = 9.5;
-                    paddingV = 2.5;
+                    paddingV = 1.5;
                     paddingH = 3;
-                    theadHeight = 26;
+                    theadHeight = 25;
+                    sigMarginTop = 10;
+                    sigLineMargin = 16;
                     lineHeight = 1.15;
-                    sigMarginTop = 12;
-                    sigLineMargin = 18;
                 } else {
-                    rowHeight = Math.max(16, Math.floor(400 / (count + 1)));
+                    rowHeight = 16;
                     fontSize = 9.0;
                     thFontSize = 8.5;
-                    paddingV = 1.5;
-                    paddingH = 2;
+                    paddingV = 1.0;
+                    paddingH = 2.5;
                     theadHeight = 24;
-                    lineHeight = 1.1;
                     sigMarginTop = 8;
-                    sigLineMargin = 15;
+                    sigLineMargin = 14;
+                    lineHeight = 1.1;
                 }
 
                 let recordsHtml = '';
@@ -16311,10 +16301,10 @@ document.addEventListener('click', (e) => {
                             <td style="padding: ${paddingV}px ${paddingH}px; font-weight: bold;">${rowNumber}</td>
                             <td style="padding: ${paddingV}px ${paddingH}px;">${r.supervisor}</td>
                             <td style="padding: ${paddingV}px ${paddingH}px; white-space: nowrap;"><span dir="ltr">${UI.formatDisplayDate(r.date)}</span></td>
-                            <td style="padding: ${paddingV}px ${paddingH + 2}px; font-weight: bold; text-align: right;">${r.workerName}</td>
+                            <td style="padding: ${paddingV}px ${paddingH + 1}px; font-weight: bold; text-align: right;">${r.workerName}</td>
                             <td style="padding: ${paddingV}px ${paddingH}px;">${r.type}</td>
                             <td style="padding: ${paddingV}px ${paddingH}px;">${r.location || '-'}</td>
-                            <td style="padding: ${paddingV}px ${paddingH + 2}px; text-align: right;">${r.task || '-'}</td>
+                            <td style="padding: ${paddingV}px ${paddingH + 1}px; text-align: right;">${r.task || '-'}</td>
                             <td style="padding: ${paddingV}px ${paddingH}px; font-weight: bold; color: #1b5e20; font-variant-numeric: tabular-nums;">${Number(r.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                             <td style="padding: ${paddingV}px ${paddingH}px;">${r.notes || ''}</td>
                         </tr>
@@ -16323,8 +16313,8 @@ document.addEventListener('click', (e) => {
 
                 if (pageNum < totalPages) {
                     recordsHtml += `
-                        <tr style="height: ${Math.max(26, rowHeight)}px; background-color: #f3e5f5; font-weight: bold; color: #4a148c;">
-                            <td colspan="9" style="text-align: center; padding: 6px; font-size: ${Math.max(11, fontSize)}px;">
+                        <tr style="height: ${Math.max(22, rowHeight)}px; background-color: #f3e5f5; font-weight: bold; color: #4a148c;">
+                            <td colspan="9" style="text-align: center; padding: 3px; font-size: ${Math.max(10, fontSize)}px;">
                                 ⬅ يتبع باقي السجلات والإجمالي العام في الصفحة التالية (2/2)
                             </td>
                         </tr>
@@ -16344,7 +16334,7 @@ document.addEventListener('click', (e) => {
                 }
 
                 const pageBadge = totalPages > 1 ? ` &nbsp;&nbsp;|&nbsp;&nbsp; <span style="color: #4a148c; font-weight: bold;">(صفحة ${pageNum} من ${totalPages})</span>` : '';
-                const footerBadge = totalPages > 1 ? `<div style="text-align: center; font-size: 10px; color: #666; margin-top: 3px;">صفحة ${pageNum} من ${totalPages} - مقاول: ${contractorKey}</div>` : '';
+                const footerBadge = totalPages > 1 ? `<div style="text-align: center; font-size: 9px; color: #666; margin-top: 2px;">صفحة ${pageNum} من ${totalPages} - مقاول: ${contractorKey}</div>` : '';
 
                 return `
                 <div class="contractor-page">
@@ -16365,14 +16355,14 @@ document.addEventListener('click', (e) => {
                         <table style="font-size: ${fontSize}px; line-height: ${lineHeight};">
                             <thead>
                                 <tr style="height: ${theadHeight}px;">
-                                    <th style="width: 4%; font-size: ${thFontSize}px;">م</th>
-                                    <th style="width: 13%; font-size: ${thFontSize}px;">المشرف (مسجل السركي)</th>
-                                    <th style="width: 10%; font-size: ${thFontSize}px;">التاريخ</th>
-                                    <th style="width: 16%; font-size: ${thFontSize}px;">اسم العامل</th>
-                                    <th style="width: 10%; font-size: ${thFontSize}px;">المهنة</th>
-                                    <th style="width: 12%; font-size: ${thFontSize}px;">مكان العمل</th>
-                                    <th style="width: 17%; font-size: ${thFontSize}px;">بند العمل (بالتفصيل)</th>
-                                    <th style="width: 10%; font-size: ${thFontSize}px;">يومية العامل (المخصوم)</th>
+                                    <th style="width: 3%; font-size: ${thFontSize}px;">م</th>
+                                    <th style="width: 11%; font-size: ${thFontSize}px;">المشرف (مسجل السركي)</th>
+                                    <th style="width: 9%; font-size: ${thFontSize}px;">التاريخ</th>
+                                    <th style="width: 15%; font-size: ${thFontSize}px;">اسم العامل</th>
+                                    <th style="width: 8%; font-size: ${thFontSize}px;">المهنة</th>
+                                    <th style="width: 10%; font-size: ${thFontSize}px;">مكان العمل</th>
+                                    <th style="width: 27%; font-size: ${thFontSize}px;">بند العمل (بالتفصيل)</th>
+                                    <th style="width: 9%; font-size: ${thFontSize}px;">يومية العامل (المخصوم)</th>
                                     <th style="width: 8%; font-size: ${thFontSize}px;">ملاحظات</th>
                                 </tr>
                             </thead>
@@ -16417,25 +16407,31 @@ document.addEventListener('click', (e) => {
                 @media print {
                     @page { 
                         size: A4 landscape; 
-                        margin: 0.35cm 1.0cm; 
+                        margin: 0.35cm 0.8cm; 
                     }
                     html, body {
                         margin: 0 !important;
                         padding: 0 !important;
-                        width: 100% !important;
-                        height: 100% !important;
+                        background: #fff !important;
                         -webkit-print-color-adjust: exact !important;
                         print-color-adjust: exact !important;
                     }
                     .contractor-page { 
-                        page-break-after: always; 
-                        break-after: page;
+                        display: block !important;
+                        width: 100% !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        box-sizing: border-box !important;
+                        page-break-after: always !important; 
+                        break-after: page !important;
                         page-break-inside: avoid !important;
                         break-inside: avoid !important;
+                        clear: both !important;
+                        position: relative !important;
                     }
                     .contractor-page:last-child { 
-                        page-break-after: auto; 
-                        break-after: auto;
+                        page-break-after: auto !important; 
+                        break-after: auto !important;
                     }
                 }
 
@@ -16453,18 +16449,17 @@ document.addEventListener('click', (e) => {
                 }
 
                 .contractor-page { 
+                    display: block;
                     width: 100%; 
-                    min-height: 190mm;
-                    max-height: 200mm;
-                    padding: 0.2cm 0.4cm; 
+                    margin: 0;
+                    padding: 0;
                     box-sizing: border-box; 
-                    display: flex; 
-                    flex-direction: column; 
-                    justify-content: flex-start;
-                    page-break-after: always;
+                    page-break-after: always; 
                     break-after: page;
                     page-break-inside: avoid !important;
                     break-inside: avoid !important;
+                    clear: both;
+                    position: relative;
                 }
                 .contractor-page:last-child {
                     page-break-after: auto;
@@ -16475,26 +16470,25 @@ document.addEventListener('click', (e) => {
                 .header { 
                     position: relative; 
                     text-align: center; 
-                    margin-bottom: 5px; 
+                    margin-bottom: 4px; 
                     border-bottom: 2.5px solid #4a148c; 
-                    padding-bottom: 5px; 
+                    padding-bottom: 3px; 
                     page-break-inside: avoid;
                     break-inside: avoid;
-                    flex-shrink: 0;
                 }
                 .header h1 { 
-                    margin: 2px 0; 
-                    font-size: 21px; 
+                    margin: 1px 0; 
+                    font-size: 18px; 
                     font-weight: 800; 
                     color: #4a148c;
                 }
                 .project-title-box {
                     background-color: #eef5fb;
                     color: #003366;
-                    padding: 3px 18px;
-                    border-radius: 6px;
+                    padding: 2px 14px;
+                    border-radius: 5px;
                     display: inline-block;
-                    font-size: 13.5px;
+                    font-size: 12px;
                     font-weight: bold;
                     margin: 0;
                     border: 1px solid #b8d4f0;
@@ -16502,8 +16496,8 @@ document.addEventListener('click', (e) => {
                     print-color-adjust: exact;
                 }
                 .header p { 
-                    margin: 2px 0 0 0; 
-                    font-size: 13px; 
+                    margin: 1px 0 0 0; 
+                    font-size: 11.5px; 
                     color: #333;
                     font-weight: 600;
                 }
@@ -16512,7 +16506,7 @@ document.addEventListener('click', (e) => {
                     right: 0; 
                     top: 50%; 
                     transform: translateY(-50%); 
-                    max-height: 56px; 
+                    max-height: 44px; 
                     width: auto;
                     object-fit: contain;
                 }
@@ -16520,11 +16514,9 @@ document.addEventListener('click', (e) => {
                 /* TABLE WRAPPER */
                 .table-container {
                     width: 100%;
-                    margin-bottom: 8px;
+                    margin-bottom: 4px;
                     page-break-inside: avoid;
                     break-inside: avoid;
-                    overflow: visible;
-                    flex-shrink: 0;
                 }
 
                 table { 
@@ -16547,8 +16539,8 @@ document.addEventListener('click', (e) => {
                     background-color: #4a148c !important; 
                     color: #ffffff !important;
                     font-weight: 700; 
-                    -webkit-print-color-adjust: exact;
-                    print-color-adjust: exact;
+                    -webkit-print-color-adjust: exact; 
+                    print-color-adjust: exact; 
                 }
 
                 /* SUMMARY BAR */
@@ -16556,39 +16548,36 @@ document.addEventListener('click', (e) => {
                     display: flex; 
                     justify-content: space-between; 
                     align-items: center; 
-                    font-size: 13.5px; 
+                    font-size: 12px; 
                     margin-top: 0;
-                    margin-bottom: 8px; 
+                    margin-bottom: 4px; 
                     font-weight: bold; 
                     border: 1.5px solid #4a148c; 
-                    padding: 6px 18px; 
+                    padding: 3px 14px; 
                     background: #f3e5f5 !important; 
-                    border-radius: 6px;
+                    border-radius: 5px;
                     page-break-inside: avoid !important; 
                     break-inside: avoid !important; 
-                    flex-shrink: 0; 
                     -webkit-print-color-adjust: exact; 
                     print-color-adjust: exact; 
                 }
                 .summary span {
                     color: #4a148c;
-                    font-size: 15px;
+                    font-size: 13.5px;
                 }
 
                 /* SIGNATURES */
                 .signatures { 
                     display: flex; 
                     justify-content: space-between; 
-                    margin-top: auto; 
-                    padding-top: 6px; 
+                    padding-top: 2px; 
                     page-break-inside: avoid !important; 
                     break-inside: avoid !important; 
-                    flex-shrink: 0; 
                 }
                 .sig-box { 
                     text-align: center; 
-                    width: 16%; 
-                    font-size: 12px; 
+                    width: 17%; 
+                    font-size: 11px; 
                     font-weight: bold; 
                     color: #222;
                     page-break-inside: avoid !important; 
@@ -16596,7 +16585,6 @@ document.addEventListener('click', (e) => {
                 }
                 .sig-line { 
                     border-bottom: 1.5px solid #000; 
-                    margin-top: 28px; 
                 }
             </style>
         </head>
@@ -16606,55 +16594,17 @@ document.addEventListener('click', (e) => {
         </html>
         `;
 
-        // Render iframe with explicit A4 landscape dimensions to prevent false shrink
         const iframe = document.createElement('iframe');
         iframe.style.position = 'fixed';
-        iframe.style.right = '-9999px';
-        iframe.style.bottom = '-9999px';
-        iframe.style.width = '297mm';
-        iframe.style.height = '210mm';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
         iframe.style.border = 'none';
-        iframe.style.visibility = 'hidden';
         iframe.srcdoc = printHtml;
         document.body.appendChild(iframe);
         
         iframe.onload = function() {
-            try {
-                const doc = iframe.contentDocument || iframe.contentWindow.document;
-                if (doc) {
-                    const pages = doc.querySelectorAll('.contractor-page');
-                    pages.forEach(page => {
-                        // Summary page NEVER needs shrinking - its heights are tailored to fit
-                        if (page.classList.contains('summary-page')) return;
-                        
-                        const tbl = page.querySelector('table');
-                        const rowCount = tbl ? tbl.querySelectorAll('tbody tr').length : 0;
-                        
-                        // Only perform shrink adjustment if contractor has many records (> 16) and truly overflows
-                        if (tbl && rowCount > 16 && page.clientHeight > 300) {
-                            let attempts = 0;
-                            while (page.scrollHeight > (page.clientHeight + 4) && attempts < 12) {
-                                attempts++;
-                                const curSize = parseFloat(window.getComputedStyle(tbl).fontSize) || 12;
-                                tbl.style.fontSize = Math.max(8.5, curSize - 0.5) + 'px';
-                                tbl.querySelectorAll('tr').forEach(r => {
-                                    const h = parseFloat(r.style.height) || 24;
-                                    if (h > 16) r.style.height = (h - 2) + 'px';
-                                });
-                                tbl.querySelectorAll('th, td').forEach(c => {
-                                    const curPad = parseFloat(window.getComputedStyle(c).paddingTop) || 4;
-                                    if (curPad > 2) {
-                                        c.style.paddingTop = (curPad - 1) + 'px';
-                                        c.style.paddingBottom = (curPad - 1) + 'px';
-                                    }
-                                });
-                            }
-                        }
-                    });
-                }
-            } catch(e) {
-                console.warn("Fit adjustment error:", e);
-            }
             setTimeout(() => {
                 iframe.contentWindow.focus();
                 iframe.contentWindow.print();
