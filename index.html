@@ -1562,9 +1562,9 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=8.8').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=8.9').then(reg => {
                 reg.update();
-                console.log('ServiceWorker v8.8 registered cleanly.');
+                console.log('ServiceWorker v8.9 registered cleanly.');
             });
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -2968,6 +2968,56 @@ select {
                             <textarea id="eq-entry-notes" class="modal-input" rows="2" placeholder="اكتب بالتفصيل ما تم إنجازه بواسطة المعدة اليوم أو أي ملاحظات وأسباب الخصم..."></textarea>
                         </div>
 
+                        <!-- Equipment Work Photos Section (Before & After Work) -->
+                        <div style="background: var(--surface-color); border: 1.5px dashed var(--border-color); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
+                                <div>
+                                    <strong style="color: var(--text-main); font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                                        <i class="fas fa-camera text-primary"></i> صور تشغيل المعدة (قبل بدء العمل / بعد انتهاء العمل)
+                                    </strong>
+                                    <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 2px;">
+                                        متاح التقاط أو رفع الصور الآن أثناء التسجيل، أو إضافتها في أي وقت لاحقاً بعد انتهاء اليوم
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;">
+                                <!-- 1. Before Work Photos -->
+                                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <label style="font-weight: 700; color: #4338ca; font-size: 0.88rem; margin: 0; display: flex; align-items: center; gap: 6px;">
+                                            <i class="fas fa-play-circle"></i> صور قبل بدء العمل
+                                        </label>
+                                        <span id="eq-before-photos-count" class="badge" style="background: rgba(99,102,241,0.12); color: #4338ca; font-size: 0.76rem; padding: 2px 7px;">0 صور</span>
+                                    </div>
+                                    <div style="display: flex; gap: 8px; align-items: center;">
+                                        <input type="file" id="eq-entry-photos-before" accept="image/*" multiple capture="environment" style="display: none;" onchange="app.handleEquipmentDraftPhotoSelect('before', this.files)">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('eq-entry-photos-before').click()" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; padding: 5px 12px; background: rgba(99,102,241,0.08); color: #4f46e5; border-color: #818cf8;">
+                                            <i class="fas fa-camera"></i> التقاط أو اختيار صور
+                                        </button>
+                                    </div>
+                                    <div id="eq-entry-photos-before-preview" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;"></div>
+                                </div>
+
+                                <!-- 2. After Work Photos -->
+                                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <label style="font-weight: 700; color: #065f46; font-size: 0.88rem; margin: 0; display: flex; align-items: center; gap: 6px;">
+                                            <i class="fas fa-check-circle"></i> صور بعد انتهاء العمل
+                                        </label>
+                                        <span id="eq-after-photos-count" class="badge" style="background: rgba(16,185,129,0.12); color: #047857; font-size: 0.76rem; padding: 2px 7px;">0 صور</span>
+                                    </div>
+                                    <div style="display: flex; gap: 8px; align-items: center;">
+                                        <input type="file" id="eq-entry-photos-after" accept="image/*" multiple capture="environment" style="display: none;" onchange="app.handleEquipmentDraftPhotoSelect('after', this.files)">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('eq-entry-photos-after').click()" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; padding: 5px 12px; background: rgba(16,185,129,0.08); color: #059669; border-color: #34d399;">
+                                            <i class="fas fa-camera"></i> التقاط أو اختيار صور
+                                        </button>
+                                    </div>
+                                    <div id="eq-entry-photos-after-preview" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;"></div>
+                                </div>
+                            </div>
+                        </div>
+
                         <button type="submit" id="btn-submit-eq-log" class="btn btn-primary btn-block" style="padding: 12px; font-size: 1.05rem; font-weight: bold;">
                             <i class="fas fa-paper-plane"></i> إرسال طلب تشغيل المعدة للاعتماد
                         </button>
@@ -3017,11 +3067,12 @@ select {
                                     <th>الخصم (ج.م)</th>
                                     <th>الحالة وملاحظات الاعتماد</th>
                                     <th>ملاحظات وبيان العمل</th>
+                                    <th>الصور</th>
                                     <th>الإجراء</th>
                                 </tr>
                             </thead>
                             <tbody id="today-equipment-table-body">
-                                <tr><td colspan="15" style="text-align: center; color: var(--text-muted); padding: 20px;">جاري تحميل سجلات تشغيل المعدات...</td></tr>
+                                <tr><td colspan="16" style="text-align: center; color: var(--text-muted); padding: 20px;">جاري تحميل سجلات تشغيل المعدات...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -3918,6 +3969,21 @@ select {
                     <textarea id="edit-eq-notes" class="modal-input" style="width: 100%; min-height: 65px; resize: vertical;" placeholder="بيان تفصيلي بالأعمال التي أنجزتها المعدة..."></textarea>
                 </div>
 
+                <!-- Photos Management Bar in Edit Modal -->
+                <div style="background: var(--surface-color); padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <strong style="color: var(--text-main); font-size: 0.92rem; display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-camera text-primary"></i> صور التشغيل (قبل / بعد العمل)
+                        </strong>
+                        <span id="edit-eq-photos-count-text" style="font-size: 0.8rem; color: var(--text-muted);">
+                            جاري فحص الصور المسجلة...
+                        </span>
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="app.openEquipmentPhotosModal(document.getElementById('edit-eq-id').value)" style="display: inline-flex; align-items: center; gap: 6px; font-weight: bold; background: rgba(99,102,241,0.1); color: #4f46e5; border-color: #6366f1;">
+                        <i class="fas fa-images"></i> استعراض وإدارة الصور
+                    </button>
+                </div>
+
                 <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);">
                     <button type="button" class="btn btn-danger" id="btn-modal-delete-eq" style="display: flex; align-items: center; gap: 6px; font-weight: bold;">
                         <i class="fas fa-trash-alt"></i> مسح السجل نهائياً
@@ -3932,6 +3998,109 @@ select {
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal: Equipment Photos Management -->
+    <div id="modal-equipment-photos" class="modal" style="display: none; position: fixed; inset: 0; background: rgba(9, 30, 66, 0.7); z-index: 10050; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div class="card" style="width: 100%; max-width: 840px; max-height: 92vh; display: flex; flex-direction: column; position: relative; margin: 15px; border-radius: 14px; box-shadow: 0 12px 35px rgba(0,0,0,0.3); background: var(--bg-card); border: 1px solid var(--border-color); overflow: hidden;">
+            
+            <!-- Header -->
+            <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--surface-color);">
+                <div>
+                    <h3 id="modal-eq-photos-title" style="margin: 0; font-size: 1.2rem; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-camera text-primary"></i> صور تشغيل وساعات المعدة
+                    </h3>
+                    <div id="modal-eq-photos-subtitle" style="font-size: 0.83rem; color: var(--text-muted); margin-top: 3px;">
+                        <!-- Subtitle filled dynamically -->
+                    </div>
+                </div>
+                <button type="button" class="btn-icon" onclick="app.closeEquipmentPhotosModal()" style="font-size: 1.6rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 4px 8px;">&times;</button>
+            </div>
+
+            <!-- Body Scrollable -->
+            <div style="padding: 18px 20px; overflow-y: auto; flex: 1;">
+                
+                <!-- Notice Box -->
+                <div id="modal-eq-photos-perm-notice" style="margin-bottom: 16px; padding: 10px 14px; border-radius: 8px; font-size: 0.84rem; display: flex; align-items: center; gap: 8px;">
+                    <!-- Populated dynamically based on user role -->
+                </div>
+
+                <!-- SECTION 1: Before Work Photos -->
+                <div class="card mb-20" style="padding: 16px; border-radius: 10px; border: 1.5px solid #818cf8; background: var(--bg-card); margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                        <div>
+                            <h4 style="margin: 0; font-size: 1.05rem; color: #4338ca; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-play-circle"></i> صور قبل بدء العمل
+                                <span id="modal-before-count-badge" class="badge" style="background: rgba(99,102,241,0.12); color: #4338ca; font-size: 0.8rem; padding: 2px 8px;">0 صور</span>
+                            </h4>
+                            <span style="font-size: 0.78rem; color: var(--text-muted);">صور حالة المعدة، العداد، ومكان التشغيل قبل الانطلاق</span>
+                        </div>
+                        <div>
+                            <input type="file" id="modal-input-upload-before" accept="image/*" multiple capture="environment" style="display: none;" onchange="app.uploadPhotosToEquipmentLog('before', this.files)">
+                            <button type="button" id="btn-modal-upload-before" class="btn btn-primary btn-sm" onclick="document.getElementById('modal-input-upload-before').click()" style="display: inline-flex; align-items: center; gap: 6px; font-weight: bold; background: #6366f1; border-color: #4f46e5; padding: 6px 14px;">
+                                <i class="fas fa-plus"></i> إضافة صور قبل العمل 📷
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="modal-before-photos-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px;">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- SECTION 2: After Work Photos -->
+                <div class="card" style="padding: 16px; border-radius: 10px; border: 1.5px solid #34d399; background: var(--bg-card);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                        <div>
+                            <h4 style="margin: 0; font-size: 1.05rem; color: #065f46; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-check-circle"></i> صور بعد انتهاء العمل
+                                <span id="modal-after-count-badge" class="badge" style="background: rgba(16,185,129,0.12); color: #047857; font-size: 0.8rem; padding: 2px 8px;">0 صور</span>
+                            </h4>
+                            <span style="font-size: 0.78rem; color: var(--text-muted);">صور الأعمال المنجزة والعداد والمعدة بعد انتهاء التشغيل</span>
+                        </div>
+                        <div>
+                            <input type="file" id="modal-input-upload-after" accept="image/*" multiple capture="environment" style="display: none;" onchange="app.uploadPhotosToEquipmentLog('after', this.files)">
+                            <button type="button" id="btn-modal-upload-after" class="btn btn-success btn-sm" onclick="document.getElementById('modal-input-upload-after').click()" style="display: inline-flex; align-items: center; gap: 6px; font-weight: bold; background: #10b981; border-color: #059669; padding: 6px 14px;">
+                                <i class="fas fa-plus"></i> إضافة صور بعد العمل 📸
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="modal-after-photos-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px;">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div style="padding: 12px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; background: var(--surface-color);">
+                <button type="button" class="btn btn-secondary" onclick="app.closeEquipmentPhotosModal()">
+                    إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Lightbox Fullscreen Photo Viewer -->
+    <div id="modal-photo-lightbox" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 10100; align-items: center; justify-content: center; flex-direction: column; backdrop-filter: blur(6px); padding: 15px;">
+        <div style="width: 100%; max-width: 95vw; display: flex; justify-content: space-between; align-items: center; color: #fff; margin-bottom: 10px; padding: 0 10px;">
+            <div>
+                <h4 id="lightbox-title" style="margin: 0; font-size: 1.1rem; color: #fff;">معاينة الصورة</h4>
+                <span id="lightbox-info" style="font-size: 0.8rem; color: #cbd5e1;"></span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <a id="lightbox-download-link" href="#" download="equipment_photo.jpg" class="btn btn-sm btn-secondary" style="background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); text-decoration: none; padding: 5px 12px; border-radius: 6px; font-size: 0.85rem;" target="_blank">
+                    <i class="fas fa-download"></i> تحميل
+                </a>
+                <button type="button" onclick="app.closePhotoLightbox()" style="background: rgba(255,255,255,0.2); border: none; color: #fff; font-size: 1.5rem; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                    &times;
+                </button>
+            </div>
+        </div>
+        <div style="max-width: 95vw; max-height: 85vh; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+            <img id="lightbox-img" src="" style="max-width: 100%; max-height: 85vh; object-fit: contain; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);">
         </div>
     </div>
 
@@ -5949,6 +6118,8 @@ document.addEventListener('keydown', (e) => {
         window.app = this;
         this.currentWorkers = [];
         this.directoryWorkers = [];
+        this.draftEquipmentPhotos = { before: [], after: [] };
+        this.currentViewingEquipmentLogId = null;
         this.init();
     }
 
@@ -11485,6 +11656,111 @@ document.addEventListener('keydown', (e) => {
         if (costEl) costEl.innerText = finalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
+    compressImageFile(file, maxDimension = 1200, quality = 0.75) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > height) {
+                        if (width > maxDimension) {
+                            height = Math.round((height * maxDimension) / width);
+                            width = maxDimension;
+                        }
+                    } else {
+                        if (height > maxDimension) {
+                            width = Math.round((width * maxDimension) / height);
+                            height = maxDimension;
+                        }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    resolve({
+                        dataUrl,
+                        width,
+                        height,
+                        size: Math.round(dataUrl.length * 0.75)
+                    });
+                };
+                img.onerror = () => reject(new Error('فشل قراءة ملف الصورة'));
+                img.src = e.target.result;
+            };
+            reader.onerror = () => reject(new Error('فشل تحميل الملف'));
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async handleEquipmentDraftPhotoSelect(type, files) {
+        if (!files || files.length === 0) return;
+        const user = auth.currentUser;
+        const uploaderName = (user && user.username === 'admin') ? 'Bishoy Mamdouh' : (user ? (user.username || user.name) : 'مشرف');
+        const uploaderRole = auth.getRole();
+
+        if (!this.draftEquipmentPhotos) {
+            this.draftEquipmentPhotos = { before: [], after: [] };
+        }
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (!file.type.startsWith('image/')) continue;
+            try {
+                const comp = await this.compressImageFile(file, 1200, 0.75);
+                this.draftEquipmentPhotos[type].push({
+                    id: 'ph_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                    url: comp.dataUrl,
+                    name: file.name,
+                    timestamp: new Date().toISOString(),
+                    uploadedById: user ? user.id : 'unknown',
+                    uploadedByName: uploaderName,
+                    uploadedByRole: uploaderRole,
+                    type: type
+                });
+            } catch(e) {
+                console.error('Image compression error:', e);
+            }
+        }
+        this.renderDraftEquipmentPhotos();
+        const inp = document.getElementById(type === 'before' ? 'eq-entry-photos-before' : 'eq-entry-photos-after');
+        if (inp) inp.value = '';
+    }
+
+    removeDraftEquipmentPhoto(type, index) {
+        if (this.draftEquipmentPhotos && this.draftEquipmentPhotos[type]) {
+            this.draftEquipmentPhotos[type].splice(index, 1);
+            this.renderDraftEquipmentPhotos();
+        }
+    }
+
+    renderDraftEquipmentPhotos() {
+        ['before', 'after'].forEach(type => {
+            const countEl = document.getElementById(type === 'before' ? 'eq-before-photos-count' : 'eq-after-photos-count');
+            const previewEl = document.getElementById(type === 'before' ? 'eq-entry-photos-before-preview' : 'eq-entry-photos-after-preview');
+            const list = (this.draftEquipmentPhotos && this.draftEquipmentPhotos[type]) || [];
+
+            if (countEl) {
+                countEl.innerText = list.length + ' صور';
+            }
+            if (previewEl) {
+                if (list.length === 0) {
+                    previewEl.innerHTML = '';
+                } else {
+                    previewEl.innerHTML = list.map((p, idx) => `
+                        <div style="position: relative; width: 68px; height: 68px; border-radius: 8px; overflow: hidden; border: 1.5px solid ${type === 'before' ? '#6366f1' : '#10b981'}; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <img src="${p.url}" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="app.openPhotoLightbox('${p.url}', '${type === 'before' ? 'صور قبل العمل' : 'صور بعد العمل'}', 'معاينة قبل الحفظ')" title="اضغط للتكبير">
+                            <button type="button" onclick="event.stopPropagation(); app.removeDraftEquipmentPhoto('${type}', ${idx})" style="position: absolute; top: 2px; right: 2px; background: rgba(239,68,68,0.92); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;" title="إلغاء اختيار هذه الصورة">&times;</button>
+                        </div>
+                    `).join('');
+                }
+            }
+        });
+    }
+
     async submitEquipmentLog() {
         const dateInput = document.getElementById('eq-entry-date');
         const select = document.getElementById('eq-entry-select');
@@ -11622,6 +11898,8 @@ document.addEventListener('keydown', (e) => {
             grossCost: grossCost,
             totalCost: totalCost,
             notes: notes,
+            beforePhotos: (this.draftEquipmentPhotos && Array.isArray(this.draftEquipmentPhotos.before)) ? [...this.draftEquipmentPhotos.before] : [],
+            afterPhotos: (this.draftEquipmentPhotos && Array.isArray(this.draftEquipmentPhotos.after)) ? [...this.draftEquipmentPhotos.after] : [],
             createdById: user ? user.id : 'unknown',
             createdByName: (user && user.username === 'admin') ? 'Bishoy Mamdouh' : (user ? (user.username || user.name) : 'مشرف'),
             createdByRole: user ? user.role : 'supervisor',
@@ -11683,6 +11961,12 @@ document.addEventListener('keydown', (e) => {
             }
 
             // Clear inputs for next log
+            this.draftEquipmentPhotos = { before: [], after: [] };
+            this.renderDraftEquipmentPhotos();
+            const pBefore = document.getElementById('eq-entry-photos-before');
+            if (pBefore) pBefore.value = '';
+            const pAfter = document.getElementById('eq-entry-photos-after');
+            if (pAfter) pAfter.value = '';
             select.value = '';
             const badge = document.getElementById('eq-entry-contractor-badge');
             if (badge) badge.style.display = 'none';
@@ -11880,7 +12164,7 @@ document.addEventListener('keydown', (e) => {
         filtered.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (new Date(b.createdAt || 0) - new Date(a.createdAt || 0)));
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="15" style="text-align: center; color: var(--text-muted); padding: 25px;"><i class="fas fa-info-circle"></i> لا توجد سجلات تشغيل معدات مسجلة تطابق الفلتر المحدد</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="16" style="text-align: center; color: var(--text-muted); padding: 25px;"><i class="fas fa-info-circle"></i> لا توجد سجلات تشغيل معدات مسجلة تطابق الفلتر المحدد</td></tr>`;
             return;
         }
 
@@ -11894,6 +12178,25 @@ document.addEventListener('keydown', (e) => {
             const breakText = (Number(l.breakHours || 0) > 0) ? `<span style="color: #f59e0b; font-weight: bold;">${Number(l.breakHours).toFixed(2)} س</span> ${l.breakReason ? '(' + l.breakReason + ')' : ''}` : '<span style="color: var(--text-muted);">-</span>';
             const dedMoney = Number(l.deductionAmount !== undefined ? l.deductionAmount : (l.deduction || 0));
             const dedBadge = (dedMoney > 0) ? `<span style="background: rgba(239, 68, 68, 0.1); color: #dc2626; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85rem;">-${dedMoney.toFixed(2)} ج.م</span>` : '<span style="color: var(--text-muted);">-</span>';
+            
+            const beforeCount = Array.isArray(l.beforePhotos) ? l.beforePhotos.length : 0;
+            const afterCount = Array.isArray(l.afterPhotos) ? l.afterPhotos.length : 0;
+            const totalPhotos = beforeCount + afterCount;
+            let photosCellHtml = '';
+            if (totalPhotos > 0) {
+                photosCellHtml = `
+                    <button type="button" class="btn btn-sm" onclick="app.openEquipmentPhotosModal('${l.id}')" style="background: rgba(99,102,241,0.12); color: #4338ca; border: 1px solid #6366f1; border-radius: 6px; padding: 4px 8px; font-weight: 700; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;" title="عرض وإدارة صور تشغيل المعدة">
+                        <i class="fas fa-camera"></i> ${totalPhotos} صورة
+                        <small style="color: #6366f1; font-weight: normal;">(${beforeCount} قبل / ${afterCount} بعد)</small>
+                    </button>
+                `;
+            } else {
+                photosCellHtml = `
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="app.openEquipmentPhotosModal('${l.id}')" style="background: transparent; color: var(--text-muted); border: 1px dashed var(--border-color); border-radius: 6px; padding: 3px 8px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;" title="رفع صور للمعدة قبل أو بعد العمل">
+                        <i class="fas fa-plus"></i> صور
+                    </button>
+                `;
+            }
             
             let statusBadge = '';
             if (l.status === 'pending') {
@@ -11985,6 +12288,7 @@ document.addEventListener('keydown', (e) => {
                     <td style="text-align: center;">${dedBadge}</td>
                     <td style="text-align: center;">${statusBadge}</td>
                     <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${l.notes || ''}">${l.notes || '-'}</td>
+                    <td style="text-align: center;">${photosCellHtml}</td>
                     <td style="text-align: center;">${actionHtml}</td>
                 </tr>
             `;
@@ -12050,6 +12354,46 @@ document.addEventListener('keydown', (e) => {
             filtered.forEach(l => {
                 const codeBadge = l.equipmentCode ? `<span style="background: rgba(99,102,241,0.1); color: #6366f1; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem; font-weight: bold;">${l.equipmentCode}</span>` : '';
                 const breakText = (l.breakHours > 0) ? `${Number(l.breakHours).toFixed(2)} س (${l.breakReason || 'استقطاع'})` : 'لا يوجد';
+                
+                const beforePhotos = Array.isArray(l.beforePhotos) ? l.beforePhotos : [];
+                const afterPhotos = Array.isArray(l.afterPhotos) ? l.afterPhotos : [];
+                const totalPhotos = beforePhotos.length + afterPhotos.length;
+                let photosPreviewHtml = `
+                    <div style="margin-top: 10px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                            <div style="font-size: 0.88rem; font-weight: bold; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-camera text-primary"></i> صور التشغيل:
+                                <span class="badge" style="background: rgba(99,102,241,0.12); color: #4338ca; font-size: 0.8rem; padding: 2px 8px;">
+                                    ${totalPhotos} صورة (${beforePhotos.length} قبل العمل / ${afterPhotos.length} بعد العمل)
+                                </span>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="app.openEquipmentPhotosModal('${l.id}')" style="padding: 4px 10px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-images"></i> استعراض وإدارة الصور
+                            </button>
+                        </div>
+                        ${totalPhotos > 0 ? `
+                            <div style="display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; padding-bottom: 4px;">
+                                ${beforePhotos.slice(0, 4).map(p => `
+                                    <div style="position: relative; flex-shrink: 0; cursor: pointer; width: 60px; height: 60px; border-radius: 6px; overflow: hidden; border: 1.5px solid #6366f1;" onclick="app.openPhotoLightbox('${p.url}', 'صور قبل العمل - ${l.equipmentName}', 'رفع: ${p.uploadedByName || ''}')">
+                                        <img src="${p.url}" style="width: 100%; height: 100%; object-fit: cover;" title="قبل العمل - اضغط للتكبير">
+                                        <span style="position: absolute; bottom: 2px; right: 2px; background: rgba(99,102,241,0.9); color: #fff; font-size: 0.62rem; padding: 1px 4px; border-radius: 3px; font-weight: bold;">قبل</span>
+                                    </div>
+                                `).join('')}
+                                ${afterPhotos.slice(0, 4).map(p => `
+                                    <div style="position: relative; flex-shrink: 0; cursor: pointer; width: 60px; height: 60px; border-radius: 6px; overflow: hidden; border: 1.5px solid #10b981;" onclick="app.openPhotoLightbox('${p.url}', 'صور بعد العمل - ${l.equipmentName}', 'رفع: ${p.uploadedByName || ''}')">
+                                        <img src="${p.url}" style="width: 100%; height: 100%; object-fit: cover;" title="بعد العمل - اضغط للتكبير">
+                                        <span style="position: absolute; bottom: 2px; right: 2px; background: rgba(16,185,129,0.9); color: #fff; font-size: 0.62rem; padding: 1px 4px; border-radius: 3px; font-weight: bold;">بعد</span>
+                                    </div>
+                                `).join('')}
+                                ${totalPhotos > 8 ? `
+                                    <div style="width: 60px; height: 60px; border-radius: 6px; background: rgba(99,102,241,0.08); border: 1px dashed #6366f1; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; color: #4338ca; cursor: pointer;" onclick="app.openEquipmentPhotosModal('${l.id}')">
+                                        +${totalPhotos - 8}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
                 
                 let badgeHtml = '';
                 if (l.status === 'pending') {
@@ -12146,6 +12490,8 @@ document.addEventListener('keydown', (e) => {
 
                         ${l.notes ? `<div style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted); background: var(--surface-color); padding: 8px 12px; border-radius: 6px;"><strong>بيان الأعمال والملاحظات:</strong> ${l.notes}</div>` : ''}
                         ${l.rejectReason ? `<div style="margin-top: 10px; font-size: 0.85rem; color: #b91c1c; background: #fef2f2; border: 1px solid #ef4444; padding: 8px 12px; border-radius: 6px;"><strong>سبب الرفض:</strong> ${l.rejectReason}</div>` : ''}
+
+                        ${photosPreviewHtml}
 
                         ${actionsHtml}
                     </div>
@@ -12831,6 +13177,18 @@ document.addEventListener('keydown', (e) => {
         if (costInput) costInput.value = Number(log.totalCost || 0).toFixed(2);
         if (notesInput) notesInput.value = log.notes || '';
 
+        const photosSummaryEl = document.getElementById('edit-eq-photos-count-text');
+        if (photosSummaryEl) {
+            const bLen = Array.isArray(log.beforePhotos) ? log.beforePhotos.length : 0;
+            const aLen = Array.isArray(log.afterPhotos) ? log.afterPhotos.length : 0;
+            const tot = bLen + aLen;
+            if (tot > 0) {
+                photosSummaryEl.innerHTML = `<span style="color: #4338ca; font-weight: bold;">${tot} صور مسجلة</span> (${bLen} قبل بدء العمل / ${aLen} بعد انتهاء العمل)`;
+            } else {
+                photosSummaryEl.innerText = 'لا توجد صور مسجلة حتى الآن - اضغط لإضافة أو رفع صور';
+            }
+        }
+
         // Configure delete button inside modal
         const delBtn = document.getElementById('btn-modal-delete-eq');
         if (delBtn) {
@@ -13063,6 +13421,356 @@ document.addEventListener('keydown', (e) => {
         }
     }
 
+
+    // --- Equipment Photos Management & Lightbox ---
+
+    async openEquipmentPhotosModal(logId) {
+        if (!logId) return;
+        this.currentViewingEquipmentLogId = logId;
+
+        let log = (this.allEquipmentLogs || []).find(l => String(l.id) === String(logId));
+        if (!log) {
+            try {
+                const logs = await db.getAll('equipment_logs') || [];
+                log = logs.find(l => String(l.id) === String(logId));
+            } catch(e) {}
+        }
+        if (!log) {
+            alert('تعذر العثور على سجل المعدة المطلوب.');
+            return;
+        }
+
+        this.renderEquipmentPhotosModal(log);
+        const modal = document.getElementById('modal-equipment-photos');
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+
+    closeEquipmentPhotosModal() {
+        const modal = document.getElementById('modal-equipment-photos');
+        if (modal) modal.style.display = 'none';
+        this.currentViewingEquipmentLogId = null;
+    }
+
+    renderEquipmentPhotosModal(log) {
+        if (!log) return;
+
+        const titleEl = document.getElementById('modal-eq-photos-title');
+        const subEl = document.getElementById('modal-eq-photos-subtitle');
+        const permNoticeEl = document.getElementById('modal-eq-photos-perm-notice');
+        const beforeGrid = document.getElementById('modal-before-photos-grid');
+        const afterGrid = document.getElementById('modal-after-photos-grid');
+        const beforeCountBadge = document.getElementById('modal-before-count-badge');
+        const afterCountBadge = document.getElementById('modal-after-count-badge');
+
+        const role = auth.getRole();
+        const user = auth.currentUser;
+        const isEngineerOrAdmin = !!(role === 'admin' || role === 'engineer' || (user && user.username === 'admin'));
+
+        const codeStr = log.equipmentCode ? ` (${log.equipmentCode})` : '';
+        if (titleEl) {
+            titleEl.innerHTML = `<i class="fas fa-camera text-primary"></i> صور تشغيل: <strong>${log.equipmentName}${codeStr}</strong>`;
+        }
+
+        let statusText = 'قيد الانتظار';
+        let statusColor = '#d97706';
+        if (log.status === 'approved') {
+            statusText = `معتمد (${log.approvedByName || 'المهندس'})`;
+            statusColor = '#059669';
+        } else if (log.status === 'rejected') {
+            statusText = `مرفوض ${log.rejectReason ? '(' + log.rejectReason + ')' : ''}`;
+            statusColor = '#dc2626';
+        }
+
+        if (subEl) {
+            subEl.innerHTML = `
+                <span><i class="far fa-calendar-alt"></i> ${UI.formatDisplayDate(log.date)}</span> | 
+                <span><i class="fas fa-map-marker-alt"></i> ${log.location || '-'}</span> | 
+                <span><i class="fas fa-hard-hat"></i> المهندس: <strong>${log.engineerName || '-'}</strong></span> | 
+                <span><i class="fas fa-user-circle"></i> السائق: ${log.driverName || '-'}</span> | 
+                <span style="color: ${statusColor}; font-weight: bold;"><i class="fas fa-info-circle"></i> ${statusText}</span>
+            `;
+        }
+
+        if (permNoticeEl) {
+            if (isEngineerOrAdmin) {
+                permNoticeEl.style.background = '#eff6ff';
+                permNoticeEl.style.border = '1px solid #bfdbfe';
+                permNoticeEl.style.color = '#1e40af';
+                permNoticeEl.innerHTML = '<i class="fas fa-user-shield" style="font-size: 1.15rem; color: #2563eb;"></i> <div><strong>صلاحيات المهندس / مدير النظام:</strong> يمكنك إضافة صور جديدة في أي وقت، ولك كامل الصلاحية في مراجعة وتعديل ومسح أي صورة غير ملائمة من السجل.</div>';
+            } else {
+                permNoticeEl.style.background = '#fefce8';
+                permNoticeEl.style.border = '1px solid #fef08a';
+                permNoticeEl.style.color = '#854d0e';
+                permNoticeEl.innerHTML = '<i class="fas fa-lock" style="font-size: 1.15rem; color: #ca8a04;"></i> <div><strong>صلاحيات المشرف:</strong> يمكنك إضافة والتقاط صور جديدة في أي وقت لتوثيق العمل. الصور المحفوظة بالسجل مشفرة ومؤمنة ولا يمكن مسحها لضمان نزاهة ومصداقية التقارير.</div>';
+            }
+        }
+
+        const beforePhotos = Array.isArray(log.beforePhotos) ? log.beforePhotos : [];
+        const afterPhotos = Array.isArray(log.afterPhotos) ? log.afterPhotos : [];
+
+        if (beforeCountBadge) beforeCountBadge.innerText = `${beforePhotos.length} صور`;
+        if (afterCountBadge) afterCountBadge.innerText = `${afterPhotos.length} صور`;
+
+        // Render Before Grid
+        if (beforeGrid) {
+            if (beforePhotos.length === 0) {
+                beforeGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 22px; background: var(--surface-color); border-radius: 8px; border: 1px dashed var(--border-color);">
+                        <i class="fas fa-camera" style="font-size: 1.8rem; color: #cbd5e1; margin-bottom: 6px; display: block;"></i>
+                        لا توجد صور مسجلة قبل بدء العمل حتى الآن
+                    </div>
+                `;
+            } else {
+                beforeGrid.innerHTML = beforePhotos.map(p => this.renderSinglePhotoCard(p, 'before', log.id, isEngineerOrAdmin)).join('');
+            }
+        }
+
+        // Render After Grid
+        if (afterGrid) {
+            if (afterPhotos.length === 0) {
+                afterGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 22px; background: var(--surface-color); border-radius: 8px; border: 1px dashed var(--border-color);">
+                        <i class="fas fa-camera" style="font-size: 1.8rem; color: #cbd5e1; margin-bottom: 6px; display: block;"></i>
+                        لا توجد صور مسجلة بعد انتهاء العمل حتى الآن
+                    </div>
+                `;
+            } else {
+                afterGrid.innerHTML = afterPhotos.map(p => this.renderSinglePhotoCard(p, 'after', log.id, isEngineerOrAdmin)).join('');
+            }
+        }
+    }
+
+    renderSinglePhotoCard(p, type, logId, isEngineerOrAdmin) {
+        const timeStr = UI.formatCairoDateTime(p.timestamp);
+        const roleLabel = (auth && typeof auth.getRoleNameAr === 'function') ? auth.getRoleNameAr(p.uploadedByRole || 'supervisor') : (p.uploadedByRole || '');
+        const uploaderStr = `${p.uploadedByName || 'مشرف'} (${roleLabel})`;
+        const titleSafe = (type === 'before' ? 'صور قبل بدء العمل' : 'صور بعد انتهاء العمل');
+
+        let actionBtnHtml = '';
+        if (isEngineerOrAdmin) {
+            actionBtnHtml = `
+                <button type="button" class="btn btn-sm btn-danger" onclick="app.deletePhotoFromEquipmentLog('${logId}', '${type}', '${p.id}')" style="padding: 3px 8px; font-size: 0.75rem; border-radius: 5px; font-weight: bold; display: inline-flex; align-items: center; gap: 4px;" title="مسح هذه الصورة نهائياً من سجل المعدة">
+                    <i class="fas fa-trash-alt"></i> مسح
+                </button>
+            `;
+        } else {
+            actionBtnHtml = `
+                <span class="badge" style="background: rgba(148,163,184,0.15); color: var(--text-muted); font-size: 0.72rem; padding: 3px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px;" title="لا يملك المشرف صلاحية مسح الصور المسجلة">
+                    <i class="fas fa-lock"></i> محفوظة بالسجل
+                </span>
+            `;
+        }
+
+        return `
+            <div class="photo-card" style="border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: var(--bg-card); display: flex; flex-direction: column; box-shadow: 0 1px 4px rgba(0,0,0,0.06);">
+                <div style="position: relative; width: 100%; padding-top: 75%; background: #0f172a; cursor: pointer;" onclick="app.openPhotoLightbox('${p.url}', '${titleSafe}', 'تم الرفع بواسطة: ${uploaderStr} - ${timeStr}')">
+                    <img src="${p.url}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 40%); opacity: 0; transition: opacity 0.2s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0">
+                        <span style="position: absolute; bottom: 6px; left: 6px; color: #fff; font-size: 0.75rem; display: flex; align-items: center; gap: 4px;">
+                            <i class="fas fa-search-plus"></i> تكبير
+                        </span>
+                    </div>
+                </div>
+                <div style="padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; flex: 1; justify-content: space-between;">
+                    <div style="font-size: 0.73rem; color: var(--text-muted); line-height: 1.35;">
+                        <div style="font-weight: 600; color: var(--text-main); margin-bottom: 2px;">
+                            <i class="far fa-user"></i> ${uploaderStr}
+                        </div>
+                        <div><i class="far fa-clock"></i> ${timeStr}</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-color); padding-top: 6px; margin-top: 4px;">
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="app.openPhotoLightbox('${p.url}', '${titleSafe}', 'تم الرفع بواسطة: ${uploaderStr} - ${timeStr}')" style="padding: 2px 7px; font-size: 0.75rem;" title="عرض مكبر">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                        ${actionBtnHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    async uploadPhotosToEquipmentLog(type, files) {
+        if (!files || files.length === 0) return;
+        const logId = this.currentViewingEquipmentLogId;
+        if (!logId) {
+            alert('تعذر تحديد سجل المعدة.');
+            return;
+        }
+
+        const btn = document.getElementById(type === 'before' ? 'btn-modal-upload-before' : 'btn-modal-upload-after');
+        const origText = btn ? btn.innerHTML : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري ضغط ورفع الصور...';
+        }
+
+        try {
+            const user = auth.currentUser;
+            const uploaderName = (user && user.username === 'admin') ? 'Bishoy Mamdouh' : (user ? (user.username || user.name) : 'مشرف');
+            const uploaderRole = auth.getRole();
+
+            const newPhotos = [];
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (!file.type.startsWith('image/')) continue;
+                const comp = await this.compressImageFile(file, 1200, 0.75);
+                newPhotos.push({
+                    id: 'ph_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                    url: comp.dataUrl,
+                    name: file.name,
+                    timestamp: new Date().toISOString(),
+                    uploadedById: user ? user.id : 'unknown',
+                    uploadedByName: uploaderName,
+                    uploadedByRole: uploaderRole,
+                    type: type
+                });
+            }
+
+            if (newPhotos.length === 0) {
+                alert('لم يتم اختيار أي ملفات صور صالحة.');
+                return;
+            }
+
+            let logs = await db.getAll('equipment_logs') || [];
+            let log = logs.find(l => String(l.id) === String(logId));
+            if (!log) {
+                alert('تعذر العثور على السجل في قاعدة البيانات.');
+                return;
+            }
+
+            const key = (type === 'before') ? 'beforePhotos' : 'afterPhotos';
+            const currentList = Array.isArray(log[key]) ? log[key] : [];
+            log[key] = [...currentList, ...newPhotos];
+            log.lastModifiedAt = new Date().toISOString();
+            log.lastModifiedBy = uploaderName;
+
+            await db.update('equipment_logs', log.id, log);
+
+            // Update local memory
+            if (this.allEquipmentLogs) {
+                const idx = this.allEquipmentLogs.findIndex(l => String(l.id) === String(log.id));
+                if (idx >= 0) this.allEquipmentLogs[idx] = log;
+            }
+
+            // Re-render modal
+            this.renderEquipmentPhotosModal(log);
+
+            // Re-render background lists
+            this.renderEquipmentEntryTable();
+            if (this.currentEngineerTab === 'equipment') {
+                this.renderEngineerEquipmentList();
+            }
+
+            if (window.showAppNotification) {
+                window.showAppNotification(`تم رفع وحفظ (${newPhotos.length}) صور جديدة بنجاح! 📸✅`, 'success');
+            } else {
+                alert('تم رفع وحفظ الصور بنجاح!');
+            }
+        } catch(err) {
+            console.error('Error uploading photos:', err);
+            alert('حدث خطأ أثناء رفع الصور: ' + err.message);
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = origText;
+            }
+            const inp = document.getElementById(type === 'before' ? 'modal-input-upload-before' : 'modal-input-upload-after');
+            if (inp) inp.value = '';
+        }
+    }
+
+    async deletePhotoFromEquipmentLog(logId, type, photoId) {
+        const role = auth.getRole();
+        const isEngineerOrAdmin = !!(role === 'admin' || role === 'engineer' || (auth.currentUser && auth.currentUser.username === 'admin'));
+
+        if (!isEngineerOrAdmin) {
+            alert('عفواً، لا يملك المشرف صلاحية مسح الصور بعد تسجيلها. يحق للمهندس ومدير النظام فقط حذف الصور.');
+            return;
+        }
+
+        if (!confirm('هل أنت متأكد من مسح هذه الصورة نهائياً من سجل تشغيل المعدة؟')) {
+            return;
+        }
+
+        try {
+            let logs = await db.getAll('equipment_logs') || [];
+            let log = logs.find(l => String(l.id) === String(logId));
+            if (!log) {
+                alert('تعذر العثور على السجل في قاعدة البيانات.');
+                return;
+            }
+
+            const key = (type === 'before') ? 'beforePhotos' : 'afterPhotos';
+            const currentList = Array.isArray(log[key]) ? log[key] : [];
+            log[key] = currentList.filter(p => p.id !== photoId);
+            log.lastModifiedAt = new Date().toISOString();
+            log.lastModifiedBy = auth.currentUser ? (auth.currentUser.username || auth.currentUser.name) : 'مهندس';
+
+            await db.update('equipment_logs', log.id, log);
+
+            // Update local memory
+            if (this.allEquipmentLogs) {
+                const idx = this.allEquipmentLogs.findIndex(l => String(l.id) === String(log.id));
+                if (idx >= 0) this.allEquipmentLogs[idx] = log;
+            }
+
+            // Re-render modal
+            this.renderEquipmentPhotosModal(log);
+
+            // Re-render background lists
+            this.renderEquipmentEntryTable();
+            if (this.currentEngineerTab === 'equipment') {
+                this.renderEngineerEquipmentList();
+            }
+
+            if (window.showAppNotification) {
+                window.showAppNotification('تم مسح الصورة من سجل المعدة بنجاح 🗑️', 'info');
+            } else {
+                alert('تم مسح الصورة بنجاح');
+            }
+        } catch(err) {
+            console.error('Error deleting photo:', err);
+            alert('حدث خطأ أثناء مسح الصورة: ' + err.message);
+        }
+    }
+
+    openPhotoLightbox(photoUrl, title, infoText) {
+        const modal = document.getElementById('modal-photo-lightbox');
+        const img = document.getElementById('lightbox-img');
+        const titleEl = document.getElementById('lightbox-title');
+        const infoEl = document.getElementById('lightbox-info');
+        const downloadLink = document.getElementById('lightbox-download-link');
+
+        if (!modal || !img) return;
+
+        img.src = photoUrl;
+        if (titleEl) titleEl.innerText = title || 'معاينة الصورة';
+        if (infoEl) infoEl.innerText = infoText || '';
+        if (downloadLink) {
+            downloadLink.href = photoUrl;
+            downloadLink.download = (title ? title.replace(/\s+/g, '_') : 'photo') + '.jpg';
+        }
+
+        modal.style.display = 'flex';
+
+        this._lightboxEscHandler = (e) => {
+            if (e.key === 'Escape') this.closePhotoLightbox();
+        };
+        window.addEventListener('keydown', this._lightboxEscHandler);
+    }
+
+    closePhotoLightbox() {
+        const modal = document.getElementById('modal-photo-lightbox');
+        if (modal) modal.style.display = 'none';
+        const img = document.getElementById('lightbox-img');
+        if (img) img.src = '';
+        if (this._lightboxEscHandler) {
+            window.removeEventListener('keydown', this._lightboxEscHandler);
+            this._lightboxEscHandler = null;
+        }
+    }
     async deleteEquipmentLog(id) {
         let logs = [];
         try { logs = await db.getAll('equipment_logs') || []; } catch(e){}

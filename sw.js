@@ -1,4 +1,4 @@
-// Service Worker v8.8 - Fixed contractor deduction report print layout & clean page breaks
+// Service Worker v8.9 - Added before & after equipment work photo uploads with role-based moderation
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
