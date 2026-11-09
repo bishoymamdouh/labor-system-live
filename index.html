@@ -1562,9 +1562,9 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=8.9').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=9.0').then(reg => {
                 reg.update();
-                console.log('ServiceWorker v8.9 registered cleanly.');
+                console.log('ServiceWorker v9.0 registered cleanly.');
             });
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -2990,10 +2990,15 @@ select {
                                         </label>
                                         <span id="eq-before-photos-count" class="badge" style="background: rgba(99,102,241,0.12); color: #4338ca; font-size: 0.76rem; padding: 2px 7px;">0 صور</span>
                                     </div>
-                                    <div style="display: flex; gap: 8px; align-items: center;">
-                                        <input type="file" id="eq-entry-photos-before" accept="image/*" multiple capture="environment" style="display: none;" onchange="app.handleEquipmentDraftPhotoSelect('before', this.files)">
-                                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('eq-entry-photos-before').click()" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; padding: 5px 12px; background: rgba(99,102,241,0.08); color: #4f46e5; border-color: #818cf8;">
-                                            <i class="fas fa-camera"></i> التقاط أو اختيار صور
+                                    <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                                        <input type="file" id="eq-entry-photos-before-cam" accept="image/*" capture="environment" style="display: none;" onchange="app.handleEquipmentDraftPhotoSelect('before', this.files)">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('eq-entry-photos-before-cam').click()" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; padding: 5px 10px; background: rgba(99,102,241,0.1); color: #4338ca; border: 1px solid #818cf8; font-weight: 600;" title="التقاط صورة مباشرة بالكاميرا">
+                                            <i class="fas fa-camera"></i> بالكاميرا 📸
+                                        </button>
+
+                                        <input type="file" id="eq-entry-photos-before-gallery" accept="image/*" multiple style="display: none;" onchange="app.handleEquipmentDraftPhotoSelect('before', this.files)">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('eq-entry-photos-before-gallery').click()" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; padding: 5px 10px; background: rgba(99,102,241,0.06); color: #4338ca; border: 1px dashed #818cf8; font-weight: 600;" title="اختيار صورة أو عدة صور من الاستوديو / المعرض">
+                                            <i class="fas fa-images"></i> من الاستوديو 🖼️
                                         </button>
                                     </div>
                                     <div id="eq-entry-photos-before-preview" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;"></div>
@@ -3007,10 +3012,15 @@ select {
                                         </label>
                                         <span id="eq-after-photos-count" class="badge" style="background: rgba(16,185,129,0.12); color: #047857; font-size: 0.76rem; padding: 2px 7px;">0 صور</span>
                                     </div>
-                                    <div style="display: flex; gap: 8px; align-items: center;">
-                                        <input type="file" id="eq-entry-photos-after" accept="image/*" multiple capture="environment" style="display: none;" onchange="app.handleEquipmentDraftPhotoSelect('after', this.files)">
-                                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('eq-entry-photos-after').click()" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; padding: 5px 12px; background: rgba(16,185,129,0.08); color: #059669; border-color: #34d399;">
-                                            <i class="fas fa-camera"></i> التقاط أو اختيار صور
+                                    <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                                        <input type="file" id="eq-entry-photos-after-cam" accept="image/*" capture="environment" style="display: none;" onchange="app.handleEquipmentDraftPhotoSelect('after', this.files)">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('eq-entry-photos-after-cam').click()" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; padding: 5px 10px; background: rgba(16,185,129,0.1); color: #047857; border: 1px solid #34d399; font-weight: 600;" title="التقاط صورة مباشرة بالكاميرا">
+                                            <i class="fas fa-camera"></i> بالكاميرا 📸
+                                        </button>
+
+                                        <input type="file" id="eq-entry-photos-after-gallery" accept="image/*" multiple style="display: none;" onchange="app.handleEquipmentDraftPhotoSelect('after', this.files)">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('eq-entry-photos-after-gallery').click()" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; padding: 5px 10px; background: rgba(16,185,129,0.06); color: #047857; border: 1px dashed #34d399; font-weight: 600;" title="اختيار صورة أو عدة صور من الاستوديو / المعرض">
+                                            <i class="fas fa-images"></i> من الاستوديو 🖼️
                                         </button>
                                     </div>
                                     <div id="eq-entry-photos-after-preview" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;"></div>
@@ -4036,10 +4046,15 @@ select {
                             </h4>
                             <span style="font-size: 0.78rem; color: var(--text-muted);">صور حالة المعدة، العداد، ومكان التشغيل قبل الانطلاق</span>
                         </div>
-                        <div>
-                            <input type="file" id="modal-input-upload-before" accept="image/*" multiple capture="environment" style="display: none;" onchange="app.uploadPhotosToEquipmentLog('before', this.files)">
-                            <button type="button" id="btn-modal-upload-before" class="btn btn-primary btn-sm" onclick="document.getElementById('modal-input-upload-before').click()" style="display: inline-flex; align-items: center; gap: 6px; font-weight: bold; background: #6366f1; border-color: #4f46e5; padding: 6px 14px;">
-                                <i class="fas fa-plus"></i> إضافة صور قبل العمل 📷
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <input type="file" id="modal-upload-before-cam" accept="image/*" capture="environment" style="display: none;" onchange="app.uploadPhotosToEquipmentLog('before', this.files)">
+                            <button type="button" id="btn-modal-upload-before-cam" class="btn btn-primary btn-sm" onclick="document.getElementById('modal-upload-before-cam').click()" style="display: inline-flex; align-items: center; gap: 5px; font-weight: bold; background: #6366f1; border-color: #4f46e5; padding: 6px 12px; font-size: 0.82rem;" title="تصوير فوري بالكاميرا">
+                                <i class="fas fa-camera"></i> بالكاميرا 📸
+                            </button>
+
+                            <input type="file" id="modal-upload-before-gallery" accept="image/*" multiple style="display: none;" onchange="app.uploadPhotosToEquipmentLog('before', this.files)">
+                            <button type="button" id="btn-modal-upload-before-gallery" class="btn btn-secondary btn-sm" onclick="document.getElementById('modal-upload-before-gallery').click()" style="display: inline-flex; align-items: center; gap: 5px; font-weight: bold; background: rgba(99,102,241,0.12); color: #4338ca; border: 1.5px solid #6366f1; padding: 6px 12px; font-size: 0.82rem;" title="اختيار من استوديو / معرض الصور">
+                                <i class="fas fa-images"></i> من الاستوديو 🖼️
                             </button>
                         </div>
                     </div>
@@ -4059,10 +4074,15 @@ select {
                             </h4>
                             <span style="font-size: 0.78rem; color: var(--text-muted);">صور الأعمال المنجزة والعداد والمعدة بعد انتهاء التشغيل</span>
                         </div>
-                        <div>
-                            <input type="file" id="modal-input-upload-after" accept="image/*" multiple capture="environment" style="display: none;" onchange="app.uploadPhotosToEquipmentLog('after', this.files)">
-                            <button type="button" id="btn-modal-upload-after" class="btn btn-success btn-sm" onclick="document.getElementById('modal-input-upload-after').click()" style="display: inline-flex; align-items: center; gap: 6px; font-weight: bold; background: #10b981; border-color: #059669; padding: 6px 14px;">
-                                <i class="fas fa-plus"></i> إضافة صور بعد العمل 📸
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <input type="file" id="modal-upload-after-cam" accept="image/*" capture="environment" style="display: none;" onchange="app.uploadPhotosToEquipmentLog('after', this.files)">
+                            <button type="button" id="btn-modal-upload-after-cam" class="btn btn-success btn-sm" onclick="document.getElementById('modal-upload-after-cam').click()" style="display: inline-flex; align-items: center; gap: 5px; font-weight: bold; background: #10b981; border-color: #059669; padding: 6px 12px; font-size: 0.82rem;" title="تصوير فوري بالكاميرا">
+                                <i class="fas fa-camera"></i> بالكاميرا 📸
+                            </button>
+
+                            <input type="file" id="modal-upload-after-gallery" accept="image/*" multiple style="display: none;" onchange="app.uploadPhotosToEquipmentLog('after', this.files)">
+                            <button type="button" id="btn-modal-upload-after-gallery" class="btn btn-secondary btn-sm" onclick="document.getElementById('modal-upload-after-gallery').click()" style="display: inline-flex; align-items: center; gap: 5px; font-weight: bold; background: rgba(16,185,129,0.12); color: #047857; border: 1.5px solid #10b981; padding: 6px 12px; font-size: 0.82rem;" title="اختيار من استوديو / معرض الصور">
+                                <i class="fas fa-images"></i> من الاستوديو 🖼️
                             </button>
                         </div>
                     </div>
@@ -11726,8 +11746,10 @@ document.addEventListener('keydown', (e) => {
             }
         }
         this.renderDraftEquipmentPhotos();
-        const inp = document.getElementById(type === 'before' ? 'eq-entry-photos-before' : 'eq-entry-photos-after');
-        if (inp) inp.value = '';
+        const inpCam = document.getElementById(type === 'before' ? 'eq-entry-photos-before-cam' : 'eq-entry-photos-after-cam');
+        if (inpCam) inpCam.value = '';
+        const inpGal = document.getElementById(type === 'before' ? 'eq-entry-photos-before-gallery' : 'eq-entry-photos-after-gallery');
+        if (inpGal) inpGal.value = '';
     }
 
     removeDraftEquipmentPhoto(type, index) {
@@ -11963,10 +11985,10 @@ document.addEventListener('keydown', (e) => {
             // Clear inputs for next log
             this.draftEquipmentPhotos = { before: [], after: [] };
             this.renderDraftEquipmentPhotos();
-            const pBefore = document.getElementById('eq-entry-photos-before');
-            if (pBefore) pBefore.value = '';
-            const pAfter = document.getElementById('eq-entry-photos-after');
-            if (pAfter) pAfter.value = '';
+            ['eq-entry-photos-before-cam', 'eq-entry-photos-before-gallery', 'eq-entry-photos-after-cam', 'eq-entry-photos-after-gallery'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
             select.value = '';
             const badge = document.getElementById('eq-entry-contractor-badge');
             if (badge) badge.style.display = 'none';
@@ -13599,12 +13621,12 @@ document.addEventListener('keydown', (e) => {
             return;
         }
 
-        const btn = document.getElementById(type === 'before' ? 'btn-modal-upload-before' : 'btn-modal-upload-after');
-        const origText = btn ? btn.innerHTML : '';
-        if (btn) {
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري ضغط ورفع الصور...';
-        }
+        const btnCam = document.getElementById(type === 'before' ? 'btn-modal-upload-before-cam' : 'btn-modal-upload-after-cam');
+        const btnGal = document.getElementById(type === 'before' ? 'btn-modal-upload-before-gallery' : 'btn-modal-upload-after-gallery');
+        const origCamText = btnCam ? btnCam.innerHTML : '';
+        const origGalText = btnGal ? btnGal.innerHTML : '';
+        if (btnCam) { btnCam.disabled = true; btnCam.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
+        if (btnGal) { btnGal.disabled = true; btnGal.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...'; }
 
         try {
             const user = auth.currentUser;
@@ -13672,12 +13694,12 @@ document.addEventListener('keydown', (e) => {
             console.error('Error uploading photos:', err);
             alert('حدث خطأ أثناء رفع الصور: ' + err.message);
         } finally {
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = origText;
-            }
-            const inp = document.getElementById(type === 'before' ? 'modal-input-upload-before' : 'modal-input-upload-after');
-            if (inp) inp.value = '';
+            if (btnCam) { btnCam.disabled = false; btnCam.innerHTML = origCamText; }
+            if (btnGal) { btnGal.disabled = false; btnGal.innerHTML = origGalText; }
+            const inpCam = document.getElementById(type === 'before' ? 'modal-upload-before-cam' : 'modal-upload-after-cam');
+            if (inpCam) inpCam.value = '';
+            const inpGal = document.getElementById(type === 'before' ? 'modal-upload-before-gallery' : 'modal-upload-after-gallery');
+            if (inpGal) inpGal.value = '';
         }
     }
 

@@ -1,4 +1,4 @@
-// Service Worker v8.9 - Added before & after equipment work photo uploads with role-based moderation
+// Service Worker v9.0 - Added dual choice for camera capture vs gallery/studio photo selection
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
