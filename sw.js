@@ -1,4 +1,4 @@
-// Service Worker v9.0 - Added dual choice for camera capture vs gallery/studio photo selection
+// Service Worker v9.1 - Added local photo archival indicator & dedicated Excel backup sync
 self.addEventListener('install', e => {
   self.skipWaiting();
 });

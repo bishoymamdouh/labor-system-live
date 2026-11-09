@@ -1562,9 +1562,9 @@ select {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js?v=9.0').then(reg => {
+            navigator.serviceWorker.register('/sw.js?v=9.1').then(reg => {
                 reg.update();
-                console.log('ServiceWorker v9.0 registered cleanly.');
+                console.log('ServiceWorker v9.1 registered cleanly.');
             });
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -12212,6 +12212,12 @@ document.addEventListener('keydown', (e) => {
                         <small style="color: #6366f1; font-weight: normal;">(${beforeCount} قبل / ${afterCount} بعد)</small>
                     </button>
                 `;
+            } else if (l.photosArchived) {
+                photosCellHtml = `
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="app.openEquipmentPhotosModal('${l.id}')" style="background: rgba(100,116,139,0.1); color: #475569; border: 1px solid #94a3b8; border-radius: 6px; padding: 3px 8px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;" title="تمت أرشفة الصور في النسخ الاحتياطي المحلي بالكمبيوتر">
+                        <i class="fas fa-archive"></i> مؤرشفة محلياً 📦
+                    </button>
+                `;
             } else {
                 photosCellHtml = `
                     <button type="button" class="btn btn-sm btn-secondary" onclick="app.openEquipmentPhotosModal('${l.id}')" style="background: transparent; color: var(--text-muted); border: 1px dashed var(--border-color); border-radius: 6px; padding: 3px 8px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;" title="رفع صور للمعدة قبل أو بعد العمل">
@@ -13516,16 +13522,28 @@ document.addEventListener('keydown', (e) => {
         }
 
         if (permNoticeEl) {
+            let archiveBanner = '';
+            if (log.photosArchived) {
+                archiveBanner = `
+                    <div style="background: #f0fdf4; border: 1px solid #86efac; color: #166534; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-check-circle" style="font-size: 1.25rem; color: #22c55e; flex-shrink: 0;"></i>
+                        <div>
+                            <strong>تم أرشفة وحفظ الصور محلياً:</strong> صور تشغيل هذه المعدة تم تنزيلها وحفظها بأمان على جهاز الكمبيوتر في مجلد النسخ الاحتياطي وشيت الإكسيل (مر عليها 14 يوماً من تاريخ التشغيل). تم تفريغها من السيرفر السحابي تلقائياً للحفاظ على أعلى سرعة واستقرار.
+                        </div>
+                    </div>
+                `;
+            }
+
             if (isEngineerOrAdmin) {
                 permNoticeEl.style.background = '#eff6ff';
                 permNoticeEl.style.border = '1px solid #bfdbfe';
                 permNoticeEl.style.color = '#1e40af';
-                permNoticeEl.innerHTML = '<i class="fas fa-user-shield" style="font-size: 1.15rem; color: #2563eb;"></i> <div><strong>صلاحيات المهندس / مدير النظام:</strong> يمكنك إضافة صور جديدة في أي وقت، ولك كامل الصلاحية في مراجعة وتعديل ومسح أي صورة غير ملائمة من السجل.</div>';
+                permNoticeEl.innerHTML = archiveBanner + '<i class="fas fa-user-shield" style="font-size: 1.15rem; color: #2563eb;"></i> <div><strong>صلاحيات المهندس / مدير النظام:</strong> يمكنك إضافة صور جديدة في أي وقت، ولك كامل الصلاحية في مراجعة وتعديل ومسح أي صورة من السجل.</div>';
             } else {
                 permNoticeEl.style.background = '#fefce8';
                 permNoticeEl.style.border = '1px solid #fef08a';
                 permNoticeEl.style.color = '#854d0e';
-                permNoticeEl.innerHTML = '<i class="fas fa-lock" style="font-size: 1.15rem; color: #ca8a04;"></i> <div><strong>صلاحيات المشرف:</strong> يمكنك إضافة والتقاط صور جديدة في أي وقت لتوثيق العمل. الصور المحفوظة بالسجل مشفرة ومؤمنة ولا يمكن مسحها لضمان نزاهة ومصداقية التقارير.</div>';
+                permNoticeEl.innerHTML = archiveBanner + '<i class="fas fa-lock" style="font-size: 1.15rem; color: #ca8a04;"></i> <div><strong>صلاحيات المشرف:</strong> يمكنك إضافة والتقاط صور جديدة في أي وقت لتوثيق العمل. الصور المحفوظة بالسجل مشفرة ومؤمنة ولا يمكن مسحها لضمان نزاهة ومصداقية التقارير.</div>';
             }
         }
 
