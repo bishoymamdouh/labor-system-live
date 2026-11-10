@@ -66,6 +66,26 @@ export class D1Store {
         }
     }
 
+    async listStatus(col: string) {
+        try {
+            const { results } = await this.db.prepare(
+                "SELECT key, json_extract(value, '$.status') as status, json_extract(value, '$.engineerId') as engineerId, json_extract(value, '$.date') as date, json_extract(value, '$.createdAt') as createdAt FROM kv WHERE collection = ?"
+            ).bind(col).all();
+            return (results || []).map((r: any) => ({
+                id: r.key,
+                value: {
+                    status: r.status,
+                    engineerId: r.engineerId,
+                    date: r.date,
+                    createdAt: r.createdAt
+                }
+            }));
+        } catch (e: any) {
+            console.error("D1Store.listStatus error:", e);
+            return [];
+        }
+    }
+
     async getSubscriptionsForUser(userId: string) {
         try {
             const { results } = await this.db.prepare(
@@ -1077,11 +1097,11 @@ export async function onRequest(context: any): Promise<Response> {
             }
         }
 
-        // 4. Pending Count & Status (Instant Real-time from D1)
+        // 4. Pending Count & Status (Instant Real-time from D1 via lightweight listStatus)
         if (resource === "pendingCount" && method === "GET") {
             const engineerId = url.searchParams.get("engineerId");
-            const records = await store.list("records");
-            const eqLogs = await store.list("equipment_logs");
+            const records = await store.listStatus("records");
+            const eqLogs = await store.listStatus("equipment_logs");
             let count = 0;
             let totalCount = 0;
             for (const r of records) {
@@ -1105,8 +1125,8 @@ export async function onRequest(context: any): Promise<Response> {
 
         if (resource === "pendingStatus" && method === "GET") {
             const engineerId = url.searchParams.get("engineerId");
-            const records = await store.list("records");
-            const eqLogs = await store.list("equipment_logs");
+            const records = await store.listStatus("records");
+            const eqLogs = await store.listStatus("equipment_logs");
             const pendingList: any[] = [];
             for (const r of records) {
                 if (r.value && r.value.status === "pending") {
@@ -1529,7 +1549,7 @@ export async function onRequest(context: any): Promise<Response> {
 
                 const filters: Record<string, string> = {};
                 for (const [key, value] of url.searchParams.entries()) {
-                    if (key !== "id") filters[key] = value;
+                    if (key !== "id" && key !== "fullPhotos") filters[key] = value;
                 }
 
                 if (Object.keys(filters).length > 0) {
@@ -1538,6 +1558,40 @@ export async function onRequest(context: any): Promise<Response> {
                             if (String(item[key]) !== String(filters[key])) return false;
                         }
                         return true;
+                    });
+                }
+
+                // Optimization: Exclude heavy Base64 photo URLs from equipment_logs list query
+                // Preserves thumbnails (thumbUrl) and metadata so the list is ~10KB instead of megabytes!
+                // Full high-resolution photos are retrieved on-demand via /api/equipment_logs?id=...
+                if (resource === "equipment_logs" && url.searchParams.get("fullPhotos") !== "true") {
+                    list = list.map((item: any) => {
+                        const copy = { ...item };
+                        if (Array.isArray(copy.beforePhotos)) {
+                            copy.beforePhotos = copy.beforePhotos.map((p: any) => ({
+                                id: p.id,
+                                thumbUrl: p.thumbUrl || null,
+                                name: p.name,
+                                timestamp: p.timestamp,
+                                uploadedById: p.uploadedById,
+                                uploadedByName: p.uploadedByName,
+                                uploadedByRole: p.uploadedByRole,
+                                type: p.type
+                            }));
+                        }
+                        if (Array.isArray(copy.afterPhotos)) {
+                            copy.afterPhotos = copy.afterPhotos.map((p: any) => ({
+                                id: p.id,
+                                thumbUrl: p.thumbUrl || null,
+                                name: p.name,
+                                timestamp: p.timestamp,
+                                uploadedById: p.uploadedById,
+                                uploadedByName: p.uploadedByName,
+                                uploadedByRole: p.uploadedByRole,
+                                type: p.type
+                            }));
+                        }
+                        return copy;
                     });
                 }
 

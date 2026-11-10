@@ -1,4 +1,4 @@
-// Service Worker v9.1 - Added local photo archival indicator & dedicated Excel backup sync
+// Service Worker v9.2 - Ultra-fast equipment approval and lightweight thumbnail caching
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
