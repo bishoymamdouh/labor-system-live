@@ -73,7 +73,8 @@ function sanitizeFolderName(str: string): string {
     return (str || "معدة").replace(/[\\/:*?"<>|]/g, "_").trim();
 }
 
-const todayStr = getCairoDateStr();
+const targetDateArg = Deno.args[0];
+const todayStr = targetDateArg && /^\d{4}-\d{2}-\d{2}$/.test(targetDateArg) ? targetDateArg : getCairoDateStr();
 console.log(`======================================================================`);
 console.log(`   بدء منظومة النسخ الاحتياطي السحابي الشامل والتنظيم الثلاثي: ${todayStr}`);
 console.log(`   1. سراكي العمالة الشاملة (Excel 4 صفحات) -> [1- سراكي العمالة/]`);
